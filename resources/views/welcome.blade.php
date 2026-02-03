@@ -420,9 +420,15 @@
                 font-size: 1.75rem;
             }
 
-            .flipdown .rotor {
-                width: 28px !important;
-                height: 40px !important;
+            /* Fix FlipDown on Mobile by Scaling */
+            .countdown-section {
+                transform: scale(0.8);
+                transform-origin: center top;
+                margin-bottom: -1rem; /* Compensate for scale gap */
+            }
+            
+            .flipdown {
+                width: auto !important;
             }
         }
 
