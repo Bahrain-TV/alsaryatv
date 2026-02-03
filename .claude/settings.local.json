@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(composer install:*)"
+      "Bash(composer install:*)",
+      "Bash(composer update:*)",
+      "Bash(php artisan:*)"
     ]
   }
 }
