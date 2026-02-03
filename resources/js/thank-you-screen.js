@@ -40,8 +40,29 @@ class ThankYouScreen {
     if (!container) {
       container = document.createElement('div');
       container.id = this.container;
+      // ensure it's appended to document.body to avoid being constrained by parent containers
       document.body.appendChild(container);
     }
+
+    // Force full-screen fixed layout at runtime (defensive)
+    container.style.position = 'fixed';
+    container.style.inset = '0';
+    container.style.width = '100vw';
+    container.style.height = '100vh';
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+    container.style.zIndex = '9999';
+
+    // Prevent body scroll while thank you screen is visible
+    try {
+      this._previousBodyOverflow = document.body.style.overflow || '';
+      document.body.style.overflow = 'hidden';
+    } catch (e) {
+      // ignore if running in restricted environment
+    }
+
+    container.classList.add('thank-you-visible');
 
     const accentColor = this.type === 'family' ? '#9A3412' : '#4338CA';
     const accentColorRgb = this.type === 'family' ? '154, 52, 18' : '67, 56, 202';
@@ -121,6 +142,24 @@ class ThankYouScreen {
         </div>
       </div>
     `;
+
+    // Ensure the container is visible (defensive for CSS specificity overrides)
+    container.style.display = 'flex';
+
+    // Click backdrop to dismiss (only when clicking outside the inner wrapper)
+    container.addEventListener('click', (e) => {
+      if (e.target === container) {
+        this.destroy();
+      }
+    });
+
+    // Escape key to close
+    this._escHandler = (e) => {
+      if (e.key === 'Escape') {
+        this.destroy();
+      }
+    };
+    document.addEventListener('keydown', this._escHandler);
   }
 
   /**
@@ -414,6 +453,27 @@ class ThankYouScreen {
           container.innerHTML = '';
           container.style.display = 'none';
 
+          // restore body scroll
+          try {
+            if (typeof this._previousBodyOverflow !== 'undefined') {
+              document.body.style.overflow = this._previousBodyOverflow;
+            } else {
+              document.body.style.overflow = '';
+            }
+          } catch (e) {
+            // ignore
+          }
+
+          // remove esc handler
+          try {
+            if (this._escHandler) {
+              document.removeEventListener('keydown', this._escHandler);
+              this._escHandler = null;
+            }
+          } catch (e) {
+            // ignore
+          }
+
           // Dispatch custom event
           document.dispatchEvent(new CustomEvent('thankYouScreenComplete'));
         }
@@ -431,6 +491,28 @@ class ThankYouScreen {
     const container = document.getElementById(this.container);
     if (container) {
       container.innerHTML = '';
+      container.style.display = 'none';
+    }
+
+    // restore body scroll
+    try {
+      if (typeof this._previousBodyOverflow !== 'undefined') {
+        document.body.style.overflow = this._previousBodyOverflow;
+      } else {
+        document.body.style.overflow = '';
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // remove esc handler
+    try {
+      if (this._escHandler) {
+        document.removeEventListener('keydown', this._escHandler);
+        this._escHandler = null;
+      }
+    } catch (e) {
+      // ignore
     }
   }
 }
