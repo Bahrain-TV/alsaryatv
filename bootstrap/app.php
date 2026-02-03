@@ -14,14 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web();
-        $middleware->api();
-        
-        // Use custom CSRF middleware with logging
-        $middleware->use([
-            VerifyCsrfToken::class,
-        ]);
-
+        //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
