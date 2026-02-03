@@ -59,10 +59,38 @@ increment_version() {
     echo "${major}.${minor}.${patch}"
 }
 
-# Function to send a message to Discord
+# Function to send "Dramatic" Discord Notifications
 send_discord_message() {
-    local message="$1"
-    curl -s -H "Content-Type: application/json" -X POST -d "{\"content\": \"$message\"}" "$DISCORD_WEBHOOK"
+    local title="$1"
+    local description="$2"
+    local color="$3" # e.g., 5763719 (Green), 15548997 (Red), 3447003 (Blue)
+
+    # Default to Green if no color provided
+    if [ -z "$color" ]; then
+        color=5763719
+    fi
+
+    TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%S.000Z)
+
+    # JSON Payload for Embed
+    PAYLOAD=$(cat <<EOF
+{
+  "embeds": [
+    {
+      "title": "$title",
+      "description": "$description",
+      "color": $color,
+      "timestamp": "$TIMESTAMP",
+      "footer": {
+        "text": "AlSarya TV Server Deployment"
+      }
+    }
+  ]
+}
+EOF
+)
+
+    curl -s -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK" > /dev/null 2>&1
 }
 
 # Function to export data before deployment
@@ -88,6 +116,7 @@ export_data_backup() {
 
 # Main deployment logic
 echo "🚀 Starting deployment..."
+send_discord_message "🚀 Deployment Started" "Server is starting deployment sequence..." 3447003
 
 # Run backup
 export_data_backup
@@ -106,5 +135,5 @@ NEW_VERSION=$(increment_version "$CURRENT_VERSION")
 echo "$NEW_VERSION" > "$VERSION_FILE"
 
 echo "✅ Deployment completed successfully! New version: $NEW_VERSION"
-send_discord_message "Deployment of AlSarya TV $NEW_VERSION completed successfully."
+send_discord_message "Deployment Successful ✅" "AlSarya TV successfully deployed version **$NEW_VERSION**." 5763719
 exit 0
