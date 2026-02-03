@@ -38,7 +38,7 @@
             --primary-gold: #d4af37;
             --primary-emerald: #10b981;
             --bg-dark: #0a0f1a;
-            --bg-card: rgba(15, 23, 42, 0.9);
+            --bg-card: rgba(15, 23, 42, 0.95);
             --text-primary: #ffffff;
             --text-secondary: rgba(255, 255, 255, 0.7);
         }
@@ -62,61 +62,49 @@
             color: var(--text-primary);
         }
 
-        /* Animated Background Stars */
-        .stars {
+        /* Lottie Background Container */
+        .lottie-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            overflow: hidden;
             z-index: 0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeInLottie 2s ease-out forwards, breathe 8s ease-in-out infinite 2s;
         }
 
-        .star {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 2s infinite ease-in-out;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.5); }
-        }
-
-        /* Crescent Moon */
-        .crescent-moon {
-            position: fixed;
-            top: 10%;
-            right: 10%;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            box-shadow: 
-                inset -25px 0 0 0 #fbbf24,
-                0 0 40px rgba(251, 191, 36, 0.4),
-                0 0 80px rgba(251, 191, 36, 0.2);
-            animation: moonGlow 4s ease-in-out infinite;
-            z-index: 1;
-        }
-
-        @keyframes moonGlow {
-            0%, 100% { 
-                box-shadow: 
-                    inset -25px 0 0 0 #fbbf24,
-                    0 0 40px rgba(251, 191, 36, 0.4),
-                    0 0 80px rgba(251, 191, 36, 0.2);
+        @keyframes fadeInLottie {
+            from {
+                opacity: 0;
+                transform: scale(1.1);
             }
-            50% { 
-                box-shadow: 
-                    inset -25px 0 0 0 #fbbf24,
-                    0 0 60px rgba(251, 191, 36, 0.6),
-                    0 0 120px rgba(251, 191, 36, 0.3);
+            to {
+                opacity: 0.5;
+                transform: scale(1);
             }
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.65;
+                transform: scale(1.02);
+            }
+        }
+
+        .lottie-background lottie-player {
+            min-width: 100vw;
+            min-height: 100vh;
+            width: 150%;
+            height: 150%;
         }
 
         /* Main Container */
@@ -161,17 +149,21 @@
             }
         }
 
-        /* Downtime Card */
+        /* Downtime Card - Glassmorphism */
         .downtime-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 24px;
             padding: 3rem;
             width: 100%;
             box-shadow: 
-                0 25px 80px rgba(0, 0, 0, 0.5),
-                0 0 40px rgba(212, 175, 55, 0.1);
+                0 25px 80px rgba(0, 0, 0, 0.4),
+                0 0 60px rgba(212, 175, 55, 0.08),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
             animation: cardAppear 1.2s ease-out 0.3s both;
         }
 
@@ -377,98 +369,27 @@
                 font-size: 1.75rem;
             }
 
-            .crescent-moon {
-                width: 60px;
-                height: 60px;
-                top: 5%;
-                right: 5%;
-            }
-
             .flipdown .rotor {
                 width: 28px !important;
                 height: 40px !important;
             }
         }
-
-        /* Lantern Decorations */
-        .lantern {
-            position: fixed;
-            width: 40px;
-            height: 80px;
-            background: linear-gradient(180deg, #fbbf24, #d97706);
-            border-radius: 50% 50% 50% 50% / 30% 30% 60% 60%;
-            animation: lanternSwing 4s ease-in-out infinite;
-            z-index: 1;
-            opacity: 0.6;
-        }
-
-        .lantern::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 10px;
-            background: #92400e;
-            border-radius: 5px 5px 0 0;
-        }
-
-        .lantern::after {
-            content: '';
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 20px;
-            background: #78350f;
-        }
-
-        .lantern-left {
-            left: 5%;
-            top: 30%;
-            animation-delay: 0s;
-        }
-
-        .lantern-right {
-            right: 5%;
-            top: 25%;
-            animation-delay: 1s;
-        }
-
-        @keyframes lanternSwing {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
-        }
-
-        /* Decorative Islamic Pattern */
-        .islamic-pattern {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 20'%3E%3Cpath d='M0 20 L20 0 L40 20 L60 0 L80 20' fill='none' stroke='%23d4af37' stroke-width='1' opacity='0.2'/%3E%3C/svg%3E") repeat-x;
-            opacity: 0.3;
-            z-index: 0;
-        }
     </style>
 </head>
 
 <body dir="rtl">
-    <!-- Animated Stars Background -->
-    <div class="stars" id="stars"></div>
-
-    <!-- Crescent Moon -->
-    <div class="crescent-moon"></div>
-
-    <!-- Lanterns -->
-    <div class="lantern lantern-left"></div>
-    <div class="lantern lantern-right"></div>
-
-    <!-- Islamic Pattern -->
-    <div class="islamic-pattern"></div>
+    <!-- Lottie Animation Background -->
+    <div class="lottie-background">
+        <lottie-player
+            id="lottie-bg"
+            src="{{ asset('lottie/crecent-moon-ramadan.json') }}"
+            background="transparent"
+            speed="0.3"
+            mode="bounce"
+            loop
+            autoplay>
+        </lottie-player>
+    </div>
 
     <!-- Main Content -->
     <div class="main-container">
@@ -512,30 +433,15 @@
         </div>
     </div>
 
+    <!-- Lottie Player Library -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
     <!-- FlipDown JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flipdown/0.3.2/flipdown.min.js"></script>
     
     <script>
-        // Generate Stars
-        function generateStars() {
-            const starsContainer = document.getElementById('stars');
-            const starCount = 100;
-
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 2 + 's';
-                star.style.animationDuration = (Math.random() * 2 + 1) + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            generateStars();
-
             // Ramadan 1447 starts on February 26, 2026 at midnight (Bahrain time)
             // Using Bahrain timezone (UTC+3)
             const ramadanDate = new Date('2026-02-26T00:00:00+03:00');
