@@ -128,7 +128,11 @@
         }
 
         .logo-section img {
-            height: 120px;
+            max-width: 280px;
+            max-height: 180px;
+            width: auto;
+            height: auto;
+            border-radius: 16px;
             filter: drop-shadow(0 10px 30px rgba(212, 175, 55, 0.3));
             animation: logoFloat 3s ease-in-out infinite;
         }
@@ -395,7 +399,7 @@
     <div class="main-container">
         <!-- Logo -->
         <div class="logo-section">
-            <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" />
+            <img src="{{ asset('images/alsarya-bg-2026-by-gemini.jpeg') }}" alt="السارية" />
         </div>
 
         <!-- Downtime Card -->
