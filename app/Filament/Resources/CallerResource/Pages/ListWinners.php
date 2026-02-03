@@ -16,9 +16,9 @@ class ListWinners extends ListRecords
     // Add navigation properties so the page appears in the menu.
     protected static ?string $navigationLabel = 'Winners List';
 
-    protected static ?string $navigationIcon = 'heroicon-o-trophy';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-trophy';
 
-    protected static ?string $navigationGroup = 'Callers';
+    protected static \UnitEnum|string|null $navigationGroup = 'Callers';
 
     protected function getTableQuery(): Builder
     {

@@ -15,11 +15,11 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationGroup = 'User Management';
+    protected static \UnitEnum|string|null $navigationGroup = 'User Management';
 
     public static function form(Form $form): Form
     {

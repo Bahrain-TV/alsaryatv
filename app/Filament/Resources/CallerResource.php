@@ -15,11 +15,11 @@ class CallerResource extends Resource
 {
     protected static ?string $model = Caller::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-phone';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-phone';
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationGroup = 'Caller Management';
+    protected static \UnitEnum|string|null $navigationGroup = 'Caller Management';
 
     public static function getNavigationItems(): array
     {
