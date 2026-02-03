@@ -51,7 +51,12 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 50%, #0f1a2a 100%);
+            background: linear-gradient(135deg, rgba(10, 15, 26, 0.85) 0%, rgba(26, 31, 46, 0.8) 50%, rgba(15, 26, 42, 0.85) 100%),
+                        url('{{ asset("images/alsarya-bg-2026-by-gemini2.jpeg") }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -75,7 +80,14 @@
             align-items: center;
             justify-content: center;
             opacity: 0;
-            animation: fadeInLottie 2s ease-out forwards, breathe 8s ease-in-out infinite 2s;
+            transform: scale(1.1);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
+
+        .lottie-background.revealed {
+            opacity: 0.5;
+            transform: scale(1);
+            animation: breathe 8s ease-in-out infinite 1.5s;
         }
 
         @keyframes fadeInLottie {
@@ -119,6 +131,14 @@
             text-align: center;
             width: 100%;
             max-width: 900px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .main-container.revealed {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Logo Section */
@@ -128,11 +148,7 @@
         }
 
         .logo-section img {
-            max-width: 280px;
-            max-height: 180px;
-            width: auto;
-            height: auto;
-            border-radius: 16px;
+            height: 120px;
             filter: drop-shadow(0 10px 30px rgba(212, 175, 55, 0.3));
             animation: logoFloat 3s ease-in-out infinite;
         }
@@ -378,10 +394,213 @@
                 height: 40px !important;
             }
         }
+
+        /* ==================== PRELOADER STYLES ==================== */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050810;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .preloader.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Logo Container */
+        .preloader-logo-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The Logo */
+        .preloader-logo {
+            width: 120px;
+            height: auto;
+            z-index: 10;
+            animation: logoBreath 2s ease-in-out infinite, logoGlow 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+        }
+
+        @keyframes logoBreath {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes logoGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5)) brightness(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 40px rgba(212, 175, 55, 0.8)) brightness(1.2);
+            }
+        }
+
+        /* Rotating Ring */
+        .preloader-ring {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top: 2px solid rgba(212, 175, 55, 0.8);
+            border-right: 2px solid rgba(212, 175, 55, 0.4);
+            animation: ringRotate 2s linear infinite;
+        }
+
+        .preloader-ring::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+        }
+
+        @keyframes ringRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Second Ring */
+        .preloader-ring-2 {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.6);
+            border-left: 1px solid rgba(16, 185, 129, 0.3);
+            animation: ringRotate 3s linear infinite reverse;
+        }
+
+        /* Particles */
+        .preloader-particles {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            animation: particleFloat 3s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+        }
+
+        .particle:nth-child(1) { top: 0; left: 50%; animation-delay: 0s; }
+        .particle:nth-child(2) { top: 15%; left: 85%; animation-delay: 0.2s; }
+        .particle:nth-child(3) { top: 50%; left: 100%; animation-delay: 0.4s; }
+        .particle:nth-child(4) { top: 85%; left: 85%; animation-delay: 0.6s; }
+        .particle:nth-child(5) { top: 100%; left: 50%; animation-delay: 0.8s; }
+        .particle:nth-child(6) { top: 85%; left: 15%; animation-delay: 1s; }
+        .particle:nth-child(7) { top: 50%; left: 0; animation-delay: 1.2s; }
+        .particle:nth-child(8) { top: 15%; left: 15%; animation-delay: 1.4s; }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Text */
+        .preloader-text {
+            margin-top: 40px;
+            font-size: 1.2rem;
+            color: var(--primary-gold);
+            letter-spacing: 4px;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Stars Background */
+        .preloader-stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
     </style>
 </head>
 
 <body dir="rtl">
+    <!-- ==================== PRELOADER ==================== -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-stars" id="preloaderStars"></div>
+        <div class="preloader-content">
+            <div class="preloader-logo-container">
+                <div class="preloader-particles">
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                </div>
+                <div class="preloader-ring"></div>
+                <div class="preloader-ring-2"></div>
+                <img src="{{ asset('images/bahrain-tv-sm.png') }}" alt="Bahrain TV" class="preloader-logo" />
+            </div>
+            <div class="preloader-text">جاري التحميل</div>
+        </div>
+    </div>
     <!-- Lottie Animation Background -->
     <div class="lottie-background">
         <lottie-player
@@ -399,7 +618,7 @@
     <div class="main-container">
         <!-- Logo -->
         <div class="logo-section">
-            <img src="{{ asset('images/alsarya-bg-2026-by-gemini.jpeg') }}" alt="السارية" />
+            <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" />
         </div>
 
         <!-- Downtime Card -->
@@ -444,7 +663,52 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flipdown/0.3.2/flipdown.min.js"></script>
     
     <script>
-        // Initialize
+        // ==================== PRELOADER / SPLASH SCREEN ====================
+        (function() {
+            const SPLASH_DURATION = 2000; // Show splash for exactly 2 seconds
+            const FADE_DURATION = 800;    // Fade out duration
+
+            // Generate random stars for splash background
+            const starsContainer = document.getElementById('preloaderStars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = (Math.random() * 3 + 1) + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                starsContainer.appendChild(star);
+            }
+
+            // Function to reveal main content
+            function revealContent() {
+                const preloader = document.getElementById('preloader');
+                const lottieBackground = document.querySelector('.lottie-background');
+                const mainContainer = document.querySelector('.main-container');
+
+                // Fade out preloader
+                preloader.classList.add('fade-out');
+
+                // After preloader starts fading, reveal background
+                setTimeout(function() {
+                    lottieBackground.classList.add('revealed');
+                }, 200);
+
+                // Then reveal main content with slight delay
+                setTimeout(function() {
+                    mainContainer.classList.add('revealed');
+                }, 500);
+            }
+
+            // Start the reveal sequence after splash duration
+            window.addEventListener('load', function() {
+                setTimeout(revealContent, SPLASH_DURATION);
+            });
+        })();
+
+        // ==================== MAIN APP ====================
         document.addEventListener('DOMContentLoaded', function() {
             // Ramadan 1447 starts on February 26, 2026 at midnight (Bahrain time)
             // Using Bahrain timezone (UTC+3)
@@ -452,7 +716,7 @@
             const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
 
             // Initialize FlipDown
-            new FlipDown(ramadanTimestamp, {
+            new FlipDown(ramadanTimestamp, 'flipdown', {
                 theme: 'dark'
             }).start().ifEnded(() => {
                 // When countdown ends, show Ramadan message
