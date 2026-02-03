@@ -25,8 +25,12 @@ Route::get('/', function () {
     ];
     $formattedDate = $ramadanDate->day . ' ' . $arabicMonths[$ramadanDate->month] . ' ' . $ramadanDate->year;
     
+    // Get current hits total
+    $totalHits = HitsCounter::getHits();
+    
     return view('welcome', [
         'ramadanDate' => $formattedDate,
+        'totalHits' => $totalHits,
     ]);
 })->name('home');
 
@@ -59,8 +63,12 @@ Route::get('/welcome', function () {
     ];
     $formattedDate = $ramadanDate->day . ' ' . $arabicMonths[$ramadanDate->month] . ' ' . $ramadanDate->year;
     
+    // Get current hits total
+    $totalHits = HitsCounter::getHits();
+    
     return view('welcome', [
         'ramadanDate' => $formattedDate,
+        'totalHits' => $totalHits,
     ]);
 })->name('welcome');
 

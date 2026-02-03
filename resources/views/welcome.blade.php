@@ -367,6 +367,37 @@
             color: #fbbf24;
         }
 
+        .footer-meta {
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .visitors-count {
+            color: var(--primary-emerald);
+            font-weight: 500;
+        }
+
+        .login-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            transition: color 0.3s;
+        }
+
+        .login-link:hover {
+            color: var(--primary-gold);
+            text-decoration: underline;
+        }
+
+        .separator {
+            opacity: 0.3;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-container {
@@ -653,6 +684,14 @@
         <!-- Footer -->
         <div class="footer-section">
             <p>© {{ date('Y') }} <a href="https://btv.bh" target="_blank">تلفزيون البحرين</a> | جميع الحقوق محفوظة</p>
+            
+            <div class="footer-meta">
+                <span class="visitors-count">
+                    👁️ عدد الزوار: {{ number_format($totalHits ?? 0) }}
+                </span>
+                <span class="separator">|</span>
+                <a href="{{ route('login') }}" class="login-link">تسجيل الدخول</a>
+            </div>
         </div>
     </div>
 
