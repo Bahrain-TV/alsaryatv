@@ -88,60 +88,20 @@ send_discord_notification "🚀 Publish Started" "Initiating new version publish
 # Upload files
 upload_files_to_production
 
-# Send deploy webhook and capture JSON response
-echo "📡 Triggering Server Deployment Webhook..."
-RESPONSE=$(https -jb "https://h6.doy.tech:8090/websites/alsarya.tv/webhook" deploy=1) || true
-printf "Webhook response:\n%s\n" "$RESPONSE"
+# Execute deploy.sh via SSH
+echo "⚡ Executing deploy.sh on server via SSH..."
+send_discord_notification "Phase 2: Execution ⚡" "Triggering ./deploy.sh on remote server..." 3447003
 
-# Detect divergent-branches/generic git pull hint in the returned commandStatus
-if echo "$RESPONSE" | grep -qiE "divergent branches|Need to specify how to reconcile divergent branches"; then
-  echo "⚠️ Detected git divergent-branches error. Attempting reconciliation..."
-  send_discord_notification "Git Divergence Detected ⚠️" "Attempting automatic reconciliation of git branches..." 16776960
+ssh "$SERVER" "cd $APP_DIR && ./deploy.sh"
+DEPLOY_EXIT_CODE=$?
 
-  # Move to repo root if possible
-  REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
-  if [ -n "$REPO_ROOT" ]; then
-    cd "$REPO_ROOT"
-  fi
-
-  # Fetch remote state
-  git fetch origin --quiet
-
-  # Ensure an upstream is configured
-  if ! git rev-parse --abbrev-ref --symbolic-full-name @{u} >/dev/null 2>&1; then
-      echo "No upstream configured."
-      send_discord_notification "Publish Failed ❌" "No upstream git branch configured." 15548997
-      exit 1
-  fi
-
-  LOCAL=$(git rev-parse @)
-  REMOTE=$(git rev-parse @{u})
-  BASE=$(git merge-base @ @{u})
-
-  if [ "$LOCAL" = "$REMOTE" ]; then
-    echo "Local branch up-to-date."
-  elif [ "$LOCAL" = "$BASE" ]; then
-    echo "Fast-forwarding..."
-    git pull --ff-only
-  elif [ "$REMOTE" = "$BASE" ]; then
-    echo "Pushing local commits..."
-    git push || { send_discord_notification "Publish Failed ❌" "Git push failed." 15548997; exit 1; }
-  else
-    echo "Rebasing..."
-    git pull --rebase --autostash || { send_discord_notification "Publish Failed ❌" "Git rebase failed." 15548997; exit 1; }
-  fi
-
-  # Retry webhook after reconciliation
-  echo "Retrying webhook deploy..."
-  send_discord_notification "Retrying Deployment 🔄" "Git reconciliation complete. Retrying webhook..." 3447003
-  RESPONSE2=$(https -jb "https://h6.doy.tech:8090/websites/alsarya.tv/webhook" deploy=1) || true
-  printf "Webhook retry response:\n%s\n" "$RESPONSE2"
-  
-  send_discord_notification "Publish Finished ✅" "Deployment webhook triggered successfully after reconciliation." 5763719
-  exit 0
+if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
+    echo "✅ Remote deployment executed successfully!"
+    send_discord_notification "Publish Finished ✅" "Deployment script completed successfully on server." 5763719
+else
+    echo "❌ Remote deployment failed (Exit Code: $DEPLOY_EXIT_CODE)"
+    send_discord_notification "Publish Failed ❌" "Remote deployment script returned non-zero exit code." 15548997
+    exit 1
 fi
 
-# If no divergence detected
-send_discord_notification "Publish Finished ✅" "Deployment webhook triggered successfully." 5763719
-printf "%s\n" "$RESPONSE"
 exit 0

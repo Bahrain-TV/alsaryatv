@@ -118,6 +118,18 @@ export_data_backup() {
 echo "🚀 Starting deployment..."
 send_discord_message "🚀 Deployment Started" "Server is starting deployment sequence..." 3447003
 
+# Pull latest changes (Force Sync)
+echo "⬇️ Syncing with origin/main..."
+$SUDO_PREFIX git fetch origin main
+
+if $SUDO_PREFIX git reset --hard origin/main; then
+    echo "✅ Code synced successfully"
+else
+    echo "❌ Git sync failed"
+    send_discord_message "Deployment Failed ❌" "git reset --hard origin/main failed on server." 15548997
+    exit 1
+fi
+
 # Run backup
 export_data_backup
 
@@ -133,6 +145,8 @@ $SUDO_PREFIX $ART_CMD view:cache
 # Update version
 NEW_VERSION=$(increment_version "$CURRENT_VERSION")
 echo "$NEW_VERSION" > "$VERSION_FILE"
+# Ensure version file is owned by app user
+chown $APP_USER:$APP_USER "$VERSION_FILE"
 
 echo "✅ Deployment completed successfully! New version: $NEW_VERSION"
 send_discord_message "Deployment Successful ✅" "AlSarya TV successfully deployed version **$NEW_VERSION**." 5763719
