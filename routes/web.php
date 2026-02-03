@@ -30,6 +30,7 @@ Route::get('/', function () {
     
     return view('welcome', [
         'ramadanDate' => $formattedDate,
+        'targetISO' => $registrationOpenDate,
         'totalHits' => $totalHits,
     ]);
 })->name('home');
@@ -48,6 +49,8 @@ Route::get('/family', function () {
     
     return view('welcome', [
         'ramadanDate' => $formattedDate,
+        'targetISO' => $registrationOpenDate,
+        'totalHits' => HitsCounter::getHits(), // Fetch hits effectively
     ]);
 })->name('family.registration');
 
@@ -68,6 +71,7 @@ Route::get('/welcome', function () {
     
     return view('welcome', [
         'ramadanDate' => $formattedDate,
+        'targetISO' => $registrationOpenDate,
         'totalHits' => $totalHits,
     ]);
 })->name('welcome');

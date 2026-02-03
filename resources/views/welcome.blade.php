@@ -757,7 +757,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Ramadan 1447 starts on February 26, 2026 at midnight (Bahrain time)
             // Using Bahrain timezone (UTC+3)
-            const ramadanDate = new Date('2026-02-26T00:00:00+03:00');
+            const ramadanDate = new Date('{{ $targetISO ?? "2026-02-26" }}T00:00:00+03:00');
             const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
 
             // Initialize FlipDown
