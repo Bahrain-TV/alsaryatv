@@ -1,0 +1,55 @@
+name: AI CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+    name: Run PEST Tests (PHP 8.5)
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.5'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+        coverage: none
+
+    - name: Install dependencies
+      run: |
+        composer install --prefer-dist --no-interaction --no-progress
+
+    - name: Copy .env
+      run: cp .env.example .env
+
+    - name: Generate Key
+      run: php artisan key:generate
+
+    - name: Create Database
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+
+    - name: Execute Tests (PEST)
+      run: php artisan test --parallel
+
+    - name: Notify Discord on Success
+      if: success()
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      run: |
+        curl -H "Content-Type: application/json" -X POST -d '{"embeds": [{"title": "CI/CD Pipeline Passed ✅", "description": "Tests passed successfully on branch **${{ github.ref_name }}**.", "color": 5763719}]}' $DISCORD_WEBHOOK
+
+    - name: Notify Discord on Failure
+      if: failure()
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      run: |
+        curl -H "Content-Type: application/json" -X POST -d '{"embeds": [{"title": "CI/CD Pipeline Failed ❌", "description": "Tests failed on branch **${{ github.ref_name }}**. Please check logs.", "color": 15548997}]}' $DISCORD_WEBHOOK

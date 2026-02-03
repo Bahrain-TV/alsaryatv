@@ -81,7 +81,57 @@ upload_files_to_production() {
     fi
 }
 
-# START
+# Configuration (matching deploy.sh)
+APP_USER="alsar4210"
+SUDO_PREFIX="sudo -u $APP_USER"
+
+# Function to handle Maintenance Mode
+maintenance_mode() {
+    local mode="$1" # 'up' or 'down'
+    local message="$2"
+    local color="$3"
+
+    echo "🔧 Switching maintenance mode to: $mode..."
+    send_discord_notification "Maintenance Mode 🔧" "Switching site to **$mode** mode..." 3447003
+
+    if [ "$mode" == "down" ]; then
+        # Activate Maintenance Mode with 'down' view and secret bypass
+        COMMAND="cd $APP_DIR && $SUDO_PREFIX php artisan down --render='down' --secret='ramadan2026'"
+        SUCCESS_MSG="🔴 Maintenance Mode ENABLED"
+        SUCCESS_DESC="Site is now in maintenance mode. Bypass secret: ramadan2026"
+        SUCCESS_COLOR=15548997 # Red
+    else
+        # Deactivate Maintenance Mode
+        COMMAND="cd $APP_DIR && $SUDO_PREFIX php artisan up"
+        SUCCESS_MSG="🟢 Maintenance Mode DISABLED"
+        SUCCESS_DESC="Site is now LIVE."
+        SUCCESS_COLOR=5763719 # Green
+    fi
+
+    # Execute SSH Command
+    ssh "$SERVER" "$COMMAND"
+    EXIT_CODE=$?
+
+    if [ $EXIT_CODE -eq 0 ]; then
+        echo "✅ Maintenance mode updated successfully."
+        send_discord_notification "$SUCCESS_MSG" "$SUCCESS_DESC" $SUCCESS_COLOR
+    else
+        echo "❌ Failed to update maintenance mode."
+        send_discord_notification "Maintenance Update Failed ❌" "Could not run 'php artisan $mode'." 15548997
+        exit 1
+    fi
+}
+
+# Argument Handling
+if [ "$1" == "--down" ]; then
+    maintenance_mode "down"
+    exit 0
+elif [ "$1" == "--up" ]; then
+    maintenance_mode "up"
+    exit 0
+fi
+
+# START STANDARD DEPLOYMENT (No arguments)
 echo "🚀 Starting Publish Process..."
 send_discord_notification "🚀 Publish Started" "Initiating new version publish from local machine..." 3447003
 
