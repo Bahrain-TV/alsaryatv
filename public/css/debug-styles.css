@@ -1,0 +1,93 @@
+/* Debug styles to fix white text on white background issue */
+/* High-specificity selectors to override conflicting styles */
+
+/* Force text colors in admin panel for better visibility */
+.filament-app *,
+.fi-layout *,
+.fi-sidebar *,
+.fi-main *,
+.filament-login-page *,
+.filament-dashboard * {
+    color: #111827 !important;
+}
+
+/* Forms and inputs */
+.filament-forms-field-wrapper label,
+.filament-forms-field-wrapper span,
+input, select, textarea,
+.fi-fo-field-wrp-label span {
+    color: #111827 !important;
+}
+
+/* Tables */
+.filament-tables-table,
+.filament-tables-table *,
+.fi-ta-text {
+    color: #111827 !important;
+}
+
+/* Force dark backgrounds to have light text */
+.dark .filament-app *,
+.dark .fi-layout *,
+.dark .fi-sidebar *,
+.dark .fi-main *,
+.dark-mode .filament-app *,
+.dark-mode .fi-layout *,
+.dark-mode .fi-sidebar *,
+.dark-mode .fi-main * {
+    color: #f1f5f9 !important;
+}
+
+/* Debug outline to identify elements with potential contrast issues */
+[style*="color: white"],
+[style*="color:#fff"],
+[style*="color: #fff"],
+[style*="color:#ffffff"],
+[style*="color: #ffffff"] {
+    outline: 2px solid red !important;
+    background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+/* Ensure buttons have visible text */
+button,
+.fi-btn,
+.filament-button {
+    color: #ffffff !important;
+    background-color: #4b5563 !important;
+}
+
+/* Ensure proper contrast for sidebar */
+.filament-sidebar {
+    background-color: #f3f4f6 !important;
+}
+
+.dark .filament-sidebar,
+.dark-mode .filament-sidebar {
+    background-color: #1e293b !important;
+}
+
+/* Force table background color */
+.filament-tables-table {
+    background-color: #ffffff !important;
+}
+
+.dark .filament-tables-table,
+.dark-mode .filament-tables-table {
+    background-color: #1f2937 !important;
+}
+
+/* Force card background color */
+.filament-widget-card,
+.fi-section,
+.fi-card {
+    background-color: #ffffff !important;
+}
+
+.dark .filament-widget-card,
+.dark .fi-section,
+.dark .fi-card,
+.dark-mode .filament-widget-card,
+.dark-mode .fi-section,
+.dark-mode .fi-card {
+    background-color: #1f2937 !important;
+}

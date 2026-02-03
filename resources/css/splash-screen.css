@@ -1,0 +1,108 @@
+/**
+ * Simple Clean Splash Screen
+ * Minimal effects, just the logo
+ */
+
+#splash-screen-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-screen-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Logo container - simple and clean */
+.logo-container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: simpleFadeIn 1s ease-out 0.5s forwards;
+}
+
+.logo-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-logo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+  z-index: 2;
+}
+
+/* Simple fade in animation */
+@keyframes simpleFadeIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Simple fade out */
+.splash-screen-wrapper.fade-out {
+  animation: fadeOut 0.8s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .logo-wrapper {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .logo-container {
+    animation: none !important;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .splash-screen-wrapper.fade-out {
+    animation: none !important;
+    opacity: 0;
+  }
+}

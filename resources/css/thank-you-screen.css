@@ -1,0 +1,486 @@
+/**
+ * Thank You Screen Styles
+ * Celebratory animation with confetti, particles, and success indicators
+ */
+
+#thank-you-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.thank-you-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* Background */
+.thank-you-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(67, 56, 202, 0.1) 0%, rgba(67, 56, 202, 0.05) 100%);
+  opacity: 0;
+  z-index: 1;
+}
+
+/* Success checkmark container */
+.success-checkmark-container {
+  position: relative;
+  z-index: 20;
+  margin-bottom: 2rem;
+}
+
+.checkmark {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  display: block;
+}
+
+.checkmark-circle {
+  stroke: #4F46E5;
+  stroke-width: 3;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-linecap: round;
+  animation: stroke-animation 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  stroke: #4F46E5;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke-animation 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards;
+}
+
+@keyframes stroke-animation {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Content styling */
+.thank-you-content {
+  position: relative;
+  z-index: 15;
+  text-align: center;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+.thank-you-title {
+  font-family: 'Tajawal', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: 1px;
+  opacity: 0;
+  text-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+  line-height: 1.2;
+}
+
+.thank-you-subtitle {
+  font-family: 'Figtree', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #6366F1;
+  margin: 0 0 2rem 0;
+  opacity: 0;
+  letter-spacing: 0.5px;
+}
+
+.thank-you-details {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+.detail-text {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0.5rem 0;
+  opacity: 0;
+  line-height: 1.6;
+}
+
+.detail-text:first-child {
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 600;
+}
+
+/* Celebration rays */
+.celebration-rays {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  opacity: 0;
+  z-index: 5;
+}
+
+.ray {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 300px;
+  background: linear-gradient(
+    180deg,
+    rgba(79, 70, 229, 0.8),
+    transparent
+  );
+  transform-origin: center top;
+  opacity: 0.6;
+}
+
+.ray-1 {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.ray-2 {
+  transform: translate(-50%, -50%) rotate(90deg);
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.8), transparent);
+}
+
+.ray-3 {
+  transform: translate(-50%, -50%) rotate(180deg);
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.8), transparent);
+}
+
+.ray-4 {
+  transform: translate(-50%, -50%) rotate(270deg);
+  background: linear-gradient(180deg, rgba(236, 72, 153, 0.8), transparent);
+}
+
+/* Animated shapes */
+.animated-shapes {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+  opacity: 0;
+  z-index: 3;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.shape-1 {
+  width: 80px;
+  height: 80px;
+  top: 10%;
+  left: 10%;
+  background: rgba(79, 70, 229, 0.3);
+}
+
+.shape-2 {
+  width: 60px;
+  height: 60px;
+  bottom: 15%;
+  right: 10%;
+  background: rgba(168, 85, 247, 0.3);
+}
+
+.shape-3 {
+  width: 70px;
+  height: 70px;
+  top: 50%;
+  right: 5%;
+  background: rgba(59, 130, 246, 0.3);
+}
+
+/* Particle styling */
+.particle-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute !important;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Confetti styling */
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute !important;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Timer display */
+.auto-close-timer {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  background: rgba(79, 70, 229, 0.2);
+  border: 2px solid rgba(79, 70, 229, 0.5);
+  border-radius: 50px;
+  padding: 1rem 1.5rem;
+  z-index: 25;
+  backdrop-filter: blur(10px);
+}
+
+.timer-text {
+  font-family: 'Figtree', sans-serif;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.timer-count {
+  display: inline-block;
+  min-width: 1.5rem;
+  color: #4F46E5;
+  font-weight: 700;
+  animation: timer-pulse 1s ease-in-out infinite;
+}
+
+@keyframes timer-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #thank-you-container {
+    padding: 1rem;
+  }
+
+  .thank-you-title {
+    font-size: 1.75rem;
+    letter-spacing: 0.5px;
+  }
+
+  .thank-you-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .checkmark {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+  }
+
+  .thank-you-content {
+    padding: 1.5rem;
+    max-width: 90vw;
+  }
+
+  .thank-you-details {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .detail-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .celebration-rays {
+    width: 350px;
+    height: 350px;
+  }
+
+  .ray {
+    height: 175px;
+  }
+
+  .animated-shapes {
+    width: 280px;
+    height: 280px;
+  }
+
+  .shape-1, .shape-2, .shape-3 {
+    opacity: 0.25;
+  }
+
+  .auto-close-timer {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 0.8rem 1.2rem;
+  }
+
+  .timer-text {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #thank-you-container {
+    padding: 0.75rem;
+  }
+
+  .thank-you-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3px;
+  }
+
+  .thank-you-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .checkmark {
+    width: 70px;
+    height: 70px;
+  }
+
+  .success-checkmark-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .thank-you-content {
+    padding: 1rem;
+    max-width: 95vw;
+  }
+
+  .thank-you-details {
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+  }
+
+  .detail-text {
+    font-size: 0.9rem;
+    margin: 0.4rem 0;
+    line-height: 1.4;
+  }
+
+  .celebration-rays {
+    width: 280px;
+    height: 280px;
+  }
+
+  .ray {
+    height: 140px;
+  }
+
+  .animated-shapes {
+    width: 220px;
+    height: 220px;
+  }
+
+  .shape-1 {
+    width: 55px;
+    height: 55px;
+  }
+
+  .shape-2 {
+    width: 45px;
+    height: 45px;
+  }
+
+  .shape-3 {
+    width: 50px;
+    height: 50px;
+  }
+
+  .auto-close-timer {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .timer-text {
+    font-size: 0.8rem;
+  }
+
+  .timer-count {
+    min-width: 1.2rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .thank-you-wrapper,
+  .checkmark-circle,
+  .checkmark-check,
+  .thank-you-title,
+  .thank-you-subtitle,
+  .detail-text,
+  .particle,
+  .confetti-piece,
+  .ray,
+  .shape {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  #thank-you-container {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .thank-you-details {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(79, 70, 229, 0.3);
+  }
+}
+
+/* Light mode support */
+@media (prefers-color-scheme: light) {
+  .thank-you-subtitle {
+    color: #4F46E5;
+  }
+
+  .timer-text {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}

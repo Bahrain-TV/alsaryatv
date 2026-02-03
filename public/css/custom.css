@@ -1,0 +1,90 @@
+/* Prevent scrollbar appearance during animations while ensuring content visibility */
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+/* Logo container specific styles - improved for mobile */
+.logo-container {
+    display: flex;
+    position: relative;
+    z-index: 5; /* Ensure logo is above other elements */
+    width: 100%;
+    overflow: visible;
+    padding: 0.75rem 0;
+    margin-bottom: 2rem;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Animation wrapper for logo */
+.animation-wrapper {
+    position: relative;
+    display: inline-block;
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Responsive adjustments for logo */
+@media (max-width: 640px) {
+    .logo-container {
+        margin-bottom: 1rem;
+        padding: 0.75rem 0;
+    }
+
+    /* Adjust logo size for small screens while preserving aspect ratio */
+    .logo-container img {
+        max-width: 85%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .logo-container {
+        padding-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .logo-container img {
+        max-width: 80%;
+    }
+
+    /* Adjust spacing elements */
+    .logo-spacing {
+        height: 1rem !important;
+    }
+}
+
+/* Control animations to prevent overflow */
+.aldoyh-animate {
+    overflow: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    max-width: 100%;
+    margin-top: 1rem; /* Add space between elements */
+}
+
+/* Spacer utility */
+.spacer, .logo-spacing {
+    width: 100%;
+    clear: both;
+    display: block;
+}
+
+/* Enhanced glitch effect container */
+#logo, #logo img {
+    position: relative;
+    display: inline-block;
+    backface-visibility: hidden;
+}
+
+/* Ensure the FlipDown timer doesn't cause overflow */
+.flipdown {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    margin-top: 1rem;
+}

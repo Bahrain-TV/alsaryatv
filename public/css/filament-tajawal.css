@@ -1,0 +1,94 @@
+/* Tajawal Font Integration for Filament Admin */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+
+/* Filament root elements */
+.filament-app,
+.fi-layout, 
+.fi-sidebar, 
+.fi-main, 
+.filament-login-page,
+.filament-dashboard {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+/* Headings and titles */
+h1, h2, h3, h4, h5, h6,
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-modal-heading,
+.fi-card-header,
+.fi-breadcrumb-item {
+    font-family: 'Tajawal', sans-serif !important;
+    font-weight: 700;
+}
+
+/* Content text */
+p, span, div, li, a {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+/* Form elements */
+.fi-input,
+.fi-select,
+.fi-textarea,
+.fi-checkbox,
+.fi-radio,
+.fi-field-wrapper,
+.fi-btn {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+/* Tables */
+.fi-table,
+.fi-table th,
+.fi-table td,
+.fi-table-header-cell,
+.fi-table-cell {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+/* Navigation elements */
+.fi-sidebar-item,
+.fi-sidebar-group-label,
+.fi-dropdown-list-item,
+.fi-header-heading,
+.fi-badge,
+.fi-notification {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+/* RTL support for Arabic */
+[dir="rtl"] .fi-sidebar,
+[dir="rtl"] .fi-main,
+[dir="rtl"] .fi-form,
+[dir="rtl"] .fi-table {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+/* Placeholders */
+::placeholder {
+    font-family: 'Tajawal', sans-serif !important;
+}
+
+/* Logo styling */
+.fi-sidebar-header {
+    background-color: #1a202c; /* Dark background for logo */
+    padding: 1rem 0.75rem;
+}
+
+.fi-sidebar-header img {
+    max-height: 36px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+}
+
+/* Ensure the logo is visible in dark mode */
+.dark .fi-sidebar-header {
+    background-color: #111827;
+}
+
+/* Add a subtle animation on hover */
+.fi-sidebar-header img:hover {
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+}

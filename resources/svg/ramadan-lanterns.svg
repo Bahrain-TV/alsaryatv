@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="ramadan-lanterns" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200">
+  <style type="text/css">
+    <![CDATA[
+      .lantern {
+        animation: swing 2s ease-in-out infinite;
+        transform-origin: center top;
+      }
+      .lantern:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+      .lantern:nth-child(3) {
+        animation-delay: 0.6s;
+      }
+      @keyframes swing {
+        0%   { transform: rotate(0deg); }
+        25%  { transform: rotate(5deg); }
+        50%  { transform: rotate(0deg); }
+        75%  { transform: rotate(-5deg); }
+        100% { transform: rotate(0deg); }
+      }
+      .rope {
+        stroke: #555;
+        stroke-width: 2;
+      }
+    ]]>
+  </style>
+
+  <!-- Lantern 1 -->
+  <g class="lantern" transform="translate(100,20)">
+    <line class="rope" x1="0" y1="0" x2="0" y2="40"/>
+    <ellipse cx="0" cy="70" rx="20" ry="30" fill="#FF6347" stroke="#B22222" stroke-width="2"/>
+    <rect x="-10" y="60" width="20" height="20" fill="#FFD700"/>
+  </g>
+
+  <!-- Lantern 2 -->
+  <g class="lantern" transform="translate(300,20)">
+    <line class="rope" x1="0" y1="0" x2="0" y2="40"/>
+    <ellipse cx="0" cy="70" rx="20" ry="30" fill="#3CB371" stroke="#2E8B57" stroke-width="2"/>
+    <rect x="-10" y="60" width="20" height="20" fill="#ADFF2F"/>
+  </g>
+
+  <!-- Lantern 3 -->
+  <g class="lantern" transform="translate(500,20)">
+    <line class="rope" x1="0" y1="0" x2="0" y2="40"/>
+    <ellipse cx="0" cy="70" rx="20" ry="30" fill="#1E90FF" stroke="#00008B" stroke-width="2"/>
+    <rect x="-10" y="60" width="20" height="20" fill="#87CEFA"/>
+  </g>
+</svg>

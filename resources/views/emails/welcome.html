@@ -1,0 +1,84 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<head>
+    <meta charset="utf-8">
+    <title>برنامج السارية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: #f8f9fa;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .content {
+            padding: 20px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 3px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>برنامج السارية</h1>
+        </div>
+
+        <div class="content">
+            <p>باسووردك الجديد: <strong>{{ $password }}</strong></p>
+            <p>يرجى تغييره بمجرد تسجيل الدخول.</p>
+            <p>شكرًا لاستخدامك برنامج السارية!</p>
+            <a href="https://alsarya.tv/dashboard" class="button">زرنوق السياديه</a>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 برنامج السارية. جميع الحقوق محفوظة.</p>
+            <p>الرد على هذا البريد الإلكتروني للحصول على المساعدة.</p>
+            <p>لقد تلقيت هذا البريد الإلكتروني لأنك اشتركت في نشرتنا الإخبارية.</p>
+            <p><a href="{{ $unsubscribe_link }}">إلغاء الاشتراك</a> | <a href="{{ $view_in_browser_link }}">عرض في
+                    المتصفح</a></p>
+            <p>للمزيد من التفاصيل، يرجى زيارة <a href="https://alsarya.tv/contact">صفحة الاتصال</a>.</p>
+        </div>
+    </div>
+</body>
+
+</html>
