@@ -26,7 +26,7 @@
     <link href="https://fonts.bunny.net/css?family=tajawal:400,500,600,700,800&display=swap" rel="stylesheet" />
     
     <!-- FlipDown CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flipdown/0.3.2/flipdown.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.css" />
 
     @vite([
         'resources/css/app.css',
@@ -618,7 +618,7 @@
     <div class="main-container">
         <!-- Logo -->
         <div class="logo-section">
-            <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" />
+            {{-- <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" /> --}}
         </div>
 
         <!-- Downtime Card -->
@@ -660,7 +660,7 @@
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     
     <!-- FlipDown JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flipdown/0.3.2/flipdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.js"></script>
     
     <script>
         // ==================== PRELOADER / SPLASH SCREEN ====================
