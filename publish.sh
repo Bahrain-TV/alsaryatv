@@ -1,5 +1,36 @@
 #!/bin/bash
 
+# Configuration (matching deploy.sh)
+SERVER="root@h6.doy.tech"
+APP_DIR="/home/alsarya.tv/public_html"
+
+# Function to SCP .env.production to production server
+scp_env_to_production() {
+    echo "📤 Uploading .env.production to production server..."
+    
+    # Get the directory where this script is located
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    ENV_FILE="$SCRIPT_DIR/.env.production"
+    
+    if [ ! -f "$ENV_FILE" ]; then
+        echo "❌ Error: .env.production file not found at $ENV_FILE"
+        exit 1
+    fi
+    
+    # SCP the .env.production file to the server as .env
+    scp "$ENV_FILE" "$SERVER:$APP_DIR/.env"
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ .env file successfully uploaded to production"
+    else
+        echo "❌ Failed to upload .env file to production"
+        exit 1
+    fi
+}
+
+# Upload .env to production FIRST
+scp_env_to_production
+
 # Send deploy webhook and capture JSON response
 RESPONSE=$(https -jb "https://h6.doy.tech:8090/websites/alsarya.tv/webhook" deploy=1) || true
 printf "Webhook response:\n%s\n" "$RESPONSE"

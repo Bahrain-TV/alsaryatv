@@ -12,34 +12,55 @@ Route::get('/splash', function () {
 })->name('splash');
 
 // Individual caller registration (friendly URL)
+// Displays countdown to Ramadan when registration is closed
 Route::get('/', function () {
-    return view('welcome');
+    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
+    $ramadanDate = Carbon::parse($registrationOpenDate);
+    
+    // Format date in Arabic
+    $arabicMonths = [
+        1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
+        5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
+        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+    ];
+    $formattedDate = $ramadanDate->day . ' ' . $arabicMonths[$ramadanDate->month] . ' ' . $ramadanDate->year;
+    
+    return view('welcome', [
+        'ramadanDate' => $formattedDate,
+    ]);
 })->name('home');
 
 // Family caller registration (friendly URL)
 Route::get('/family', function () {
-    return view('welcome');
+    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
+    $ramadanDate = Carbon::parse($registrationOpenDate);
+    
+    $arabicMonths = [
+        1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
+        5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
+        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+    ];
+    $formattedDate = $ramadanDate->day . ' ' . $arabicMonths[$ramadanDate->month] . ' ' . $ramadanDate->year;
+    
+    return view('welcome', [
+        'ramadanDate' => $formattedDate,
+    ]);
 })->name('family.registration');
 
 // Welcome page (informational page with Ramadan countdown)
 Route::get('/welcome', function () {
-    // Check the next Ramadan 1st of March 2025
-    $nextRamadan = Carbon::create(2025, 3, 1);
-    $currentDate = Carbon::now();
-    $daysUntilRamadan = $currentDate->diffInDays($nextRamadan, false);
-
-    // Get hits from HitsCounter provider
-    $hits = HitsCounter::getHits();
-
-    // Increment hits
-    HitsCounter::incrementHits();
-    $totalHits = HitsCounter::getTotalHits();
-
+    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
+    $ramadanDate = Carbon::parse($registrationOpenDate);
+    
+    $arabicMonths = [
+        1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
+        5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
+        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+    ];
+    $formattedDate = $ramadanDate->day . ' ' . $arabicMonths[$ramadanDate->month] . ' ' . $ramadanDate->year;
+    
     return view('welcome', [
-        'days' => round($daysUntilRamadan),
-        'ramadan' => $nextRamadan->format('d M Y'),
-        'hits' => number_format($hits ?? 0),
-        'totalHits' => number_format($totalHits ?? 0),
+        'ramadanDate' => $formattedDate,
     ]);
 })->name('welcome');
 
