@@ -58,6 +58,7 @@
             background-attachment: fixed;
             background-repeat: no-repeat;
             min-height: 100vh;
+            min-height: 100dvh; /* Dynamic viewport height for mobile */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -65,6 +66,7 @@
             overflow-x: hidden;
             position: relative;
             color: var(--text-primary);
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         /* Lottie Background Container */
@@ -130,10 +132,11 @@
             padding: 2rem;
             text-align: center;
             width: 100%;
-            max-width: 900px;
+            max-width: min(900px, calc(100vw - 2rem));
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 1s ease, transform 1s ease;
+            box-sizing: border-box;
         }
 
         .main-container.revealed {
@@ -253,6 +256,11 @@
         /* Countdown Section */
         .countdown-section {
             margin: 2rem 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: visible;
         }
 
         .countdown-label {
@@ -263,6 +271,8 @@
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
+            text-align: center;
+            line-height: 1.6;
         }
 
         .countdown-label::before,
@@ -277,10 +287,18 @@
             to { transform: rotate(360deg); }
         }
 
-        /* FlipDown Overrides */
+        /* FlipDown Overrides - Base */
         .flipdown {
             margin: 0 auto;
             direction: ltr;
+            width: auto !important;
+            overflow: visible;
+        }
+
+        .flipdown .rotor-group {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .flipdown .rotor-group-heading::before {
@@ -305,6 +323,7 @@
         .flipdown.flipdown__theme-dark .rotor-leaf-rear {
             background: linear-gradient(180deg, #1e293b, #0f172a) !important;
             border-color: rgba(212, 175, 55, 0.2) !important;
+            box-sizing: border-box !important;
         }
 
         .flipdown.flipdown__theme-dark .rotor-top,
@@ -315,6 +334,14 @@
         .flipdown.flipdown__theme-dark .rotor-bottom,
         .flipdown.flipdown__theme-dark .rotor-leaf-rear {
             color: #fbbf24 !important;
+        }
+
+        /* FlipDown Rotor Sizing - Desktop */
+        .flipdown .rotor {
+            width: 40px;
+            height: 55px;
+            font-size: 36px;
+            line-height: 55px;
         }
 
         /* Ramadan Date Info */
@@ -398,7 +425,7 @@
             opacity: 0.3;
         }
 
-        /* Responsive */
+        /* Responsive - Tablet */
         @media (max-width: 768px) {
             .main-container {
                 padding: 1rem;
@@ -406,6 +433,7 @@
 
             .downtime-card {
                 padding: 1.5rem;
+                border-radius: 20px;
             }
 
             .logo-section img {
@@ -420,15 +448,271 @@
                 font-size: 1.75rem;
             }
 
-            /* Fix FlipDown on Mobile by Scaling */
-            .countdown-section {
-                transform: scale(0.8);
-                transform-origin: center top;
-                margin-bottom: -1rem; /* Compensate for scale gap */
+            .subtitle {
+                font-size: 1.1rem;
             }
-            
+
+            .closed-message {
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .closed-message h3 {
+                font-size: 1.25rem;
+            }
+
+            .closed-message p {
+                font-size: 0.95rem;
+            }
+
+            .countdown-section {
+                margin: 1.5rem 0;
+            }
+
+            .countdown-label {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+
+            .ramadan-info {
+                padding: 1.25rem;
+                margin-top: 1.5rem;
+            }
+
+            .ramadan-info h4 {
+                font-size: 1.1rem;
+            }
+
+            .ramadan-info .date {
+                font-size: 1.35rem;
+            }
+
+            .ramadan-info .hijri {
+                font-size: 1rem;
+            }
+
+            /* FlipDown Responsive - Tablet */
             .flipdown {
                 width: auto !important;
+            }
+
+            .flipdown .rotor-group {
+                margin: 0 3px !important;
+            }
+
+            .flipdown .rotor {
+                width: 32px !important;
+                height: 44px !important;
+                font-size: 28px !important;
+                line-height: 44px !important;
+            }
+
+            .flipdown .rotor-group-heading::before {
+                font-size: 0.8rem !important;
+            }
+        }
+
+        /* Responsive - Mobile */
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0.75rem;
+            }
+
+            .downtime-card {
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .bismillah {
+                font-size: 1.4rem;
+                margin-bottom: 1rem;
+            }
+
+            .main-title {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .closed-message {
+                padding: 1rem;
+                margin-bottom: 1.25rem;
+                border-radius: 12px;
+            }
+
+            .closed-message h3 {
+                font-size: 1.1rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .closed-message p {
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            .countdown-section {
+                margin: 1.25rem 0;
+            }
+
+            .countdown-label {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .countdown-label::before,
+            .countdown-label::after {
+                font-size: 0.85rem;
+            }
+
+            .ramadan-info {
+                padding: 1rem;
+                margin-top: 1.25rem;
+                border-radius: 12px;
+            }
+
+            .ramadan-info h4 {
+                font-size: 1rem;
+            }
+
+            .ramadan-info .date {
+                font-size: 1.25rem;
+            }
+
+            .ramadan-info .hijri {
+                font-size: 0.95rem;
+            }
+
+            .footer-section {
+                margin-top: 1.5rem;
+                font-size: 0.85rem;
+            }
+
+            .footer-meta {
+                font-size: 0.85rem;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            /* FlipDown Responsive - Mobile */
+            .flipdown .rotor-group {
+                margin: 0 2px !important;
+            }
+
+            .flipdown .rotor {
+                width: 28px !important;
+                height: 38px !important;
+                font-size: 24px !important;
+                line-height: 38px !important;
+            }
+
+            .flipdown .rotor-top,
+            .flipdown .rotor-bottom,
+            .flipdown .rotor-leaf-front,
+            .flipdown .rotor-leaf-rear {
+                border-radius: 4px !important;
+            }
+
+            .flipdown .rotor-group-heading::before {
+                font-size: 0.75rem !important;
+            }
+        }
+
+        /* Responsive - Small Mobile */
+        @media (max-width: 360px) {
+            .main-container {
+                padding: 0.5rem;
+            }
+
+            .downtime-card {
+                padding: 1rem;
+                border-radius: 14px;
+            }
+
+            .bismillah {
+                font-size: 1.2rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .main-title {
+                font-size: 1.3rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .closed-message {
+                padding: 0.875rem;
+                margin-bottom: 1rem;
+            }
+
+            .closed-message h3 {
+                font-size: 1rem;
+            }
+
+            .closed-message p {
+                font-size: 0.85rem;
+            }
+
+            .countdown-section {
+                margin: 1rem 0;
+            }
+
+            .countdown-label {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .countdown-label::before,
+            .countdown-label::after {
+                font-size: 0.75rem;
+            }
+
+            .ramadan-info {
+                padding: 0.875rem;
+                margin-top: 1rem;
+            }
+
+            .ramadan-info h4 {
+                font-size: 0.9rem;
+            }
+
+            .ramadan-info .date {
+                font-size: 1.1rem;
+            }
+
+            .ramadan-info .hijri {
+                font-size: 0.85rem;
+            }
+
+            .footer-section {
+                margin-top: 1.25rem;
+                font-size: 0.8rem;
+            }
+
+            .footer-meta {
+                font-size: 0.8rem;
+            }
+
+            /* FlipDown Responsive - Small Mobile */
+            .flipdown .rotor-group {
+                margin: 0 1px !important;
+            }
+
+            .flipdown .rotor {
+                width: 24px !important;
+                height: 32px !important;
+                font-size: 20px !important;
+                line-height: 32px !important;
+            }
+
+            .flipdown .rotor-group-heading::before {
+                font-size: 0.65rem !important;
             }
         }
 
