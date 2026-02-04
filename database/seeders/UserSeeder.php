@@ -121,14 +121,14 @@ class UserSeeder extends Seeder
             Log::info('Email sent to: '.$user['email']);
 
             // Send to developer email in staging env
-            // Mail::to('aldoyh@gmail.com')->send(
-            //     new WelcomePasswordEmail(
-            //         $plainPass,
-            //         $user['name'],
-            //         $user['email']
-            //     )
-            // );
-            // Log::info('Staging email sent to developer');
+            Mail::to('aldoyh@gmail.com')->send(
+                new WelcomePasswordEmail(
+                    $plainPass,
+                    $user['name'],
+                    $user['email']
+                )
+            );
+            Log::info('Staging email sent to developer');
         } catch (\Exception $e) {
             Log::error('Failed to send welcome email: '.$e->getMessage());
         }
