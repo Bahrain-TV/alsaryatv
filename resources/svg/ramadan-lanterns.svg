@@ -3,7 +3,7 @@
   <style type="text/css">
     <![CDATA[
       .lantern {
-        animation: swing 2s ease-in-out infinite;
+        animation: swing 4s ease-in-out infinite;
         transform-origin: center top;
       }
       .lantern:nth-child(2) {

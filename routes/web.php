@@ -14,8 +14,12 @@ Route::get('/splash', function () {
 // Individual caller registration (friendly URL)
 // Displays countdown to Ramadan when registration is closed
 Route::get('/', function () {
-    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
-    $ramadanDate = Carbon::parse($registrationOpenDate);
+    // Ramadan 1447 starts on February 26, 2026
+    $ramadanStartDate = '2026-02-26';
+    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-03-01');
+    
+    // Use Ramadan start date for countdown and display
+    $ramadanDate = Carbon::parse($ramadanStartDate);
 
     // Format date in Arabic
     $arabicMonths = [
@@ -30,15 +34,20 @@ Route::get('/', function () {
 
     return view('welcome', [
         'ramadanDate' => $formattedDate,
-        'targetISO' => $registrationOpenDate,
+        'ramadanStartISO' => $ramadanStartDate,
+        'registrationOpenISO' => $registrationOpenDate,
         'totalHits' => $totalHits,
     ]);
 })->name('home');
 
 // Family caller registration (friendly URL)
 Route::get('/family', function () {
-    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
-    $ramadanDate = Carbon::parse($registrationOpenDate);
+    // Ramadan 1447 starts on February 26, 2026
+    $ramadanStartDate = '2026-02-26';
+    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-03-01');
+    
+    // Use Ramadan start date for countdown and display
+    $ramadanDate = Carbon::parse($ramadanStartDate);
 
     $arabicMonths = [
         1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
@@ -49,15 +58,20 @@ Route::get('/family', function () {
 
     return view('welcome', [
         'ramadanDate' => $formattedDate,
-        'targetISO' => $registrationOpenDate,
+        'ramadanStartISO' => $ramadanStartDate,
+        'registrationOpenISO' => $registrationOpenDate,
         'totalHits' => HitsCounter::getHits(), // Fetch hits effectively
     ]);
 })->name('family.registration');
 
 // Welcome page (informational page with Ramadan countdown)
 Route::get('/welcome', function () {
-    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
-    $ramadanDate = Carbon::parse($registrationOpenDate);
+    // Ramadan 1447 starts on February 26, 2026
+    $ramadanStartDate = '2026-02-26';
+    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-03-01');
+    
+    // Use Ramadan start date for countdown and display
+    $ramadanDate = Carbon::parse($ramadanStartDate);
 
     $arabicMonths = [
         1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
@@ -71,7 +85,8 @@ Route::get('/welcome', function () {
 
     return view('welcome', [
         'ramadanDate' => $formattedDate,
-        'targetISO' => $registrationOpenDate,
+        'ramadanStartISO' => $ramadanStartDate,
+        'registrationOpenISO' => $registrationOpenDate,
         'totalHits' => $totalHits,
     ]);
 })->name('welcome');

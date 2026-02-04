@@ -1033,8 +1033,8 @@
 
             // Ramadan 1447 starts on February 26, 2026 at midnight (Bahrain time)
             // Using Bahrain timezone (UTC+3)
-            const targetISO = '{{ $targetISO ?? "2026-02-26" }}';
-            const ramadanDate = new Date(targetISO + 'T00:00:00+03:00');
+            const ramadanStartISO = '{{ $ramadanStartISO ?? "2026-02-26" }}';
+            const ramadanDate = new Date(ramadanStartISO + 'T00:00:00+03:00');
             const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
 
             // Ensure container exists and is empty
