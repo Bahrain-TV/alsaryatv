@@ -119,10 +119,6 @@ class PersistDataCommand extends Command
             $winners = Caller::where('is_winner', true)->count();
             $this->line("  ✓ Total winners marked: {$winners}");
 
-            // Check family members
-            $family = Caller::where('is_family', true)->count();
-            $this->line("  ✓ Total family members marked: {$family}");
-
             $this->info('✓ Data integrity verification completed');
 
         } catch (\Exception $e) {
@@ -176,7 +172,7 @@ class PersistDataCommand extends Command
             }
 
             // Generate CSV content
-            $csv = "Name,Phone,CPR,Status,Is Winner,Is Family,Hits,Last Hit,Created At,Updated At\n";
+            $csv = "Name,Phone,CPR,Status,Is Winner,Hits,Last Hit,Created At,Updated At\n";
 
             foreach ($callers as $caller) {
                 $csv .= sprintf(
@@ -186,7 +182,6 @@ class PersistDataCommand extends Command
                     str_replace('"', '""', $caller->cpr ?? ''),
                     str_replace('"', '""', $caller->status ?? 'active'),
                     $caller->is_winner ? 1 : 0,
-                    $caller->is_family ? 1 : 0,
                     $caller->hits ?? 0,
                     str_replace('"', '""', $caller->last_hit?->format('Y-m-d H:i:s') ?? ''),
                     str_replace('"', '""', $caller->created_at?->format('Y-m-d H:i:s') ?? ''),
@@ -291,7 +286,6 @@ class PersistDataCommand extends Command
                 'timestamp' => now(),
                 'total_callers' => Caller::count(),
                 'total_winners' => Caller::where('is_winner', true)->count(),
-                'total_family' => Caller::where('is_family', true)->count(),
                 'database' => config('database.default'),
                 'environment' => app()->environment(),
                 'disk_space_available_gb' => disk_free_space(storage_path()) / (1024 ** 3),

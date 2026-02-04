@@ -182,8 +182,8 @@ class ShowStatisticsCommand extends Command
     {
         try {
             $totalCallers = DB::table('callers')->count();
-            $individualCallers = DB::table('callers')->where('is_family', false)->count();
-            $familyCallers = DB::table('callers')->where('is_family', true)->count();
+            $individualCallers = $totalCallers;
+            $familyCallers = 0;
             $winnersCount = DB::table('callers')->where('is_winner', true)->count();
             $totalHits = DB::table('callers')->sum('hits');
 
@@ -296,7 +296,6 @@ class ShowStatisticsCommand extends Command
         $markdown .= "### 👥 المشاركين\n\n";
         $markdown .= "* إجمالي عدد المشاركين: **{$data['totalCallers']}**\n";
         $markdown .= "* المشاركين الأفراد: **{$data['individualCallers']}**\n";
-        $markdown .= "* المشاركين العائلات: **{$data['familyCallers']}**\n";
         $markdown .= "* الفائزين: **{$data['winnersCount']}**\n\n";
         $markdown .= "### 🎯 الضغطات\n\n";
         $markdown .= "* إجمالي عدد الضغطات: **{$data['totalHits']}**\n";

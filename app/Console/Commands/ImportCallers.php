@@ -294,7 +294,6 @@ class ImportCallers extends Command
             'last_hit' => $lastHit,
             'status' => $record['Status'] ?? $record['status'] ?? 'active',
             'notes' => $record['Notes'] ?? $record['notes'] ?? null,
-            'is_family' => (bool) ($record['is_family'] ?? false),
             'is_winner' => $record['is_winner'] === 'Yes' || $record['is_winner'] === '1' || $record['is_winner'] === true,
             'updated_at' => now()->toDateTimeString(),
         ];

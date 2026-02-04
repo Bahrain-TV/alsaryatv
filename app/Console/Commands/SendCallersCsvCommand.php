@@ -17,7 +17,6 @@ class SendCallersCsvCommand extends Command
                            {--bcc= : Optional BCC email addresses (comma separated)}
                            {--subject= : Custom email subject}
                            {--note= : Additional note to include in the email}
-                           {--family-only : Export only family callers}
                            {--individual-only : Export only individual callers}';
 
     protected $description = 'Send a CSV export of callers to specified email address';
@@ -59,11 +58,7 @@ class SendCallersCsvCommand extends Command
             // Build query directly to avoid ORM events
             $query = DB::table('callers');
 
-            if ($familyOnly) {
-                $query->where('is_family', true);
-                $this->info('Exporting family callers only');
-            } elseif ($individualOnly) {
-                $query->where('is_family', false);
+            if ($individualOnly) {
                 $this->info('Exporting individual callers only');
             }
 
@@ -137,7 +132,7 @@ class SendCallersCsvCommand extends Command
             Storage::makeDirectory($directory);
 
             // Create CSV file with headers
-            $headers = ['ID', 'Name', 'Phone', 'CPR', 'Family', 'Winner', 'Hits', 'Status', 'Notes', 'Created At'];
+            $headers = ['ID', 'Name', 'Phone', 'CPR', 'Winner', 'Hits', 'Status', 'Notes', 'Created At'];
 
             $handle = fopen(Storage::path($path), 'w');
             if (! $handle) {
@@ -157,7 +152,6 @@ class SendCallersCsvCommand extends Command
                         $record->name,
                         $record->phone_number,
                         $record->cpr,
-                        $record->is_family ? 'Yes' : 'No',
                         $record->is_winner ? 'Yes' : 'No',
                         $record->hits,
                         $record->status,

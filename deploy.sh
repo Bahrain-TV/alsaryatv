@@ -4,7 +4,17 @@
 # Supports automated data backup/restore during deployment
 # For emergency restore: ./deploy.sh restore <backup-filename>
 
-# Configuration
+# --- Colors for Terminal ---
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
+
+# --- Configuration ---
 if [ -z "$APP_ENV" ]; then
     APP_ENV="staging"
 else
@@ -22,9 +32,7 @@ SUDO_PREFIX="sudo -u $APP_USER"
 # Data persistence variables
 BACKUP_ENABLE=true
 BACKUP_DIR="$APP_DIR/storage/app/backups/callers"
-LATEST_BACKUP_FILE=""
 DEPLOYMENT_ID="deploy_$(date +%s)"
-ENABLE_RESTORE_ON_FAILURE=true
 
 # Version management
 VERSION_FILE="$APP_DIR/version.txt"
@@ -34,45 +42,21 @@ else
     CURRENT_VERSION="1.0.0"
 fi
 
-# Function to increment version
-increment_version() {
-    local version=$1
-    local major minor patch
+# --- Helper Functions ---
 
-    IFS='.' read -r major minor patch <<< "$version"
+log_info() { echo -e "${BLUE}${BOLD}INFO:${NC} $1"; }
+log_success() { echo -e "${GREEN}${BOLD}SUCCESS:${NC} $1"; }
+log_warn() { echo -e "${YELLOW}${BOLD}WARNING:${NC} $1"; }
+log_error() { echo -e "${RED}${BOLD}ERROR:${NC} $1"; }
 
-    # Increment patch version
-    patch=$((patch + 1))
-
-    # Reset patch and increment minor if patch >= 100 (optional convention)
-    if [ $patch -ge 100 ]; then
-        patch=0
-        minor=$((minor + 1))
-
-        # Reset minor and increment major if minor >= 100
-        if [ $minor -ge 100 ]; then
-            minor=0
-            major=$((major + 1))
-        fi
-    fi
-
-    echo "${major}.${minor}.${patch}"
-}
-
-# Function to send "Dramatic" Discord Notifications
 send_discord_message() {
     local title="$1"
     local description="$2"
     local color="$3" # e.g., 5763719 (Green), 15548997 (Red), 3447003 (Blue)
 
-    # Default to Green if no color provided
-    if [ -z "$color" ]; then
-        color=5763719
-    fi
-
+    if [ -z "$color" ]; then color=5763719; fi
     TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%S.000Z)
 
-    # JSON Payload for Embed
     PAYLOAD=$(cat <<EOF
 {
   "embeds": [
@@ -81,101 +65,113 @@ send_discord_message() {
       "description": "$description",
       "color": $color,
       "timestamp": "$TIMESTAMP",
-      "footer": {
-        "text": "AlSarya TV Server Deployment"
-      }
+      "footer": { "text": "AlSarya TV Server Deployment" }
     }
   ]
 }
 EOF
 )
-
     curl -s -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK" > /dev/null 2>&1
 }
 
-# Function to export data before deployment
-export_data_backup() {
-    if [ "$BACKUP_ENABLE" != "true" ]; then
-        echo "→ Data backup is disabled"
-        return 0
+increment_version() {
+    local version=$1
+    local major minor patch
+    IFS='.' read -r major minor patch <<< "$version"
+    patch=$((patch + 1))
+    if [ $patch -ge 100 ]; then
+        patch=0
+        minor=$((minor + 1))
+        if [ $minor -ge 100 ]; then
+            minor=0
+            major=$((major + 1))
+        fi
     fi
+    echo "${major}.${minor}.${patch}"
+}
 
-    echo ""
-    echo "=========================================="
-    echo "📦 Creating pre-deployment backup..."
+# Execute command and only show output on error
+execute_silent() {
+    local cmd="$1"
+    local msg="$2"
     
-    # Run the persistence command to create CSV backup and clean old ones (keeping 5)
-    $SUDO_PREFIX $ART_CMD app:persist-data --export-csv --verify
+    echo -ne "  → $msg... "
+    output=$(eval "$cmd" 2>&1)
+    status=$?
     
-    if [ $? -eq 0 ]; then
-        echo "✅ Backup completed and verified"
+    if [ $status -eq 0 ]; then
+        echo -e "${GREEN}DONE${NC}"
     else
-        echo "⚠️ Backup warning: Data persistence command returned non-zero exit code"
+        echo -e "${RED}FAILED${NC}"
+        echo -e "${YELLOW}--- Error Output ---${NC}"
+        echo -e "$output"
+        echo -e "${YELLOW}--------------------${NC}"
+        return $status
     fi
 }
 
-# Function to restore data after deployment
-import_data_restore() {
-    if [ "$BACKUP_ENABLE" != "true" ]; then
-        echo "→ Data restore is disabled"
-        return 0
-    fi
+# --- Main Deployment Steps ---
 
-    echo ""
-    echo "=========================================="
-    echo "⏪ Restoring data from latest backup..."
-    
-    # Run the import command to restore callers from the latest CSV
-    $SUDO_PREFIX $ART_CMD app:callers:import --force
-    
-    if [ $? -eq 0 ]; then
-        echo "✅ Data restoration completed successfully"
-    else
-        echo "⚠️ Restore warning: Caller import command returned non-zero exit code"
-    fi
-}
+echo -e "${PURPLE}${BOLD}==========================================================${NC}"
+echo -e "${PURPLE}${BOLD}🚀 AlSarya TV - Automated Deployment Sequence${NC}"
+echo -e "${PURPLE}${BOLD}==========================================================${NC}"
 
-# Main deployment logic
-echo "🚀 Starting deployment..."
-send_discord_message "🚀 Deployment Started" "Server is starting deployment sequence..." 3447003
+send_discord_message "🚀 Deployment Started" "Server is starting deployment sequence for version $(increment_version "$CURRENT_VERSION")..." 3447003
 
-# Pull latest changes (Force Sync)
-echo "⬇️ Syncing with origin/main..."
-$SUDO_PREFIX git fetch origin main
-
-if $SUDO_PREFIX git reset --hard origin/main; then
-    echo "✅ Code synced successfully"
-    
-    # Cleanup: Remove development and workflow files from production server
-    echo "🧹 Cleaning up development files from production..."
-    $SUDO_PREFIX rm -rf .github PROJECT_DOCS tests .vscode .claude .gitignore README.md CLAUDE.md TODO.md
-else
-    echo "❌ Git sync failed"
-    send_discord_message "Deployment Failed ❌" "git reset --hard origin/main failed on server." 15548997
+# 1. Git Sync
+log_info "Synchronizing code with origin/main..."
+execute_silent "$SUDO_PREFIX git fetch origin main" "Fetching latest changes"
+if ! execute_silent "$SUDO_PREFIX git reset --hard origin/main" "Resetting to origin/main"; then
+    log_error "Git sync failed. Aborting deployment."
+    send_discord_message "Deployment Failed ❌" "Git synchronization failed on server." 15548997
     exit 1
 fi
 
-# Run backup
-export_data_backup
+# 2. Cleanup
+execute_silent "$SUDO_PREFIX rm -rf .github PROJECT_DOCS tests .vscode .claude .gitignore README.md CLAUDE.md TODO.md" "Cleaning up development files"
 
-# Run migrations
-$SUDO_PREFIX $ART_CMD migrate --force
+# 3. Pre-deployment Backup
+if [ "$BACKUP_ENABLE" == "true" ]; then
+    log_info "Creating pre-deployment data backup..."
+    if ! execute_silent "$SUDO_PREFIX $ART_CMD app:persist-data --export-csv --verify" "Exporting callers database"; then
+        log_warn "Backup failed or had warnings. Continuing with caution."
+    fi
+fi
 
-# Run restore
-import_data_restore
+# 4. Migrations
+log_info "Running database migrations..."
+if ! execute_silent "$SUDO_PREFIX $ART_CMD migrate --force" "Executing artisan migrate"; then
+    log_error "Migration failed. Critical error."
+    send_discord_message "Deployment Failed ❌" "Database migration failed on server." 15548997
+    exit 1
+fi
 
-# Clear caches
-$SUDO_PREFIX $ART_CMD optimize:clear
-$SUDO_PREFIX $ART_CMD config:cache
-$SUDO_PREFIX $ART_CMD route:cache
-$SUDO_PREFIX $ART_CMD view:cache
+# 5. Data Restoration
+if [ "$BACKUP_ENABLE" == "true" ]; then
+    log_info "Restoring data from latest backup..."
+    if ! execute_silent "$SUDO_PREFIX $ART_CMD app:callers:import --force" "Executing data import"; then
+        log_error "Data restoration failed! The database might be inconsistent."
+        send_discord_message "Deployment Warning ⚠️" "Data restoration failed during deployment. Manual check required." 15548997
+        # Note: We don't exit here as the code is already updated and migrated.
+    fi
+fi
 
-# Update version
+# 6. Optimization
+log_info "Optimizing application performance..."
+execute_silent "$SUDO_PREFIX $ART_CMD optimize:clear" "Clearing caches"
+execute_silent "$SUDO_PREFIX $ART_CMD config:cache" "Caching configuration"
+execute_silent "$SUDO_PREFIX $ART_CMD route:cache" "Caching routes"
+execute_silent "$SUDO_PREFIX $ART_CMD view:cache" "Caching views"
+
+# 7. Version Update
 NEW_VERSION=$(increment_version "$CURRENT_VERSION")
-echo "$NEW_VERSION" > "$VERSION_FILE"
-# Ensure version file is owned by app user
-chown $APP_USER:$APP_USER "$VERSION_FILE"
+execute_silent "echo '$NEW_VERSION' > '$VERSION_FILE' && chown $APP_USER:$APP_USER '$VERSION_FILE'" "Updating version to $NEW_VERSION"
 
-echo "✅ Deployment completed successfully! New version: $NEW_VERSION"
+echo -e "${GREEN}${BOLD}==========================================================${NC}"
+echo -e "${GREEN}${BOLD}✅ Deployment Completed Successfully!${NC}"
+echo -e "${GREEN}${BOLD}New Version: $NEW_VERSION${NC}"
+echo -e "${GREEN}${BOLD}==========================================================${NC}"
+
 send_discord_message "Deployment Successful ✅" "AlSarya TV successfully deployed version **$NEW_VERSION**." 5763719
+
 exit 0
