@@ -200,8 +200,8 @@ class PersistDataCommand extends Command
             Storage::put($filepath, $csv);
             $this->line("  ✓ Timestamped backup created: {$filename}");
 
-            // Keep only last 30 backups
-            $this->cleanOldBackups($backupDir, 30);
+            // Keep only last 5 backups
+            $this->cleanOldBackups($backupDir, 5);
 
         } catch (\Exception $e) {
             $this->warn("⚠ Failed to create timestamped backup: {$e->getMessage()}");

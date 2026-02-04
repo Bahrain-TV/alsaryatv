@@ -68,5 +68,24 @@ class AppServiceProvider extends ServiceProvider
             Css::make('debug-styles', asset('css/debug-styles.css'))
                 ->loadedOnRequest(),
         ]);
+
+        // Global Persistence Hooks for Migrations and Seeding
+        if ($this->app->runningInConsole()) {
+            \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\CommandStarting::class, function ($event) {
+                if (in_array($event->command, ['migrate', 'db:seed', 'migrate:fresh', 'migrate:refresh', 'migrate:rollback'])) {
+                    // Always backup before potentially destructive operations
+                    \Illuminate\Support\Facades\Artisan::call('app:persist-data', ['--export-csv' => true, '--verify' => true]);
+                }
+            });
+
+            \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\CommandFinished::class, function ($event) {
+                // Restore data if it was a migration or seeding that likely cleared data
+                if (in_array($event->command, ['migrate', 'db:seed', 'migrate:fresh', 'migrate:refresh'])) {
+                    if ($event->exitCode === 0) {
+                        \Illuminate\Support\Facades\Artisan::call('app:callers:import', ['--force' => true]);
+                    }
+                }
+            });
+        }
     }
 }

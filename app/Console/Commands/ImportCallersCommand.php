@@ -20,7 +20,7 @@ class ImportCallersCommand extends Command
      * @var string
      */
     protected $signature = 'app:callers:import
-                            {file? : The path to the CSV file relative to storage/app/private/exports/callers/}
+                            {file? : The path to the CSV file relative to storage/app/backups/callers/}
                             {--force : Force import without confirmation}
                             {--d|debug : Show detailed debug information}
                             {--l|list : List all CSV files for selection instead of picking latest}
@@ -403,7 +403,7 @@ class ImportCallersCommand extends Command
 
         if (! $filePath) {
             // List all CSV files in the specified directory
-            $files = collect(Storage::files('exports/callers'))
+            $files = collect(Storage::files('backups/callers'))
                 ->filter(function ($file) {
                     return Str::endsWith($file, '.csv');
                 })
@@ -411,7 +411,7 @@ class ImportCallersCommand extends Command
                 ->all();
 
             if (empty($files)) {
-                $this->error('No CSV files found in storage/app/private/exports/callers/');
+                $this->error('No CSV files found in storage/app/backups/callers/');
 
                 return null;
             }
@@ -459,8 +459,8 @@ class ImportCallersCommand extends Command
             }
         } else {
             // If relative path provided, prepend the directory
-            if (! Str::startsWith($filePath, 'exports/callers/')) {
-                $filePath = 'exports/callers/'.$filePath;
+            if (! Str::startsWith($filePath, 'backups/callers/')) {
+                $filePath = 'backups/callers/'.$filePath;
             }
         }
 

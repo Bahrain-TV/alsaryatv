@@ -104,14 +104,35 @@ export_data_backup() {
     echo "=========================================="
     echo "📦 Creating pre-deployment backup..."
     
-    # Ensure backup directory exists
-    mkdir -p "$BACKUP_DIR"
+    # Run the persistence command to create CSV backup and clean old ones (keeping 5)
+    $SUDO_PREFIX $ART_CMD app:persist-data --export-csv --verify
     
-    # Create backup of the database (sqlite) and other critical files if needed
-    # (Simplified for now - just creating a timestamp marker)
-    touch "$BACKUP_DIR/backup_$DEPLOYMENT_ID.txt"
+    if [ $? -eq 0 ]; then
+        echo "✅ Backup completed and verified"
+    else
+        echo "⚠️ Backup warning: Data persistence command returned non-zero exit code"
+    fi
+}
+
+# Function to restore data after deployment
+import_data_restore() {
+    if [ "$BACKUP_ENABLE" != "true" ]; then
+        echo "→ Data restore is disabled"
+        return 0
+    fi
+
+    echo ""
+    echo "=========================================="
+    echo "⏪ Restoring data from latest backup..."
     
-    echo "✅ Backup completed"
+    # Run the import command to restore callers from the latest CSV
+    $SUDO_PREFIX $ART_CMD app:callers:import --force
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Data restoration completed successfully"
+    else
+        echo "⚠️ Restore warning: Caller import command returned non-zero exit code"
+    fi
 }
 
 # Main deployment logic
@@ -135,6 +156,9 @@ export_data_backup
 
 # Run migrations
 $SUDO_PREFIX $ART_CMD migrate --force
+
+# Run restore
+import_data_restore
 
 # Clear caches
 $SUDO_PREFIX $ART_CMD optimize:clear

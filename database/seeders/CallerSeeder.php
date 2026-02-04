@@ -24,7 +24,7 @@ class CallerSeeder extends Seeder
         Caller::truncate();
 
         // Find the most recent CSV file in the specified directory
-        $csvDirectory = 'private/exports/csv/callers';
+        $csvDirectory = 'backups/callers';
         $csvFiles = Storage::files($csvDirectory);
 
         // Filter to only include CSV files
