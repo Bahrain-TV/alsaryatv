@@ -3,31 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Events\CallerApproved;
+use App\Http\Requests\UpdateCallerStatusRequest;
 use App\Models\Caller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class CallerStatusController extends Controller
 {
     /**
      * Update the caller's status.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(UpdateCallerStatusRequest $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'status' => 'required|string|in:PENDING,REJECTED,APPROVED',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
-
         $caller = Caller::findOrFail($id);
-        $caller->status = $request->status;
-        $caller->save();
+        $caller->update(['status' => $request->validated('status')]);
 
         return response()->json(['success' => true, 'caller' => $caller]);
     }
@@ -78,24 +66,4 @@ class CallerStatusController extends Controller
         ]);
     }
 
-    /**
-     * Toggle the caller's family status.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function toggleFamily($id)
-    {
-        $caller = Caller::findOrFail($id);
-
-        // Toggle the is_family status
-        $caller->is_family = ! $caller->is_family;
-        $caller->save();
-
-        return response()->json([
-            'success' => true,
-            'caller' => $caller,
-            'is_family' => $caller->is_family,
-        ]);
-    }
 }

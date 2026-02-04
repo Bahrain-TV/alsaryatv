@@ -22,7 +22,8 @@ class CallerController extends Controller
 
     public function index()
     {
-        return view('callers.index', ['callers' => Caller::latest()->get()]);
+        $callers = Caller::latest()->paginate(25);
+        return view('callers.index', ['callers' => $callers]);
     }
 
     public function create()
@@ -95,12 +96,8 @@ class CallerController extends Controller
 
     public function winners()
     {
-        return view('callers.winners', ['winners' => Caller::winners()->latest()->get()]);
-    }
-
-    public function families()
-    {
-        return view('callers.families', ['families' => Caller::where('is_family', true)->latest()->get()]);
+        $winners = Caller::winners()->latest()->paginate(25);
+        return view('callers.winners', ['winners' => $winners]);
     }
 
     public function checkCpr(Request $request)
