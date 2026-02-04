@@ -22,6 +22,9 @@
                     <x-nav-link href="{{ route('winners') }}" :active="request()->routeIs('winners')">
                         {{ __('Winners') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('families') }}" :active="request()->routeIs('families')">
+                        {{ __('Families') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -151,6 +154,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('winners') }}" :active="request()->routeIs('winners')">
                 {{ __('Winners') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('families') }}" :active="request()->routeIs('families')">
+                {{ __('Families') }}
             </x-responsive-nav-link>
         </div>
 

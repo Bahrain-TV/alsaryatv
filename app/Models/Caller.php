@@ -16,6 +16,7 @@ class Caller extends Model
         'phone',
         'cpr',
         'is_winner',
+        'is_family',
         'status',
         'ip_address',
         'hits',
@@ -26,6 +27,7 @@ class Caller extends Model
 
     protected $casts = [
         'is_winner' => 'boolean',
+        'is_family' => 'boolean',
         'last_hit' => 'datetime',
     ];
 

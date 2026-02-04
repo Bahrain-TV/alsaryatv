@@ -826,33 +826,68 @@
             <h1 class="main-title">برنامج السارية</h1>
             <p class="subtitle">على شاشة تلفزيون البحرين</p>
 
-            <!-- Registration Closed -->
-            <div class="closed-message">
-                <h3>⏸️ التسجيل مغلق حالياً</h3>
-                <p>سيتم فتح التسجيل مع بداية شهر رمضان المبارك</p>
-            </div>
-
-            <!-- Countdown -->
-            <div class="countdown-section">
-                <div class="countdown-title">
-                    <span class="crescent">☪</span>
-                    العد التنازلي لشهر رمضان المبارك
-                    <span class="crescent">☪</span>
+            @auth
+                <!-- Authenticated User - Show Admin Actions -->
+                <div class="admin-actions" style="margin: 2rem 0; padding: 1.5rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1)); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px;">
+                    <h3 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        👋 مرحباً، {{ Auth::user()->name }}
+                    </h3>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">
+                        لديك صلاحيات الوصول الكامل للنظام
+                    </p>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                        <a href="{{ route('dashboard') }}" 
+                           style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; border-radius: 12px; text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);">
+                            📊 لوحة التحكم
+                        </a>
+                        <a href="{{ route('callers.create') }}" 
+                           style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 700; border-radius: 12px; text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                            ➕ تسجيل متصل جديد
+                        </a>
+                        <a href="{{ route('winners') }}" 
+                           style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; font-weight: 700; border-radius: 12px; text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+                            🏆 الفائزين
+                        </a>
+                        <a href="{{ route('families') }}" 
+                           style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; background: linear-gradient(135deg, #ec4899, #db2777); color: white; font-weight: 700; border-radius: 12px; text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);">
+                            👨‍👩‍👧‍👦 العائلات
+                        </a>
+                    </div>
                 </div>
-                <x-ramadan-countdown
-                    :target-date="($ramadanStartISO ?? '2026-02-18') . 'T00:00:00+03:00'"
-                    id="ramadan-countdown"
-                />
-            </div>
 
-            <!-- Ramadan Date Info -->
-            <div class="ramadan-info">
-                <h4>🌙 أول أيام شهر رمضان المبارك</h4>
-                <div class="date">
-                    {{ '18 فبراير 2026' }}
+                <!-- Quick Stats for Authenticated Users -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+                    <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; padding: 1rem; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #fbbf24;">{{ number_format($totalHits ?? 0) }}</div>
+                        <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.875rem;">إجمالي الزوار</div>
+                    </div>
                 </div>
-                <div class="hijri">1 رمضان 1447 هـ</div>
-            </div>
+            @else
+                <!-- Guest User - Show Countdown -->
+                <!-- Registration Closed -->
+                <div class="closed-message">
+                    <h3>⏸️ التسجيل مغلق حالياً</h3>
+                    <p>سيتم فتح التسجيل مع بداية شهر رمضان المبارك</p>
+                </div>
+
+                <!-- Countdown -->
+                <div class="countdown-section">
+                    <div class="countdown-label">
+                        العد التنازلي لشهر رمضان المبارك
+                    </div>
+                    <div id="flipdown" class="flipdown flipdown__theme-dark"></div>
+                </div>
+
+                <!-- Ramadan Date Info -->
+                <div class="ramadan-info">
+                    <h4>🌙 أول أيام شهر رمضان المبارك</h4>
+                    <div class="date">
+                        {{ '18 فبراير 2026' }}
+                    </div>
+                    <div class="hijri">1 رمضان 1447 هـ</div>
+                </div>
+            @endauth
         </div>
 
         <!-- Footer -->
@@ -864,7 +899,14 @@
                     👁️ عدد الزوار: {{ number_format($totalHits ?? 0) }}
                 </span>
                 <span class="separator">|</span>
-                <a href="{{ route('login') }}" class="login-link">تسجيل الدخول</a>
+                @auth
+                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="login-link" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit;">تسجيل الخروج</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="login-link">تسجيل الدخول</a>
+                @endauth
             </div>
         </div>
     </div>
@@ -920,9 +962,28 @@
 
         // ==================== COUNTDOWN ENDED HANDLER ====================
         document.addEventListener('DOMContentLoaded', function() {
-            const countdown = document.getElementById('ramadan-countdown');
-            if (countdown) {
-                countdown.addEventListener('countdownEnded', function() {
+            // Only initialize FlipDown for guest users (when the element exists)
+            const flipdownEl = document.getElementById('flipdown');
+            if (!flipdownEl || window.flipdownInitialized) return;
+            
+            window.flipdownInitialized = true;
+
+            // Ramadan 1447 starts on February 18, 2026 at midnight (Bahrain time)
+            // Using Bahrain timezone (UTC+3)
+            const ramadanStartISO = '{{ $ramadanStartISO ?? "2026-02-18" }}';
+            const ramadanDate = new Date(ramadanStartISO + 'T00:00:00+03:00');
+            const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
+
+            // Ensure container is empty before initializing
+            flipdownEl.innerHTML = '';
+
+            // Initialize FlipDown
+            try {
+                const flipdown = new FlipDown(ramadanTimestamp, 'flipdown', {
+                    theme: 'dark'
+                });
+                
+                flipdown.start().ifEnded(() => {
                     // When countdown ends, show Ramadan message
                     const title = document.querySelector('.closed-message h3');
                     const desc = document.querySelector('.closed-message p');

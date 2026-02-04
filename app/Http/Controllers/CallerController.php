@@ -98,6 +98,11 @@ class CallerController extends Controller
         return view('callers.winners', ['winners' => Caller::winners()->latest()->get()]);
     }
 
+    public function families()
+    {
+        return view('callers.families', ['families' => Caller::where('is_family', true)->latest()->get()]);
+    }
+
     public function checkCpr(Request $request)
     {
         return response()->json([
