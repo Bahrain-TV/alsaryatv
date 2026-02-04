@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Caller;
 use App\Services\CsvExportService;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -63,7 +62,7 @@ class PersistDataCommand extends Command
             return self::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('Data persistence check failed: ' . $e->getMessage());
+            $this->error('Data persistence check failed: '.$e->getMessage());
             Log::error('Data persistence check failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -142,7 +141,7 @@ class PersistDataCommand extends Command
 
         try {
             $callers = Caller::all();
-            $csvService = new CsvExportService();
+            $csvService = new CsvExportService;
             $filename = $csvService->generate($callers);
 
             if ($filename) {
@@ -172,7 +171,7 @@ class PersistDataCommand extends Command
             $backupDir = 'backups/callers';
 
             // Create backup directory if it doesn't exist
-            if (!Storage::exists($backupDir)) {
+            if (! Storage::exists($backupDir)) {
                 Storage::makeDirectory($backupDir, 0755, true);
             }
 
@@ -231,7 +230,7 @@ class PersistDataCommand extends Command
             }
 
             if (count($filesToDelete) > 0) {
-                $this->line("  ✓ Cleaned up " . count($filesToDelete) . " old backups (kept {$keepCount})");
+                $this->line('  ✓ Cleaned up '.count($filesToDelete)." old backups (kept {$keepCount})");
             }
 
         } catch (\Exception $e) {
@@ -255,7 +254,7 @@ class PersistDataCommand extends Command
             ];
 
             foreach ($backupDirs as $dir) {
-                if (!Storage::exists($dir)) {
+                if (! Storage::exists($dir)) {
                     Storage::makeDirectory($dir, 0755, true);
                     $this->line("  ✓ Created backup directory: {$dir}");
                 } else {
@@ -267,10 +266,9 @@ class PersistDataCommand extends Command
             // Check available disk space
             $diskSpace = disk_free_space(storage_path());
             $diskSpaceGb = $diskSpace / (1024 ** 3);
-            $this->line("  ✓ Available disk space: {$diskSpaceGb:.2f} GB");
 
             if ($diskSpaceGb < 1) {
-                $this->error("  ✗ Warning: Less than 1GB available disk space!");
+                $this->error('  ✗ Warning: Less than 1GB available disk space!');
             }
 
             $this->info('✓ Backup structure verified');
@@ -304,7 +302,7 @@ class PersistDataCommand extends Command
             $this->line('  ✓ Metrics logged:');
             foreach ($metrics as $key => $value) {
                 if (is_numeric($value)) {
-                    $this->line("    - {$key}: " . number_format($value, 2));
+                    $this->line("    - {$key}: ".number_format($value, 2));
                 } else {
                     $this->line("    - {$key}: {$value}");
                 }
@@ -323,7 +321,7 @@ class PersistDataCommand extends Command
     protected function debugLog(string $message): void
     {
         if ($this->option('debug')) {
-            $this->info('[DEBUG] ' . $message);
+            $this->info('[DEBUG] '.$message);
         }
     }
 }

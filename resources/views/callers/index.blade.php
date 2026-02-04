@@ -214,6 +214,17 @@
                                         class="px-3 py-1 rounded border text-xs font-bold hover:bg-opacity-30 transition-colors"
                                         x-text="caller.is_winner ? 'Unmark Winner' : 'Mark Winner'"
                                     ></button>
+                                    
+                                     <a :href="`/callers/${caller.id}/edit`" class="bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-1 rounded text-xs font-bold hover:bg-opacity-30 transition-colors">
+                                        Edit
+                                    </a>
+                                    
+                                    <button 
+                                        @click="confirmDelete(caller)"
+                                        class="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1 rounded text-xs font-bold hover:bg-opacity-30 transition-colors"
+                                    >
+                                        Delete
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -239,6 +250,11 @@
         Showing <span x-text="filteredCallers.length"></span> of <span x-text="callers.length"></span> records
     </div>
 
+    <!-- Hidden Delete Form -->
+    <form id="delete-form" method="POST" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
 </div>
 
 <script src="//unpkg.com/alpinejs" defer></script>
@@ -282,20 +298,43 @@
                 this.showWinnersOnly = !this.showWinnersOnly;
             },
             
-            toggleWinner(caller) {
+            async toggleWinner(caller) {
                 // Determine new state
-                const newState = !caller.is_winner;
+                const originalState = caller.is_winner;
                 
-                // Optimistic UI update
-                caller.is_winner = newState;
-                
-                // Here you would typically make an AJAX call to persist the change
-                // Since I can't easily add a new route/controller method right now without terminal,
-                // I will assume the 'btn-winner-toggle' existed before and might have had JS listeners.
-                // But for a PROTOTYPE/VISUAL fix requested, this visual toggle demonstrates the UI.
-                // If real persistence is needed, we'd use fetch() here.
-                
-                console.log(`Toggled winner for ${caller.name} to ${newState}`);
+                try {
+                    const response = await fetch(`/callers/${caller.id}/toggle-winner`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        caller.is_winner = data.is_winner;
+                        // Optional: trigger a toast or notification here
+                        console.log(data.message);
+                    } else {
+                        // Revert if failed
+                        caller.is_winner = originalState;
+                        alert('Failed to update status');
+                    }
+                } catch (error) {
+                    caller.is_winner = originalState;
+                    console.error('Error:', error);
+                    alert('An error occurred while updating winner status');
+                }
+            },
+
+            confirmDelete(caller) {
+                if (confirm(`Are you sure you want to delete ${caller.name}?`)) {
+                    const form = document.getElementById('delete-form');
+                    form.action = `/callers/${caller.id}`;
+                    form.submit();
+                }
             }
         };
     }

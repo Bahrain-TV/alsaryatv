@@ -128,7 +128,7 @@ class CallerController extends Controller
         // Rate limit: 1 registration per 5 minutes (300 seconds) per CPR
         if (! $this->checkRateLimit('caller_creation:'.$cpr, 1, 300)) {
             $this->logSecurityEvent('caller_registration.rate_limit_exceeded', [
-                'cpr' => substr($cpr, 0, 3) . '***', // Log partial CPR for security
+                'cpr' => substr($cpr, 0, 3).'***', // Log partial CPR for security
                 'ip' => request()->ip(),
             ]);
             throw new DceSecurityException('You can only register once every 5 minutes. Please try again later.');
@@ -283,13 +283,19 @@ class CallerController extends Controller
             throw new DceSecurityException('Unauthorized access attempt.');
         }
 
-        // Use validated data from the request class
-        $validatedData = $request->validated();
+        $validated = $request->validated();
 
-        // Update the call associated with this caller
-        $caller->calls()->where('id', $validatedData['caller_id'])->update($validatedData);
+        $caller->update([
+            'name' => $validated['name'],
+            'phone' => $validated['phone_number'],
+            'cpr' => $validated['cpr'],
+            'is_family' => $validated['caller_type'] === 'family',
+            'hits' => $validated['hits'] ?? $caller->hits,
+            'is_winner' => $request->boolean('is_winner'),
+            'notes' => $validated['notes'] ?? $caller->notes,
+        ]);
 
-        return redirect()->route('dashboard')->with('success', 'Call updated successfully.');
+        return redirect()->route('dashboard')->with('success', 'Caller updated successfully.');
     }
 
     /**
@@ -353,5 +359,38 @@ class CallerController extends Controller
     public function success()
     {
         return view('calls.success');
+    }
+
+    /**
+     * Toggle the winner status for a caller.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleWinner(Caller $caller)
+    {
+        $caller->is_winner = ! $caller->is_winner;
+        $caller->save();
+
+        return response()->json([
+            'success' => true,
+            'is_winner' => $caller->is_winner,
+            'message' => $caller->is_winner ? 'Caller marked as winner!' : 'Winner status removed.',
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(Caller $caller)
+    {
+        if (! Auth::check()) {
+            throw new DceSecurityException('Unauthorized action.');
+        }
+
+        $caller->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Caller deleted successfully.');
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\SanitizedInput;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCallerRequest extends FormRequest
@@ -12,7 +11,7 @@ class UpdateCallerRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // This will be checked via the Gate in the controller
+        // Handled in controller gate
         return true;
     }
 
@@ -22,11 +21,13 @@ class UpdateCallerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'caller_id' => 'required|exists:callers,id',
-            'call_date' => 'required|date',
-            'call_duration' => 'required|integer|min:1',
-            'call_status' => 'required|in:answered,missed,busy',
-            'notes' => ['sometimes', 'nullable', 'string', 'max:1000', new SanitizedInput],
+            'name' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:45',
+            'cpr' => 'required|string|max:255|unique:callers,cpr,'.$this->route('caller')->id,
+            'caller_type' => 'required|string|in:family,individual',
+            'hits' => 'integer|min:0',
+            'is_winner' => 'boolean',
+            'notes' => 'nullable|string',
         ];
     }
 }

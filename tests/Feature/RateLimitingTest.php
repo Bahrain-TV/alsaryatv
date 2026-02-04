@@ -39,7 +39,7 @@ class RateLimitingTest extends TestCase
 
         // Should get rate limit error
         $this->assertTrue(
-            $response2->status() === 422 || 
+            $response2->status() === 422 ||
             $response2->status() === 500 ||
             strpos($response2->getContent(), 'rate limit') !== false
         );
@@ -80,8 +80,8 @@ class RateLimitingTest extends TestCase
         for ($i = 0; $i < 11; $i++) {
             $response = $this->post('/callers', [
                 'name' => "Test User $i",
-                'cpr' => "12345678" . str_pad($i, 1, '0', STR_PAD_LEFT),
-                'phone_number' => '3333333' . str_pad($i, 1, '0', STR_PAD_LEFT),
+                'cpr' => '12345678'.str_pad($i, 1, '0', STR_PAD_LEFT),
+                'phone_number' => '3333333'.str_pad($i, 1, '0', STR_PAD_LEFT),
                 'caller_type' => 'individual',
             ]);
 
@@ -91,7 +91,7 @@ class RateLimitingTest extends TestCase
             } else {
                 // 11th should be rate limited by IP
                 $this->assertTrue(
-                    $response->status() === 422 || 
+                    $response->status() === 422 ||
                     $response->status() === 500 ||
                     strpos($response->getContent(), 'rate limit') !== false ||
                     strpos($response->getContent(), 'location') !== false

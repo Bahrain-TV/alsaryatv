@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Caller;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
@@ -17,7 +16,7 @@ class CsrfProtectionTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('callers.create');
-        
+
         // Check CSRF token is in view
         $content = $response->getContent();
         $this->assertStringContainsString('csrf-token', $content);

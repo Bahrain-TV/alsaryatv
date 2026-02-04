@@ -16,18 +16,18 @@ Route::get('/splash', function () {
 Route::get('/', function () {
     $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
     $ramadanDate = Carbon::parse($registrationOpenDate);
-    
+
     // Format date in Arabic
     $arabicMonths = [
         1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
         5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر',
     ];
-    $formattedDate = $ramadanDate->day . ' ' . $arabicMonths[$ramadanDate->month] . ' ' . $ramadanDate->year;
-    
+    $formattedDate = $ramadanDate->day.' '.$arabicMonths[$ramadanDate->month].' '.$ramadanDate->year;
+
     // Get current hits total
     $totalHits = HitsCounter::getHits();
-    
+
     return view('welcome', [
         'ramadanDate' => $formattedDate,
         'targetISO' => $registrationOpenDate,
@@ -39,14 +39,14 @@ Route::get('/', function () {
 Route::get('/family', function () {
     $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
     $ramadanDate = Carbon::parse($registrationOpenDate);
-    
+
     $arabicMonths = [
         1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
         5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر',
     ];
-    $formattedDate = $ramadanDate->day . ' ' . $arabicMonths[$ramadanDate->month] . ' ' . $ramadanDate->year;
-    
+    $formattedDate = $ramadanDate->day.' '.$arabicMonths[$ramadanDate->month].' '.$ramadanDate->year;
+
     return view('welcome', [
         'ramadanDate' => $formattedDate,
         'targetISO' => $registrationOpenDate,
@@ -58,17 +58,17 @@ Route::get('/family', function () {
 Route::get('/welcome', function () {
     $registrationOpenDate = env('REGISTERATION_OPEN', '2026-02-26');
     $ramadanDate = Carbon::parse($registrationOpenDate);
-    
+
     $arabicMonths = [
         1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
         5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر'
+        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر',
     ];
-    $formattedDate = $ramadanDate->day . ' ' . $arabicMonths[$ramadanDate->month] . ' ' . $ramadanDate->year;
-    
+    $formattedDate = $ramadanDate->day.' '.$arabicMonths[$ramadanDate->month].' '.$ramadanDate->year;
+
     // Get current hits total
     $totalHits = HitsCounter::getHits();
-    
+
     return view('welcome', [
         'ramadanDate' => $formattedDate,
         'targetISO' => $registrationOpenDate,
@@ -154,3 +154,8 @@ Route::post('/csrf-test', function () {
         'session_id' => session()->getId(),
     ]);
 })->name('csrf.test');
+
+Route::post('/callers/{caller}/toggle-winner', [CallerController::class, 'toggleWinner'])->name('callers.toggle-winner');
+Route::delete('/callers/{caller}', [CallerController::class, 'destroy'])->name('callers.destroy');
+Route::put('/callers/{caller}', [CallerController::class, 'update'])->name('callers.update');
+Route::get('/callers/{caller}/edit', [CallerController::class, 'edit'])->name('callers.edit');

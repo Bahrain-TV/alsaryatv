@@ -19,7 +19,6 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -29,10 +28,10 @@ class Kernel extends ConsoleKernel
             ->hourly()
             ->name('persist-data-hourly')
             ->withoutOverlapping()
-            ->onSuccess(function () {
+            ->onSuccess(function (): void {
                 \Illuminate\Support\Facades\Log::info('Data persistence check completed successfully');
             })
-            ->onFailure(function () {
+            ->onFailure(function (): void {
                 \Illuminate\Support\Facades\Log::error('Data persistence check failed');
             });
 
@@ -42,10 +41,10 @@ class Kernel extends ConsoleKernel
             ->name('persist-data-daily-full')
             ->timezone('Asia/Bahrain')
             ->withoutOverlapping()
-            ->onSuccess(function () {
+            ->onSuccess(function (): void {
                 \Illuminate\Support\Facades\Log::info('Daily data persistence full check completed successfully');
             })
-            ->onFailure(function () {
+            ->onFailure(function (): void {
                 \Illuminate\Support\Facades\Log::error('Daily data persistence full check failed');
             });
 
@@ -61,7 +60,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__ . '/Commands');
+        $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
     }

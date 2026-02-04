@@ -1,55 +1,126 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="container">
-    <h1>Winners</h1>
+@push('styles')
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
     
-    <div class="mb-3">
-        <a href="{{ route('dashboard') }}" class="btn btn-primary">Back to All Callers</a>
-        <a href="{{ route('families') }}" class="btn btn-secondary">View Families</a>
-    </div>
+    .min-h-screen.bg-gray-100 {
+        background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%) !important;
+    }
+    
+    header.bg-white.shadow {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: #fbbf24;
+    }
+    header h2 {
+        color: #fbbf24 !important;
+    }
 
-    <div class="alert alert-info">
-        This page shows all callers marked as winners. Winners cannot be edited from this page.
-    </div>
+    body {
+        font-family: 'Tajawal', sans-serif;
+        color: #e2e8f0;
+    }
     
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>CPR</th>
-                <th>Status</th>
-                <th>Winner</th>
-                <th>Entry Type</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($winners as $winner)
-            <tr>
-                <td class="caller-name-cell">{{ $winner->name }}</td>
-                <td>{{ $winner->phone }}</td>
-                <td>{{ $winner->cpr }}</td>
-                <td>
-                    <span class="badge status-{{ strtolower($winner->status) }}">
-                        {{ $winner->status ?? 'PENDING' }}
-                    </span>
-                </td>
-                <td>
-                    <span class="badge is-winner">WINNER</span>
-                </td>
-                <td class="entry-type-cell" data-is-family="{{ $winner->is_family ? 'true' : 'false' }}">
-                    {{ $winner->is_family ? 'FAMILY' : 'INDIVIDUAL' }}
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    .dashboard-container {
+        padding: 2rem;
+    }
+
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .custom-table th {
+        background: rgba(15, 23, 42, 0.8);
+        color: #fbbf24;
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 2px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .custom-table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: #cbd5e1;
+        background: rgba(30, 41, 59, 0.4);
+    }
+
+    .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .badge-gold { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+    .badge-green { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .badge-purple { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.2); }
+</style>
+@endpush
+
+@section('content')
+<div class="dashboard-container">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-yellow-500">🏆 Winners Roster</h1>
+        <a href="{{ route('dashboard') }}" class="px-6 py-2 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-600 transition-all">
+            Back to Dashboard
+        </a>
+    </div>
 
     @if($winners->isEmpty())
-    <div class="alert alert-warning">
-        No winners found. Go to the main callers list to mark callers as winners.
-    </div>
+        <div class="glass-card p-12 text-center text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-xl">No winners found yet.</p>
+            <p class="mt-2 text-sm">Mark callers as winners from the main dashboard.</p>
+        </div>
+    @else
+        <div class="glass-card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>CPR</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($winners as $winner)
+                            <tr>
+                                <td class="font-medium text-white">{{ $winner->name }}</td>
+                                <td class="font-mono text-yellow-500">{{ $winner->phone }}</td>
+                                <td class="font-mono text-gray-400">{{ $winner->cpr }}</td>
+                                <td>
+                                    <span class="badge {{ $winner->is_family ? 'badge-purple' : 'badge-green' }}">
+                                        {{ $winner->is_family ? 'FAMILY' : 'INDIVIDUAL' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-green">🏆 WINNER</span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     @endif
 </div>
 @endsection

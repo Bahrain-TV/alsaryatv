@@ -1,51 +1,100 @@
 # GitHub Copilot Instructions for Alsaryatv (AlSarya TV)
 
 ## Quick summary
-- Purpose: Laravel app for TV show caller registration (individual & family modes). Key concerns: CSRF, rate-limiting, caller-hit integrity, and Filament admin UI.
-- Primary languages/tools: PHP (Laravel 12.x), Vite, Tailwind, Alpine.js, Livewire, Pest, Filament.
+- **Purpose**: Laravel 12 TV show caller registration system (individual & family modes). Ramadan countdown, hit counter, winner selection, and admin dashboard.
+- **Stack**: PHP 8.5 | Laravel 12.x | Livewire/Flux | Filament | Vite + Tailwind | Alpine.js | Pest | SQLite (dev) / MySQL (prod).
+- **Key concerns**: CSRF protection, rate-limiting (per-CPR/IP), caller-hit integrity enforcement, and Filament admin security.
 
-## Big picture & important boundaries
-- Public registration flow: splash → registration form(s) → store/update `callers` → thank-you screen. See `routes/web.php` and `resources/views/welcome.blade.php`.
-- Security-critical domain logic lives in the `Caller` model boot (protects updates) and `SecureOperations` trait (rate-limits and IP checks). Always review these when touching registration or hit logic:
-  - `app/Models/Caller.php` (boot hook, throws `DceSecurityException` for unauthorized updates)
-  - `app/Traits/SecureOperations.php` (per-CPR / per-IP limits)
-- Admin UI & operations: Filament resources in `app/Filament/` manage callers, winners, and reports (access via `/admin`).
-- Real-time and logging: Laravel Reverb + Pusher + `php artisan pail` for real-time logs. Tests and local dev rely on `composer dev` which starts multiple services.
+## Architecture & data flow
 
-## Commands you'll need (use exact commands in CI / scripts)
-- Setup: `composer install`, `cp .env.example .env`, `php artisan key:generate`, `php artisan migrate --seed`.
-- Dev: `composer dev` (preferred: starts server, queue, logs, vite), or run components individually: `php artisan serve`, `npm run dev`, `php artisan queue:listen`, `php artisan pail`.
-- Frontend build: `npm run build` (or `pnpm build`).
-- Tests: `php artisan test` or `./vendor/bin/pest`. Watch mode: `./vendor/bin/pest --watch`.
-- Lint/format: `./vendor/bin/pint` and static upgrades with `./vendor/bin/rector`.
-- Deployment: follow `./deploy.sh` and `./publish.sh` (see scripts for exact steps: build assets, migrate, cache/config).
+### Registration Pipeline
+1. **Entry**: Splash screen (`/splash`) → Individual (`/`) or Family (`/family`) form
+2. **Rate-limit check**: Per-CPR (1 reg/5 min) + per-IP (10 reg/hour) via `SecureOperations::checkRateLimit()`
+3. **Caller lookup/create**: Find by CPR or create new record; increment `hits` if returning
+4. **Submit & persist**: Store via `CallerController::store()` → `Caller` model (guarded boot hook fires)
+5. **Response**: Session data → Thank-you screen with stats display
 
-## Project-specific conventions & gotchas
-- Caller updates are guarded. Any code that updates `callers.hits` must either:
-  - pass the controlled `increment_hits` flag in request/logic, or
-  - be performed by an authenticated user or explicitly named updater. Changing this requires updating `Caller` boot checks and adding tests.
-- Rate limits: per-CPR = 1 registration/5 minutes; per-IP = 10 registrations/hour. These live in `SecureOperations` and use the cache backend. If you change limits, update tests and seed data.
-- CSRF: forms use `@csrf` and sessions are database-backed (`SESSION_DRIVER=database`), so tests need proper session setup. Fixing 419 errors often means checking `config/session.php` and cookie settings.
-- Database for testing: SQLite locking can occur if multiple processes operate on DB. For CI/test changes requiring DB schema, use `php artisan migrate:fresh --seed` in the appropriate environment.
+**Key files**: [`routes/web.php`](routes/web.php#L1) (entry routes), [`app/Http/Controllers/CallerController.php`](app/Http/Controllers/CallerController.php) (store logic).
 
-## Tests & PR guidance
-- Add feature tests for any change to registration, security, or rate-limiting. Place tests under `tests/Feature/`.
-- For model/security changes, include at least one test showing an unauthorized update is blocked (assert exception) and one that demonstrates the authorized path.
-- If a migration is added, include a rollback-qualified migration and add a schema test if appropriate.
+### Security-Critical Boundaries
+All `callers` table updates are protected by a **boot hook** that enforces authorization:
+- **Allowed**: Authenticated (admin), `increment_hits` flag in request, or hits-only updates
+- **Blocked**: Any other update from public endpoints (throws `DceSecurityException`)
 
-## Files to inspect for context (start here)
-- `app/Models/Caller.php` — model boot, hit-update guard
-- `app/Traits/SecureOperations.php` — rate limiting and IP checks
-- `app/Http/Controllers/CallerController.php` — registration flow and validation
-- `app/Http/Requests/StoreCallerRequest.php` — request flags and validation rules
-- `resources/views/` and `resources/js/` — front-end entry points (`welcome.blade.php`, `app.js`)
-- `app/Filament/` — admin resources and role access
-- `CLAUDE.md` — extended repository notes and commands (use as detailed reference)
+**Never bypass this check** without an explicit flag and test. Files:
+- [`app/Models/Caller.php`](app/Models/Caller.php#L36-L67) — boot hook, update guards
+- [`app/Traits/SecureOperations.php`](app/Traits/SecureOperations.php) — rate limits + security logging
 
-## When unsure, follow these safe behaviors
-- Run tests locally (`php artisan test`) and add failing tests reproducing the issue before fixing.
-- Do not bypass `Caller` boot checks. If a change must bypass security, add an explicit flag and test that documents the reason.
-- Update `CLAUDE.md` if you discover new long-running processes or developer commands (e.g., if `composer dev` changes behavior).
+### Admin & Real-time
+- **Filament**: Resources in [`app/Filament/`](app/Filament/) (callers, winners, reports); access via `/admin` (auth required).
+- **Real-time logging**: `php artisan pail` streams `security` and `single` channels; Laravel Reverb + Echo for potential live updates.
 
----
-If you'd like, I can open a PR that adds this file and include a tiny checklist in the README linking to it. Any areas you want emphasized or added examples for? ✅
+## Essential commands
+
+| Task | Command |
+|------|---------|
+| **Setup** | `composer install && npm install && cp .env.example .env && php artisan key:generate && php artisan migrate --seed` |
+| **Dev (all services)** | `composer dev` ← **preferred** (runs: Laravel serve + queue + pail logs + Vite) |
+| **Dev (individual)** | `php artisan serve` \| `npm run dev` \| `php artisan queue:listen` \| `php artisan pail` |
+| **Build assets** | `npm run build` (or `pnpm build` if monorepo) |
+| **Tests** | `php artisan test` or `./vendor/bin/pest --watch` |
+| **Format/lint** | `./vendor/bin/pint` (code), `./vendor/bin/rector` (refactors) |
+| **Deploy** | `./deploy.sh` (prod) or `./publish.sh` (upload .env + scripts); see scripts for backup/restore |
+
+## Project conventions & gotchas
+
+### Caller Hit Integrity
+- **Any update to `callers.hits`** must pass `increment_hits` or `increment_if_exists` flag in request, or be authenticated.
+- **Test pattern**: Assert `DceSecurityException` on unauthorized update, then test authorized path separately.
+- **Example**: `StoreCallerRequest` checks `$request->boolean('increment_hits')` before calling controller.
+
+### Rate Limiting Details
+- **Per-CPR**: 1 registration every 5 minutes (cache key: `caller.cpr.{cpr}`)
+- **Per-IP**: 10 registrations per hour (cache key: `caller.ip.{ip}`)
+- **Implementation**: `SecureOperations::checkRateLimit()` uses Laravel cache; see [`CallerController::store()`](app/Http/Controllers/CallerController.php#L45-L80) for integration.
+- **Changing limits**: Update cache TTL in controller → add test case → update seed data if needed.
+
+### CSRF & Session Handling
+- Forms use `@csrf` directive; middleware validates `_token` in POST.
+- Sessions are **database-backed** (`SESSION_DRIVER=database` in `.env`), so tests must have proper session setup.
+- **419 errors**: Check `config/session.php` (COOKIE_SECURE, COOKIE_HTTP_ONLY) and `.env` (CSRF_TRUSTED_HOSTS).
+
+### Database & Testing
+- **Dev DB**: SQLite (file: `database/database.sqlite`). Multiple processes → locking; use `php artisan migrate:fresh --seed` in test env.
+- **Test isolation**: Use `RefreshDatabase` trait in Pest tests; ensure migrations rollback cleanly.
+- **Seeding**: Populate test callers with known CPRs/IPs in `database/seeders/` to support rate-limit tests.
+
+## Code patterns & requirements
+
+### Feature Testing (required for registration/security changes)
+```php
+// tests/Feature/RegistrationTest.php
+test('unauthorized caller update throws exception', function () {
+    $caller = Caller::create(['cpr' => '12345678', 'name' => 'Test']);
+    expect(fn() => $caller->update(['hits' => 999]))->toThrow(DceSecurityException::class);
+});
+
+test('increment_hits flag allows authorized update', function () {
+    $caller = Caller::create(['cpr' => '12345678', 'name' => 'Test']);
+    $this->post('/caller/store', ['cpr' => '12345678', 'increment_hits' => true]);
+    expect($caller->fresh()->hits)->toBeGreaterThan(0);
+});
+```
+
+### Model Updates & Validation
+- Validation rules live in [`app/Http/Requests/StoreCallerRequest.php`](app/Http/Requests/StoreCallerRequest.php); keep Arabic error messages in sync.
+- Use form request `authorize()` method only to check policy; security is enforced in controller + model boot.
+
+## Files to read first
+1. [`app/Models/Caller.php`](app/Models/Caller.php) — understand boot hook + update guards
+2. [`app/Traits/SecureOperations.php`](app/Traits/SecureOperations.php) — rate limit logic + security events
+3. [`app/Http/Controllers/CallerController.php`](app/Http/Controllers/CallerController.php#L45) — `store()` method flow
+4. [`routes/web.php`](routes/web.php#L1-L50) — entry routes + countdown logic
+5. [`CLAUDE.md`](CLAUDE.md) — extended notes on tech stack, project structure, common commands
+
+## Safe fallback behaviors
+1. **Unsure about a change**: Write a failing test first, then fix code to pass it.
+2. **Modifying security**: Add explicit flag + test showing unauthorized path is blocked AND authorized path works.
+3. **Rate limit changes**: Update `SecureOperations`, test with multiple CPRs/IPs, adjust seed data.
+4. **New long-running process**: Document in `composer dev` script and `CLAUDE.md` (build commands, env vars, etc.).
+5. **Database schema**: Use `php artisan make:migration` + rollback test; avoid manual SQL.

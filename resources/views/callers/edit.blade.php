@@ -1,144 +1,130 @@
-<x-layouts.app title="تعديل بيانات المتصل">
-    <div class="container mx-auto px-4 py-8">
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold mb-2">تعديل بيانات المتصل</h1>
-            <a href="{{ route('dashboard') }}" class="text-indigo-600 hover:text-indigo-800">
-                &larr; العودة إلى لوحة التحكم
-            </a>
-        </div>
+@extends('layouts.app')
 
-        @if ($errors->any())
-        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-            <strong>يرجى تصحيح الأخطاء التالية:</strong>
-            <ul class="mt-2 list-disc list-inside">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
+@push('styles')
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+    
+    .min-h-screen.bg-gray-100 {
+        background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%) !important;
+    }
+    
+    header.bg-white.shadow {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: #fbbf24;
+    }
 
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="p-6">
-                <form method="POST" action="{{ route('callers.update', $caller->id) }}" class="space-y-4">
-                    @csrf
-                    @method('PUT')
-                    
-                    <input type="hidden" name="id" value="{{ $caller->id }}">
-                    <input type="hidden" name="is_update" value="1">
-                    <input type="hidden" name="is_family" value="{{ $caller->is_family ? 1 : 0 }}">
-                    <input type="hidden" name="caller_type" value="{{ $caller->is_family ? 'family' : 'individual' }}">
-                    
-                    <!-- Status Badge -->
-                    <div class="mb-4">
-                        <span class="px-3 py-1 text-sm rounded-full {{ $caller->is_family ? 'bg-orange-100 text-orange-800' : 'bg-indigo-100 text-indigo-800' }}">
-                            {{ $caller->is_family ? 'عائلة' : 'فرد' }}
-                        </span>
-                        
-                        @if($caller->is_winner)
-                        <span class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800 mr-2">
-                            فائز
-                        </span>
-                        @endif
-                    </div>
-                    
-                    <!-- Basic Information -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
-                            <input type="text" name="name" id="name" value="{{ old('name', $caller->name) }}" required
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rtl">
-                        </div>
-                        
-                        <div>
-                            <label for="cpr" class="block text-sm font-medium text-gray-700 mb-1">الرقم الشخصي</label>
-                            <input type="text" name="cpr" id="cpr" value="{{ old('cpr', $caller->cpr) }}" required
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rtl">
-                        </div>
-                        
-                        <div>
-                            <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف</label>
-                            <input type="tel" name="phone_number" id="phone_number" value="{{ old('phone_number', $caller->phone_number) }}" required
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rtl">
-                        </div>
-                        
-                        <div>
-                            <label for="hits" class="block text-sm font-medium text-gray-700 mb-1">عدد المشاركات</label>
-                            <input type="number" name="hits" id="hits" value="{{ old('hits', $caller->hits) }}" min="1"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                        </div>
-                    </div>
+    body {
+        font-family: 'Tajawal', sans-serif;
+        color: #e2e8f0;
+    }
+    
+    .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
 
-                    <!-- Admin Options -->
-                    <div class="pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900 mb-3">خيارات إضافية</h3>
-                        
-                        <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:space-x-reverse">
-                            <div class="flex items-center">
-                                <input type="checkbox" name="is_winner" id="is_winner" value="1" 
-                                       {{ old('is_winner', $caller->is_winner) ? 'checked' : '' }}
-                                       class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                <label for="is_winner" class="mr-2 block text-sm text-gray-700">تعيين كفائز</label>
-                            </div>
-                            
-                            <div class="flex items-center">
-                                <input type="checkbox" name="is_contacted" id="is_contacted" value="1" 
-                                       {{ old('is_contacted', $caller->is_contacted) ? 'checked' : '' }}
-                                       class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                <label for="is_contacted" class="mr-2 block text-sm text-gray-700">تم التواصل</label>
-                            </div>
+    .form-input {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        width: 100%;
+        transition: all 0.3s;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #fbbf24;
+        box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+    }
+    .form-label {
+        display: block;
+        color: #cbd5e1;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        text-align: right;
+    }
+</style>
+@endpush
 
-                            <div class="flex items-center">
-                                <input type="checkbox" name="is_verified" id="is_verified" value="1" 
-                                       {{ old('is_verified', $caller->is_verified) ? 'checked' : '' }}
-                                       class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                <label for="is_verified" class="mr-2 block text-sm text-gray-700">تم التحقق</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Notes Section -->
-                    <div class="pt-4">
-                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
-                        <textarea name="notes" id="notes" rows="3"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rtl">{{ old('notes', $caller->notes) }}</textarea>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex items-center justify-end space-x-3 space-x-reverse pt-4">
-                        <button type="button" onclick="confirmDelete({{ $caller->id }})"
-                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                            حذف
-                        </button>
-                        
-                        <button type="submit"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                            حفظ التغييرات
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Delete Form (Hidden) -->
-        <form id="delete-form" method="POST" style="display: none;">
-            @csrf
-            @method('DELETE')
-        </form>
+@section('content')
+<div class="max-w-3xl mx-auto py-12 px-4">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-yellow-500">📝 Edit Caller</h1>
+        <a href="{{ route('dashboard') }}" class="px-6 py-2 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-600 transition-all">
+            Cancel
+        </a>
     </div>
 
-    <script>
-        function confirmDelete(id) {
-            if (confirm('هل أنت متأكد من رغبتك في حذف هذا المتصل؟ لا يمكن التراجع عن هذا الإجراء.')) {
-                const form = document.getElementById('delete-form');
-                form.action = `/callers/${id}`;
-                form.submit();
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add any additional JavaScript functionality here
-            // For example, form validation or dynamic UI behaviors
-        });
-    </script>
-</x-layouts.app>
+    <div class="glass-card p-8">
+        <form method="POST" action="{{ route('callers.update', $caller->id) }}" dir="rtl">
+            @csrf
+            @method('PUT')
+            
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Name -->
+                <div>
+                    <label for="name" class="form-label">الاسم الكامل</label>
+                    <input type="text" id="name" name="name" required value="{{ old('name', $caller->name) }}" class="form-input" placeholder="أدخل اسم المتصل">
+                    @error('name') <span class="text-red-400 text-sm mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- CPR -->
+                <div>
+                    <label for="cpr" class="form-label">رقم الهوية (CPR)</label>
+                    <input type="text" id="cpr" name="cpr" required value="{{ old('cpr', $caller->cpr) }}" class="form-input" placeholder="أدخل رقم الهوية">
+                    @error('cpr') <span class="text-red-400 text-sm mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="phone_number" class="form-label">رقم الهاتف</label>
+                    <input type="tel" id="phone_number" name="phone_number" required value="{{ old('phone_number', $caller->phone) }}" class="form-input" placeholder="أدخل رقم الهاتف">
+                    @error('phone_number') <span class="text-red-400 text-sm mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Caller Type -->
+                <div>
+                    <label for="caller_type" class="form-label">نوع المتصل</label>
+                    <select id="caller_type" name="caller_type" required class="form-input">
+                        <option value="individual" {{ (old('caller_type', $caller->is_family ? 'family' : 'individual') == 'individual') ? 'selected' : '' }}>فرد</option>
+                        <option value="family" {{ (old('caller_type', $caller->is_family ? 'family' : 'individual') == 'family') ? 'selected' : '' }}>عائلة</option>
+                    </select>
+                    @error('caller_type') <span class="text-red-400 text-sm mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Hits -->
+                <div>
+                    <label for="hits" class="form-label">عدد النقاط / المشاركات</label>
+                    <input type="number" id="hits" name="hits" required value="{{ old('hits', $caller->hits) }}" class="form-input" min="0">
+                    @error('hits') <span class="text-red-400 text-sm mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Winner Checkbox -->
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="is_winner" name="is_winner" value="1" {{ old('is_winner', $caller->is_winner) ? 'checked' : '' }} class="w-5 h-5 rounded border-gray-300 text-yellow-500 focus:ring-yellow-500">
+                    <label for="is_winner" class="text-gray-300 font-medium">تعيين كفائز 🏆</label>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label for="notes" class="form-label">ملاحظات</label>
+                    <textarea id="notes" name="notes" rows="3" class="form-input" placeholder="أدخل ملاحظات اختيارية">{{ old('notes', $caller->notes) }}</textarea>
+                    @error('notes') <span class="text-red-400 text-sm mt-1">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <div class="mt-10">
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg transition-all transform hover:scale-[1.02]">
+                    تحديث البيانات
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
