@@ -2,12 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Mail\WelcomePasswordEmail;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class UserSeeder extends Seeder
 {
@@ -16,121 +14,57 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-
-        $this->createAdminUsers();
-
-        // Create admin user
-        User::updateOrCreate(
-            ['email' => 'aldoyh@gmail.com'],
-            [
-                'name' => 'Hasan',
-                'password' => Hash::make('97333334122'),
-                'email_verified_at' => now(),
-                'is_admin' => true,
-                'role' => 'admin',
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'alsaryatv@gmail.com'],
-            [
-                'name' => 'AlSarya TEAM',
-                'password' => Hash::make('97366632332'),
-                'email_verified_at' => now(),
-                'is_admin' => true,
-                'role' => 'admin',
-            ]
-        );
-
-        // You can create more users here if needed
+        $this->seedAdminUsers();
     }
 
     /**
-     * Create admin users
+     * Seed admin users
      */
-    private function createAdminUsers(): void
+    private function seedAdminUsers(): void
     {
-        $usersList = [
+        $admins = [
             [
-                'name' => 'Admin',
+                'name' => 'Hasan',
                 'email' => 'aldoyh@gmail.com',
-                'password' => bcrypt('97333334122'),
-                'passplain' => '97333334122',
-                'role' => 'admin',
+                'password' => '97333334122',
             ],
             [
                 'name' => 'Admin Bee',
                 'email' => 'aldoyh@info.gov.bh',
-                'password' => bcrypt('97333334122'),
-                'passplain' => '97333334122',
-                'role' => 'admin',
+                'password' => '97333334122',
             ],
             [
-                'name' => 'AlSarya Team',
+                'name' => 'AlSarya TEAM',
                 'email' => 'alsaryatv@gmail.com',
-                'password' => bcrypt('97366632332'),
-                'passplain' => '97366632332',
-                'role' => 'admin',
+                'password' => '97366632332',
             ],
         ];
 
-        foreach ($usersList as $user) {
-            try {
-                // Check if user already exists
-                if (User::where('email', $user['email'])->exists()) {
-                    Log::info('User already exists: '.$user['email']);
+        foreach ($admins as $admin) {
+            $user = User::where('email', $admin['email'])->first();
+            $isNew = ! $user;
 
-                    continue;
-                }
-
-                $plainPass = $user['passplain'];
-                User::create([
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'password' => $user['password'],
-                    'role' => $user['role'],
+            User::updateOrCreate(
+                ['email' => $admin['email']],
+                [
+                    'name' => $admin['name'],
+                    'password' => Hash::make($admin['password']),
+                    'email_verified_at' => now(),
                     'is_admin' => true,
+                    'role' => 'admin',
+                ]
+            );
+
+            Log::info(($isNew ? 'Created' : 'Updated')." admin user: {$admin['email']}");
+
+            // Send welcome email ONLY in production and ONLY for new users
+            if (app()->environment('production') && $isNew) {
+                $this->command->call('app:send-welcome-email', [
+                    'email' => $admin['email'],
+                    'name' => $admin['name'],
+                    'password' => $admin['password'],
                 ]);
-                Log::info('User created: '.$user['name']);
-
-                // Send welcome email based on environment
-                $this->sendWelcomeEmail($user, $plainPass);
-            } catch (\Exception $e) {
-                Log::error('Error creating user '.$user['email'].': '.$e->getMessage());
             }
-        }
-    }
-
-    /**
-     * Send welcome email based on environment
-     *
-     * @param  array  $user  User data
-     * @param  string  $plainPass  Plain password
-     */
-    private function sendWelcomeEmail(array $user, string $plainPass): void
-    {
-        try {
-
-            Mail::to($user['email'])->send(
-                new WelcomePasswordEmail(
-                    $plainPass,
-                    $user['name'],
-                    $user['email']
-                )
-            );
-            Log::info('Email sent to: '.$user['email']);
-
-            // Send to developer email in staging env
-            Mail::to('aldoyh@gmail.com')->send(
-                new WelcomePasswordEmail(
-                    $plainPass,
-                    $user['name'],
-                    $user['email']
-                )
-            );
-            Log::info('Staging email sent to developer');
-        } catch (\Exception $e) {
-            Log::error('Failed to send welcome email: '.$e->getMessage());
         }
     }
 }

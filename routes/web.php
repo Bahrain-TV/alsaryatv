@@ -6,90 +6,25 @@ use Carbon\Carbon;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Route;
 
-// Splash screen (entry point)
-Route::get('/splash', function () {
-    return view('splash');
-})->name('splash');
-
-// Individual caller registration (friendly URL)
-// Displays countdown to Ramadan when registration is closed
-Route::get('/', function () {
-    // Ramadan 1447 starts on February 26, 2026
+// Shared Ramadan date logic
+$getRamadanContext = function () {
     $ramadanStartDate = '2026-02-26';
-    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-03-01');
+    $registrationOpenDate = config('app.registration_open', '2026-03-01');
     
-    // Use Ramadan start date for countdown and display
-    $ramadanDate = Carbon::parse($ramadanStartDate);
-
-    // Format date in Arabic
-    $arabicMonths = [
-        1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
-        5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر',
-    ];
-    $formattedDate = $ramadanDate->day.' '.$arabicMonths[$ramadanDate->month].' '.$ramadanDate->year;
-
-    // Get current hits total
-    $totalHits = HitsCounter::getHits();
-
-    return view('welcome', [
-        'ramadanDate' => $formattedDate,
+    return [
+        'ramadanDate' => Carbon::parse($ramadanStartDate)->locale('ar')->translatedFormat('j F Y'),
         'ramadanStartISO' => $ramadanStartDate,
         'registrationOpenISO' => $registrationOpenDate,
-        'totalHits' => $totalHits,
-    ]);
-})->name('home');
-
-// Family caller registration (friendly URL)
-Route::get('/family', function () {
-    // Ramadan 1447 starts on February 26, 2026
-    $ramadanStartDate = '2026-02-26';
-    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-03-01');
-    
-    // Use Ramadan start date for countdown and display
-    $ramadanDate = Carbon::parse($ramadanStartDate);
-
-    $arabicMonths = [
-        1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
-        5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر',
+        'totalHits' => HitsCounter::getHits(),
     ];
-    $formattedDate = $ramadanDate->day.' '.$arabicMonths[$ramadanDate->month].' '.$ramadanDate->year;
+};
 
-    return view('welcome', [
-        'ramadanDate' => $formattedDate,
-        'ramadanStartISO' => $ramadanStartDate,
-        'registrationOpenISO' => $registrationOpenDate,
-        'totalHits' => HitsCounter::getHits(), // Fetch hits effectively
-    ]);
-})->name('family.registration');
+// Main Entry Routes
+Route::get('/splash', fn () => view('splash'))->name('splash');
 
-// Welcome page (informational page with Ramadan countdown)
-Route::get('/welcome', function () {
-    // Ramadan 1447 starts on February 26, 2026
-    $ramadanStartDate = '2026-02-26';
-    $registrationOpenDate = env('REGISTERATION_OPEN', '2026-03-01');
-    
-    // Use Ramadan start date for countdown and display
-    $ramadanDate = Carbon::parse($ramadanStartDate);
-
-    $arabicMonths = [
-        1 => 'يناير', 2 => 'فبراير', 3 => 'مارس', 4 => 'أبريل',
-        5 => 'مايو', 6 => 'يونيو', 7 => 'يوليو', 8 => 'أغسطس',
-        9 => 'سبتمبر', 10 => 'أكتوبر', 11 => 'نوفمبر', 12 => 'ديسمبر',
-    ];
-    $formattedDate = $ramadanDate->day.' '.$arabicMonths[$ramadanDate->month].' '.$ramadanDate->year;
-
-    // Get current hits total
-    $totalHits = HitsCounter::getHits();
-
-    return view('welcome', [
-        'ramadanDate' => $formattedDate,
-        'ramadanStartISO' => $ramadanStartDate,
-        'registrationOpenISO' => $registrationOpenDate,
-        'totalHits' => $totalHits,
-    ]);
-})->name('welcome');
+Route::get('/', fn () => view('welcome', $getRamadanContext()))->name('home');
+Route::get('/welcome', fn () => view('welcome', $getRamadanContext()))->name('welcome');
+Route::get('/family', fn () => view('welcome', $getRamadanContext()))->name('family.registration');
 
 // Protected routes
 Route::middleware([
@@ -98,79 +33,52 @@ Route::middleware([
     'verified',
 ])->group(function (): void {
     Route::get('/dashboard', [CallerController::class, 'index'])->name('dashboard');
+    Route::get('/winners', [CallerController::class, 'winners'])->name('winners');
+    
+    // Filament shortcuts (if needed)
+    Route::get('/admin/callers', [\App\Filament\Resources\CallerResource\Pages\ListCallers::class, 'index'])->name('filament.admin.resources.callers.index');
+    Route::get('/admin/callers/winners', [\App\Filament\Resources\CallerResource\Pages\ListWinners::class, 'index'])->name('filament.admin.resources.callers.winners');
 });
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
-    ->group(function (): void {
-        Route::get('/winners', [CallerController::class, 'winners'])->name('winners');
-        Route::get('/families', [CallerController::class, 'families'])->name('families');
-    });
-Route::get('/admin/callers', [\App\Filament\Resources\CallerResource\Pages\ListCallers::class, 'index'])->name('filament.admin.resources.callers.index');
-
-Route::get('/admin/callers/winners', [\App\Filament\Resources\CallerResource\Pages\ListWinners::class, 'index'])->name('filament.admin.resources.callers.winners');
-Route::get('/privacy', function () {
-    return view('privacy', [
-        'policy' => Markdown::parse(file_get_contents(resource_path('markdown/privacy.md'))),
-    ]);
-})->name('privacy');
+Route::get('/privacy', fn () => view('privacy', [
+    'policy' => Markdown::parse(file_get_contents(resource_path('markdown/privacy.md'))),
+]))->name('privacy');
 
 // Caller registration routes
-Route::prefix('callers')->name('callers.')->middleware(['web'])->group(function (): void {
+Route::prefix('callers')->name('callers.')->group(function (): void {
     Route::get('/create', [CallerController::class, 'create'])->name('create');
+    Route::post('/', [CallerController::class, 'store'])->name('store')->middleware('throttle:10,1');
 
-    // Fix: Remove non-existent 'csrf' middleware and use properly named middleware
-    Route::post('/', [CallerController::class, 'store'])
-        ->name('store')
-        ->middleware('throttle:10,1');
-
-    // Success route with session check and 30 second countdown
     Route::get('/success', function () {
-        // If someone tries to access this directly without the proper session data,
-        // redirect them back to the homepage with error message
-        if (! session()->has('name') && ! session()->has('full_name')) {
+        if (! session()->has('cpr')) {
             return redirect('/')->with('error', 'Unauthorized access attempt');
         }
 
         $cpr = session('cpr');
-        $isDirtyFile = \App\Services\DirtyFileManager::exists($cpr);
-
-        // Use the user-specific hits passed from the controller
-        // If not available, get default values
-        $userHits = session(
-            'userHits',
-            HitsCounter::getUserHits(session('cpr') ?? null) ?? 1
-        );
-        $totalHits = session('totalHits', HitsCounter::getTotalHits());
-
         return view('callers.success', [
-            'userHits' => $userHits,
-            'totalHits' => $totalHits,
+            'userHits' => session('userHits', HitsCounter::getUserHits($cpr)),
+            'totalHits' => session('totalHits', HitsCounter::getTotalHits()),
             'seconds' => session('seconds', 30),
-            'isDirtyFile' => $isDirtyFile,
             'cpr' => $cpr,
         ]);
     })->name('success');
+
+    // Action routes
+    Route::middleware('auth')->group(function () {
+        Route::post('/{caller}/toggle-winner', [CallerController::class, 'toggleWinner'])->name('toggle-winner');
+        Route::delete('/{caller}', [CallerController::class, 'destroy'])->name('destroy');
+        Route::put('/{caller}', [CallerController::class, 'update'])->name('update');
+        Route::get('/{caller}/edit', [CallerController::class, 'edit'])->name('edit');
+    });
 });
 
 // Registration forms with toggle
-Route::get('/register', function () {
-    return view('calls.register');
-})->name('registration.form');
+Route::get('/register', fn () => view('calls.register'))->name('registration.form');
 
 // CSRF Test Routes
-Route::get('/csrf-test', function () {
-    return view('csrf-test');
-})->name('csrf.test.page');
-
-Route::post('/csrf-test', function () {
-    return response()->json([
-        'message' => 'CSRF token is valid! ✓',
-        'timestamp' => now(),
-        'session_id' => session()->getId(),
-    ]);
-})->name('csrf.test');
-
-Route::post('/callers/{caller}/toggle-winner', [CallerController::class, 'toggleWinner'])->name('callers.toggle-winner');
-Route::delete('/callers/{caller}', [CallerController::class, 'destroy'])->name('callers.destroy');
-Route::put('/callers/{caller}', [CallerController::class, 'update'])->name('callers.update');
-Route::get('/callers/{caller}/edit', [CallerController::class, 'edit'])->name('callers.edit');
+Route::get('/csrf-test', fn () => view('csrf-test'))->name('csrf.test.page');
+Route::post('/csrf-test', fn () => response()->json([
+    'message' => 'CSRF token is valid! ✓',
+    'timestamp' => now(),
+    'session_id' => session()->getId(),
+]))->name('csrf.test');

@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Ramsey\Uuid\Exception\DceSecurityException;
 
 class Caller extends Model
 {
@@ -26,7 +26,49 @@ class Caller extends Model
 
     protected $casts = [
         'is_winner' => 'boolean',
+        'last_hit' => 'datetime',
     ];
+
+    /**
+     * Scope a query to only include winners.
+     */
+    public function scopeWinners(Builder $query): Builder
+    {
+        return $query->where('is_winner', true);
+    }
+
+    /**
+     * Scope a query to only include eligible callers for winner selection.
+     */
+    public function scopeEligible(Builder $query): Builder
+    {
+        return $query->where('is_winner', false)
+            ->whereNotNull('cpr')
+            ->where('cpr', '!=', '');
+    }
+
+    /**
+     * Select a random winner based on CPR uniqueness
+     */
+    public static function selectRandomWinnerByCpr(): ?Caller
+    {
+        $winner = self::eligible()->inRandomOrder()->first();
+
+        if ($winner) {
+            $winner->update(['is_winner' => true]);
+        }
+        
+        return $winner;
+    }
+
+    /**
+     * Increment hits for this caller
+     */
+    public function incrementHits(): void
+    {
+        $this->increment('hits');
+        $this->update(['last_hit' => now()]);
+    }
 
     /**
      * Boot method to add event listeners
@@ -35,207 +77,23 @@ class Caller extends Model
     {
         parent::boot();
 
-        // This is the likely cause of our issue - it's throwing the exception when updating
         static::updating(function ($caller) {
-            // Allow updates if any of these conditions are met:
-            // 1. User is authenticated (admin)
-            // 2. Request has specific flags that indicate this is an allowed update
-            // 3. The only thing being updated is the 'hits' counter
-
-            // Check for our special flags first
-            $request = request();
-            if ($request->has('increment_if_exists') || $request->has('increment_hits')) {
-                return true; // Allow the update to proceed
+            // Allow hits update for everyone
+            if ($caller->isDirty('hits') && count($caller->getDirty()) === 1) {
+                return true;
             }
 
-            // Check if it's an admin
-            if (Auth::check()) {
-                return true; // Allow the update to proceed
+            // Allow all updates for authenticated admins
+            if (Auth::check() && Auth::user()->is_admin) {
+                return true;
             }
 
-            // Check if only the hits field is being updated
-            $dirty = $caller->getDirty();
-            if (count($dirty) === 1 && array_key_exists('hits', $dirty)) {
-                return true; // Allow hits-only updates
+            // In production, restrict other updates
+            if (app()->environment('production')) {
+                return false;
             }
 
-            // Allow updates in testing environment or when not in production
-            if (app()->environment('testing') || app()->runningUnitTests() || !app()->environment('production')) {
-                return true; // Allow updates in non-production environments
-            }
-
-            // If we get here, it's an unauthorized update attempt
-            throw new DceSecurityException('Unauthorized caller update attempt');
+            return true;
         });
-    }
-
-    /**
-     * Gets the winners only
-     *
-     * @param  $query
-     * @return mixed
-     *
-     * @throws DceSecurityException
-     * @throws \Exception
-     */
-    public static function winners()
-    {
-        return self::where('is_winner', true);
-    }
-
-    /**
-     * Select a random winner based on CPR uniqueness
-     *
-     * @return Caller|null
-     * @throws \Exception
-     */
-    public static function selectRandomWinnerByCpr(): ?Caller
-    {
-        // Get all eligible callers (not already winners, with valid CPR)
-        $eligibleCallers = self::where('is_winner', false)
-            ->whereNotNull('cpr')
-            ->where('cpr', '!=', '')
-            ->get();
-
-        if ($eligibleCallers->isEmpty()) {
-            return null;
-        }
-
-        // Select a random winner
-        $winner = $eligibleCallers->random();
-        
-        // Mark as winner
-        $winner->is_winner = true;
-        $winner->save();
-        
-        return $winner;
-    }
-
-    /**
-     * Get eligible callers for winner selection
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getEligibleCallers(): \Illuminate\Database\Eloquent\Collection
-    {
-        return self::where('is_winner', false)
-            ->whereNotNull('cpr')
-            ->where('cpr', '!=', '')
-            ->get();
-    }
-
-    /**
-     * Gets the hits of a user
-     */
-    public function getHits(): int|false
-    {
-        $hits = $this->hits;
-        if ($hits === null) {
-            return false;
-        }
-
-        return $hits;
-    }
-
-    /**
-     * Gets the hits of a user
-     */
-    public function incrementHits(): int|false
-    {
-        $hits = $this->hits;
-        if ($hits === null) {
-            return false;
-        }
-
-        $this->hits = $hits + 1;
-        $this->save();
-
-        return $this->hits;
-    }
-
-    /**
-     * Assigns an IP address if null then return the last known IP
-     *
-     * @throws DceSecurityException
-     * @throws \Exception
-     */
-    public function assignIpAddress(?string $ip = null): string|false
-    {
-        if ($ip === null) {
-            return $this->ip_address;
-        }
-
-        if ($this->ip_address === null) {
-            $this->ip_address = $ip;
-            $this->save();
-        }
-
-        return $this->ip_address;
-    }
-
-    /**
-     * Gets the IP address of a user
-     *
-     * @throws DceSecurityException
-     * @throws \Exception
-     */
-    public function getIpAddress(): string|false
-    {
-        return $this->ip_address;
-    }
-
-    /**
-     * Gets the hits of a user
-     *
-     * @throws DceSecurityException
-     * @throws \Exception
-     * */
-    public function getHitsCount(): int|false
-    {
-        return $this->hits;
-    }
-
-    /**
-     * Gets the hits of a user
-     *
-     * @throws DceSecurityException
-     * @throws \Exception
-     * */
-    public function incrementHitsCount(): int|false
-    {
-        $this->hits += 1;
-        $this->save();
-
-        return $this->hits;
-    }
-
-    /**
-     * LEVELS Up a Caller by highlighting the name
-     * if passed a given hits
-     *
-     * @throws DceSecurityException
-     * @throws \Exception
-     */
-    public function levelUp(int $hits = 5): void
-    {
-        if ($this->hits >= $hits) {
-            $this->name = "<span class='text-success'>{$this->name}</span>";
-            $this->save();
-        }
-    }
-
-    /**
-     * LEVELS Up a Caller by highlighting the name
-     * if passed a given hits
-     *
-     * @throws DceSecurityException
-     * @throws \Exception
-     */
-    public function levelDown(int $hits = 5): void
-    {
-        if ($this->hits >= $hits) {
-            $this->name = "<span class='text-danger'>{$this->name}</span>";
-            $this->save();
-        }
     }
 }

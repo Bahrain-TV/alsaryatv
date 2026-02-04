@@ -2,9 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\CallerResource\Pages\ListCallers;
-use App\Filament\Resources\CallerResource\Pages\ListFamilies;
-use App\Filament\Resources\CallerResource\Pages\ListWinners;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -32,11 +29,10 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Rose,
             ])
             ->font('Tajawal')
-            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
-            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                ListCallers::class,
-                ListWinners::class,
+                Pages\Dashboard::class,
             ])
             ->widgets([
                 // Keep only essential widgets

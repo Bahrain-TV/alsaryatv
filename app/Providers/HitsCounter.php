@@ -3,8 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Caller;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
 class HitsCounter extends ServiceProvider
@@ -14,71 +13,41 @@ class HitsCounter extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind('hits', function () {
-            return self::getHits();
-        });
-        $this->app->bind('total_hits', function () {
-            return self::getTotalHits();
-        });
+        $this->app->bind('hits', fn () => self::getHits());
+        $this->app->bind('total_hits', fn () => self::getTotalHits());
     }
 
     /**
-     * Bootstrap services.
+     * Increment the simulated visit counter
      */
-    public function boot(): void
+    public static function incrementHits(): int
     {
-        //
+        // Use a persistent cache key with no expiration (or long TTL)
+        return Cache::increment('stats:total_visits', random_int(1, 4));
     }
 
-    public static function incrementHits()
+    /**
+     * Get the simulated visit counter
+     */
+    public static function getHits(): int
     {
-        try {
-            $hits = self::getHits();
-            // Simple increment based on time of day
-            $currentHour = (int) now()->format('H');
-            $increment = ($currentHour >= 18 || $currentHour < 6) ? 1 : random_int(1, 4);
-
-            $hits += $increment;
-            Storage::put('hits.txt', $hits);
-
-            return $hits;
-        } catch (\Exception $e) {
-            Log::error('Failed to increment hits: '.$e->getMessage());
-
-            return 0;
-        }
+        return Cache::rememberForever('stats:total_visits', fn () => random_int(100, 500));
     }
 
-    public static function getHits()
+    /**
+     * Get the total registration hits from DB
+     */
+    public static function getTotalHits(): int
     {
-        try {
-            if (! Storage::exists('hits.txt')) {
-                Storage::put('hits.txt', random_int(1, 100));
-            }
-
-            return (int) Storage::get('hits.txt');
-        } catch (\Exception $e) {
-            Log::error('Failed to get hits: '.$e->getMessage());
-
-            return 0;
-        }
+        return (int) Caller::sum('hits');
     }
 
-    public static function getTotalHits()
+    /**
+     * Get hits for a specific caller
+     */
+    public static function getUserHits(?string $cpr): int
     {
-        try {
-            return Caller::sum('hits') ?? 0;
-        } catch (\Exception $e) {
-            return 0;
-        }
-    }
-
-    public static function getUserHits($cpr)
-    {
-        try {
-            return Caller::where('cpr', $cpr)->value('hits') ?? 0;
-        } catch (\Exception $e) {
-            return 0;
-        }
+        if (!$cpr) return 0;
+        return (int) Caller::where('cpr', $cpr)->value('hits');
     }
 }
