@@ -2,6 +2,8 @@
 
 # Configuration (matching deploy.sh)
 SERVER="root@h6.doy.tech"
+SSH_COMMAND="ssh -i ~/.ssh/id_oct24"
+
 APP_DIR="/home/alsarya.tv/public_html"
 DISCORD_WEBHOOK="https://discord.com/api/webhooks/1248966065417883659/hAnbGrEOLw9fWF6UCObAuuXHzW6ZM5I1babbBC4rBAdbUAB6YcfHqHhxZXEU4LYIyZp2"
 
@@ -63,13 +65,13 @@ upload_files_to_production() {
     fi
     
     # SCP the .env.production file
-    scp "$ENV_FILE" "$SERVER:$APP_DIR/.env"
+    scp -i ~/.ssh/id_oct24 "$ENV_FILE" "$SERVER:$APP_DIR/.env"
     ENV_STATUS=$?
 
     # SCP the deploy.sh file and make it executable
-    scp "$DEPLOY_SCRIPT" "$SERVER:$APP_DIR/deploy.sh"
+    scp -i ~/.ssh/id_oct24 "$DEPLOY_SCRIPT" "$SERVER:$APP_DIR/deploy.sh"
     DEPLOY_STATUS=$?
-    ssh "$SERVER" "chmod +x $APP_DIR/deploy.sh"
+    $SSH_COMMAND "$SERVER" "chmod +x $APP_DIR/deploy.sh"
 
     if [ $ENV_STATUS -eq 0 ] && [ $DEPLOY_STATUS -eq 0 ]; then
         echo "✅ Files successfully uploaded to production"
@@ -109,7 +111,7 @@ maintenance_mode() {
     fi
 
     # Execute SSH Command
-    ssh "$SERVER" "$COMMAND"
+    $SSH_COMMAND "$SERVER" "$COMMAND"
     EXIT_CODE=$?
 
     if [ $EXIT_CODE -eq 0 ]; then

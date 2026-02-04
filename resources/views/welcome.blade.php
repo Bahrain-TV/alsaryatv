@@ -952,7 +952,9 @@
             <!-- Ramadan Date Info -->
             <div class="ramadan-info">
                 <h4>🌙 أول أيام شهر رمضان المبارك</h4>
-                <div class="date">{{ $ramadanDate ?? '26 فبراير 2026' }}</div>
+                <div class="date">
+                    {{ '18 فبراير 2026' }}
+                </div>
                 <div class="hijri">1 رمضان 1447 هـ</div>
             </div>
         </div>
@@ -1031,9 +1033,9 @@
             if (window.flipdownInitialized) return;
             window.flipdownInitialized = true;
 
-            // Ramadan 1447 starts on February 26, 2026 at midnight (Bahrain time)
+            // Ramadan 1447 starts on February 18, 2026 at midnight (Bahrain time)
             // Using Bahrain timezone (UTC+3)
-            const ramadanStartISO = '{{ $ramadanStartISO ?? "2026-02-26" }}';
+            const ramadanStartISO = '{{ $ramadanStartISO ?? "2026-02-18" }}';
             const ramadanDate = new Date(ramadanStartISO + 'T00:00:00+03:00');
             const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
 
