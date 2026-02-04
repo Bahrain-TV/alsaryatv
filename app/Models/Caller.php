@@ -48,6 +48,14 @@ class Caller extends Model
     }
 
     /**
+     * Get eligible callers for winner selection
+     */
+    public static function getEligibleCallers(): Builder
+    {
+        return self::eligible();
+    }
+
+    /**
      * Select a random winner based on CPR uniqueness
      */
     public static function selectRandomWinnerByCpr(): ?Caller
@@ -57,7 +65,7 @@ class Caller extends Model
         if ($winner) {
             $winner->update(['is_winner' => true]);
         }
-        
+
         return $winner;
     }
 
