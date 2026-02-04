@@ -2,11 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\CallersStatsWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
+use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -25,19 +26,29 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
+            ->brandName('السارية - لوحة التحكم')
             ->colors([
-                'primary' => Color::Rose,
+                'primary' => Color::Amber,
+                'success' => Color::Emerald,
+                'warning' => Color::Orange,
+                'danger' => Color::Rose,
+                'info' => Color::Sky,
             ])
             ->font('Tajawal')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->widgets([
-                // Keep only essential widgets
+                CallersStatsWidget::class,
                 Widgets\AccountWidget::class,
             ])
+            ->navigationGroups([
+                'إدارة المتصلين' => 'Caller Management',
+                'إدارة المستخدمين' => 'User Management',
+            ])
+            ->sidebarCollapsibleOnDesktop()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
