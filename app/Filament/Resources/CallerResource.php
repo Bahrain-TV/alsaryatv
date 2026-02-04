@@ -32,17 +32,11 @@ class CallerResource extends Resource
                 ->badge(static::getNavigationBadge(), static::getNavigationBadgeColor())
                 ->url(static::getNavigationUrl()),
 
-            // NavigationItem::make('Winners')
-            //     ->icon('heroicon-o-trophy')
-            //     ->group(static::getNavigationGroup())
-            //     ->url(static::getUrl('winners'))
-            //     ->sort(static::getNavigationSort() + 1),
-
-            NavigationItem::make('Families')
-                ->icon('heroicon-o-user-group')
+            NavigationItem::make('Winners')
+                ->icon('heroicon-o-trophy')
                 ->group(static::getNavigationGroup())
-                ->url(static::getUrl('families'))
-                ->sort(static::getNavigationSort() + 2),
+                ->url(static::getUrl('winners'))
+                ->sort(static::getNavigationSort() + 1),
         ];
     }
 
@@ -60,21 +54,15 @@ class CallerResource extends Resource
                             ->required()
                             ->maxLength(20),
                         Forms\Components\TextInput::make('cpr')
-                            ->maxLength(20),
-                        Forms\Components\TextInput::make('ip_address')
-                            ->maxLength(45),
+                            ->required()
+                            ->maxLength(20)
+                            ->unique(ignoreRecord: true),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Status Information')
+                Forms\Components\Section::make('Status')
                     ->schema([
-                        Forms\Components\Toggle::make('is_family')
-                            ->label('Family Member'),
                         Forms\Components\Toggle::make('is_winner')
                             ->label('Is Winner'),
-                        Forms\Components\TextInput::make('hits')
-                            ->numeric()
-                            ->default(0),
-                        Forms\Components\DateTimePicker::make('last_hit'),
                         Forms\Components\Select::make('status')
                             ->options([
                                 'active' => 'Active',
@@ -100,17 +88,10 @@ class CallerResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('cpr')
                     ->searchable()
-                    ->toggleable(),
-                Tables\Columns\IconColumn::make('is_family')
-                    ->boolean()
-                    ->label('Family'),
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_winner')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('hits')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('last_hit')
-                    ->dateTime()
-                    ->sortable(),
+                    ->boolean()
+                    ->label('Winner'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -119,6 +100,9 @@ class CallerResource extends Resource
                         'blocked' => 'danger',
                         default => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
@@ -128,7 +112,6 @@ class CallerResource extends Resource
                         'blocked' => 'Blocked',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_winner'),
-                Tables\Filters\TernaryFilter::make('is_family'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -146,7 +129,82 @@ class CallerResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\Action::make('selectMultipleRandomWinners')
+                        ->label('Select Multiple Random Winners')
+                        ->icon('heroicon-o-trophy')
+                        ->color('success')
+                        ->form([
+                            Forms\Components\TextInput::make('count')
+                                ->label('Number of Winners')
+                                ->required()
+                                ->numeric()
+                                ->minValue(1)
+                                ->maxValue(10)
+                                ->default(3),
+                        ])
+                        ->action(function (array $data): void {
+                            $count = (int) $data['count'];
+                            
+                            // Get eligible callers
+                            $eligibleCallers = Caller::getEligibleCallers();
+                            
+                            if ($eligibleCallers->count() < $count) {
+                                $this->notify('warning', 'Not enough eligible callers. Only ' . $eligibleCallers->count() . ' available.');
+                                return;
+                            }
+                            
+                            $selectedWinners = [];
+                            $selectedCpRs = [];
+                            
+                            // Select unique winners based on CPR
+                            for ($i = 0; $i < $count; $i++) {
+                                if ($eligibleCallers->isEmpty()) {
+                                    break;
+                                }
+                                
+                                // Filter out callers whose CPR has already been selected
+                                $availableCallers = $eligibleCallers->filter(function ($caller) use ($selectedCpRs) {
+                                    return !in_array($caller->cpr, $selectedCpRs);
+                                });
+                                
+                                if ($availableCallers->isEmpty()) {
+                                    break;
+                                }
+                                
+                                $winner = $availableCallers->random();
+                                $winner->is_winner = true;
+                                $winner->save();
+                                
+                                $selectedWinners[] = $winner;
+                                $selectedCpRs[] = $winner->cpr;
+                            }
+                            
+                            $winnerNames = implode(', ', array_map(function ($winner) {
+                                return $winner->name . ' (' . $winner->cpr . ')';
+                            }, $selectedWinners));
+                            
+                            $this->notify('success', 'Selected ' . count($selectedWinners) . ' random winners: ' . $winnerNames);
+                        })
+                        ->requiresConfirmation(),
                 ]),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('selectRandomWinner')
+                    ->label('Select Random Winner')
+                    ->icon('heroicon-o-trophy')
+                    ->color('success')
+                    ->action(function (): void {
+                        // Use the model method for selecting random winner by CPR
+                        $winner = Caller::selectRandomWinnerByCpr();
+                        
+                        if (!$winner) {
+                            $this->notify('warning', 'No eligible callers found for winner selection.');
+                            return;
+                        }
+                        
+                        $this->notify('success', 'Random winner selected: ' . $winner->name . ' (CPR: ' . $winner->cpr . ')');
+                    })
+                    ->requiresConfirmation(),
             ]);
     }
 
@@ -164,7 +222,6 @@ class CallerResource extends Resource
             'create' => Pages\CreateCaller::route('/create'),
             'edit' => Pages\EditCaller::route('/{record}/edit'),
             'winners' => Pages\ListWinners::route('/winners'),
-            'families' => Pages\ListFamilies::route('/families'),
         ];
     }
 }

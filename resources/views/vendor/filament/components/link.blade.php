@@ -1,5 +1,5 @@
 @php
-    use Filament\Support\Enums\ActionSize;
+    use Filament\Support\Enums\Size;
     use Filament\Support\Enums\FontWeight;
     use Filament\Support\Enums\IconPosition;
     use Filament\Support\Enums\IconSize;
@@ -21,7 +21,7 @@
     'keyBindings' => null,
     'labelSrOnly' => false,
     'loadingIndicator' => true,
-    'size' => ActionSize::Medium,
+    'size' => Size::Medium,
     'spaMode' => null,
     'tag' => 'a',
     'target' => null,
@@ -35,12 +35,12 @@
         $iconPosition = filled($iconPosition) ? (IconPosition::tryFrom($iconPosition) ?? $iconPosition) : null;
     }
 
-    if (! $size instanceof ActionSize) {
-        $size = filled($size) ? (ActionSize::tryFrom($size) ?? $size) : null;
+    if (! $size instanceof Size) {
+        $size = filled($size) ? (Size::tryFrom($size) ?? $size) : null;
     }
 
     $iconSize ??= match ($size) {
-        ActionSize::ExtraSmall, ActionSize::Small => IconSize::Small,
+        Size::ExtraSmall, Size::Small => IconSize::Small,
         default => IconSize::Medium,
     };
 
@@ -51,15 +51,15 @@
     $linkClasses = \Illuminate\Support\Arr::toCssClasses([
         'fi-link group/link relative inline-flex items-center justify-center outline-none',
         'pointer-events-none opacity-70' => $disabled,
-        ($size instanceof ActionSize) ? "fi-size-{$size->value}" : null,
+        ($size instanceof Size) ? "fi-size-{$size->value}" : null,
         // @deprecated `fi-link-size-*` has been replaced by `fi-size-*`.
-        ($size instanceof ActionSize) ? "fi-link-size-{$size->value}" : null,
+        ($size instanceof Size) ? "fi-link-size-{$size->value}" : null,
         match ($size) {
-            ActionSize::ExtraSmall => 'gap-1',
-            ActionSize::Small => 'gap-1',
-            ActionSize::Medium => 'gap-1.5',
-            ActionSize::Large => 'gap-1.5',
-            ActionSize::ExtraLarge => 'gap-1.5',
+            Size::ExtraSmall => 'gap-1',
+            Size::Small => 'gap-1',
+            Size::Medium => 'gap-1.5',
+            Size::Large => 'gap-1.5',
+            Size::ExtraLarge => 'gap-1.5',
             default => $size,
         },
         match ($color) {
@@ -84,11 +84,11 @@
                 default => $weight,
             },
             match ($size) {
-                ActionSize::ExtraSmall => 'text-xs',
-                ActionSize::Small => 'text-sm',
-                ActionSize::Medium => 'text-sm',
-                ActionSize::Large => 'text-sm',
-                ActionSize::ExtraLarge => 'text-sm',
+                Size::ExtraSmall => 'text-xs',
+                Size::Small => 'text-sm',
+                Size::Medium => 'text-sm',
+                Size::Large => 'text-sm',
+                Size::ExtraLarge => 'text-sm',
                 default => null,
             },
             match ($color) {

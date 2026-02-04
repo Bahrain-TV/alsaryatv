@@ -1,5 +1,5 @@
 @php
-    use Filament\Support\Enums\ActionSize;
+    use Filament\Support\Enums\Size;
     use Filament\Support\Enums\IconPosition;
     use Filament\Support\Enums\IconSize;
 @endphp
@@ -17,7 +17,7 @@
     'iconSize' => IconSize::Small,
     'keyBindings' => null,
     'loadingIndicator' => true,
-    'size' => ActionSize::Medium,
+    'size' => Size::Medium,
     'spaMode' => null,
     'tag' => 'span',
     'target' => null,
@@ -30,8 +30,8 @@
         $iconPosition = filled($iconPosition) ? (IconPosition::tryFrom($iconPosition) ?? $iconPosition) : null;
     }
 
-    if (! $size instanceof ActionSize) {
-        $size = filled($size) ? (ActionSize::tryFrom($size) ?? $size) : null;
+    if (! $size instanceof Size) {
+        $size = filled($size) ? (Size::tryFrom($size) ?? $size) : null;
     }
 
     if (! $iconSize instanceof IconSize) {
@@ -103,9 +103,9 @@
                 'fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset',
                 'pointer-events-none opacity-70' => $disabled,
                 match ($size) {
-                    ActionSize::ExtraSmall => 'px-0.5 min-w-[theme(spacing.4)] tracking-tighter',
-                    ActionSize::Small => 'px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight',
-                    ActionSize::Medium, ActionSize::Large, ActionSize::ExtraLarge => 'px-2 min-w-[theme(spacing.6)] py-1',
+                    Size::ExtraSmall => 'px-0.5 min-w-[theme(spacing.4)] tracking-tighter',
+                    Size::Small => 'px-1.5 min-w-[theme(spacing.5)] py-0.5 tracking-tight',
+                    Size::Medium, Size::Large, Size::ExtraLarge => 'px-2 min-w-[theme(spacing.6)] py-1',
                     default => $size,
                 },
                 match ($color) {

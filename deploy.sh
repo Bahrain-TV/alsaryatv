@@ -145,6 +145,10 @@ $SUDO_PREFIX git fetch origin main
 
 if $SUDO_PREFIX git reset --hard origin/main; then
     echo "✅ Code synced successfully"
+    
+    # Cleanup: Remove development and workflow files from production server
+    echo "🧹 Cleaning up development files from production..."
+    $SUDO_PREFIX rm -rf .github PROJECT_DOCS tests .vscode .claude .gitignore README.md CLAUDE.md TODO.md
 else
     echo "❌ Git sync failed"
     send_discord_message "Deployment Failed ❌" "git reset --hard origin/main failed on server." 15548997

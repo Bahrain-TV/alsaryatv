@@ -24,8 +24,8 @@ class CallerFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
-            'cpr' => $this->faker->unique()->numerify('######'),
-            'is_family' => false,
+            'cpr' => $this->faker->unique()->numerify('##########'),
+
             'is_winner' => false,
             'ip_address' => $this->faker->ipv4(),
             'hits' => $this->faker->numberBetween(1, 100),
@@ -49,15 +49,5 @@ class CallerFactory extends Factory
         });
     }
 
-    /**
-     * Indicate that the caller is a family member.
-     */
-    public function family(): Factory
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'is_family' => true,
-            ];
-        });
-    }
+
 }
