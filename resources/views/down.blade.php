@@ -69,7 +69,7 @@
                 <lottie-player src="lottie/crecent-moon-ramadan.json" background="transparent" speed="1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
             </div>
             <h1 class="text-2xl font-bold text-center mb-4">لحظات وسنعود...</h1>
-            <p class="text-center mb-4">قاعدين نسحب على الأسماء ... دعواتكم 🤩</p>
+            {{-- <p class="text-center mb-4">قاعدين نسحب على الأسماء ... دعواتكم 🤩</p> --}}
             {{-- <div class="progress-bar mb-4">
                 <div class="progress-bar-fill" id="progress"></div>
             </div> --}}
@@ -87,7 +87,7 @@
         </div>
     </div>
 
-    @include('sponsors')
+    {{-- @include('sponsors') --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
