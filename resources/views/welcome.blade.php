@@ -289,22 +289,54 @@
 
         /* FlipDown Overrides - Base */
         .flipdown {
-            margin: 0 auto;
-            direction: ltr;
+            margin: 0 auto !important;
+            direction: ltr !important;
             width: auto !important;
-            overflow: visible;
+            display: inline-flex !important;
+            justify-content: center !important;
+            flex-wrap: nowrap !important;
+            font-family: inherit !important;
         }
 
-        .flipdown .rotor-group {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
+        /* Fix for jumping numbers: Hardware acceleration and font stabilization */
+        .flipdown .rotor {
+            font-family: 'Courier New', Courier, monospace !important;
+            font-weight: 700 !important;
+            box-sizing: content-box !important;
+            backface-visibility: hidden !important;
+            -webkit-backface-visibility: hidden !important;
+        }
+
+        .flipdown .rotor-leaf-front,
+        .flipdown .rotor-leaf-rear,
+        .flipdown .rotor-top,
+        .flipdown .rotor-bottom {
+            backface-visibility: hidden !important;
+            -webkit-backface-visibility: hidden !important;
+            transform-style: preserve-3d !important;
+        }
+
+        .flipdown .rotor-group-heading {
+            margin-top: 10px !important;
+            color: transparent !important;
+            position: relative !important;
+            height: 1.5rem !important;
+            display: block !important;
         }
 
         .flipdown .rotor-group-heading::before {
+            position: absolute !important;
+            top: 0 !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            display: block !important;
+            visibility: visible !important;
             color: var(--primary-gold) !important;
             font-family: 'Tajawal', sans-serif !important;
-            font-size: 0.9rem !important;
+            font-size: 1rem !important;
+            font-weight: 700 !important;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
+            white-space: nowrap !important;
         }
 
         .flipdown .rotor-group:nth-child(1) .rotor-group-heading::before { content: 'يوم' !important; }
@@ -316,32 +348,24 @@
             --bg: transparent;
         }
 
+        /* Dark Theme Specific Overrides */
         .flipdown.flipdown__theme-dark .rotor,
         .flipdown.flipdown__theme-dark .rotor-top,
         .flipdown.flipdown__theme-dark .rotor-bottom,
         .flipdown.flipdown__theme-dark .rotor-leaf-front,
         .flipdown.flipdown__theme-dark .rotor-leaf-rear {
             background: linear-gradient(180deg, #1e293b, #0f172a) !important;
-            border-color: rgba(212, 175, 55, 0.2) !important;
-            box-sizing: border-box !important;
-        }
-
-        .flipdown.flipdown__theme-dark .rotor-top,
-        .flipdown.flipdown__theme-dark .rotor-leaf-front {
+            border-color: rgba(212, 175, 55, 0.4) !important;
             color: var(--primary-gold) !important;
         }
 
-        .flipdown.flipdown__theme-dark .rotor-bottom,
-        .flipdown.flipdown__theme-dark .rotor-leaf-rear {
-            color: #fbbf24 !important;
-        }
-
-        /* FlipDown Rotor Sizing - Desktop */
-        .flipdown .rotor {
-            width: 40px;
-            height: 55px;
-            font-size: 36px;
-            line-height: 55px;
+        /* Responsive Scaling - Stable approach */
+        @media (min-width: 769px) {
+            .flipdown {
+                transform: scale(1.15);
+                transform-origin: center top;
+                margin-bottom: 2rem !important;
+            }
         }
 
         /* Ramadan Date Info */
@@ -493,22 +517,9 @@
 
             /* FlipDown Responsive - Tablet */
             .flipdown {
-                width: auto !important;
-            }
-
-            .flipdown .rotor-group {
-                margin: 0 3px !important;
-            }
-
-            .flipdown .rotor {
-                width: 32px !important;
-                height: 44px !important;
-                font-size: 28px !important;
-                line-height: 44px !important;
-            }
-
-            .flipdown .rotor-group-heading::before {
-                font-size: 0.8rem !important;
+                transform: scale(0.85);
+                transform-origin: center top;
+                margin: 0 auto -1rem auto !important;
             }
         }
 
@@ -598,26 +609,10 @@
             }
 
             /* FlipDown Responsive - Mobile */
-            .flipdown .rotor-group {
-                margin: 0 2px !important;
-            }
-
-            .flipdown .rotor {
-                width: 28px !important;
-                height: 38px !important;
-                font-size: 24px !important;
-                line-height: 38px !important;
-            }
-
-            .flipdown .rotor-top,
-            .flipdown .rotor-bottom,
-            .flipdown .rotor-leaf-front,
-            .flipdown .rotor-leaf-rear {
-                border-radius: 4px !important;
-            }
-
-            .flipdown .rotor-group-heading::before {
-                font-size: 0.75rem !important;
+            .flipdown {
+                transform: scale(0.7);
+                transform-origin: center top;
+                margin: 0 auto -2rem auto !important;
             }
         }
 
@@ -700,19 +695,10 @@
             }
 
             /* FlipDown Responsive - Small Mobile */
-            .flipdown .rotor-group {
-                margin: 0 1px !important;
-            }
-
-            .flipdown .rotor {
-                width: 24px !important;
-                height: 32px !important;
-                font-size: 20px !important;
-                line-height: 32px !important;
-            }
-
-            .flipdown .rotor-group-heading::before {
-                font-size: 0.65rem !important;
+            .flipdown {
+                transform: scale(0.6);
+                transform-origin: center top;
+                margin: 0 auto -2.5rem auto !important;
             }
         }
 
@@ -1038,21 +1024,44 @@
         })();
 
         // ==================== MAIN APP ====================
+        // Global singleton to prevent multiple initializations
+        window.flipdownInitialized = false;
+
         document.addEventListener('DOMContentLoaded', function() {
+            if (window.flipdownInitialized) return;
+            window.flipdownInitialized = true;
+
             // Ramadan 1447 starts on February 26, 2026 at midnight (Bahrain time)
             // Using Bahrain timezone (UTC+3)
-            const ramadanDate = new Date('{{ $targetISO ?? "2026-02-26" }}T00:00:00+03:00');
+            const targetISO = '{{ $targetISO ?? "2026-02-26" }}';
+            const ramadanDate = new Date(targetISO + 'T00:00:00+03:00');
             const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
 
+            // Ensure container exists and is empty
+            const flipdownEl = document.getElementById('flipdown');
+            if (flipdownEl) {
+                flipdownEl.innerHTML = '';
+            }
+
             // Initialize FlipDown
-            new FlipDown(ramadanTimestamp, 'flipdown', {
-                theme: 'dark'
-            }).start().ifEnded(() => {
-                // When countdown ends, show Ramadan message
-                document.querySelector('.closed-message h3').textContent = '🌙 رمضان كريم!';
-                document.querySelector('.closed-message p').textContent = 'أهلاً بكم في شهر رمضان المبارك - سيتم فتح التسجيل قريباً';
-                document.querySelector('.countdown-label').textContent = '🎉 حل شهر رمضان المبارك!';
-            });
+            try {
+                const flipdown = new FlipDown(ramadanTimestamp, 'flipdown', {
+                    theme: 'dark'
+                });
+                
+                flipdown.start().ifEnded(() => {
+                    // When countdown ends, show Ramadan message
+                    const title = document.querySelector('.closed-message h3');
+                    const desc = document.querySelector('.closed-message p');
+                    const label = document.querySelector('.countdown-label');
+                    
+                    if (title) title.textContent = '🌙 رمضان كريم!';
+                    if (desc) desc.textContent = 'أهلاً بكم في شهر رمضان المبارك - سيتم فتح التسجيل قريباً';
+                    if (label) label.textContent = '🎉 حل شهر رمضان المبارك!';
+                });
+            } catch (err) {
+                console.error('FlipDown Error:', err);
+            }
         });
     </script>
 </body>

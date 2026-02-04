@@ -1,81 +1,47 @@
-<!-- Insert this code after the header and before the main content -->
-<div class="relative w-full max-w-2xl px-6 lg:max-w-7xl mx-auto">
-    <div class="flex flex-col items-center justify-center py-10">
-        <div class="rounded-lg bg-white p-8 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05]">
-            <div class="text-center" id="countdown">
-                <h2 class="text-2xl font-semibold text-black font-tajawal">سيأتيكم بعد..</h2>
-                <div class="mt-6 flex items-center justify-center gap-6">
-                    <div class="flex flex-col items-center">
-                        <span id="days" class="text-4xl font-bold text-[#ffe520]">00</span>
-                        <span class="text-sm text-gray-500">Days</span>
-                    </div>
-                    <span class="text-2xl font-bold text-[#ffe520]">:</span>
-                    <div class="flex flex-col items-center">
-                        <span id="hours" class="text-4xl font-bold text-[#ffe520]">00</span>
-                        <span class="text-sm text-gray-500">Hours</span>
-                    </div>
-                    <span class="text-2xl font-bold text-[#ffe520]">:</span>
-                    <div class="flex flex-col items-center">
-                        <span id="minutes" class="text-4xl font-bold text-[#ffe520]">00</span>
-                        <span class="text-sm text-gray-500">Minutes</span>
-                    </div>
-                    <span class="text-2xl font-bold text-[#ffe520]">:</span>
-                    <div class="flex flex-col items-center">
-                        <span id="seconds" class="text-4xl font-bold text-[#ffe520]">00</span>
-                        <span class="text-sm text-gray-500">Seconds</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="countdown-section">
+    <div id="flipdown-{{ $id ?? 'main' }}" class="flipdown flipdown__theme-dark"></div>
 </div>
 
-<!-- Add this script before the closing body tag -->
+@once
+    @push('styles')
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.css" />
+        <style>
+            .countdown-section {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 2rem 0;
+                width: 100%;
+            }
+            /* Custom styling to ensure it looks good and doesn't stack incorrectly */
+            .flipdown {
+                font-family: 'Tajawal', sans-serif !important;
+                margin: 0 auto !important;
+                direction: ltr !important;
+            }
+            .flipdown .rotor-group-heading::before {
+                color: #fbbf24 !important;
+                font-family: 'Tajawal', sans-serif !important;
+            }
+            .flipdown .rotor-group:nth-child(1) .rotor-group-heading::before { content: 'يوم' !important; }
+            .flipdown .rotor-group:nth-child(2) .rotor-group-heading::before { content: 'ساعة' !important; }
+            .flipdown .rotor-group:nth-child(3) .rotor-group-heading::before { content: 'دقيقة' !important; }
+            .flipdown .rotor-group:nth-child(4) .rotor-group-heading::before { content: 'ثانية' !important; }
+            .flipdown .rotor-group-heading { font-family: 'Tajawal', sans-serif !important; }
+        </style>
+    @endpush
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.js"></script>
+    @endpush
+@endonce
+
+@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const gsap = window.gsap;
-        // Set the date we're counting down to (1st of March 2025 at 21:00)
-        const countDownDate = new Date("Mar 1, 2025 21:00:00").getTime();
-
-        // Check if gsap is available before using it
-        if (typeof gsap !== 'undefined' && gsap !== null) {
-            const heartBeat = gsap.to("#countdown", {
-                scale: 1.05,
-                duration: .5,
-                repeat: -1,
-                repeatDelay: 1,
-                yoyo: true,
-                ease: "power4.inOut",
-            });
-        } else {
-            console.error('GSAP is not loaded');
-        }
-
-        // Update the countdown every 1 second
-        const countdown = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = countDownDate - now;
-
-            // Calculate time
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Display the result
-            document.getElementById("days").textContent = String(days).padStart(2, '0');
-            document.getElementById("hours").textContent = String(hours).padStart(2, '0');
-            document.getElementById("minutes").textContent = String(minutes).padStart(2, '0');
-            document.getElementById("seconds").textContent = String(seconds).padStart(2, '0');
-
-            // If the countdown is finished, display expired
-            if (distance < 0) {
-                clearInterval(countdown);
-                document.getElementById("days").textContent = "00";
-                document.getElementById("hours").textContent = "00";
-                document.getElementById("minutes").textContent = "00";
-                document.getElementById("seconds").textContent = "00";
-            }
-        }, 1000);
+        const targetDate = new Date("{{ $targetDate ?? '2026-02-26T00:00:00+03:00' }}").getTime() / 1000;
+        new FlipDown(targetDate, "flipdown-{{ $id ?? 'main' }}", {
+            theme: 'dark'
+        }).start();
     });
 </script>
+@endpush

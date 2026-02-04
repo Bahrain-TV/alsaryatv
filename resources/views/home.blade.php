@@ -70,15 +70,14 @@
             }
 
             /* Custom labels styling */
-            .flipdown .rotor-group-heading {
-                font-family: 'Tajawal', sans-serif;
-                font-size: 16px;
-                margin-bottom: 1rem;
-                color: #fff;
-            }
+            .flipdown .rotor-group:nth-child(1) .rotor-group-heading::before { content: 'يوم' !important; }
+            .flipdown .rotor-group:nth-child(2) .rotor-group-heading::before { content: 'ساعة' !important; }
+            .flipdown .rotor-group:nth-child(3) .rotor-group-heading::before { content: 'دقيقة' !important; }
+            .flipdown .rotor-group:nth-child(4) .rotor-group-heading::before { content: 'ثانية' !important; }
 
-            .flipdown.flipdown__theme-dark .rotor-group-heading {
-                color: rgba(255, 255, 255);
+            .flipdown .rotor-group-heading {
+                font-family: 'Tajawal', sans-serif !important;
+                color: #fff !important;
             }
 
             /* Glow effect for FlipDown */
@@ -224,10 +223,9 @@
 
                     document.addEventListener('DOMContentLoaded', () => {
                         // Set up FlipDown
-                        const targetDate = new Date('2025-03-01T21:00:00').getTime() / 1000;
-                        const flipdown = new FlipDown(targetDate, {
-                            theme: 'dark',
-                            headings: ['يوم', 'ساعة', 'دقيقة', 'ثانية'],
+                        const targetDate = new Date('2026-02-26T21:00:00+03:00').getTime() / 1000;
+                        new FlipDown(targetDate, 'flipdown', {
+                            theme: 'dark'
                         }).start();
 
                         // check if the form is hidden
