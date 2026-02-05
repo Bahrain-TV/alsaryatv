@@ -68,7 +68,7 @@ Route::prefix('callers')->name('callers.')->group(function (): void {
     })->name('success');
 
     // Action routes
-    Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function (): void {
         Route::post('/{caller}/toggle-winner', [CallerController::class, 'toggleWinner'])->name('toggle-winner');
         Route::delete('/{caller}', [CallerController::class, 'destroy'])->name('destroy');
         Route::put('/{caller}', [CallerController::class, 'update'])->name('update');

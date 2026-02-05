@@ -20,8 +20,6 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $title = 'لوحة التحكم - برنامج السارية';
 
-    protected static ?string $subheading = 'مراقبة شاملة لنظام تسجيل المتصلين';
-
     public function getWidgets(): array
     {
         return [

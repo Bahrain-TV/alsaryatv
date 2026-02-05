@@ -52,13 +52,13 @@ class AppServiceProvider extends ServiceProvider
      */
     private function registerMigrationHooks(): void
     {
-        \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\CommandStarting::class, function ($event) {
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\CommandStarting::class, function ($event): void {
             if (in_array($event->command, ['migrate', 'db:seed', 'migrate:fresh', 'migrate:refresh', 'migrate:rollback'])) {
                 \Illuminate\Support\Facades\Artisan::call('app:persist-data', ['--export-csv' => true, '--verify' => true]);
             }
         });
 
-        \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\CommandFinished::class, function ($event) {
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\CommandFinished::class, function ($event): void {
             if ($event->exitCode === 0 && in_array($event->command, ['migrate', 'db:seed', 'migrate:fresh', 'migrate:refresh'])) {
                 \Illuminate\Support\Facades\Artisan::call('app:callers:import', ['--force' => true]);
             }
