@@ -24,8 +24,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net" />
     <link href="https://fonts.bunny.net/css?family=tajawal:400,500,600,700,800&display=swap" rel="stylesheet" />
-    
-    <!-- Countdown Timer styles are included in the component -->
+
+    <!-- FlipDown Countdown Timer -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.js"></script>
 
     @vite([
         'resources/css/app.css',
@@ -33,13 +35,60 @@
     ])
 
     <style>
+        /* Modern OKLCH Color System */
         :root {
-            --primary-gold: #d4af37;
-            --primary-emerald: #10b981;
-            --bg-dark: #0a0f1a;
-            --bg-card: rgba(15, 23, 42, 0.95);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
+            /* Base colors */
+            --background: oklch(0.2046 0 0);
+            --foreground: oklch(0.9219 0 0);
+            --card: oklch(0.2686 0 0);
+            --card-foreground: oklch(0.9219 0 0);
+
+            /* Primary colors - Gold/Amber theme */
+            --primary: oklch(0.7686 0.1647 70.0804);
+            --primary-foreground: oklch(0 0 0);
+            --primary-gold: oklch(0.7686 0.1647 70.0804);
+
+            /* Accent colors - Emerald theme */
+            --accent: oklch(0.6658 0.1574 155.0);
+            --accent-foreground: oklch(0.9243 0.1151 95.7459);
+            --primary-emerald: oklch(0.6658 0.1574 155.0);
+
+            /* Semantic colors */
+            --muted: oklch(0.2393 0 0);
+            --muted-foreground: oklch(0.7155 0 0);
+            --border: oklch(0.3715 0 0);
+            --input: oklch(0.3715 0 0);
+            --ring: oklch(0.7686 0.1647 70.0804);
+
+            /* Legacy support */
+            --bg-dark: oklch(0.1684 0 0);
+            --bg-card: oklch(0.2686 0.5 0);
+            --text-primary: oklch(0.9219 0 0);
+            --text-secondary: oklch(0.7155 0 0);
+
+            /* Shadows */
+            --shadow-color: oklch(0 0 0 / 0.1);
+            --shadow-sm: 0px 2px 4px var(--shadow-color);
+            --shadow-md: 0px 4px 8px var(--shadow-color);
+            --shadow-lg: 0px 8px 16px var(--shadow-color);
+            --shadow-xl: 0px 12px 24px var(--shadow-color);
+
+            /* Spacing scale */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+
+            /* Border radius */
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+
+            /* Font family */
+            --font-sans: 'Tajawal', sans-serif;
         }
 
         * {
@@ -49,23 +98,44 @@
         }
 
         body {
-            font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, rgba(10, 15, 26, 0.85) 0%, rgba(26, 31, 46, 0.8) 50%, rgba(15, 26, 42, 0.85) 100%),
-                        url('{{ asset("images/alsarya-bg-2026-by-gemini2.jpeg") }}');
+            font-family: var(--font-sans);
+            background: linear-gradient(
+                135deg,
+                oklch(0.15 0 0 / 0.95) 0%,
+                oklch(0.18 0 0 / 0.90) 50%,
+                oklch(0.16 0 0 / 0.95) 100%
+            ),
+            url('{{ asset("images/alsarya-bg-2026-by-gemini2.jpeg") }}');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
             min-height: 100vh;
-            min-height: 100dvh; /* Dynamic viewport height for mobile */
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
             position: relative;
-            color: var(--text-primary);
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            color: var(--foreground);
+            padding: clamp(0.5rem, 2vw, 1rem);
+            padding: max(env(safe-area-inset-top), 0.5rem)
+                    max(env(safe-area-inset-right), 0.5rem)
+                    max(env(safe-area-inset-bottom), 0.5rem)
+                    max(env(safe-area-inset-left), 0.5rem);
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Touch optimization for mobile */
+        @media (hover: none) and (pointer: coarse) {
+            * {
+                -webkit-tap-highlight-color: transparent;
+            }
         }
 
         /* Lottie Background Container */
@@ -120,7 +190,7 @@
             height: 150%;
         }
 
-        /* Main Container */
+        /* Main Container - Enhanced Responsiveness */
         .main-container {
             position: relative;
             z-index: 10;
@@ -128,13 +198,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: clamp(1rem, 4vw, 2rem);
             text-align: center;
             width: 100%;
-            max-width: min(900px, calc(100vw - 2rem));
+            max-width: min(900px, calc(100vw - clamp(1rem, 4vw, 2rem)));
             opacity: 0;
             transform: translateY(30px);
-            transition: opacity 1s ease, transform 1s ease;
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 1s cubic-bezier(0.4, 0, 0.2, 1);
             box-sizing: border-box;
         }
 
@@ -143,16 +214,17 @@
             transform: translateY(0);
         }
 
-        /* Logo Section */
+        /* Logo Section - Responsive sizing */
         .logo-section {
-            margin-bottom: 2rem;
-            animation: fadeInDown 1s ease-out;
+            margin-bottom: clamp(1.5rem, 3vw, 2rem);
+            animation: fadeInDown 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .logo-section img {
-            height: 120px;
-            filter: drop-shadow(0 10px 30px rgba(212, 175, 55, 0.3));
+            height: clamp(80px, 15vw, 120px);
+            filter: drop-shadow(0 10px 30px oklch(0.7686 0.1647 70.0804 / 0.3));
             animation: logoFloat 3s ease-in-out infinite;
+            will-change: transform;
         }
 
         @keyframes logoFloat {
@@ -171,22 +243,34 @@
             }
         }
 
-        /* Downtime Card - Glassmorphism */
+        /* Downtime Card - Modern Glassmorphism with OKLCH */
         .downtime-card {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 24px;
-            padding: 3rem;
+            background: oklch(0.2686 0 0 / 0.7);
+            backdrop-filter: blur(32px) saturate(180%);
+            -webkit-backdrop-filter: blur(32px) saturate(180%);
+            border: 1px solid oklch(0.3715 0 0 / 0.3);
+            border-top: 1px solid oklch(0.9219 0 0 / 0.15);
+            border-left: 1px solid oklch(0.9219 0 0 / 0.1);
+            border-radius: var(--radius-xl);
+            padding: clamp(2rem, 5vw, 3rem);
             width: 100%;
-            box-shadow: 
-                0 25px 80px rgba(0, 0, 0, 0.4),
-                0 0 60px rgba(212, 175, 55, 0.08),
-                inset 0 1px 1px rgba(255, 255, 255, 0.1);
-            animation: cardAppear 1.2s ease-out 0.3s both;
+            box-shadow:
+                var(--shadow-xl),
+                0 0 60px oklch(0.7686 0.1647 70.0804 / 0.08),
+                inset 0 1px 1px oklch(0.9219 0 0 / 0.1);
+            animation: cardAppear 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Hover effect for desktop */
+        @media (hover: hover) {
+            .downtime-card:hover {
+                transform: translateY(-2px);
+                box-shadow:
+                    0px 12px 32px oklch(0 0 0 / 0.15),
+                    0 0 80px oklch(0.7686 0.1647 70.0804 / 0.12),
+                    inset 0 1px 1px oklch(0.9219 0 0 / 0.15);
+            }
         }
 
         @keyframes cardAppear {
@@ -288,6 +372,50 @@
                 opacity: 0.7;
                 filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.8));
             }
+        }
+
+        /* FlipDown Timer Styles */
+        .countdown-label {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        #flipdown {
+            margin: 1.5rem auto;
+        }
+
+        /* Arabic Labels for FlipDown */
+        .flipdown .rotor-group-heading {
+            font-size: 0 !important;
+            height: auto !important;
+            line-height: 1.5 !important;
+            color: transparent !important;
+        }
+
+        .flipdown .rotor-group-heading::before {
+            display: block;
+            font-family: 'Tajawal', sans-serif !important;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem !important;
+            text-transform: none !important;
+            padding-top: 0.5rem;
+        }
+
+        .flipdown .rotor-group:nth-child(1) .rotor-group-heading::before {
+            content: 'يوم' !important;
+        }
+        .flipdown .rotor-group:nth-child(2) .rotor-group-heading::before {
+            content: 'ساعة' !important;
+        }
+        .flipdown .rotor-group:nth-child(3) .rotor-group-heading::before {
+            content: 'دقيقة' !important;
+        }
+        .flipdown .rotor-group:nth-child(4) .rotor-group-heading::before {
+            content: 'ثانية' !important;
         }
 
         /* Ramadan Date Info */
@@ -1000,7 +1128,7 @@
                 const flipdown = new FlipDown(ramadanTimestamp, 'flipdown', {
                     theme: 'dark'
                 });
-                
+
                 flipdown.start().ifEnded(() => {
                     // When countdown ends, show Ramadan message
                     const title = document.querySelector('.closed-message h3');
@@ -1011,6 +1139,8 @@
                     if (desc) desc.textContent = 'أهلاً بكم في شهر رمضان المبارك - سيتم فتح التسجيل قريباً';
                     if (label) label.innerHTML = '🎉 حل شهر رمضان المبارك!';
                 });
+            } catch (error) {
+                console.error('FlipDown initialization error:', error);
             }
         });
     </script>

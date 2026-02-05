@@ -1,0 +1,21 @@
+[    1569ms] Missing catch or finally after try
+[    1579ms] [WARNING] GSAP target .fixed-layout not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1580ms] [WARNING] GSAP target #logo-animation-wrapper not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1580ms] [WARNING] GSAP target .toggle-button,.forms-stack,.sponsors-container not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1580ms] [WARNING] GSAP target .intro-dance not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1582ms] [WARNING] GSAP target  not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1583ms] [WARNING] GSAP target .intro-dance not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1584ms] [WARNING] GSAP target .toggle-button not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1584ms] [WARNING] GSAP target .sponsors-container not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1584ms] [WARNING] GSAP target .forms-stack not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1584ms] [WARNING] GSAP target #call-form-container not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1584ms] [WARNING] GSAP target #family-form-container not found. https://gsap.com @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:23
+[    1587ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:6001/app/39575501d1d95209b931?protocol=7&client=js&version=8.4.0&flash=false' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:12
+[    3327ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:8000/images/favicon.ico:0
+[    3564ms] [ERROR] WebSocket connection to 'wss://127.0.0.1:6001/app/39575501d1d95209b931?protocol=7&client=js&version=8.4.0&flash=false' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:12
+[   16556ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:6001/app/39575501d1d95209b931?protocol=7&client=js&version=8.4.0&flash=false' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:12
+[   18560ms] [ERROR] WebSocket connection to 'wss://127.0.0.1:6001/app/39575501d1d95209b931?protocol=7&client=js&version=8.4.0&flash=false' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:12
+[   46561ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:6001/app/39575501d1d95209b931?protocol=7&client=js&version=8.4.0&flash=false' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:12
+[   48562ms] [ERROR] WebSocket connection to 'wss://127.0.0.1:6001/app/39575501d1d95209b931?protocol=7&client=js&version=8.4.0&flash=false' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:12
+[  106567ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:6001/app/39575501d1d95209b931?protocol=7&client=js&version=8.4.0&flash=false' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:12
+[  108577ms] [ERROR] WebSocket connection to 'wss://127.0.0.1:6001/app/39575501d1d95209b931?protocol=7&client=js&version=8.4.0&flash=false' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:8000/build/assets/app-COhlA7Ze.js:12
