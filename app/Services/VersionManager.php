@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\File;
 class VersionManager
 {
     private const VERSION_FILE = 'version.json';
-
     private const SCHEMA_FILE = '.version-schema.json';
 
     /**
@@ -80,7 +79,6 @@ class VersionManager
     public static function getBranch(): string
     {
         $branch = trim(shell_exec('git rev-parse --abbrev-ref HEAD 2>/dev/null') ?? 'unknown');
-
         return $branch ?: 'unknown';
     }
 
@@ -90,7 +88,6 @@ class VersionManager
     public static function getCommitHash(): string
     {
         $hash = trim(shell_exec('git rev-parse --short HEAD 2>/dev/null') ?? 'unknown');
-
         return $hash ?: 'unknown';
     }
 
@@ -116,7 +113,6 @@ class VersionManager
     public static function getChangeLog(): array
     {
         $data = self::getVersionData();
-
         return $data['changelog'] ?? [];
     }
 
@@ -198,7 +194,6 @@ class VersionManager
         }
 
         $content = File::get($path);
-
         return json_decode($content, true) ?? [];
     }
 
