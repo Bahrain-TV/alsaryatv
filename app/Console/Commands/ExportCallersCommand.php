@@ -33,10 +33,10 @@ class ExportCallersCommand extends Command
 
         try {
             $path = $this->option('path');
-            $encrypt = in_array($this->option('encrypt'), ['true', '1', 'yes', 'on'], true);
+            $encrypt = filter_var($this->option('encrypt'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_TO_FALSE);
 
             // Ensure directory exists
-            if (! Storage::exists($path)) {
+            if (!Storage::exists($path)) {
                 Storage::makeDirectory($path);
             }
 
@@ -121,10 +121,10 @@ class ExportCallersCommand extends Command
             $this->cleanupOldExports($path);
 
             $this->info("✓ Manifest created: {$manifestName}");
-            $this->info('✓ Export completed successfully!');
+            $this->info("✓ Export completed successfully!");
             $this->line("  Total records exported: {$totalRecords}");
             $this->line("  Location: storage/{$path}/{$filename}");
-            $this->line('  Encrypted: '.($encrypt ? 'Yes' : 'No'));
+            $this->line("  Encrypted: " . ($encrypt ? 'Yes' : 'No'));
 
         } catch (\Exception $e) {
             $this->error("Export failed: {$e->getMessage()}");

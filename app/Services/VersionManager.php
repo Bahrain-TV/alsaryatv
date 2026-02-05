@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\File;
 class VersionManager
 {
     private const VERSION_FILE = 'version.json';
-
     private const SCHEMA_FILE = '.version-schema.json';
 
     /**
@@ -55,7 +54,7 @@ class VersionManager
      */
     public static function setVersion(string $version): string
     {
-        if (! self::isValidVersion($version)) {
+        if (!self::isValidVersion($version)) {
             throw new \InvalidArgumentException("Invalid version format: {$version}. Expected: x.y.z");
         }
 
@@ -80,7 +79,6 @@ class VersionManager
     public static function getBranch(): string
     {
         $branch = trim(shell_exec('git rev-parse --abbrev-ref HEAD 2>/dev/null') ?? 'unknown');
-
         return $branch ?: 'unknown';
     }
 
@@ -90,7 +88,6 @@ class VersionManager
     public static function getCommitHash(): string
     {
         $hash = trim(shell_exec('git rev-parse --short HEAD 2>/dev/null') ?? 'unknown');
-
         return $hash ?: 'unknown';
     }
 
@@ -116,7 +113,6 @@ class VersionManager
     public static function getChangeLog(): array
     {
         $data = self::getVersionData();
-
         return $data['changelog'] ?? [];
     }
 
@@ -127,7 +123,7 @@ class VersionManager
     {
         $data = self::getVersionData();
 
-        if (! isset($data['changelog'])) {
+        if (!isset($data['changelog'])) {
             $data['changelog'] = [];
         }
 
@@ -193,12 +189,11 @@ class VersionManager
     {
         $path = base_path(self::VERSION_FILE);
 
-        if (! File::exists($path)) {
+        if (!File::exists($path)) {
             self::initializeVersion();
         }
 
         $content = File::get($path);
-
         return json_decode($content, true) ?? [];
     }
 
