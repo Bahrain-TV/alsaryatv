@@ -33,7 +33,7 @@ class ExportCallersCommand extends Command
 
         try {
             $path = $this->option('path');
-            $encrypt = filter_var($this->option('encrypt'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_TO_FALSE);
+            $encrypt = in_array($this->option('encrypt'), ['true', '1', 'yes', 'on'], true);
 
             // Ensure directory exists
             if (!Storage::exists($path)) {
