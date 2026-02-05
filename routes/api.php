@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CallerStatusController;
+use App\Http\Controllers\VersionCheckController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -10,12 +11,18 @@ Route::middleware('api')->group(function (): void {
         return $request->user();
     })->middleware('auth:sanctum');
 
-    // Add any additional API routes here
+    // Version check endpoints (publicly accessible for development)
+    Route::prefix('version')->group(function () {
+        Route::get('/', [VersionCheckController::class, 'getVersion']);
+        Route::post('/check-difference', [VersionCheckController::class, 'checkVersionDifference']);
+        Route::get('/changelog', [VersionCheckController::class, 'getChangeLog']);
+        Route::post('/increment', [VersionCheckController::class, 'incrementVersion'])->middleware('auth:sanctum');
+    });
+
     // Caller status routes
     Route::post('/callers/{id}/status', [CallerStatusController::class, 'updateStatus']);
     Route::post('/callers/{id}/live', [CallerStatusController::class, 'sendToLive']);
     Route::post('/callers/{id}/toggle-winner', [CallerStatusController::class, 'toggleWinner']);
-    Route::post('/callers/{id}/toggle-family', [CallerStatusController::class, 'toggleFamily']);
 
     // Add route to check for CPR duplication
     Route::post('/check-cpr', 'App\Http\Controllers\CallerController@checkCpr');

@@ -35,6 +35,20 @@ class Kernel extends ConsoleKernel
                 \Illuminate\Support\Facades\Log::error('Data persistence check failed');
             });
 
+        // Export all callers to encrypted CSV daily at 2:00 AM
+        $schedule->command('callers:export --encrypt=true')
+            ->dailyAt('02:00')
+            ->name('callers-export-daily')
+            ->timezone('Asia/Bahrain')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/exports.log'))
+            ->onSuccess(function (): void {
+                \Illuminate\Support\Facades\Log::info('Daily callers export completed successfully');
+            })
+            ->onFailure(function (): void {
+                \Illuminate\Support\Facades\Log::error('Daily callers export failed');
+            });
+
         // Run daily at 2:00 AM with full verification and export
         $schedule->command('app:persist-data --verify --export-csv')
             ->dailyAt('02:00')
