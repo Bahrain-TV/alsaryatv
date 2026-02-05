@@ -10,7 +10,7 @@ use BackedEnum;
 
 class Analytics extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static string $view = 'filament.pages.analytics';
 
@@ -18,7 +18,7 @@ class Analytics extends Page
 
     protected static ?string $title = 'تحليلات شاملة';
 
-    protected static ?string $navigationGroup = 'إدارة المتصلين';
+    protected static \UnitEnum|string|null $navigationGroup = 'إدارة المتصلين';
 
     protected static ?int $navigationSort = 99;
 
