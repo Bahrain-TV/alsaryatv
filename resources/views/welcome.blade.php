@@ -209,6 +209,12 @@
             box-sizing: border-box;
         }
 
+        .main-container.hidden {
+            opacity: 0;
+            transform: translateY(30px);
+            pointer-events: none;
+        }
+
         .main-container.revealed {
             opacity: 1;
             transform: translateY(0);
@@ -801,11 +807,14 @@
             align-items: center;
             justify-content: center;
             transition: opacity 0.8s ease, visibility 0.8s ease;
+            opacity: 1;
+            visibility: visible;
         }
 
         .preloader.fade-out {
             opacity: 0;
             visibility: hidden;
+            pointer-events: none;
         }
 
         .preloader-content {
@@ -1161,6 +1170,23 @@
             function startReveal() {
                 setTimeout(revealContent, SPLASH_DURATION);
             }
+
+            // Safety fallback: Force reveal after 4 seconds max
+            setTimeout(() => {
+                const mainContainer = document.querySelector('.main-container');
+                const preloader = document.getElementById('preloader');
+                const lottieBackground = document.querySelector('.lottie-background');
+
+                if (mainContainer && !mainContainer.classList.contains('revealed')) {
+                    mainContainer.classList.add('revealed');
+                }
+                if (preloader && !preloader.classList.contains('fade-out')) {
+                    preloader.classList.add('fade-out');
+                }
+                if (lottieBackground && !lottieBackground.classList.contains('revealed')) {
+                    lottieBackground.classList.add('revealed');
+                }
+            }, 4000);
 
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', startReveal);
