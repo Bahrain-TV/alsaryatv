@@ -621,6 +621,11 @@
                 margin-bottom: 1rem;
             }
 
+            .countdown-label {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+
             .ramadan-info {
                 padding: 1.25rem;
                 margin-top: 1.5rem;
@@ -685,6 +690,12 @@
             }
 
             .countdown-title {
+                font-size: 0.95rem;
+                margin-bottom: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .countdown-label {
                 font-size: 0.95rem;
                 margin-bottom: 0.75rem;
                 gap: 0.5rem;
@@ -763,6 +774,11 @@
             }
 
             .countdown-title {
+                font-size: 0.85rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .countdown-label {
                 font-size: 0.85rem;
                 margin-bottom: 0.5rem;
             }
