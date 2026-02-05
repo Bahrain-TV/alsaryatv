@@ -1125,17 +1125,21 @@
             const FADE_DURATION = 800;    // Fade out duration
 
             // Generate random stars for splash background
-            const starsContainer = document.getElementById('preloaderStars');
-            for (let i = 0; i < 50; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.width = (Math.random() * 3 + 1) + 'px';
-                star.style.height = star.style.width;
-                star.style.animationDelay = Math.random() * 2 + 's';
-                star.style.animationDuration = (Math.random() * 2 + 1) + 's';
-                starsContainer.appendChild(star);
+            function initStars() {
+                const starsContainer = document.getElementById('preloaderStars');
+                if (!starsContainer) return;
+
+                for (let i = 0; i < 50; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.width = (Math.random() * 3 + 1) + 'px';
+                    star.style.height = star.style.width;
+                    star.style.animationDelay = Math.random() * 2 + 's';
+                    star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                    starsContainer.appendChild(star);
+                }
             }
 
             // Function to reveal main content
@@ -1144,24 +1148,27 @@
                 const lottieBackground = document.querySelector('.lottie-background');
                 const mainContainer = document.querySelector('.main-container');
 
-                // Fade out preloader
-                preloader.classList.add('fade-out');
-
-                // After preloader starts fading, reveal background
-                setTimeout(function() {
-                    lottieBackground.classList.add('revealed');
-                }, 200);
-
-                // Then reveal main content with slight delay
-                setTimeout(function() {
-                    mainContainer.classList.add('revealed');
-                }, 500);
+                if (preloader) preloader.classList.add('fade-out');
+                if (lottieBackground) lottieBackground.classList.add('revealed');
+                if (mainContainer) mainContainer.classList.add('revealed');
             }
 
+            // Initialize immediately
+            initStars();
+
             // Start the reveal sequence after splash duration
-            window.addEventListener('load', function() {
+            // Use both DOMContentLoaded and load to ensure it fires
+            function startReveal() {
                 setTimeout(revealContent, SPLASH_DURATION);
-            });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', startReveal);
+            } else {
+                startReveal();
+            }
+
+            window.addEventListener('load', startReveal);
         })();
 
         // ==================== COUNTDOWN ENDED HANDLER ====================
