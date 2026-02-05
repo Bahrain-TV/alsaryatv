@@ -296,6 +296,20 @@
             }
         }
 
+        /* Countdown Label */
+        .countdown-label {
+            font-size: clamp(1rem, 3vw, 1.35rem);
+            color: var(--primary-emerald);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-align: center;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
         /* Ramadan Date Info */
         .ramadan-info {
             margin-top: 2rem;
@@ -426,6 +440,11 @@
                 margin-bottom: 1rem;
             }
 
+            .countdown-label {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+
             .ramadan-info {
                 padding: 1.25rem;
                 margin-top: 1.5rem;
@@ -490,6 +509,12 @@
             }
 
             .countdown-title {
+                font-size: 0.95rem;
+                margin-bottom: 0.75rem;
+                gap: 0.5rem;
+            }
+
+            .countdown-label {
                 font-size: 0.95rem;
                 margin-bottom: 0.75rem;
                 gap: 0.5rem;
@@ -568,6 +593,11 @@
             }
 
             .countdown-title {
+                font-size: 0.85rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .countdown-label {
                 font-size: 0.85rem;
                 margin-bottom: 0.5rem;
             }
