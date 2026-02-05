@@ -23,12 +23,15 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            // ==================== OVERVIEW SECTION ====================
             // Main Stats - First Row
             CallersStatsWidget::class,
 
+            // ==================== PARTICIPATION SECTION ====================
             // Participation Metrics - Second Row
             ParticipationRateWidget::class,
 
+            // ==================== TRENDS & ANALYTICS SECTION ====================
             // Charts Row - Third Row
             RegistrationTrendsChart::class,
 
@@ -36,6 +39,7 @@ class Dashboard extends BaseDashboard
             PeakHoursChart::class,
             StatusDistributionChart::class,
 
+            // ==================== ACTIVITY & HISTORY SECTION ====================
             // Activity Tables - Fifth Row (Side by Side)
             RecentActivityWidget::class,
 
@@ -47,9 +51,9 @@ class Dashboard extends BaseDashboard
     public function getColumns(): array|int
     {
         return [
-            'sm' => 1,
-            'md' => 2,
-            'lg' => 4,
+            'sm' => 1,   // Mobile: 1 column
+            'md' => 2,   // Tablet: 2 columns
+            'lg' => 4,   // Desktop: 4 columns
         ];
     }
 }

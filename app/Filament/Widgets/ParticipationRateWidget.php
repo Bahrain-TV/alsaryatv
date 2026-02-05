@@ -13,60 +13,62 @@ class ParticipationRateWidget extends BaseWidget
 
     protected static ?int $sort = 6;
 
+    protected static ?string $heading = '🎯 مؤشرات المشاركة والنمو';
+
     protected int | string | array $columnSpan = 'full';
 
     protected function getStats(): array
     {
         $totalCallers = Caller::count();
-        $totalHits = Caller::sum('hits');
+        $totalHits = Caller::sum('hits') ?? 0;
         $avgHitsPerCaller = $totalCallers > 0 ? round($totalHits / $totalCallers, 2) : 0;
 
         $multipleParticipants = Caller::where('hits', '>', 1)->count();
         $participationRate = $totalCallers > 0 ? round(($multipleParticipants / $totalCallers) * 100, 1) : 0;
 
         $topParticipant = Caller::orderBy('hits', 'desc')->first();
-        $this_week = Caller::where('created_at', '>=', now()->startOfWeek())->count();
-        $last_week = Caller::whereBetween('created_at', [
+        $thisWeek = Caller::where('created_at', '>=', now()->startOfWeek())->count();
+        $lastWeek = Caller::whereBetween('created_at', [
             now()->subWeek()->startOfWeek(),
             now()->subWeek()->endOfWeek()
         ])->count();
 
-        $weeklyGrowth = $last_week > 0
-            ? round((($this_week - $last_week) / $last_week) * 100, 1)
-            : ($this_week > 0 ? 100 : 0);
+        $weeklyGrowth = $lastWeek > 0
+            ? round((($thisWeek - $lastWeek) / $lastWeek) * 100, 1)
+            : ($thisWeek > 0 ? 100 : 0);
 
         return [
             Stat::make('معدل المشاركة لكل متصل', number_format($avgHitsPerCaller, 2))
-                ->description('متوسط عدد المشاركات')
+                ->description("📊 متوسط المشاركات من {$totalHits} المشاركة الإجمالية")
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info')
                 ->chart($this->getHitsDistributionChart()),
 
-            Stat::make('نسبة المشاركين المتكررين', $participationRate . '%')
-                ->description("من إجمالي {$totalCallers} متصل")
+            Stat::make('المشاركون المتكررون', "{$participationRate}%")
+                ->description("👥 {$multipleParticipants} من أصل {$totalCallers} متصل")
                 ->descriptionIcon('heroicon-m-arrow-path')
                 ->color($participationRate > 50 ? 'success' : 'warning'),
 
-            Stat::make('الأكثر مشاركة', $topParticipant ? $topParticipant->name : '-')
-                ->description($topParticipant ? "بـ {$topParticipant->hits} مشاركة" : 'لا يوجد')
+            Stat::make('الأكثر مشاركة', $topParticipant ? $topParticipant->name : '—')
+                ->description($topParticipant ? "⭐ {$topParticipant->hits} مشاركة" : 'لا يوجد بيانات')
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning'),
 
-            Stat::make('النمو الأسبوعي', number_format($this_week))
-                ->description($this->getGrowthDescription($weeklyGrowth))
+            Stat::make('النمو الأسبوعي', number_format($thisWeek))
+                ->description($this->getGrowthDescription($weeklyGrowth, $lastWeek, $thisWeek))
                 ->descriptionIcon($weeklyGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($weeklyGrowth >= 0 ? 'success' : 'danger'),
         ];
     }
 
-    private function getGrowthDescription(float $growth): string
+    private function getGrowthDescription(float $growth, int $lastWeek, int $thisWeek): string
     {
         if ($growth > 0) {
-            return "نمو {$growth}% عن الأسبوع الماضي";
+            return "📈 نمو {$growth}% ({$lastWeek}→{$thisWeek})";
         } elseif ($growth < 0) {
-            return "تراجع " . abs($growth) . "% عن الأسبوع الماضي";
+            return "📉 تراجع " . abs($growth) . "% ({$lastWeek}→{$thisWeek})";
         }
-        return 'لا تغيير عن الأسبوع الماضي';
+        return "➡️ لا تغيير ({$lastWeek} = {$thisWeek})";
     }
 
     private function getHitsDistributionChart(): array

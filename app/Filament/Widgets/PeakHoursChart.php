@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class PeakHoursChart extends ChartWidget
 {
-    protected static ?string $heading = 'ساعات الذروة للتسجيل';
+    protected static ?string $heading = '⏰ ساعات الذروة للتسجيل';
 
     protected static ?int $sort = 3;
 
@@ -20,7 +20,7 @@ class PeakHoursChart extends ChartWidget
         'lg' => 2,
     ];
 
-    protected static ?string $maxHeight = '300px';
+    protected static ?string $maxHeight = '320px';
 
     protected static ?string $pollingInterval = '120s';
 
@@ -34,24 +34,31 @@ class PeakHoursChart extends ChartWidget
 
         $labels = [];
         $counts = [];
+        $peakHour = 0;
+        $maxCount = 0;
 
         // Fill all 24 hours
         for ($i = 0; $i < 24; $i++) {
             $labels[] = sprintf('%02d:00', $i);
             $record = $data->firstWhere('hour', $i);
-            $counts[] = $record ? $record->count : 0;
+            $count = $record ? $record->count : 0;
+            $counts[] = $count;
+            
+            if ($count > $maxCount) {
+                $maxCount = $count;
+                $peakHour = $i;
+            }
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'عدد التسجيلات',
+                    'label' => "عدد التسجيلات (الذروة في {$labels[$peakHour]})",
                     'data' => $counts,
-                    'backgroundColor' => [
-                        'rgba(251, 191, 36, 0.8)',
-                    ],
+                    'backgroundColor' => 'rgba(251, 191, 36, 0.7)',
                     'borderColor' => 'rgb(251, 191, 36)',
                     'borderWidth' => 2,
+                    'borderRadius' => 4,
                 ],
             ],
             'labels' => $labels,
@@ -66,10 +73,24 @@ class PeakHoursChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'maintainAspectRatio' => true,
             'plugins' => [
                 'legend' => [
                     'display' => true,
-                    'position' => 'bottom',
+                    'position' => 'top',
+                    'labels' => [
+                        'padding' => 10,
+                        'font' => ['size' => 11],
+                    ],
+                ],
+                'tooltip' => [
+                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
+                    'padding' => 10,
+                    'titleFont' => ['size' => 12],
+                    'callbacks' => [
+                        'label' => 'function(context) { return "التسجيلات: " + context.parsed.y; }',
+                    ],
                 ],
             ],
             'scales' => [
@@ -77,6 +98,22 @@ class PeakHoursChart extends ChartWidget
                     'beginAtZero' => true,
                     'ticks' => [
                         'precision' => 0,
+                        'font' => ['size' => 10],
+                    ],
+                    'title' => [
+                        'display' => true,
+                        'text' => 'العدد',
+                        'font' => ['size' => 11],
+                    ],
+                ],
+                'x' => [
+                    'ticks' => [
+                        'font' => ['size' => 9],
+                    ],
+                    'title' => [
+                        'display' => true,
+                        'text' => 'الساعة',
+                        'font' => ['size' => 11],
                     ],
                 ],
             ],

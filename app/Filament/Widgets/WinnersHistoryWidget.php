@@ -14,7 +14,7 @@ class WinnersHistoryWidget extends BaseWidget
 
     protected int | string | array $columnSpan = 'full';
 
-    protected static ?string $heading = '🏆 سجل الفائزين';
+    protected static ?string $heading = '🏆 سجل الفائزين والمكافآت';
 
     protected static ?string $pollingInterval = '60s';
 
@@ -27,43 +27,40 @@ class WinnersHistoryWidget extends BaseWidget
                     ->latest('updated_at')
             )
             ->columns([
-                Tables\Columns\IconColumn::make('is_winner')
-                    ->label('')
-                    ->icon('heroicon-s-trophy')
-                    ->color('success')
-                    ->size(IconSize::Large),
-
                 Tables\Columns\TextColumn::make('name')
-                    ->label('الاسم')
+                    ->label('👤 الاسم')
                     ->searchable()
                     ->weight('bold')
                     ->size('lg')
-                    ->color('success'),
+                    ->color('success')
+                    ->formatStateUsing(fn (string $state): string => "🎉 {$state}"),
 
                 Tables\Columns\TextColumn::make('phone')
-                    ->label('الهاتف')
+                    ->label('📱 الهاتف')
                     ->icon('heroicon-m-phone')
                     ->copyable()
-                    ->copyMessage('تم نسخ رقم الهاتف'),
+                    ->copyMessage('تم نسخ رقم الهاتف')
+                    ->tooltip('اضغط لنسخ الرقم'),
 
                 Tables\Columns\TextColumn::make('cpr')
-                    ->label('الرقم الشخصي')
+                    ->label('🆔 الرقم الشخصي')
                     ->icon('heroicon-m-identification')
                     ->copyable()
-                    ->copyMessage('تم نسخ CPR'),
+                    ->copyMessage('تم نسخ رقم المواطن')
+                    ->tooltip('اضغط لنسخ الرقم'),
 
-                Tables\Columns\TextColumn::make('hits')
-                    ->label('المشاركات')
-                    ->badge()
-                    ->color('warning'),
+                Tables\Columns\BadgeColumn::make('hits')
+                    ->label('👋 المشاركات')
+                    ->formatStateUsing(fn (int $state): string => "{$state} مشاركة")
+                    ->color('warning')
+                    ->icon('heroicon-m-hand-raised'),
 
-                Tables\Columns\TextColumn::make('status')
-                    ->label('الحالة')
-                    ->badge()
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label('📊 الحالة')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => 'نشط',
-                        'inactive' => 'غير نشط',
-                        'blocked' => 'محظور',
+                        'active' => '✅ نشط',
+                        'inactive' => '⏸️ غير نشط',
+                        'blocked' => '🚫 محظور',
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -74,25 +71,30 @@ class WinnersHistoryWidget extends BaseWidget
                     }),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('تاريخ الفوز')
-                    ->dateTime('Y-m-d H:i:s')
+                    ->label('🕐 تاريخ الفوز')
+                    ->dateTime('Y-m-d H:i')
                     ->sortable()
+                    ->tooltip(fn (Caller $record): string => $record->updated_at->format('l، d F Y H:i:s'))
                     ->description(fn (Caller $record): string => $record->updated_at->diffForHumans()),
             ])
             ->defaultSort('updated_at', 'desc')
+            ->paginated([5, 10, 25])
             ->actions([
                 Tables\Actions\Action::make('removeWinner')
                     ->label('إزالة الفوز')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->requiresConfirmation()
+                    ->confirmationHeading('إزالة حالة الفوز')
+                    ->confirmationDescription('هل تريد بالفعل إزالة حالة الفوز من هذا المتصل؟')
                     ->action(function (Caller $record): void {
                         $record->is_winner = false;
                         $record->save();
-                    }),
+                    })
+                    ->successNotificationTitle('تم إزالة الفوز بنجاح'),
             ])
-            ->emptyStateHeading('لا يوجد فائزون')
-            ->emptyStateDescription('لم يتم اختيار أي فائز بعد.')
+            ->emptyStateHeading('🏜️ لا يوجد فائزون')
+            ->emptyStateDescription('لم يتم اختيار أي فائز بعد. ابدأ باختيار الفائزين من قائمة المتصلين.')
             ->emptyStateIcon('heroicon-o-trophy');
     }
 }
