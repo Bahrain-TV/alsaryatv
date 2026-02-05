@@ -8,7 +8,7 @@ use Filament\Widgets;
 
 class Dashboard extends BaseDashboard
 {
-    protected static string|null $navigationIcon = 'heroicon-o-home';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = 'لوحة التحكم';
 
