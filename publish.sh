@@ -135,7 +135,39 @@ fi
 
 # START STANDARD DEPLOYMENT (No arguments)
 echo "🚀 Starting Publish Process..."
-send_discord_notification "🚀 Publish Started" "Initiating new version publish from local machine..." 3447003
+
+# Auto-increment version before deployment
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VERSION_FILE="$SCRIPT_DIR/VERSION"
+
+if [ -f "$VERSION_FILE" ]; then
+    OLD_VERSION=$(cat "$VERSION_FILE")
+    # Parse version: major.minor.patch-build
+    if [[ $OLD_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)-([0-9]+)$ ]]; then
+        MAJOR="${BASH_REMATCH[1]}"
+        MINOR="${BASH_REMATCH[2]}"
+        PATCH="${BASH_REMATCH[3]}"
+        BUILD="${BASH_REMATCH[4]}"
+        NEW_BUILD=$((BUILD + 1))
+        NEW_VERSION="$MAJOR.$MINOR.$PATCH-$NEW_BUILD"
+    else
+        # Fallback: just append -1 or increment if no build number
+        NEW_VERSION="1.0.0-1"
+    fi
+    echo "$NEW_VERSION" > "$VERSION_FILE"
+    echo "📦 Version bumped: $OLD_VERSION → $NEW_VERSION"
+
+    # Commit the version bump
+    cd "$SCRIPT_DIR"
+    git add VERSION
+    git commit -m "chore: bump version to $NEW_VERSION [skip ci]" 2>/dev/null || true
+else
+    echo "1.0.0-1" > "$VERSION_FILE"
+    NEW_VERSION="1.0.0-1"
+    echo "📦 Created VERSION file: $NEW_VERSION"
+fi
+
+send_discord_notification "🚀 Publish Started (v$NEW_VERSION)" "Initiating version **$NEW_VERSION** publish from local machine..." 3447003
 
 # Upload files
 upload_files_to_production
