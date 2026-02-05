@@ -176,7 +176,7 @@ upload_files_to_production
 echo "⚡ Executing deploy.sh on server via SSH..."
 send_discord_notification "Phase 2: Execution ⚡" "Triggering ./deploy.sh on remote server..." 3447003
 
-ssh "$SERVER" "cd $APP_DIR && ./deploy.sh"
+$SSH_COMMAND "$SERVER" "cd $APP_DIR && ./deploy.sh"
 DEPLOY_EXIT_CODE=$?
 
 if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
