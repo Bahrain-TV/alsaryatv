@@ -311,7 +311,7 @@ class CallerResource extends Resource
                                 ->native(false),
                         ])
                         ->action(function (array $data, $records): void {
-                            $records->each(function ($record) use ($data) {
+                            $records->each(function ($record) use ($data): void {
                                 $record->update(['status' => $data['status']]);
                             });
                         })
@@ -399,7 +399,7 @@ class CallerResource extends Resource
                         ->icon('heroicon-o-trophy')
                         ->color('success')
                         ->action(function ($records): void {
-                            $records->each(function ($record) {
+                            $records->each(function ($record): void {
                                 $record->update(['is_winner' => true]);
                             });
 
@@ -418,7 +418,7 @@ class CallerResource extends Resource
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->action(function ($records): void {
-                            $records->each(function ($record) {
+                            $records->each(function ($record): void {
                                 $record->update(['is_winner' => false]);
                             });
 
@@ -498,7 +498,7 @@ class CallerResource extends Resource
     {
         $fileName = 'callers_' . now()->format('Y-m-d_H-i-s') . '.csv';
 
-        return response()->streamDownload(function () use ($records) {
+        return response()->streamDownload(function () use ($records): void {
             $handle = fopen('php://output', 'w');
 
             // Add UTF-8 BOM for proper Arabic display in Excel

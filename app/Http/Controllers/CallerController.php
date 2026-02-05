@@ -86,7 +86,6 @@ class CallerController extends Controller
             'name' => $validated['name'],
             'phone' => $validated['phone_number'],
             'cpr' => $validated['cpr'],
-            'hits' => $validated['hits'] ?? $caller->hits,
             'is_winner' => $request->boolean('is_winner'),
             'notes' => $validated['notes'] ?? $caller->notes,
         ]);
@@ -102,8 +101,19 @@ class CallerController extends Controller
 
     public function checkCpr(Request $request)
     {
+        // Validate CPR input
+        $validated = $request->validate([
+            'cpr' => 'required|string|max:255',
+        ]);
+
+        // Log the check attempt for security audit
+        Log::channel('security')->info('CPR check requested', [
+            'ip' => $request->ip(),
+            'user_id' => auth()->id() ?? 'guest',
+        ]);
+
         return response()->json([
-            'exists' => Caller::where('cpr', $request->cpr)->exists()
+            'exists' => Caller::where('cpr', $validated['cpr'])->exists(),
         ]);
     }
 

@@ -7,18 +7,19 @@ use Filament\Pages\Page;
 use Filament\Support\Enums\IconSize;
 use Illuminate\Support\Facades\DB;
 use BackedEnum;
+use UnitEnum;
 
 class Analytics extends Page
 {
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string $view = 'filament.pages.analytics';
+    protected string $view = 'filament.pages.analytics';
 
     protected static ?string $navigationLabel = 'التحليلات';
 
     protected static ?string $title = 'تحليلات شاملة';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'إدارة المتصلين';
+    protected static string|UnitEnum|null $navigationGroup = 'إدارة المتصلين';
 
     protected static ?int $navigationSort = 99;
 

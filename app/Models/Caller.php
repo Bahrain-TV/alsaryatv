@@ -70,12 +70,14 @@ class Caller extends Model
     }
 
     /**
-     * Increment hits for this caller
+     * Increment hits for this caller (atomic operation)
      */
     public function incrementHits(): void
     {
-        $this->increment('hits');
-        $this->update(['last_hit' => now()]);
+        // Use atomic increment to prevent race conditions
+        $this->increment('hits', 1, ['last_hit' => now()]);
+        // Refresh instance to reflect database state
+        $this->refresh();
     }
 
     /**

@@ -19,6 +19,8 @@ trait SecureOperations
      */
     protected function checkRateLimit(string $key, int $maxAttempts, int $decaySeconds): bool
     {
+        // Use the configured cache driver (database by default)
+        // No Redis dependency - uses whatever is configured in .env (CACHE_STORE)
         $attempts = Cache::get($key, 0);
 
         if ($attempts >= $maxAttempts) {

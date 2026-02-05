@@ -13,9 +13,9 @@ class AdminPanelTest extends TestCase
     public function test_admin_can_access_filament_panel()
     {
         $user = User::factory()->create();
-        
+
         $response = $this->actingAs($user)->get('/admin');
-        
+
         // Should redirect to login or dashboard, not error
         $response->assertStatus(302); // Redirect status is acceptable
     }
