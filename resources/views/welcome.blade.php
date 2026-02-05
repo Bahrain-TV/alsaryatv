@@ -367,6 +367,15 @@
             text-decoration: underline;
         }
 
+        .version-tag {
+            font-size: 0.75rem;
+            color: var(--primary-emerald);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
         .separator {
             opacity: 0.3;
         }
@@ -849,20 +858,22 @@
             <div class="ramadan-info">
                 <h4>🌙 أول أيام شهر رمضان المبارك</h4>
                 <div class="date">
-                    {{ '18 فبراير 2026' }}
+                    {{ $ramadanDate ?? '28 فبراير 2026' }}
                 </div>
-                <div class="hijri">1 رمضان 1447 هـ</div>
+                <div class="hijri">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="footer-section">
             <p>© {{ date('Y') }} <a href="https://btv.bh" target="_blank">تلفزيون البحرين</a> | جميع الحقوق محفوظة</p>
-            
+
             <div class="footer-meta">
                 <span class="visitors-count">
                     👁️ عدد الزوار: {{ number_format($totalHits ?? 0) }}
                 </span>
+                <span class="separator">|</span>
+                <span class="version-tag" title="إصدار التطبيق">v{{ $appVersion ?? '1.0.0' }}</span>
                 <span class="separator">|</span>
                 <a href="{{ route('login') }}" class="login-link">تسجيل الدخول</a>
             </div>

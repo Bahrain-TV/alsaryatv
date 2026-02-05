@@ -8,14 +8,17 @@ use Illuminate\Support\Facades\Route;
 
 // Shared Ramadan date logic
 $getRamadanContext = function () {
-    $ramadanStartDate = '2026-02-18';
-    $registrationOpenDate = config('app.registration_open', '2026-03-01');
-    
+    $ramadanStartDate = config('alsarya.ramadan.start_date', '2026-02-28');
+    $hijriDate = config('alsarya.ramadan.hijri_date', '1 رمضان 1447 هـ');
+    $registrationOpenDate = config('alsarya.registration.open_date', '2026-03-01');
+
     return [
         'ramadanDate' => Carbon::parse($ramadanStartDate)->locale('ar')->translatedFormat('j F Y'),
         'ramadanStartISO' => $ramadanStartDate,
+        'ramadanHijri' => $hijriDate,
         'registrationOpenISO' => $registrationOpenDate,
         'totalHits' => HitsCounter::getHits(),
+        'appVersion' => trim(file_exists(base_path('VERSION')) ? file_get_contents(base_path('VERSION')) : '1.0.0'),
     ];
 };
 
