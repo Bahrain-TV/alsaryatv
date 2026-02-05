@@ -120,7 +120,7 @@ class CallerController extends Controller
         ]);
 
         return response()->json([
-            'exists' => Caller::where('cpr', $validated['cpr'])->exists(),
+            'exists' => Caller::where('cpr', $request->cpr)->exists(),
         ]);
     }
 

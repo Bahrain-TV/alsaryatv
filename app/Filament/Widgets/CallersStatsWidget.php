@@ -70,17 +70,10 @@ class CallersStatsWidget extends BaseWidget
         if ($trend > 0) {
             return "📈 زيادة {$trend}% عن الأمس";
         } elseif ($trend < 0) {
-            return "📉 انخفاض " . abs($trend) . "% عن الأمس";
+            return 'انخفاض '.abs($trend).'% عن الأمس';
         }
-        return '➡️ لا تغيير عن الأمس';
-    }
 
-    private function getAverageHits(int $totalCallers, int $totalHits): string
-    {
-        if ($totalCallers === 0) {
-            return '0';
-        }
-        return number_format(round($totalHits / $totalCallers, 1), 1);
+        return 'لا تغيير عن الأمس';
     }
 
     private function getRegistrationChart(): array

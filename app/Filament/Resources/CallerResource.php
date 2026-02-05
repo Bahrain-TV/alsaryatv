@@ -328,11 +328,8 @@ class CallerResource extends Resource
                             $eligibleCallers = Caller::getEligibleCallers();
 
                             if ($eligibleCallers->count() < $count) {
-                                \Filament\Notifications\Notification::make()
-                                    ->warning()
-                                    ->title('عدد غير كافٍ')
-                                    ->body('عدد المتصلين المؤهلين غير كافٍ. يوجد فقط ' . $eligibleCallers->count() . ' متصل.')
-                                    ->send();
+                                $this->notify('warning', 'عدد المتصلين المؤهلين غير كافٍ. يوجد فقط '.$eligibleCallers->count().' متصل.');
+
                                 return;
                             }
 
@@ -366,11 +363,7 @@ class CallerResource extends Resource
                                 return $winner->name.' ('.$winner->cpr.')';
                             }, $selectedWinners));
 
-                            \Filament\Notifications\Notification::make()
-                                ->success()
-                                ->title('تم اختيار الفائزين')
-                                ->body('تم اختيار ' . count($selectedWinners) . ' فائز: ' . $winnerNames)
-                                ->send();
+                            $this->notify('success', 'تم اختيار '.count($selectedWinners).' فائز: '.$winnerNames);
                         })
                         ->requiresConfirmation()
                         ->modalHeading('اختيار فائزين عشوائيين')
@@ -444,20 +437,13 @@ class CallerResource extends Resource
                         // Use the model method for selecting random winner by CPR
                         $winner = Caller::selectRandomWinnerByCpr();
 
-                        if (!$winner) {
-                            \Filament\Notifications\Notification::make()
-                                ->warning()
-                                ->title('لا يوجد متصلين مؤهلين')
-                                ->body('لا يوجد متصلين مؤهلين للفوز.')
-                                ->send();
+                        if (! $winner) {
+                            $this->notify('warning', 'لا يوجد متصلين مؤهلين للفوز.');
+
                             return;
                         }
 
-                        \Filament\Notifications\Notification::make()
-                            ->success()
-                            ->title('تم اختيار الفائز')
-                            ->body('تم اختيار الفائز: ' . $winner->name . ' (CPR: ' . $winner->cpr . ')')
-                            ->send();
+                        $this->notify('success', 'تم اختيار الفائز: '.$winner->name.' (CPR: '.$winner->cpr.')');
                     })
                     ->requiresConfirmation()
                     ->modalHeading('اختيار فائز عشوائي')
