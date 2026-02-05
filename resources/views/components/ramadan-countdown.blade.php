@@ -3,242 +3,335 @@
     'id' => 'ramadan-countdown'
 ])
 
-<div id="{{ $id }}" class="countdown-wrapper" data-target="{{ $targetDate }}">
-    <div class="countdown-grid">
-        <!-- Seconds -->
-        <div class="countdown-item">
-            <div class="countdown-value-container">
-                <span class="countdown-value" data-seconds>00</span>
-                <div class="countdown-glow"></div>
+<div id="{{ $id }}" class="rc-countdown" data-target="{{ $targetDate }}">
+    <div class="rc-grid">
+        {{-- Days - First (leftmost in LTR grid) --}}
+        <div class="rc-unit">
+            <div class="rc-flip-card">
+                <div class="rc-card-inner">
+                    <div class="rc-card-top">
+                        <span class="rc-number" data-days>00</span>
+                    </div>
+                    <div class="rc-card-bottom">
+                        <span class="rc-number" data-days-bottom>00</span>
+                    </div>
+                    <div class="rc-card-divider"></div>
+                </div>
             </div>
-            <span class="countdown-label">ثانية</span>
+            <span class="rc-label">يوم</span>
         </div>
 
-        <!-- Minutes -->
-        <div class="countdown-item">
-            <div class="countdown-value-container">
-                <span class="countdown-value" data-minutes>00</span>
-                <div class="countdown-glow"></div>
+        <div class="rc-separator">:</div>
+
+        {{-- Hours --}}
+        <div class="rc-unit">
+            <div class="rc-flip-card">
+                <div class="rc-card-inner">
+                    <div class="rc-card-top">
+                        <span class="rc-number" data-hours>00</span>
+                    </div>
+                    <div class="rc-card-bottom">
+                        <span class="rc-number" data-hours-bottom>00</span>
+                    </div>
+                    <div class="rc-card-divider"></div>
+                </div>
             </div>
-            <span class="countdown-label">دقيقة</span>
+            <span class="rc-label">ساعة</span>
         </div>
 
-        <!-- Hours -->
-        <div class="countdown-item">
-            <div class="countdown-value-container">
-                <span class="countdown-value" data-hours>00</span>
-                <div class="countdown-glow"></div>
+        <div class="rc-separator">:</div>
+
+        {{-- Minutes --}}
+        <div class="rc-unit">
+            <div class="rc-flip-card">
+                <div class="rc-card-inner">
+                    <div class="rc-card-top">
+                        <span class="rc-number" data-minutes>00</span>
+                    </div>
+                    <div class="rc-card-bottom">
+                        <span class="rc-number" data-minutes-bottom>00</span>
+                    </div>
+                    <div class="rc-card-divider"></div>
+                </div>
             </div>
-            <span class="countdown-label">ساعة</span>
+            <span class="rc-label">دقيقة</span>
         </div>
 
-        <!-- Days -->
-        <div class="countdown-item">
-            <div class="countdown-value-container">
-                <span class="countdown-value" data-days>00</span>
-                <div class="countdown-glow"></div>
+        <div class="rc-separator">:</div>
+
+        {{-- Seconds --}}
+        <div class="rc-unit">
+            <div class="rc-flip-card">
+                <div class="rc-card-inner">
+                    <div class="rc-card-top">
+                        <span class="rc-number" data-seconds>00</span>
+                    </div>
+                    <div class="rc-card-bottom">
+                        <span class="rc-number" data-seconds-bottom>00</span>
+                    </div>
+                    <div class="rc-card-divider"></div>
+                </div>
             </div>
-            <span class="countdown-label">يوم</span>
+            <span class="rc-label">ثانية</span>
         </div>
     </div>
 </div>
 
 <style>
-    .countdown-wrapper {
-        width: 100%;
+/* Ramadan Countdown - Scoped Styles */
+.rc-countdown {
+    --rc-gold: #d4af37;
+    --rc-gold-light: #f5d97e;
+    --rc-emerald: #10b981;
+    --rc-bg-dark: rgba(15, 23, 42, 0.95);
+    --rc-bg-card: rgba(30, 41, 59, 0.9);
+
+    width: 100%;
+    padding: 1.5rem 0;
+    direction: ltr;
+}
+
+.rc-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.25rem, 1.5vw, 1rem);
+    flex-wrap: nowrap;
+}
+
+.rc-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(0.5rem, 1.5vw, 0.875rem);
+}
+
+.rc-flip-card {
+    position: relative;
+    width: clamp(50px, 15vw, 100px);
+    height: clamp(60px, 18vw, 110px);
+    perspective: 1000px;
+}
+
+.rc-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: clamp(8px, 2vw, 14px);
+    background: linear-gradient(180deg,
+        var(--rc-bg-card) 0%,
+        var(--rc-bg-dark) 49.9%,
+        var(--rc-bg-dark) 50.1%,
+        var(--rc-bg-card) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 4px 16px rgba(212, 175, 55, 0.08);
+    overflow: hidden;
+}
+
+.rc-card-top,
+.rc-card-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.rc-card-top {
+    top: 0;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.06) 0%,
+        transparent 100%);
+    border-radius: clamp(8px, 2vw, 14px) clamp(8px, 2vw, 14px) 0 0;
+}
+
+.rc-card-top .rc-number {
+    transform: translateY(50%);
+}
+
+.rc-card-bottom {
+    bottom: 0;
+    border-radius: 0 0 clamp(8px, 2vw, 14px) clamp(8px, 2vw, 14px);
+}
+
+.rc-card-bottom .rc-number {
+    transform: translateY(-50%);
+}
+
+.rc-card-divider {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.5) 10%,
+        rgba(0, 0, 0, 0.6) 50%,
+        rgba(0, 0, 0, 0.5) 90%,
+        transparent 100%);
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.rc-card-divider::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(212, 175, 55, 0.3),
+        transparent);
+}
+
+.rc-number {
+    font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow:
+        0 0 20px rgba(212, 175, 55, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    transition: color 0.2s ease;
+}
+
+.rc-unit.pulse .rc-number {
+    color: var(--rc-gold);
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
+}
+
+.rc-separator {
+    font-family: 'Tajawal', sans-serif;
+    font-size: clamp(1.25rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--rc-gold);
+    opacity: 0.7;
+    align-self: flex-start;
+    margin-top: clamp(1rem, 3vw, 1.75rem);
+    animation: rc-pulse 1s ease-in-out infinite;
+}
+
+@keyframes rc-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 0.3; }
+}
+
+.rc-label {
+    font-family: 'Tajawal', sans-serif;
+    font-size: clamp(0.65rem, 2vw, 0.95rem);
+    font-weight: 600;
+    color: var(--rc-gold);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
+/* Hover effect */
+.rc-flip-card:hover .rc-card-inner {
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+        0 4px 24px rgba(212, 175, 55, 0.15);
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .rc-countdown {
         padding: 1rem 0;
     }
 
-    .countdown-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: clamp(0.5rem, 2vw, 1.5rem);
-        max-width: 600px;
-        margin: 0 auto;
-        direction: ltr;
+    .rc-grid {
+        gap: clamp(0.2rem, 2vw, 0.75rem);
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .rc-countdown {
+        padding: 0.75rem 0;
     }
 
-    .countdown-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.75rem;
+    .rc-grid {
+        gap: 0.15rem;
     }
 
-    .countdown-value-container {
-        position: relative;
-        width: clamp(60px, 18vw, 120px);
-        height: clamp(70px, 20vw, 130px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(145deg,
-            rgba(15, 23, 42, 0.9) 0%,
-            rgba(30, 41, 59, 0.8) 50%,
-            rgba(15, 23, 42, 0.95) 100%);
-        border-radius: clamp(12px, 3vw, 20px);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        box-shadow:
-            0 10px 40px rgba(0, 0, 0, 0.4),
-            0 0 30px rgba(212, 175, 55, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-        overflow: hidden;
+    .rc-flip-card {
+        width: clamp(48px, 20vw, 65px);
+        height: clamp(55px, 22vw, 75px);
     }
 
-    .countdown-value-container::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg,
-            transparent,
-            rgba(212, 175, 55, 0.3),
-            transparent);
+    .rc-separator {
+        font-size: 1.1rem;
+        margin-top: 0.9rem;
     }
 
-    .countdown-value-container::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 50%;
-        background: linear-gradient(180deg,
-            rgba(255, 255, 255, 0.08) 0%,
-            transparent 100%);
-        border-radius: clamp(12px, 3vw, 20px) clamp(12px, 3vw, 20px) 0 0;
+    .rc-unit {
+        gap: 0.4rem;
     }
 
-    .countdown-glow {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(
-            ellipse at center,
-            rgba(212, 175, 55, 0.15) 0%,
-            transparent 70%
-        );
-        opacity: 0;
-        transition: opacity 0.3s ease;
+    .rc-label {
+        font-size: 0.6rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 360px) {
+    .rc-grid {
+        gap: 0.1rem;
     }
 
-    .countdown-value-container:hover .countdown-glow,
-    .countdown-value-container.pulse .countdown-glow {
-        opacity: 1;
+    .rc-flip-card {
+        width: 44px;
+        height: 52px;
     }
 
-    .countdown-value {
-        font-family: 'Tajawal', system-ui, sans-serif;
-        font-size: clamp(1.75rem, 6vw, 3.5rem);
-        font-weight: 700;
-        color: #ffffff;
-        text-shadow:
-            0 0 20px rgba(212, 175, 55, 0.5),
-            0 2px 4px rgba(0, 0, 0, 0.3);
-        position: relative;
-        z-index: 1;
-        line-height: 1;
-        letter-spacing: 0.02em;
-        transition: transform 0.15s ease, color 0.15s ease;
+    .rc-number {
+        font-size: 1.25rem;
     }
 
-    .countdown-value.changing {
-        animation: valueChange 0.3s ease;
+    .rc-separator {
+        font-size: 1rem;
+        margin-top: 0.75rem;
     }
 
-    @keyframes valueChange {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.1); color: #d4af37; }
-        100% { transform: scale(1); }
+    .rc-label {
+        font-size: 0.55rem;
     }
 
-    .countdown-label {
-        font-family: 'Tajawal', sans-serif;
-        font-size: clamp(0.75rem, 2.5vw, 1.1rem);
-        font-weight: 600;
-        color: #d4af37;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    .rc-card-inner {
+        border-radius: 6px;
     }
+}
 
-    /* Separator dots between items */
-    .countdown-item:not(:last-child)::after {
-        content: ':';
-        position: absolute;
-        right: calc(-0.5rem - 1vw);
-        top: 50%;
-        transform: translateY(-70%);
-        font-size: clamp(1.5rem, 4vw, 2.5rem);
-        font-weight: bold;
-        color: rgba(212, 175, 55, 0.6);
-        animation: separatorPulse 1s ease-in-out infinite;
-    }
+/* Countdown ended */
+.rc-countdown.ended .rc-card-inner {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 4px 16px rgba(16, 185, 129, 0.15);
+}
 
-    .countdown-item {
-        position: relative;
-    }
+.rc-countdown.ended .rc-number {
+    color: var(--rc-emerald);
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+}
 
-    @keyframes separatorPulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.4; }
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 480px) {
-        .countdown-grid {
-            gap: 0.4rem;
-            padding: 0 0.5rem;
-        }
-
-        .countdown-item::after {
-            font-size: 1.25rem;
-            right: -0.35rem;
-        }
-
-        .countdown-label {
-            letter-spacing: 0.05em;
-        }
-    }
-
-    @media (max-width: 360px) {
-        .countdown-value-container {
-            width: 55px;
-            height: 65px;
-            border-radius: 10px;
-        }
-
-        .countdown-value {
-            font-size: 1.5rem;
-        }
-
-        .countdown-label {
-            font-size: 0.65rem;
-        }
-
-        .countdown-item::after {
-            display: none;
-        }
-    }
-
-    /* Countdown ended state */
-    .countdown-wrapper.ended .countdown-value-container {
-        background: linear-gradient(145deg,
-            rgba(16, 185, 129, 0.2) 0%,
-            rgba(5, 150, 105, 0.15) 100%);
-        border-color: rgba(16, 185, 129, 0.5);
-    }
-
-    .countdown-wrapper.ended .countdown-value {
-        color: #10b981;
-        text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
-    }
-
-    .countdown-wrapper.ended .countdown-label {
-        color: #10b981;
-    }
+.rc-countdown.ended .rc-label,
+.rc-countdown.ended .rc-separator {
+    color: var(--rc-emerald);
+}
 </style>
 
 <script>
@@ -248,39 +341,46 @@
     wrapper.dataset.initialized = 'true';
 
     const targetDate = new Date(wrapper.dataset.target).getTime();
-    const daysEl = wrapper.querySelector('[data-days]');
-    const hoursEl = wrapper.querySelector('[data-hours]');
-    const minutesEl = wrapper.querySelector('[data-minutes]');
-    const secondsEl = wrapper.querySelector('[data-seconds]');
+
+    const elements = {
+        days: wrapper.querySelector('[data-days]'),
+        daysBottom: wrapper.querySelector('[data-days-bottom]'),
+        hours: wrapper.querySelector('[data-hours]'),
+        hoursBottom: wrapper.querySelector('[data-hours-bottom]'),
+        minutes: wrapper.querySelector('[data-minutes]'),
+        minutesBottom: wrapper.querySelector('[data-minutes-bottom]'),
+        seconds: wrapper.querySelector('[data-seconds]'),
+        secondsBottom: wrapper.querySelector('[data-seconds-bottom]')
+    };
 
     let lastValues = { days: -1, hours: -1, minutes: -1, seconds: -1 };
 
-    function updateValue(element, value, key) {
+    function updateUnit(key, value) {
         const paddedValue = String(value).padStart(2, '0');
+        const el = elements[key];
+        const elBottom = elements[key + 'Bottom'];
+
         if (lastValues[key] !== value) {
-            element.classList.add('changing');
-            element.parentElement.classList.add('pulse');
-            setTimeout(() => {
-                element.classList.remove('changing');
-                element.parentElement.classList.remove('pulse');
-            }, 300);
+            // Add pulse animation
+            const unit = el.closest('.rc-unit');
+            unit.classList.add('pulse');
+            setTimeout(() => unit.classList.remove('pulse'), 300);
             lastValues[key] = value;
         }
-        element.textContent = paddedValue;
+
+        el.textContent = paddedValue;
+        if (elBottom) elBottom.textContent = paddedValue;
     }
 
     function updateCountdown() {
-        const now = new Date().getTime();
+        const now = Date.now();
         const distance = targetDate - now;
 
-        if (distance < 0) {
+        if (distance <= 0) {
             wrapper.classList.add('ended');
-            daysEl.textContent = '00';
-            hoursEl.textContent = '00';
-            minutesEl.textContent = '00';
-            secondsEl.textContent = '00';
-
-            // Dispatch event for countdown end
+            ['days', 'hours', 'minutes', 'seconds'].forEach(key => {
+                updateUnit(key, 0);
+            });
             wrapper.dispatchEvent(new CustomEvent('countdownEnded'));
             return;
         }
@@ -290,10 +390,10 @@
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        updateValue(daysEl, days, 'days');
-        updateValue(hoursEl, hours, 'hours');
-        updateValue(minutesEl, minutes, 'minutes');
-        updateValue(secondsEl, seconds, 'seconds');
+        updateUnit('days', days);
+        updateUnit('hours', hours);
+        updateUnit('minutes', minutes);
+        updateUnit('seconds', seconds);
     }
 
     // Initial update
