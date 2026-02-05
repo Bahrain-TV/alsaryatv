@@ -1121,7 +1121,7 @@
     <script>
         // ==================== PRELOADER / SPLASH SCREEN ====================
         (function() {
-            const SPLASH_DURATION = 2000; // Show splash for exactly 2 seconds
+            const SPLASH_DURATION = 3000; // Show splash for exactly 3 seconds
             const FADE_DURATION = 800;    // Fade out duration
 
             // Generate random stars for splash background
