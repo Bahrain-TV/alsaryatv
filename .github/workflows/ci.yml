@@ -22,20 +22,33 @@ jobs:
         extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
         coverage: none
 
-    - name: Install dependencies
-      run: |
-        composer install --prefer-dist --no-interaction --no-progress
+    - name: Cache Composer Dependencies
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
 
-    - name: Copy .env
+    - name: Install Composer Dependencies
+      run: composer install --prefer-dist --no-interaction --no-progress
+
+    - name: Copy Environment File
       run: cp .env.example .env
 
-    - name: Generate Key
+    - name: Generate Application Key
       run: php artisan key:generate
 
-    - name: Create Database
+    - name: Create SQLite Database
       run: |
         mkdir -p database
         touch database/database.sqlite
+
+    - name: Run Database Migrations
+      run: php artisan migrate --force
+
+    - name: Run Code Style Check (Pint)
+      run: ./vendor/bin/pint --test
 
     - name: Execute Tests (PEST)
       run: php artisan test --parallel
@@ -45,11 +58,15 @@ jobs:
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       run: |
-        curl -H "Content-Type: application/json" -X POST -d '{"embeds": [{"title": "CI/CD Pipeline Passed ✅", "description": "Tests passed successfully on branch **${{ github.ref_name }}**.", "color": 5763719}]}' $DISCORD_WEBHOOK
+        if [ -n "$DISCORD_WEBHOOK" ]; then
+          curl -H "Content-Type: application/json" -X POST -d '{"embeds": [{"title": "CI/CD Pipeline Passed ✅", "description": "Tests passed successfully on branch **${{ github.ref_name }}**.", "color": 5763719}]}' $DISCORD_WEBHOOK
+        fi
 
     - name: Notify Discord on Failure
       if: failure()
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       run: |
-        curl -H "Content-Type: application/json" -X POST -d '{"embeds": [{"title": "CI/CD Pipeline Failed ❌", "description": "Tests failed on branch **${{ github.ref_name }}**. Please check logs.", "color": 15548997}]}' $DISCORD_WEBHOOK
+        if [ -n "$DISCORD_WEBHOOK" ]; then
+          curl -H "Content-Type: application/json" -X POST -d '{"embeds": [{"title": "CI/CD Pipeline Failed ❌", "description": "Tests failed on branch **${{ github.ref_name }}**. Please check logs.", "color": 15548997}]}' $DISCORD_WEBHOOK
+        fi
