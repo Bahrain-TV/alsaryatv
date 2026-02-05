@@ -849,7 +849,7 @@
                     <span class="crescent">☪</span>
                 </div>
                 <x-ramadan-countdown
-                    :target-date="($ramadanStartISO ?? '2026-02-18') . 'T00:00:00+03:00'"
+                    :target-date="isset($ramadanStartISO) ? $ramadanStartISO . 'T00:00:00+03:00' : null"
                     id="ramadan-countdown"
                 />
             </div>

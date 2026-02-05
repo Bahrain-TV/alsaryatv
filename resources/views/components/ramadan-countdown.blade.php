@@ -1,9 +1,15 @@
 @props([
-    'targetDate' => '2026-02-18T00:00:00+03:00',
+    'targetDate' => null,
     'id' => 'ramadan-countdown'
 ])
 
-<div id="{{ $id }}" class="rc-countdown" data-target="{{ $targetDate }}">
+@php
+    $defaultDate = config('alsarya.ramadan.start_date', '2026-02-28');
+    $timezone = config('alsarya.ramadan.timezone', 'Asia/Bahrain');
+    $actualTargetDate = $targetDate ?? ($defaultDate . 'T00:00:00+03:00');
+@endphp
+
+<div id="{{ $id }}" class="rc-countdown" data-target="{{ $actualTargetDate }}">
     <div class="rc-grid">
         {{-- Days - First (leftmost in LTR grid) --}}
         <div class="rc-unit">
