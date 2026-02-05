@@ -8,13 +8,11 @@ use Filament\Widgets;
 
 class Dashboard extends BaseDashboard
 {
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = 'لوحة التحكم';
 
     protected static ?string $title = 'لوحة التحكم';
-
-    protected static string $view = 'filament.pages.dashboard';
 
     public function getWidgets(): array
     {
@@ -23,7 +21,7 @@ class Dashboard extends BaseDashboard
         ];
     }
 
-    public function getColumns(): int|string|array
+    public function getColumns(): array|int
     {
         return 3;
     }

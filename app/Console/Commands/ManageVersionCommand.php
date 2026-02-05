@@ -12,9 +12,9 @@ class ManageVersionCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'version {action : Action to perform (get, increment, set, changelog)}
+    protected $signature = 'pkg:version {action : Action to perform (get, increment, set, changelog)}
                             {--type=patch : Version part to increment (major, minor, patch)}
-                            {--version= : Specific version to set}
+                            {--v= : Specific version to set}
                             {--limit=20 : Limit for changelog display}';
 
     /**
@@ -103,11 +103,11 @@ class ManageVersionCommand extends Command
 
     private function setVersion(): void
     {
-        $version = $this->option('version');
+        $version = $this->option('v');
 
         if (!$version) {
-            $this->error('Please provide a version with --version option');
-            $this->comment('Example: php artisan version set --version=2.0.0');
+            $this->error('Please provide a version with --v option');
+            $this->comment('Example: php artisan pkg:version set --v=2.0.0');
             return;
         }
 
