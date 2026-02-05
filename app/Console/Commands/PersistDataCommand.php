@@ -176,7 +176,7 @@ class PersistDataCommand extends Command
 
             foreach ($callers as $caller) {
                 $csv .= sprintf(
-                    "\"%s\",\"%s\",\"%s\",\"%s\",%d,%d,%d,\"%s\",\"%s\",\"%s\"\n",
+                    "\"%s\",\"%s\",\"%s\",\"%s\",%d,%d,\"%s\",\"%s\",\"%s\"\n",
                     str_replace('"', '""', $caller->name ?? ''),
                     str_replace('"', '""', $caller->phone ?? ''),
                     str_replace('"', '""', $caller->cpr ?? ''),

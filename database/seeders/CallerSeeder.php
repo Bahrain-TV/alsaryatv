@@ -32,108 +32,105 @@ class CallerSeeder extends Seeder
             return Str::endsWith($file, '.csv');
         });
 
-        if (empty($csvFiles)) {
-            $this->command->error("No CSV files found in: {$csvDirectory}");
+        if (!empty($csvFiles)) {
+            // Sort by last modified time (most recent first)
+            usort($csvFiles, function ($a, $b) {
+                return Storage::lastModified($b) - Storage::lastModified($a);
+            });
 
-            return;
-        }
+            // Get the most recent file
+            $latestCsvFile = $csvFiles[0];
 
-        // Sort by last modified time (most recent first)
-        usort($csvFiles, function ($a, $b) {
-            return Storage::lastModified($b) - Storage::lastModified($a);
-        });
+            $this->command->info("Using latest CSV file: {$latestCsvFile}");
 
-        // Get the most recent file
-        $latestCsvFile = $csvFiles[0];
+            try {
+                // Create a temporary file to work with
+                $tempFile = tempnam(sys_get_temp_dir(), 'callers_');
+                file_put_contents($tempFile, Storage::get($latestCsvFile));
 
-        $this->command->info("Using latest CSV file: {$latestCsvFile}");
+                // Log the path of the temporary file
+                Log::info("Temporary file created at: {$tempFile}");
 
-        try {
-            // Create a temporary file to work with
-            $tempFile = tempnam(sys_get_temp_dir(), 'callers_');
-            file_put_contents($tempFile, Storage::get($latestCsvFile));
+                // Parse the CSV file using League CSV
+                $csv = Reader::createFromPath($tempFile, 'r');
+                $csv->setHeaderOffset(0); // The first row contains headers
 
-            // Log the path of the temporary file
-            Log::info("Temporary file created at: {$tempFile}");
+                // Get total records for progress tracking
+                $totalRecords = count($csv);
+                $this->command->info("Found {$totalRecords} records to import");
 
-            // Parse the CSV file using League CSV
-            $csv = Reader::createFromPath($tempFile, 'r');
-            $csv->setHeaderOffset(0); // The first row contains headers
+                $records = $csv->getRecords();
+                $count = 0;
+                $batchSize = 100;
 
-            // Get total records for progress tracking
-            $totalRecords = count($csv);
-            $this->command->info("Found {$totalRecords} records to import");
+                foreach ($records as $record) {
+                    // Properly handle the last_hit field - ensure it's a valid datetime or NULL
+                    $lastHit = null;
+                    if (! empty($record['last_hit']) && $record['last_hit'] !== 'active') {
+                        try {
+                            // Try to parse as a datetime
+                            $lastHit = Carbon::parse($record['last_hit'])->toDateTimeString();
+                        } catch (\Exception $e) {
+                            // If parsing fails, log and set to null
+                            $lastHit = null;
+                        }
+                    }
 
-            $records = $csv->getRecords();
-            $count = 0;
-            $batchSize = 100;
+                    // Get CPR from record and ensure it doesn't exceed the database limit
+                    $cpr = $record['CPR'] ?? $record['cpr'] ?? Str::random(9);
+                    $cpr = Str::limit($cpr, 50, ''); // Truncate to maximum 50 characters
 
-            foreach ($records as $record) {
-                // Properly handle the last_hit field - ensure it's a valid datetime or NULL
-                $lastHit = null;
-                if (! empty($record['last_hit']) && $record['last_hit'] !== 'active') {
-                    try {
-                        // Try to parse as a datetime
-                        $lastHit = Carbon::parse($record['last_hit'])->toDateTimeString();
-                    } catch (\Exception $e) {
-                        // If parsing fails, log and set to null
-                        $lastHit = null;
+                    // Get phone and ensure it doesn't exceed the database limit
+                    $phone = $record['Phone'] ?? $record['phone'] ?? '';
+                    $phone = Str::limit($phone, 255, ''); // Truncate to standard string length
+
+                    $hits = intval($record['Hits'] ?? $record['hits'] ?? 1);
+
+                    $level = ($hits >= 200) ? 'gold' : (($hits >= 100) ? 'silver' : 'bronze');
+
+                    // Prepare caller data
+                    $callerData = [
+                        'name' => $record['Name'] ?? $record['name'] ?? '',
+                        'phone' => $phone,
+                        'cpr' => $cpr,
+                        'hits' => $hits,
+                        'last_hit' => $lastHit,
+                        'level' => $level,
+                        'status' => $record['Status'] ?? $record['status'] ?? 'active',
+                        'notes' => $record['Notes'] ?? $record['notes'] ?? null,
+                        'is_winner' => $record['is_winner'] === 'Yes' || $record['is_winner'] === '1' || $record['is_winner'] === true,
+                        'created_at' => $record['created_at'] ?? now()->toDateTimeString(),
+                        'updated_at' => $record['updated_at'] ?? now()->toDateTimeString(),
+                    ];
+
+                    // Use updateOrCreate to handle duplicates
+                    Caller::updateOrCreate(
+                        ['cpr' => $cpr],
+                        $callerData
+                    );
+
+                    $count++;
+
+                    // Show progress periodically
+                    if ($count % $batchSize === 0) {
+                        $this->command->info("Processed {$count} of {$totalRecords} records");
                     }
                 }
 
-                // Get CPR from record and ensure it doesn't exceed the database limit
-                $cpr = $record['CPR'] ?? $record['cpr'] ?? Str::random(9);
-                $cpr = Str::limit($cpr, 50, ''); // Truncate to maximum 50 characters
+                // Clean up the temporary file
+                unlink($tempFile);
 
-                // Get phone and ensure it doesn't exceed the database limit
-                $phone = $record['Phone'] ?? $record['phone'] ?? '';
-                $phone = Str::limit($phone, 255, ''); // Truncate to standard string length
+                $this->command->info("Successfully imported {$count} callers from CSV.");
 
-                $hits = intval($record['Hits'] ?? $record['hits'] ?? 1);
-
-                $level = ($hits >= 200) ? 'gold' : (($hits >= 100) ? 'silver' : 'bronze');
-
-                // Prepare caller data
-                $callerData = [
-                    'name' => $record['Name'] ?? $record['name'] ?? '',
-                    'phone' => $phone,
-                    'cpr' => $cpr,
-                    'hits' => $hits,
-                    'last_hit' => $lastHit,
-                    'level' => $level,
-                    'status' => $record['Status'] ?? $record['status'] ?? 'active',
-                    'notes' => $record['Notes'] ?? $record['notes'] ?? null,
-                    'is_family' => (bool) ($record['is_family'] ?? false),
-                    'is_winner' => $record['is_winner'] === 'Yes' || $record['is_winner'] === '1' || $record['is_winner'] === true,
-                    'created_at' => $record['created_at'] ?? now()->toDateTimeString(),
-                    'updated_at' => $record['updated_at'] ?? now()->toDateTimeString(),
-                ];
-
-                // Use updateOrCreate to handle duplicates
-                Caller::updateOrCreate(
-                    ['cpr' => $cpr],
-                    $callerData
-                );
-
-                $count++;
-
-                // Show progress periodically
-                if ($count % $batchSize === 0) {
-                    $this->command->info("Processed {$count} of {$totalRecords} records");
-                }
+            } catch (\Exception $e) {
+                $this->command->error('Error importing CSV: '.$e->getMessage());
+                Log::error('CSV import error: '.$e->getMessage(), [
+                    'file' => $latestCsvFile,
+                    'trace' => $e->getTraceAsString(),
+                ]);
             }
-
-            // Clean up the temporary file
-            unlink($tempFile);
-
-            $this->command->info("Successfully imported {$count} callers from CSV.");
-
-        } catch (\Exception $e) {
-            $this->command->error('Error importing CSV: '.$e->getMessage());
-            Log::error('CSV import error: '.$e->getMessage(), [
-                'file' => $latestCsvFile,
-                'trace' => $e->getTraceAsString(),
-            ]);
+        } else {
+            $this->command->error("No CSV files found in: {$csvDirectory}");
         }
 
         // Create some sample callers
@@ -142,11 +139,6 @@ class CallerSeeder extends Seeder
         // Create some winners
         Caller::factory()->count(10)->create([
             'is_winner' => true,
-        ]);
-
-        // Create some family members
-        Caller::factory()->count(15)->create([
-            'is_family' => true,
         ]);
     }
 }

@@ -371,9 +371,11 @@ class ImportCallersCommand extends Command
             // Validate the structure of the data
             foreach ($winners as $index => $winner) {
                 if (! $winner) {
-                    exit('Winner record at index '.$index.' is empty');
+                    $this->warn('Winner record at index '.$index.' is empty');
+                    unset($winners[$index]);
+                    continue;
                 }
-                exit($winner);
+
                 if (! isset($winner['name']) || ! isset($winner['phone']) || ! isset($winner['cpr'])) {
                     $this->warn('Winner record at index '.$index.' is missing required fields');
                     unset($winners[$index]);

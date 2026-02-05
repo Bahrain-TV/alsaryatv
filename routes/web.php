@@ -37,6 +37,7 @@ Route::middleware([
 ])->group(function (): void {
     Route::get('/dashboard', [CallerController::class, 'index'])->name('dashboard');
     Route::get('/winners', [CallerController::class, 'winners'])->name('winners');
+    Route::get('/families', [CallerController::class, 'families'])->name('families');
     
     // Filament shortcuts (if needed)
     Route::get('/admin/callers', [\App\Filament\Resources\CallerResource\Pages\ListCallers::class, 'index'])->name('filament.admin.resources.callers.index');

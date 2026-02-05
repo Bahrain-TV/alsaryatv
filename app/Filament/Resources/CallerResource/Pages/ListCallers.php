@@ -18,11 +18,6 @@ class ListCallers extends ListRecords
         return \App\Models\Caller::query();
     }
 
-    protected function index(): void
-    {
-        $this->getTableQuery()->where('is_family', 0);
-    }
-
     protected function getHeaderActions(): array
     {
         return [
@@ -32,15 +27,6 @@ class ListCallers extends ListRecords
 
     protected function getTableFilters(): array
     {
-        return [
-            SelectFilter::make('is_family')
-                ->label('عائلات فقط')
-                ->options([
-                    '1' => 'Yes',
-                    '0' => 'No',
-                ])
-                ->sortable()
-                ->placeholder('All'),
-        ];
+        return [];
     }
 }

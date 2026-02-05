@@ -18,20 +18,21 @@ class HitsCounter extends ServiceProvider
     }
 
     /**
-     * Increment the simulated visit counter
+     * Increment the visit counter
      */
     public static function incrementHits(): int
     {
-        // Use a persistent cache key with no expiration (or long TTL)
-        return Cache::increment('stats:total_visits', random_int(1, 4));
+        // Invalidate cache and return fresh count
+        Cache::forget('stats:total_visits');
+        return self::getHits();
     }
 
     /**
-     * Get the simulated visit counter
+     * Get the total visit counter from database
      */
     public static function getHits(): int
     {
-        return Cache::rememberForever('stats:total_visits', fn () => random_int(100, 500));
+        return Cache::rememberForever('stats:total_visits', fn () => (int) Caller::sum('hits'));
     }
 
     /**
