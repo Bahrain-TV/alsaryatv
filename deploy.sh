@@ -127,8 +127,8 @@ if ! execute_silent "$SUDO_PREFIX git reset --hard origin/main" "Resetting to or
     exit 1
 fi
 
-# 2. Cleanup
-execute_silent "$SUDO_PREFIX rm -rf .github PROJECT_DOCS tests .vscode .claude .gitignore README.md CLAUDE.md TODO.md" "Cleaning up development files"
+# 2. Cleanup (use sudo directly for root-owned files, preserving public_html ownership)
+execute_silent "sudo rm -rf .github PROJECT_DOCS tests .vscode .claude .gitignore README.md CLAUDE.md TODO.md" "Cleaning up development files"
 
 # 3. Pre-deployment Backup
 if [ "$BACKUP_ENABLE" == "true" ]; then
