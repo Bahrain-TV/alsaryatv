@@ -7,11 +7,11 @@ use Filament\Widgets\ChartWidget;
 
 class StatusDistributionChart extends ChartWidget
 {
-    protected static ?string $heading = '📈 توزيع حالات المتصلين';
+    protected ?string $heading = '📈 توزيع حالات المتصلين';
 
     protected static ?int $sort = 7;
 
-    protected static string $color = 'success';
+    protected string $color = 'success';
 
     protected int | string | array $columnSpan = [
         'sm' => 1,
@@ -19,9 +19,9 @@ class StatusDistributionChart extends ChartWidget
         'lg' => 2,
     ];
 
-    protected static ?string $maxHeight = '320px';
+    protected ?string $maxHeight = '320px';
 
-    protected static ?string $pollingInterval = '120s';
+    protected ?string $pollingInterval = '120s';
 
     protected function getData(): array
     {

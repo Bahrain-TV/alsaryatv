@@ -14,9 +14,7 @@ class WinnersHistoryWidget extends BaseWidget
 
     protected int | string | array $columnSpan = 'full';
 
-    protected static ?string $heading = '🏆 سجل الفائزين والمكافآت';
-
-    protected static ?string $pollingInterval = '60s';
+    protected ?string $pollingInterval = '60s';
 
     public function table(Table $table): Table
     {

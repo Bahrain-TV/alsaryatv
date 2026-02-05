@@ -8,17 +8,17 @@ use Illuminate\Support\Facades\DB;
 
 class RegistrationTrendsChart extends ChartWidget
 {
-    protected static ?string $heading = '📊 اتجاهات التسجيل - آخر 30 يوم';
+    protected ?string $heading = '📊 اتجاهات التسجيل - آخر 30 يوم';
 
     protected static ?int $sort = 2;
 
-    protected static string $color = 'info';
+    protected string $color = 'info';
 
     protected int | string | array $columnSpan = 'full';
 
-    protected static ?string $maxHeight = '350px';
+    protected ?string $maxHeight = '350px';
 
-    protected static ?string $pollingInterval = '60s';
+    protected ?string $pollingInterval = '60s';
 
     protected function getData(): array
     {

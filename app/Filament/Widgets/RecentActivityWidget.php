@@ -18,9 +18,7 @@ class RecentActivityWidget extends BaseWidget
         'lg' => 2,
     ];
 
-    protected static ?string $heading = '📝 آخر التسجيلات والنشاطات';
-
-    protected static ?string $pollingInterval = '30s';
+    protected ?string $pollingInterval = '30s';
 
     public function table(Table $table): Table
     {

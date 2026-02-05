@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class PeakHoursChart extends ChartWidget
 {
-    protected static ?string $heading = '⏰ ساعات الذروة للتسجيل';
+    protected ?string $heading = '⏰ ساعات الذروة للتسجيل';
 
     protected static ?int $sort = 3;
 
-    protected static string $color = 'warning';
+    protected string $color = 'warning';
 
     protected int | string | array $columnSpan = [
         'sm' => 1,
@@ -20,9 +20,9 @@ class PeakHoursChart extends ChartWidget
         'lg' => 2,
     ];
 
-    protected static ?string $maxHeight = '320px';
+    protected ?string $maxHeight = '320px';
 
-    protected static ?string $pollingInterval = '120s';
+    protected ?string $pollingInterval = '120s';
 
     protected function getData(): array
     {

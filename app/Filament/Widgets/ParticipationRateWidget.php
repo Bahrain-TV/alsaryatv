@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class ParticipationRateWidget extends BaseWidget
 {
-    protected static ?string $pollingInterval = '60s';
+    protected ?string $pollingInterval = '60s';
 
     protected static ?int $sort = 6;
 
-    protected static ?string $heading = '🎯 مؤشرات المشاركة والنمو';
+    protected ?string $heading = '🎯 مؤشرات المشاركة والنمو';
 
     protected int | string | array $columnSpan = 'full';
 

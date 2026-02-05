@@ -8,11 +8,11 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class CallersStatsWidget extends BaseWidget
 {
-    protected static ?string $pollingInterval = '30s';
+    protected ?string $pollingInterval = '30s';
 
     protected static ?int $sort = 1;
 
-    protected static ?string $heading = 'ملخص الإحصائيات الرئيسية';
+    protected ?string $heading = 'ملخص الإحصائيات الرئيسية';
 
     protected function getStats(): array
     {
