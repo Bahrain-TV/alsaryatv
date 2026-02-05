@@ -284,78 +284,103 @@
             }
         }
 
-        /* Bismillah */
+        /* Bismillah - Responsive Typography */
         .bismillah {
-            font-size: 2.5rem;
+            font-size:clamp(1.5rem, 5vw, 2.5rem);
             color: var(--primary-gold);
-            margin-bottom: 1.5rem;
-            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
-            animation: shimmer 3s infinite;
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            text-shadow: 0 0 30px oklch(0.7686 0.1647 70.0804 / 0.5);
+            animation: shimmer 3s ease-in-out infinite;
+            line-height: 1.4;
         }
 
         @keyframes shimmer {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+            50% { opacity: 0.85; }
         }
 
-        /* Main Title */
+        /* Main Title - Gradient Text with OKLCH */
         .main-title {
-            font-size: 2.5rem;
+            font-size: clamp(1.75rem, 6vw, 2.5rem);
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-gold), #fbbf24, var(--primary-gold));
+            background: linear-gradient(
+                135deg,
+                var(--primary-gold),
+                oklch(0.8369 0.1644 84.4286),
+                var(--primary-gold)
+            );
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 0.5rem;
+            margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
             text-shadow: none;
+            animation: gradientShift 6s ease infinite;
+            line-height: 1.2;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .subtitle {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: var(--muted-foreground);
+            margin-bottom: clamp(1.5rem, 4vw, 2rem);
+            line-height: 1.6;
         }
 
-        /* Registration Closed Message */
+        /* Registration Closed Message - Enhanced with OKLCH */
         .closed-message {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            background: linear-gradient(
+                135deg,
+                oklch(0.55 0.22 25.0 / 0.15),
+                oklch(0.5 0.20 20.0 / 0.08)
+            );
+            border: 1px solid oklch(0.6368 0.2078 25.3313 / 0.4);
+            border-radius: var(--radius-lg);
+            padding: clamp(1.25rem, 3vw, 1.5rem);
+            margin-bottom: clamp(1.5rem, 4vw, 2rem);
+            transition: transform 0.2s ease, border-color 0.2s ease;
         }
 
         .closed-message h3 {
-            color: #f87171;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            color: oklch(0.75 0.19 25.0);
+            font-size: clamp(1.25rem, 4vw, 1.5rem);
+            margin-bottom: clamp(0.375rem, 1.5vw, 0.5rem);
+            line-height: 1.3;
         }
 
         .closed-message p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
+            color: var(--muted-foreground);
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            line-height: 1.6;
         }
 
-        /* Countdown Section */
+        /* Countdown Section - Enhanced Responsiveness */
         .countdown-section {
-            margin: 2rem 0;
+            margin: clamp(1.5rem, 4vw, 2rem) 0;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: var(--spacing-lg);
         }
 
-        .countdown-title {
-            font-size: clamp(1rem, 3vw, 1.35rem);
+        .countdown-title,
+        .countdown-label {
+            font-size: clamp(0.95rem, 3vw, 1.35rem);
             color: var(--primary-emerald);
-            margin-bottom: 1.5rem;
+            margin-bottom: var(--spacing-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: clamp(0.5rem, 2vw, 0.75rem);
             text-align: center;
             line-height: 1.6;
             font-weight: 600;
+            text-shadow: 0 0 20px oklch(0.6658 0.1574 155.0 / 0.3);
         }
 
         .countdown-title .crescent {
@@ -366,28 +391,35 @@
         @keyframes crescentGlow {
             0%, 100% {
                 opacity: 1;
-                filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.5));
+                filter: drop-shadow(0 0 5px oklch(0.6658 0.1574 155.0 / 0.5));
             }
             50% {
-                opacity: 0.7;
-                filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.8));
+                opacity: 0.75;
+                filter: drop-shadow(0 0 15px oklch(0.6658 0.1574 155.0 / 0.8));
             }
         }
 
-        /* FlipDown Timer Styles */
-        .countdown-label {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            font-weight: 500;
-        }
-
+        /* FlipDown Timer - Responsive */
         #flipdown {
-            margin: 1.5rem auto;
+            margin: clamp(1rem, 3vw, 1.5rem) auto;
+            transform: scale(1);
+            transition: transform 0.3s ease;
         }
 
-        /* Arabic Labels for FlipDown */
+        /* Scale down timer on smaller screens */
+        @media (max-width: 640px) {
+            #flipdown {
+                transform: scale(0.85);
+            }
+        }
+
+        @media (max-width: 480px) {
+            #flipdown {
+                transform: scale(0.75);
+            }
+        }
+
+        /* Arabic Labels for FlipDown - Enhanced */
         .flipdown .rotor-group-heading {
             font-size: 0 !important;
             height: auto !important;
@@ -397,10 +429,10 @@
 
         .flipdown .rotor-group-heading::before {
             display: block;
-            font-family: 'Tajawal', sans-serif !important;
+            font-family: var(--font-sans) !important;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem !important;
+            color: var(--muted-foreground);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem) !important;
             text-transform: none !important;
             padding-top: 0.5rem;
         }
@@ -418,69 +450,95 @@
             content: 'ثانية' !important;
         }
 
-        /* Ramadan Date Info */
+        /* Ramadan Date Info - Enhanced with OKLCH */
         .ramadan-info {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 16px;
+            margin-top: clamp(1.5rem, 4vw, 2rem);
+            padding: clamp(1.25rem, 3vw, 1.5rem);
+            background: linear-gradient(
+                135deg,
+                oklch(0.6658 0.1574 155.0 / 0.12),
+                oklch(0.5553 0.1455 155.0 / 0.06)
+            );
+            border: 1px solid oklch(0.6658 0.1574 155.0 / 0.35);
+            border-radius: var(--radius-lg);
+            transition: border-color 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Hover effect for desktop */
+        @media (hover: hover) {
+            .ramadan-info:hover {
+                border-color: oklch(0.6658 0.1574 155.0 / 0.5);
+                transform: translateY(-2px);
+            }
         }
 
         .ramadan-info h4 {
             color: var(--primary-emerald);
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
+            font-size: clamp(1.1rem, 3vw, 1.25rem);
+            margin-bottom: clamp(0.375rem, 1.5vw, 0.5rem);
+            line-height: 1.4;
+            text-shadow: 0 0 15px oklch(0.6658 0.1574 155.0 / 0.3);
         }
 
         .ramadan-info .date {
-            font-size: 1.5rem;
-            color: white;
+            font-size: clamp(1.25rem, 4vw, 1.5rem);
+            color: var(--foreground);
             font-weight: 700;
+            line-height: 1.3;
         }
 
         .ramadan-info .hijri {
             color: var(--primary-gold);
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            margin-top: clamp(0.375rem, 1.5vw, 0.5rem);
+            text-shadow: 0 0 15px oklch(0.7686 0.1647 70.0804 / 0.3);
         }
 
-        /* Footer */
+        /* Footer - Enhanced Responsiveness */
         .footer-section {
-            margin-top: 2rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            margin-top: clamp(1.5rem, 4vw, 2rem);
+            color: var(--muted-foreground);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
             animation: fadeIn 1.5s ease-out 1s both;
+            line-height: 1.6;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer-section p {
+            margin-bottom: var(--spacing-sm);
         }
 
         .footer-section a {
             color: var(--primary-gold);
             text-decoration: none;
-            transition: color 0.3s;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
         }
 
-        .footer-section a:hover {
-            color: #fbbf24;
+        @media (hover: hover) {
+            .footer-section a:hover {
+                color: oklch(0.8369 0.1644 84.4286);
+                text-shadow: 0 0 10px oklch(0.7686 0.1647 70.0804 / 0.4);
+            }
         }
 
         .footer-meta {
-            margin-top: 0.75rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+            margin-top: clamp(0.5rem, 2vw, 0.75rem);
+            font-size: clamp(0.75rem, 2.25vw, 0.9rem);
+            color: var(--muted-foreground);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 2vw, 0.75rem);
         }
 
         .visitors-count {
             color: var(--primary-emerald);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .login-link {
@@ -1013,8 +1071,8 @@
                 {{-- Current Ramadan Info --}}
                 <div class="ramadan-info">
                     <h4>🌙 أهلاً بكم في شهر رمضان المبارك</h4>
-                    <div class="date">1 رمضان 1447 هـ</div>
-                    <div class="hijri" style="color: #34d399;">{{ $ramadanDate ?? '18 فبراير 2026' }}</div>
+                    <div class="date">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
+                    <div class="hijri" style="color: #34d399;">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
                 </div>
             @else
                 {{-- Guests see the countdown timer --}}
@@ -1035,8 +1093,8 @@
                 <!-- Ramadan Date Info -->
                 <div class="ramadan-info">
                     <h4>🌙 أول أيام شهر رمضان المبارك</h4>
-                    <div class="date">{{ $ramadanDate ?? '18 فبراير 2026' }}</div>
-                    <div class="hijri">1 رمضان 1447 هـ</div>
+                    <div class="date">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
+                    <div class="hijri">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
                 </div>
             @endauth
         </div>
@@ -1063,7 +1121,7 @@
     <script>
         // ==================== PRELOADER / SPLASH SCREEN ====================
         (function() {
-            const SPLASH_DURATION = 2000; // Show splash for exactly 2 seconds
+            const SPLASH_DURATION = 3000; // Show splash for exactly 3 seconds
             const FADE_DURATION = 800;    // Fade out duration
 
             // Generate random stars for splash background
@@ -1111,12 +1169,12 @@
             // Only initialize FlipDown for guests (when the element exists)
             const flipdownEl = document.getElementById('flipdown');
             if (!flipdownEl || window.flipdownInitialized) return;
-            
+
             window.flipdownInitialized = true;
 
-            // Ramadan 1447 starts on February 18, 2026 at midnight (Bahrain time)
+            // Ramadan 1447 starts on configured date at midnight (Bahrain time)
             // Using Bahrain timezone (UTC+3)
-            const ramadanStartISO = '{{ $ramadanStartISO ?? "2026-02-18" }}';
+            const ramadanStartISO = '{{ $ramadanStartISO ?? "2026-02-28" }}';
             const ramadanDate = new Date(ramadanStartISO + 'T00:00:00+03:00');
             const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
 
