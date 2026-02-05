@@ -18,7 +18,7 @@ class RecentActivityWidget extends BaseWidget
         'lg' => 2,
     ];
 
-    protected static ?string $heading = 'آخر التسجيلات';
+    protected static ?string $heading = '📝 آخر التسجيلات والنشاطات';
 
     protected static ?string $pollingInterval = '30s';
 
@@ -32,34 +32,57 @@ class RecentActivityWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('الاسم')
+                    ->label('👤 الاسم')
                     ->searchable()
                     ->weight('bold')
-                    ->color('primary'),
+                    ->color('primary')
+                    ->size('sm'),
 
                 Tables\Columns\TextColumn::make('phone')
-                    ->label('الهاتف')
+                    ->label('📱 الهاتف')
                     ->icon('heroicon-m-phone')
-                    ->iconSize(IconSize::Small),
+                    ->iconSize(IconSize::Small)
+                    ->size('sm'),
 
-                Tables\Columns\TextColumn::make('hits')
-                    ->label('المشاركات')
-                    ->badge()
-                    ->color('info'),
+                Tables\Columns\BadgeColumn::make('hits')
+                    ->label('👋 المشاركات')
+                    ->formatStateUsing(fn (int $state): string => "{$state}")
+                    ->color('info')
+                    ->icon('heroicon-m-hand-raised'),
 
                 Tables\Columns\IconColumn::make('is_winner')
-                    ->label('فائز')
+                    ->label('🏆 فائز')
                     ->boolean()
-                    ->trueIcon('heroicon-o-trophy')
+                    ->trueIcon('heroicon-s-trophy')
                     ->trueColor('success')
-                    ->falseIcon('heroicon-o-minus')
+                    ->falseIcon('heroicon-m-minus-circle')
                     ->falseColor('gray'),
 
+                Tables\Columns\TextColumn::make('status')
+                    ->label('📊 الحالة')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'active' => '✅ نشط',
+                        'inactive' => '⏸️ غير نشط',
+                        'blocked' => '🚫 محظور',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'warning',
+                        'blocked' => 'danger',
+                        default => 'gray',
+                    }),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('التاريخ')
+                    ->label('🕐 التاريخ')
                     ->since()
+                    ->size('sm')
                     ->dateTimeTooltip('Y-m-d H:i:s'),
             ])
-            ->paginated(false);
+            ->paginated(false)
+            ->emptyStateHeading('📭 لا توجد تسجيلات حديثة')
+            ->emptyStateDescription('لم يتم تسجيل أي متصلين بعد.')
+            ->emptyStateIcon('heroicon-o-inbox');
     }
 }

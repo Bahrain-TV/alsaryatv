@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class RegistrationTrendsChart extends ChartWidget
 {
-    protected static ?string $heading = 'اتجاهات التسجيل (30 يوم)';
+    protected static ?string $heading = '📊 اتجاهات التسجيل - آخر 30 يوم';
 
     protected static ?int $sort = 2;
 
@@ -16,7 +16,7 @@ class RegistrationTrendsChart extends ChartWidget
 
     protected int | string | array $columnSpan = 'full';
 
-    protected static ?string $maxHeight = '300px';
+    protected static ?string $maxHeight = '350px';
 
     protected static ?string $pollingInterval = '60s';
 
@@ -36,21 +36,31 @@ class RegistrationTrendsChart extends ChartWidget
         // Fill in missing dates with 0
         for ($i = 29; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
-            $labels[] = now()->subDays($i)->format('M d');
+            $labels[] = now()->subDays($i)->format('d M');
 
             $record = $data->firstWhere('date', $date);
             $counts[] = $record ? $record->count : 0;
         }
 
+        // Calculate statistics
+        $maxCount = max($counts) ?: 1;
+        $avgCount = round(array_sum($counts) / count($counts), 1);
+        $totalCount = array_sum($counts);
+
         return [
             'datasets' => [
                 [
-                    'label' => 'التسجيلات اليومية',
+                    'label' => "التسجيلات اليومية (المتوسط: {$avgCount})",
                     'data' => $counts,
                     'fill' => true,
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.15)',
                     'borderColor' => 'rgb(59, 130, 246)',
+                    'borderWidth' => 2,
                     'tension' => 0.4,
+                    'pointRadius' => 4,
+                    'pointBackgroundColor' => 'rgb(59, 130, 246)',
+                    'pointBorderColor' => 'rgb(255, 255, 255)',
+                    'pointBorderWidth' => 2,
                 ],
             ],
             'labels' => $labels,
@@ -65,10 +75,27 @@ class RegistrationTrendsChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'responsive' => true,
+            'maintainAspectRatio' => true,
             'plugins' => [
                 'legend' => [
                     'display' => true,
-                    'position' => 'bottom',
+                    'position' => 'top',
+                    'labels' => [
+                        'padding' => 15,
+                        'font' => [
+                            'size' => 12,
+                        ],
+                    ],
+                ],
+                'tooltip' => [
+                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
+                    'padding' => 12,
+                    'titleFont' => ['size' => 13],
+                    'bodyFont' => ['size' => 12],
+                    'callbacks' => [
+                        'label' => 'function(context) { return "التسجيلات: " + context.parsed.y; }',
+                    ],
                 ],
             ],
             'scales' => [
@@ -76,6 +103,20 @@ class RegistrationTrendsChart extends ChartWidget
                     'beginAtZero' => true,
                     'ticks' => [
                         'precision' => 0,
+                        'font' => ['size' => 11],
+                    ],
+                    'title' => [
+                        'display' => true,
+                        'text' => 'عدد التسجيلات',
+                    ],
+                ],
+                'x' => [
+                    'ticks' => [
+                        'font' => ['size' => 11],
+                    ],
+                    'title' => [
+                        'display' => true,
+                        'text' => 'التاريخ',
                     ],
                 ],
             ],

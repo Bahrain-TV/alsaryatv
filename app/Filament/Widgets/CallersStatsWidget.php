@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class CallersStatsWidget extends BaseWidget
 {
-    protected static ?string $pollingInterval = '30s'; // Refresh every 30 seconds
+    protected static ?string $pollingInterval = '30s';
 
     protected static ?int $sort = 1;
+
+    protected static ?string $heading = 'ملخص الإحصائيات الرئيسية';
 
     protected function getStats(): array
     {
@@ -28,15 +30,17 @@ class CallersStatsWidget extends BaseWidget
             ? round((($todayCallers - $yesterdayCallers) / $yesterdayCallers) * 100, 1)
             : ($todayCallers > 0 ? 100 : 0);
 
+        $winRatio = $totalCallers > 0 ? round(($totalWinners / $totalCallers) * 100, 1) : 0;
+
         return [
             Stat::make('إجمالي المتصلين', number_format($totalCallers))
-                ->description('جميع المتصلين المسجلين')
+                ->description("📞 جميع المتصلين المسجلين في النظام")
                 ->descriptionIcon('heroicon-m-phone')
                 ->color('primary')
                 ->chart($this->getRegistrationChart()),
 
             Stat::make('الفائزون', number_format($totalWinners))
-                ->description('إجمالي الفائزين في المسابقة')
+                ->description("🏆 {$winRatio}% من إجمالي المتصلين")
                 ->descriptionIcon('heroicon-m-trophy')
                 ->color('success'),
 
@@ -46,17 +50,17 @@ class CallersStatsWidget extends BaseWidget
                 ->color($todayTrend >= 0 ? 'info' : 'warning'),
 
             Stat::make('إجمالي المشاركات', number_format($totalHits))
-                ->description('عدد مرات المشاركة الكلي')
+                ->description("👋 متوسط {$this->getAverageHits($totalCallers, $totalHits)} مشاركة لكل متصل")
                 ->descriptionIcon('heroicon-m-hand-raised')
                 ->color('warning'),
 
             Stat::make('المتصلون النشطون', number_format($activeCallers))
-                ->description('الحسابات النشطة حالياً')
+                ->description("✅ " . ($totalCallers > 0 ? round(($activeCallers / $totalCallers) * 100, 1) : 0) . "% من المتصلين")
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
-            Stat::make('الأرقام الفريدة', number_format($uniqueCprs))
-                ->description('عدد المتصلين الفريدين (CPR)')
+            Stat::make('أرقام فريدة (CPR)', number_format($uniqueCprs))
+                ->description("🔐 عدد المتصلين الفريدين حسب رقم المواطن")
                 ->descriptionIcon('heroicon-m-identification')
                 ->color('gray'),
         ];
@@ -65,11 +69,19 @@ class CallersStatsWidget extends BaseWidget
     private function getTrendDescription(float $trend): string
     {
         if ($trend > 0) {
-            return "زيادة {$trend}% عن الأمس";
+            return "📈 زيادة {$trend}% عن الأمس";
         } elseif ($trend < 0) {
-            return "انخفاض " . abs($trend) . "% عن الأمس";
+            return "📉 انخفاض " . abs($trend) . "% عن الأمس";
         }
-        return 'لا تغيير عن الأمس';
+        return '➡️ لا تغيير عن الأمس';
+    }
+
+    private function getAverageHits(int $totalCallers, int $totalHits): string
+    {
+        if ($totalCallers === 0) {
+            return '0';
+        }
+        return number_format(round($totalHits / $totalCallers, 1), 1);
     }
 
     private function getRegistrationChart(): array
