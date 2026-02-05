@@ -24,6 +24,7 @@ class HitsCounter extends ServiceProvider
     {
         // Invalidate cache and return fresh count
         Cache::forget('stats:total_visits');
+
         return self::getHits();
     }
 
@@ -48,7 +49,10 @@ class HitsCounter extends ServiceProvider
      */
     public static function getUserHits(?string $cpr): int
     {
-        if (!$cpr) return 0;
+        if (! $cpr) {
+            return 0;
+        }
+
         return (int) Caller::where('cpr', $cpr)->value('hits');
     }
 }

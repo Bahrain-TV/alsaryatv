@@ -213,7 +213,8 @@ class CallerResource extends Resource
                             $eligibleCallers = Caller::getEligibleCallers();
 
                             if ($eligibleCallers->count() < $count) {
-                                $this->notify('warning', 'عدد المتصلين المؤهلين غير كافٍ. يوجد فقط ' . $eligibleCallers->count() . ' متصل.');
+                                $this->notify('warning', 'عدد المتصلين المؤهلين غير كافٍ. يوجد فقط '.$eligibleCallers->count().' متصل.');
+
                                 return;
                             }
 
@@ -228,7 +229,7 @@ class CallerResource extends Resource
 
                                 // Filter out callers whose CPR has already been selected
                                 $availableCallers = $eligibleCallers->filter(function ($caller) use ($selectedCpRs) {
-                                    return !in_array($caller->cpr, $selectedCpRs);
+                                    return ! in_array($caller->cpr, $selectedCpRs);
                                 });
 
                                 if ($availableCallers->isEmpty()) {
@@ -244,10 +245,10 @@ class CallerResource extends Resource
                             }
 
                             $winnerNames = implode('، ', array_map(function ($winner) {
-                                return $winner->name . ' (' . $winner->cpr . ')';
+                                return $winner->name.' ('.$winner->cpr.')';
                             }, $selectedWinners));
 
-                            $this->notify('success', 'تم اختيار ' . count($selectedWinners) . ' فائز: ' . $winnerNames);
+                            $this->notify('success', 'تم اختيار '.count($selectedWinners).' فائز: '.$winnerNames);
                         })
                         ->requiresConfirmation()
                         ->modalHeading('اختيار فائزين عشوائيين')
@@ -263,12 +264,13 @@ class CallerResource extends Resource
                         // Use the model method for selecting random winner by CPR
                         $winner = Caller::selectRandomWinnerByCpr();
 
-                        if (!$winner) {
+                        if (! $winner) {
                             $this->notify('warning', 'لا يوجد متصلين مؤهلين للفوز.');
+
                             return;
                         }
 
-                        $this->notify('success', 'تم اختيار الفائز: ' . $winner->name . ' (CPR: ' . $winner->cpr . ')');
+                        $this->notify('success', 'تم اختيار الفائز: '.$winner->name.' (CPR: '.$winner->cpr.')');
                     })
                     ->requiresConfirmation()
                     ->modalHeading('اختيار فائز عشوائي')

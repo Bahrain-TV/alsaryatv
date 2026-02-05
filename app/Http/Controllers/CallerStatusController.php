@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Events\CallerApproved;
 use App\Http\Requests\UpdateCallerStatusRequest;
 use App\Models\Caller;
-use Illuminate\Http\Request;
 
 class CallerStatusController extends Controller
 {
@@ -65,5 +64,4 @@ class CallerStatusController extends Controller
             'is_winner' => $caller->is_winner,
         ]);
     }
-
 }

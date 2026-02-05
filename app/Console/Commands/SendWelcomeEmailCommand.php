@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Mail\WelcomePasswordEmail;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SendWelcomeEmailCommand extends Command
 {
@@ -34,17 +34,17 @@ class SendWelcomeEmailCommand extends Command
 
         try {
             Mail::to($email)->send(new WelcomePasswordEmail($password, $name, $email));
-            
+
             // Also send a copy to the developer for confirmation in production/staging
             if (app()->environment('production')) {
-                 Mail::to('aldoyh@gmail.com')->send(new WelcomePasswordEmail($password, $name, $email));
+                Mail::to('aldoyh@gmail.com')->send(new WelcomePasswordEmail($password, $name, $email));
             }
 
             $this->info("Welcome email sent successfully to {$email}");
             Log::info("Welcome email sent to {$email}");
         } catch (\Exception $e) {
-            $this->error("Failed to send welcome email to {$email}: " . $e->getMessage());
-            Log::error("Failed to send welcome email to {$email}: " . $e->getMessage());
+            $this->error("Failed to send welcome email to {$email}: ".$e->getMessage());
+            Log::error("Failed to send welcome email to {$email}: ".$e->getMessage());
         }
     }
 }

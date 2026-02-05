@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Filament\Widgets\CallersStatsWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Widgets;
 
 class Dashboard extends BaseDashboard
 {

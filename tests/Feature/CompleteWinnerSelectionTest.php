@@ -120,8 +120,8 @@ class CompleteWinnerSelectionTest extends TestCase
         // Create multiple callers
         for ($i = 1; $i <= 10; $i++) {
             Caller::create([
-                'name' => 'Caller ' . $i,
-                'phone' => '555' . str_pad($i, 7, '0', STR_PAD_LEFT),
+                'name' => 'Caller '.$i,
+                'phone' => '555'.str_pad($i, 7, '0', STR_PAD_LEFT),
                 'cpr' => str_pad($i, 9, '0', STR_PAD_LEFT),
                 'is_winner' => false,
                 'status' => 'active',
@@ -134,7 +134,7 @@ class CompleteWinnerSelectionTest extends TestCase
             $winner = Caller::selectRandomWinnerByCpr();
             $this->assertNotNull($winner);
             $this->assertTrue($winner->is_winner);
-            
+
             // Verify CPR is unique
             $this->assertNotContains($winner->cpr, $selectedCpRs);
             $selectedCpRs[] = $winner->cpr;

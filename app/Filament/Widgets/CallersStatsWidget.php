@@ -5,7 +5,6 @@ namespace App\Filament\Widgets;
 use App\Models\Caller;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 class CallersStatsWidget extends BaseWidget
 {
@@ -67,8 +66,9 @@ class CallersStatsWidget extends BaseWidget
         if ($trend > 0) {
             return "زيادة {$trend}% عن الأمس";
         } elseif ($trend < 0) {
-            return "انخفاض " . abs($trend) . "% عن الأمس";
+            return 'انخفاض '.abs($trend).'% عن الأمس';
         }
+
         return 'لا تغيير عن الأمس';
     }
 

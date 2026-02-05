@@ -32,7 +32,7 @@ class CallerSeeder extends Seeder
             return Str::endsWith($file, '.csv');
         });
 
-        if (!empty($csvFiles)) {
+        if (! empty($csvFiles)) {
             // Sort by last modified time (most recent first)
             usort($csvFiles, function ($a, $b) {
                 return Storage::lastModified($b) - Storage::lastModified($a);

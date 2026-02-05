@@ -373,6 +373,7 @@ class ImportCallersCommand extends Command
                 if (! $winner) {
                     $this->warn('Winner record at index '.$index.' is empty');
                     unset($winners[$index]);
+
                     continue;
                 }
 
