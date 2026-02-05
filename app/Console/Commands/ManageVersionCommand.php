@@ -135,6 +135,7 @@ class ManageVersionCommand extends Command
 
         if (empty($changelog)) {
             $this->info('No changelog entries found');
+
             return;
         }
 
