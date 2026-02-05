@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Caller;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,7 +13,7 @@ class SimpleWinnerTest extends TestCase
     public function test_winner_selection_works()
     {
         // Create callers manually
-        $caller1 = new Caller();
+        $caller1 = new Caller;
         $caller1->name = 'Test Caller 1';
         $caller1->phone = '123456789';
         $caller1->cpr = '123456789';
@@ -22,7 +21,7 @@ class SimpleWinnerTest extends TestCase
         $caller1->status = 'active';
         $caller1->save();
 
-        $caller2 = new Caller();
+        $caller2 = new Caller;
         $caller2->name = 'Test Caller 2';
         $caller2->phone = '987654321';
         $caller2->cpr = '987654321';
@@ -47,7 +46,7 @@ class SimpleWinnerTest extends TestCase
     public function test_no_winner_when_no_eligible_callers()
     {
         // Create caller that's already a winner
-        $caller = new Caller();
+        $caller = new Caller;
         $caller->name = 'Test Caller';
         $caller->phone = '123456789';
         $caller->cpr = '123456789';

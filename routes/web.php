@@ -38,7 +38,7 @@ Route::middleware([
     Route::get('/dashboard', [CallerController::class, 'index'])->name('dashboard');
     Route::get('/winners', [CallerController::class, 'winners'])->name('winners');
     Route::get('/families', [CallerController::class, 'families'])->name('families');
-    
+
     // Filament shortcuts (if needed)
     Route::get('/admin/callers', [\App\Filament\Resources\CallerResource\Pages\ListCallers::class, 'index'])->name('filament.admin.resources.callers.index');
     Route::get('/admin/callers/winners', [\App\Filament\Resources\CallerResource\Pages\ListWinners::class, 'index'])->name('filament.admin.resources.callers.winners');
@@ -59,6 +59,7 @@ Route::prefix('callers')->name('callers.')->group(function (): void {
         }
 
         $cpr = session('cpr');
+
         return view('callers.success', [
             'userHits' => session('userHits', HitsCounter::getUserHits($cpr)),
             'totalHits' => session('totalHits', HitsCounter::getTotalHits()),

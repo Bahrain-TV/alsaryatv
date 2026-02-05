@@ -10,7 +10,6 @@ use App\Filament\Widgets\RegistrationTrendsChart;
 use App\Filament\Widgets\StatusDistributionChart;
 use App\Filament\Widgets\WinnersHistoryWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Widgets;
 
 class Dashboard extends BaseDashboard
 {

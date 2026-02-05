@@ -71,8 +71,9 @@ class ManageVersionCommand extends Command
     {
         $type = $this->option('type');
 
-        if (!in_array($type, ['major', 'minor', 'patch'])) {
+        if (! in_array($type, ['major', 'minor', 'patch'])) {
             $this->error("Invalid type: {$type}. Use: major, minor, or patch");
+
             return;
         }
 
@@ -83,7 +84,7 @@ class ManageVersionCommand extends Command
             'patch' => VersionManager::incrementPatch(),
         };
 
-        $this->info("✓ Version incremented successfully");
+        $this->info('✓ Version incremented successfully');
         $this->table(
             ['Property', 'Value'],
             [
@@ -98,23 +99,24 @@ class ManageVersionCommand extends Command
         $this->line('');
         $this->comment('Don\'t forget to commit this change:');
         $this->comment('  git add version.json');
-        $this->comment('  git commit -m "chore: bump version to ' . $newVersion . '"');
+        $this->comment('  git commit -m "chore: bump version to '.$newVersion.'"');
     }
 
     private function setVersion(): void
     {
         $version = $this->option('v');
 
-        if (!$version) {
+        if (! $version) {
             $this->error('Please provide a version with --v option');
             $this->comment('Example: php artisan pkg:version set --v=2.0.0');
+
             return;
         }
 
         $oldVersion = VersionManager::getVersion();
         VersionManager::setVersion($version);
 
-        $this->info("✓ Version set successfully");
+        $this->info('✓ Version set successfully');
         $this->table(
             ['Property', 'Value'],
             [
@@ -133,6 +135,7 @@ class ManageVersionCommand extends Command
 
         if (empty($changelog)) {
             $this->info('No changelog entries found');
+
             return;
         }
 
@@ -146,7 +149,7 @@ class ManageVersionCommand extends Command
             array_map(fn ($entry) => [
                 $entry['version'],
                 strtoupper($entry['type']),
-                substr($entry['message'], 0, 50) . (strlen($entry['message']) > 50 ? '...' : ''),
+                substr($entry['message'], 0, 50).(strlen($entry['message']) > 50 ? '...' : ''),
                 \Carbon\Carbon::parse($entry['timestamp'])->format('Y-m-d H:i'),
             ], $displayed)
         );

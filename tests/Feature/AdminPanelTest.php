@@ -23,7 +23,7 @@ class AdminPanelTest extends TestCase
     public function test_guest_cannot_access_admin_panel()
     {
         $response = $this->get('/admin');
-        
+
         $response->assertStatus(302); // Should redirect to login
         $response->assertRedirect('/login');
     }

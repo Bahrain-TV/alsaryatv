@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('callers', function (Blueprint $table) {
-            if (!Schema::hasColumn('callers', 'is_family')) {
+            if (! Schema::hasColumn('callers', 'is_family')) {
                 $table->boolean('is_family')->default(false)->after('is_winner');
             }
         });

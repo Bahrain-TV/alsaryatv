@@ -5,7 +5,6 @@ namespace App\Filament\Resources\CallerResource\Pages;
 use App\Filament\Resources\CallerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Tables\Filters\SelectFilter;
 
 class ListCallers extends ListRecords
 {

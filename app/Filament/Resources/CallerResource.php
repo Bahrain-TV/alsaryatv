@@ -364,7 +364,7 @@ class CallerResource extends Resource
 
                                 // Filter out callers whose CPR has already been selected
                                 $availableCallers = $eligibleCallers->filter(function ($caller) use ($selectedCpRs) {
-                                    return !in_array($caller->cpr, $selectedCpRs);
+                                    return ! in_array($caller->cpr, $selectedCpRs);
                                 });
 
                                 if ($availableCallers->isEmpty()) {
@@ -380,7 +380,7 @@ class CallerResource extends Resource
                             }
 
                             $winnerNames = implode('، ', array_map(function ($winner) {
-                                return $winner->name . ' (' . $winner->cpr . ')';
+                                return $winner->name.' ('.$winner->cpr.')';
                             }, $selectedWinners));
 
                             \Filament\Notifications\Notification::make()

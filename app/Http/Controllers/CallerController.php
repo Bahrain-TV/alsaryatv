@@ -9,9 +9,7 @@ use App\Providers\HitsCounter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Log;
 
 class CallerController extends Controller
 {
@@ -23,6 +21,7 @@ class CallerController extends Controller
     public function index()
     {
         $callers = Caller::latest()->paginate(25);
+
         return view('callers.index', ['callers' => $callers]);
     }
 
@@ -43,9 +42,9 @@ class CallerController extends Controller
         if (RateLimiter::tooManyAttempts('caller-registration:'.$cpr, 1)) {
             return back()->withErrors(['cpr' => 'You can only register once every 5 minutes.'])->withInput();
         }
-        
+
         if (RateLimiter::tooManyAttempts('caller-registration-ip:'.$request->ip(), 10)) {
-             return back()->withErrors(['general' => 'Too many registrations from your location.'])->withInput();
+            return back()->withErrors(['general' => 'Too many registrations from your location.'])->withInput();
         }
 
         $caller = Caller::updateOrCreate(
@@ -81,7 +80,7 @@ class CallerController extends Controller
     public function update(UpdateCallerRequest $request, Caller $caller)
     {
         $validated = $request->validated();
-        
+
         $caller->update([
             'name' => $validated['name'],
             'phone' => $validated['phone_number'],
@@ -96,6 +95,7 @@ class CallerController extends Controller
     public function winners()
     {
         $winners = Caller::winners()->latest()->paginate(25);
+
         return view('callers.winners', ['winners' => $winners]);
     }
 
@@ -131,6 +131,7 @@ class CallerController extends Controller
     public function destroy(Caller $caller)
     {
         $caller->delete();
+
         return redirect()->route('dashboard')->with('success', 'Caller deleted successfully.');
     }
 }
