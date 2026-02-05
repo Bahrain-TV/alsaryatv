@@ -15,10 +15,11 @@ use Filament\Widgets;
 class Dashboard extends BaseDashboard
 {
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = 'لوحة التحكم';
 
-    protected static ?string $title = 'لوحة التحكم - برنامج السارية';
+    protected static ?string $title = 'لوحة التحكم';
 
     public function getWidgets(): array
     {
@@ -48,6 +49,7 @@ class Dashboard extends BaseDashboard
         ];
     }
 
+    public function getColumns(): array|int
     public function getColumns(): array|int
     {
         return [
