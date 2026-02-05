@@ -201,11 +201,10 @@
             padding: clamp(1rem, 4vw, 2rem);
             text-align: center;
             width: 100%;
-            max-width: min(900px, calc(100vw - clamp(1rem, 4vw, 2rem)));
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
-                        transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: min(900px, calc(100vw - 2rem));
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 1s ease, transform 1s ease;
             box-sizing: border-box;
         }
 
