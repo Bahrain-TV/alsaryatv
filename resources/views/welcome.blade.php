@@ -826,26 +826,82 @@
             <h1 class="main-title">برنامج السارية</h1>
             <p class="subtitle">على شاشة تلفزيون البحرين</p>
 
-            <!-- Registration Closed -->
-            <div class="closed-message">
-                <h3>⏸️ التسجيل مغلق حالياً</h3>
-                <p>سيتم فتح التسجيل مع بداية شهر رمضان المبارك</p>
-            </div>
-
-            <!-- Countdown -->
-            <div class="countdown-section">
-                <div class="countdown-label">
-                    العد التنازلي لشهر رمضان المبارك
+            @auth
+                {{-- Logged-in users see Ramadan mode (Registration Open) --}}
+                <div class="open-message" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1)); border: 2px solid rgba(16, 185, 129, 0.4); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="color: #34d399; font-size: 1.5rem; margin-bottom: 0.5rem;">🌙 رمضان كريم!</h3>
+                    <p style="color: rgba(255, 255, 255, 0.8);">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
                 </div>
-                <div id="flipdown" class="flipdown flipdown__theme-dark"></div>
-            </div>
 
-            <!-- Ramadan Date Info -->
-            <div class="ramadan-info">
-                <h4>🌙 أول أيام شهر رمضان المبارك</h4>
-                <div class="date">{{ $ramadanDate ?? '18 فبراير 2026' }}</div>
-                <div class="hijri">1 رمضان 1447 هـ</div>
-            </div>
+                {{-- Registration Form for Logged-in Users --}}
+                <div class="registration-form" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+                    <form method="POST" action="{{ route('callers.store') }}" dir="rtl" style="display: flex; flex-direction: column; gap: 1rem;">
+                        @csrf
+                        
+                        {{-- Name --}}
+                        <div>
+                            <label for="name" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">الاسم الكامل</label>
+                            <input type="text" id="name" name="name" required value="{{ old('name') }}" 
+                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
+                                   placeholder="أدخل اسمك الكامل">
+                            @error('name') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- CPR --}}
+                        <div>
+                            <label for="cpr" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">رقم الهوية (CPR)</label>
+                            <input type="text" id="cpr" name="cpr" required value="{{ old('cpr') }}" pattern="\d*"
+                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
+                                   placeholder="أدخل رقم الهوية">
+                            @error('cpr') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Phone --}}
+                        <div>
+                            <label for="phone_number" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">رقم الهاتف</label>
+                            <input type="tel" id="phone_number" name="phone_number" required value="{{ old('phone_number') }}"
+                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
+                                   placeholder="أدخل رقم الهاتف">
+                            @error('phone_number') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Submit Button --}}
+                        <button type="submit" 
+                                style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; font-size: 1.125rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 0.5rem; transition: all 0.3s;">
+                            🎯 سجّل الآن
+                        </button>
+                    </form>
+                </div>
+
+                {{-- Current Ramadan Info --}}
+                <div class="ramadan-info">
+                    <h4>🌙 أهلاً بكم في شهر رمضان المبارك</h4>
+                    <div class="date">1 رمضان 1447 هـ</div>
+                    <div class="hijri" style="color: #34d399;">{{ $ramadanDate ?? '18 فبراير 2026' }}</div>
+                </div>
+            @else
+                {{-- Guests see the countdown timer --}}
+                <!-- Registration Closed -->
+                <div class="closed-message">
+                    <h3>⏸️ التسجيل مغلق حالياً</h3>
+                    <p>سيتم فتح التسجيل مع بداية شهر رمضان المبارك</p>
+                </div>
+
+                <!-- Countdown -->
+                <div class="countdown-section">
+                    <div class="countdown-label">
+                        العد التنازلي لشهر رمضان المبارك
+                    </div>
+                    <div id="flipdown" class="flipdown flipdown__theme-dark"></div>
+                </div>
+
+                <!-- Ramadan Date Info -->
+                <div class="ramadan-info">
+                    <h4>🌙 أول أيام شهر رمضان المبارك</h4>
+                    <div class="date">{{ $ramadanDate ?? '18 فبراير 2026' }}</div>
+                    <div class="hijri">1 رمضان 1447 هـ</div>
+                </div>
+            @endauth
         </div>
 
         <!-- Footer -->
@@ -913,7 +969,10 @@
 
         // ==================== COUNTDOWN ENDED HANDLER ====================
         document.addEventListener('DOMContentLoaded', function() {
-            if (window.flipdownInitialized) return;
+            // Only initialize FlipDown for guests (when the element exists)
+            const flipdownEl = document.getElementById('flipdown');
+            if (!flipdownEl || window.flipdownInitialized) return;
+            
             window.flipdownInitialized = true;
 
             // Ramadan 1447 starts on February 18, 2026 at midnight (Bahrain time)
@@ -922,11 +981,8 @@
             const ramadanDate = new Date(ramadanStartISO + 'T00:00:00+03:00');
             const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
 
-            // Ensure container exists and is empty
-            const flipdownEl = document.getElementById('flipdown');
-            if (flipdownEl) {
-                flipdownEl.innerHTML = '';
-            }
+            // Clear container before initializing
+            flipdownEl.innerHTML = '';
 
             // Initialize FlipDown
             try {
