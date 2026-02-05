@@ -10,6 +10,8 @@ class VersionCheckController extends Controller
 {
     /**
      * Get current version information
+     *
+     * @return JsonResponse
      */
     public function getVersion(Request $request): JsonResponse
     {
@@ -36,6 +38,8 @@ class VersionCheckController extends Controller
     /**
      * Check for version differences between local and remote
      * Used by development environments to detect production changes
+     *
+     * @return JsonResponse
      */
     public function checkVersionDifference(Request $request): JsonResponse
     {
@@ -88,6 +92,8 @@ class VersionCheckController extends Controller
 
     /**
      * Get version changelog
+     *
+     * @return JsonResponse
      */
     public function getChangeLog(Request $request): JsonResponse
     {
@@ -107,6 +113,8 @@ class VersionCheckController extends Controller
 
     /**
      * Increment version (admin only)
+     *
+     * @return JsonResponse
      */
     public function incrementVersion(Request $request): JsonResponse
     {
@@ -162,7 +170,7 @@ class VersionCheckController extends Controller
                 'title' => 'Update Available',
                 'message' => "A new version ({$remoteVersion}) is available on {$remoteBranch}. Your local version is {$localVersion}.",
                 'severity' => 'info',
-                'action' => 'Pull latest changes from '.($remoteBranch ?? 'remote'),
+                'action' => 'Pull latest changes from ' . ($remoteBranch ?? 'remote'),
                 'local_version' => $localVersion,
                 'remote_version' => $remoteVersion,
                 'remote_branch' => $remoteBranch,
