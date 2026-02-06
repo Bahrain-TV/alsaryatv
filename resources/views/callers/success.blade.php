@@ -36,7 +36,11 @@
         }
 
         .success-container {
-            min-h-screen flex items-center justify-center px-4 py-12;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
             background: linear-gradient(135deg, rgba(10, 10, 20, 0.85) 0%, rgba(30, 15, 40, 0.85) 100%);
         }
 
@@ -46,11 +50,12 @@
             border: 2px solid rgba(79, 70, 229, 0.3);
             border-radius: 24px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
+                        0 0 50px rgba(79, 70, 229, 0.2),
                         inset 0 1px 1px rgba(255, 255, 255, 0.1);
             animation: slideIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-            max-width: 500px;
+            max-width: 450px;
             width: 100%;
-            padding: 48px 32px;
+            padding: 40px 28px;
             position: relative;
             overflow: hidden;
         }
