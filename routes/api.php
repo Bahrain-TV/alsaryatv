@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\CallerStatusController;
 use App\Http\Controllers\VersionCheckController;
-use App\Http\Controllers\VersionCheckController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
