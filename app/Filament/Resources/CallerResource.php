@@ -4,9 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CallerResource\Pages;
 use App\Models\Caller;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -50,7 +52,7 @@ class CallerResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('بيانات المتصل')
+                Section::make('بيانات المتصل')
                     ->description('المعلومات الأساسية للمتصل')
                     ->schema([
                         Forms\Components\TextInput::make('name')
@@ -77,7 +79,7 @@ class CallerResource extends Resource
                             ->disabled(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('الحالة')
+                Section::make('الحالة')
                     ->schema([
                         Forms\Components\Toggle::make('is_winner')
                             ->label('فائز')
@@ -252,27 +254,7 @@ class CallerResource extends Resource
                         false: fn ($query) => $query->where('hits', '<=', 5),
                     ),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->label('عرض'),
-                Tables\Actions\EditAction::make()
-                    ->label('تعديل'),
-                Tables\Actions\Action::make('toggleWinner')
-                    ->label(fn (Caller $record): string => $record->is_winner ? 'إزالة الفوز' : 'تحديد كفائز')
-                    ->icon('heroicon-o-trophy')
-                    ->color(fn (Caller $record): string => $record->is_winner ? 'warning' : 'success')
-                    ->action(function (Caller $record): void {
-                        $record->is_winner = ! $record->is_winner;
-                        $record->save();
-                    })
-                    ->requiresConfirmation()
-                    ->modalHeading(fn (Caller $record): string => $record->is_winner ? 'إزالة حالة الفوز' : 'تحديد كفائز')
-                    ->modalDescription(fn (Caller $record): string => $record->is_winner
-                        ? "هل أنت متأكد من إزالة حالة الفوز من {$record->name}؟"
-                        : "هل أنت متأكد من تحديد {$record->name} كفائز؟"),
-                Tables\Actions\DeleteAction::make()
-                    ->label('حذف'),
-            ])
+           
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     // Export Actions
@@ -433,7 +415,7 @@ class CallerResource extends Resource
                 ]),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('exportAll')
+                Action::make('exportAll')
                     ->label('تصدير الكل (CSV)')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
@@ -442,7 +424,7 @@ class CallerResource extends Resource
                         return static::exportToCsv($allCallers);
                     }),
 
-                Tables\Actions\Action::make('exportAllExcel')
+                Action::make('exportAllExcel')
                     ->label('تصدير الكل (Excel)')
                     ->icon('heroicon-o-table-cells')
                     ->color('success')
@@ -451,7 +433,7 @@ class CallerResource extends Resource
                         return static::exportToExcel($allCallers);
                     }),
 
-                Tables\Actions\Action::make('selectRandomWinner')
+                Action::make('selectRandomWinner')
                     ->label('اختيار فائز عشوائي')
                     ->icon('heroicon-o-trophy')
                     ->color('success')

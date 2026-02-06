@@ -13,7 +13,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = 'لوحة التحكم';
@@ -47,8 +47,6 @@ class Dashboard extends BaseDashboard
             WinnersHistoryWidget::class,
         ];
     }
-
-    public function getColumns(): array|int
     public function getColumns(): array|int
     {
         return [
