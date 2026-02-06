@@ -99,6 +99,13 @@ class CallerController extends Controller
         return view('callers.winners', ['winners' => $winners]);
     }
 
+    public function families()
+    {
+        $families = Caller::latest()->paginate(25);
+
+        return view('callers.families', ['families' => $families]);
+    }
+
     public function checkCpr(Request $request)
     {
         // Validate CPR input

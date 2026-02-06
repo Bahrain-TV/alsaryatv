@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CallerResource\Pages;
 use App\Models\Caller;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
@@ -255,10 +256,10 @@ class CallerResource extends Resource
                     ),
             ])
            
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->actions([
+                ActionGroup::make([
                     // Export Actions
-                    Tables\Actions\BulkAction::make('exportCsv')
+                    Action::make('exportCsv')
                         ->label('تصدير CSV')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
@@ -267,7 +268,7 @@ class CallerResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\BulkAction::make('exportExcel')
+                    Action::make('exportExcel')
                         ->label('تصدير Excel')
                         ->icon('heroicon-o-table-cells')
                         ->color('success')
@@ -277,7 +278,7 @@ class CallerResource extends Resource
                         ->deselectRecordsAfterCompletion(),
 
                     // Status Management
-                    Tables\Actions\BulkAction::make('changeStatus')
+                    Action::make('changeStatus')
                         ->label('تغيير الحالة')
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
@@ -303,11 +304,11 @@ class CallerResource extends Resource
                         ->deselectRecordsAfterCompletion(),
 
                     // Delete Action
-                    Tables\Actions\DeleteBulkAction::make()
+                    Action::make('delete')
                         ->label('حذف المحدد'),
 
                     // Winner Selection
-                    Tables\Actions\BulkAction::make('selectMultipleRandomWinners')
+                    Action::make('selectMultipleRandomWinners')
                         ->label('اختيار فائزين عشوائيين')
                         ->icon('heroicon-o-trophy')
                         ->color('success')
@@ -376,7 +377,7 @@ class CallerResource extends Resource
                         ->modalDescription('سيتم اختيار فائزين عشوائياً من المتصلين المؤهلين'),
 
                     // Mark as Winners
-                    Tables\Actions\BulkAction::make('markAsWinners')
+                    Action::make('markAsWinners')
                         ->label('تحديد كفائزين')
                         ->icon('heroicon-o-trophy')
                         ->color('success')
@@ -395,7 +396,7 @@ class CallerResource extends Resource
                         ->deselectRecordsAfterCompletion(),
 
                     // Remove Winner Status
-                    Tables\Actions\BulkAction::make('removeWinnerStatus')
+                    Action::make('removeWinnerStatus')
                         ->label('إزالة حالة الفوز')
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
@@ -412,7 +413,9 @@ class CallerResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
-                ]),
+                ])
+                ->icon('heroicon-o-ellipsis-horizontal')
+                ->tooltip('إجراءات'),
             ])
             ->headerActions([
                 Action::make('exportAll')
