@@ -13,7 +13,6 @@ class ListWinners extends ListRecords
 {
     protected static string $resource = CallerResource::class;
 
-    // Add navigation properties so the page appears in the menu.
     protected static ?string $navigationLabel = 'Winners List';
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-trophy';
@@ -52,9 +51,7 @@ class ListWinners extends ListRecords
                 ->icon(fn ($record): string => $record->is_winner ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                 ->label(fn ($record): string => $record->is_winner ? 'Unmark Winner' : 'Mark as Winner')
                 ->action(function ($record): void {
-                    // Toggle the is_winner value
                     $record->update(['is_winner' => ! $record->is_winner]);
-                    // Notify for UI refresh
                     $this->notify('success', 'Winner status updated.');
                 })
                 ->requiresConfirmation(),

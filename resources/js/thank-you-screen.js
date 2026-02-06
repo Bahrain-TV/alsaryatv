@@ -262,6 +262,9 @@ class ThankYouScreen {
    */
   setupAnimations() {
     this.timeline = gsap.timeline({
+      defaults: {
+        ease: 'power4.inOut'
+      },
       onComplete: () => {
         this.onAnimationComplete();
       }
@@ -270,8 +273,7 @@ class ThankYouScreen {
     // 1. Background fade in
     this.timeline.to('.thank-you-bg', {
       opacity: 1,
-      duration: 0.5,
-      ease: 'power2.inOut'
+      duration: 0.4
     }, 0);
 
     // 2. Checkmark animation (draw effect)
@@ -279,7 +281,7 @@ class ThankYouScreen {
       '.checkmark-circle',
       {
         strokeDashoffset: 0,
-        duration: 0.8,
+        duration: 0.55,
         ease: 'back.out'
       },
       0.2
@@ -289,7 +291,7 @@ class ThankYouScreen {
       '.checkmark-check',
       {
         strokeDashoffset: 0,
-        duration: 0.6,
+        duration: 0.45,
         ease: 'back.out'
       },
       0.5
@@ -299,7 +301,7 @@ class ThankYouScreen {
     this.timeline.fromTo(
       '.thank-you-title',
       { opacity: 0, scale: 0.5, y: 20 },
-      { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out' },
+      { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: 'back.out' },
       0.3
     );
 
@@ -307,7 +309,7 @@ class ThankYouScreen {
     this.timeline.fromTo(
       '.thank-you-subtitle',
       { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
+      { opacity: 1, y: 0, duration: 0.35 },
       0.6
     );
 
@@ -315,14 +317,14 @@ class ThankYouScreen {
     this.timeline.fromTo(
       '.detail-text',
       { opacity: 0, x: -20 },
-      { opacity: 1, x: 0, duration: 0.4, stagger: 0.15, ease: 'power2.out' },
+      { opacity: 1, x: 0, duration: 0.3, stagger: 0.15 },
       0.8
     );
 
     // 6. Celebration rays animation
     this.timeline.to(
       '.celebration-rays',
-      { opacity: 1, duration: 0.5 },
+      { opacity: 1, duration: 0.35 },
       0.4
     );
 
@@ -336,26 +338,26 @@ class ThankYouScreen {
     this.timeline.fromTo(
       '.shape',
       { opacity: 0, scale: 0 },
-      { opacity: 0.3, scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out' },
+      { opacity: 0.3, scale: 1, duration: 0.4, stagger: 0.1, ease: 'back.out' },
       0.5
     );
 
     // 8. Shapes floating animation
     this.timeline.to(
       '.shape-1',
-      { y: -30, x: -20, duration: 2, ease: 'sine.inOut', repeat: -1, yoyo: true },
+      { y: -30, x: -20, duration: 1.6, ease: 'sine.inOut', repeat: -1, yoyo: true },
       0.5
     );
 
     this.timeline.to(
       '.shape-2',
-      { y: 30, x: 20, duration: 2.5, ease: 'sine.inOut', repeat: -1, yoyo: true },
+      { y: 30, x: 20, duration: 1.8, ease: 'sine.inOut', repeat: -1, yoyo: true },
       0.5
     );
 
     this.timeline.to(
       '.shape-3',
-      { y: -20, x: 30, duration: 2.2, ease: 'sine.inOut', repeat: -1, yoyo: true },
+      { y: -20, x: 30, duration: 1.7, ease: 'sine.inOut', repeat: -1, yoyo: true },
       0.5
     );
 

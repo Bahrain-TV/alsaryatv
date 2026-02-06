@@ -10,22 +10,12 @@ class ListCallers extends ListRecords
 {
     protected static string $resource = CallerResource::class;
 
-    protected static ?string $title = 'Callers List';
-
-    protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
-    {
-        return \App\Models\Caller::query();
-    }
+    protected static ?string $title = 'المتصلين';
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),
         ];
-    }
-
-    protected function getTableFilters(): array
-    {
-        return [];
     }
 }
