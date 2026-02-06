@@ -1055,9 +1055,24 @@
 
                 {{-- Registration Form for Logged-in Users --}}
                 <div class="registration-form" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+                    {{-- Registration Type Toggle --}}
+                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center;">
+                        <button type="button" id="individual-toggle"
+                                style="flex: 1; padding: 0.875rem 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; border: 2px solid #fbbf24; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1rem;">
+                            👤 تسجيل فردي
+                        </button>
+                        <button type="button" id="family-toggle"
+                                style="flex: 1; padding: 0.875rem 1rem; background: transparent; color: #fbbf24; font-weight: 700; border: 2px solid #fbbf24; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1rem;">
+                            👨‍👩‍👧‍👦 تسجيل عائلي
+                        </button>
+                    </div>
+
                     <form method="POST" action="{{ route('callers.store') }}" dir="rtl" style="display: flex; flex-direction: column; gap: 1rem;">
                         @csrf
-                        
+
+                        {{-- Hidden field to track registration type --}}
+                        <input type="hidden" id="registration_type" name="registration_type" value="individual">
+
                         {{-- Name --}}
                         <div>
                             <label for="name" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">الاسم الكامل</label>
@@ -1083,6 +1098,26 @@
                                    style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
                                    placeholder="أدخل رقم الهاتف">
                             @error('phone_number') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Family Fields (Hidden by default) --}}
+                        <div id="family-fields" style="display: none;">
+                            {{-- Family Name --}}
+                            <div>
+                                <label for="family_name" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">اسم العائلة</label>
+                                <input type="text" id="family_name" name="family_name" value="{{ old('family_name') }}"
+                                       style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
+                                       placeholder="أدخل اسم العائلة (اختياري)">
+                                @error('family_name') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                            </div>
+
+                            {{-- Number of Family Members --}}
+                            <div>
+                                <label for="family_members" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">عدد أفراد العائلة</label>
+                                <input type="number" id="family_members" name="family_members" min="2" max="10" value="{{ old('family_members', 2) }}"
+                                       style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;">
+                                @error('family_members') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
                         {{-- Submit Button --}}
@@ -1144,6 +1179,50 @@
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     
     <script>
+        // ==================== REGISTRATION TYPE TOGGLE ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            const individualToggle = document.getElementById('individual-toggle');
+            const familyToggle = document.getElementById('family-toggle');
+            const registrationType = document.getElementById('registration_type');
+            const familyFields = document.getElementById('family-fields');
+            const nameLabel = document.querySelector('label[for="name"]');
+            const cprLabel = document.querySelector('label[for="cpr"]');
+
+            function setIndividualMode() {
+                registrationType.value = 'individual';
+                familyFields.style.display = 'none';
+                nameLabel.textContent = 'الاسم الكامل';
+                cprLabel.textContent = 'رقم الهوية (CPR)';
+
+                // Update button styles
+                individualToggle.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+                individualToggle.style.color = '#0f172a';
+                familyToggle.style.background = 'transparent';
+                familyToggle.style.color = '#fbbf24';
+            }
+
+            function setFamilyMode() {
+                registrationType.value = 'family';
+                familyFields.style.display = 'flex';
+                familyFields.style.flexDirection = 'column';
+                familyFields.style.gap = '1rem';
+                nameLabel.textContent = 'اسم المسؤول عن العائلة';
+                cprLabel.textContent = 'رقم الهوية (CPR) للمسؤول';
+
+                // Update button styles
+                individualToggle.style.background = 'transparent';
+                individualToggle.style.color = '#fbbf24';
+                familyToggle.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+                familyToggle.style.color = '#0f172a';
+            }
+
+            individualToggle.addEventListener('click', setIndividualMode);
+            familyToggle.addEventListener('click', setFamilyMode);
+
+            // Set initial state
+            setIndividualMode();
+        });
+
         // ==================== PRELOADER / SPLASH SCREEN ====================
         (function() {
             const SPLASH_DURATION = 3000; // Show splash for exactly 3 seconds

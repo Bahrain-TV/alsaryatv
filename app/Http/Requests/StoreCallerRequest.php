@@ -25,9 +25,11 @@ class StoreCallerRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'cpr' => 'required|string|max:255',  // Allow both numeric and alphanumeric CPR values
+            'cpr' => 'required|string|max:255',
             'phone_number' => 'required|string|max:45',
-            'caller_type' => 'required|string|in:family,individual',
+            'registration_type' => 'required|string|in:family,individual',
+            'family_name' => 'nullable|string|max:255',
+            'family_members' => 'nullable|integer|min:2|max:10',
         ];
     }
 
@@ -40,8 +42,10 @@ class StoreCallerRequest extends FormRequest
             'name.required' => 'الاسم مطلوب',
             'cpr.required' => 'رقم الهوية مطلوب',
             'phone_number.required' => 'رقم الهاتف مطلوب',
-            'caller_type.required' => 'نوع المتصل مطلوب',
-            'caller_type.in' => 'نوع المتصل يجب أن يكون عائلة أو فرد',
+            'registration_type.required' => 'نوع التسجيل مطلوب',
+            'registration_type.in' => 'نوع التسجيل يجب أن يكون عائلة أو فرد',
+            'family_members.min' => 'عدد أفراد العائلة يجب أن يكون على الأقل 2',
+            'family_members.max' => 'عدد أفراد العائلة يجب أن لا يتجاوز 10',
         ];
     }
 }

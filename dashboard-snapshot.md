@@ -1,0 +1,315 @@
+- generic [active] [ref=e1]:
+  - dialog [ref=e95]:
+    - iframe [ref=e162]:
+      - generic [ref=f14e2]:
+        - generic [ref=f14e4]:
+          - generic [ref=f14e5]:
+            - img [ref=f14e7]
+            - generic [ref=f14e10]: Internal Server Error
+          - button "Copy as Markdown" [ref=f14e11] [cursor=pointer]:
+            - img [ref=f14e12]
+            - generic [ref=f14e15]: Copy as Markdown
+        - generic [ref=f14e18]:
+          - generic [ref=f14e19]:
+            - heading "Illuminate\\Database\\QueryException" [level=1] [ref=f14e20]
+            - generic [ref=f14e22]: vendor/laravel/framework/src/Illuminate/Database/Connection.php:838
+            - paragraph [ref=f14e23]: "SQLSTATE[HY000]: General error: 1 no such function: HOUR (Connection: sqlite, Database: database/alsaryatv.sqlite, SQL: select HOUR(created_at) as hour, COUNT(*) as count from \"callers\" group by \"hour\" order by \"hour\" asc)"
+          - generic [ref=f14e24]:
+            - generic [ref=f14e25]:
+              - generic [ref=f14e26]:
+                - generic [ref=f14e27]: LARAVEL
+                - generic [ref=f14e28]: 12.50.0
+              - generic [ref=f14e29]:
+                - generic [ref=f14e30]: PHP
+                - generic [ref=f14e31]: 8.5.2
+            - generic [ref=f14e32]:
+              - img [ref=f14e33]
+              - text: UNHANDLED
+            - generic [ref=f14e36]: CODE HY000
+          - generic [ref=f14e38]:
+            - generic [ref=f14e39]:
+              - img [ref=f14e40]
+              - text: "500"
+            - generic [ref=f14e43]:
+              - img [ref=f14e44]
+              - text: POST
+            - generic [ref=f14e47]: http://127.0.0.1:8000/livewire-49f0b5a5/update
+            - button [ref=f14e48] [cursor=pointer]:
+              - img [ref=f14e49]
+        - generic [ref=f14e53]:
+          - generic [ref=f14e54]:
+            - generic [ref=f14e55]:
+              - img [ref=f14e57]
+              - heading "Exception trace" [level=3] [ref=f14e60]
+            - generic [ref=f14e61]:
+              - generic [ref=f14e63] [cursor=pointer]:
+                - img [ref=f14e64]
+                - generic [ref=f14e68]: 9 vendor frames
+                - button [ref=f14e69]:
+                  - img [ref=f14e70]
+              - generic [ref=f14e74]:
+                - generic [ref=f14e75] [cursor=pointer]:
+                  - generic [ref=f14e78]:
+                    - code [ref=f14e82]:
+                      - generic [ref=f14e83]: App\Filament\Widgets\PeakHoursChart->getData()
+                    - generic [ref=f14e85]: app/Filament/Widgets/PeakHoursChart.php:33
+                  - button [ref=f14e87]:
+                    - img [ref=f14e88]
+                - code [ref=f14e96]:
+                  - generic [ref=f14e97]: "28 {"
+                  - generic [ref=f14e98]: 29 // Get registration counts by hour
+                  - generic [ref=f14e99]: 30 $data = Caller::selectRaw('HOUR(created_at) as hour, COUNT(*) as count')
+                  - generic [ref=f14e100]: 31 ->groupBy('hour')
+                  - generic [ref=f14e101]: 32 ->orderBy('hour')
+                  - generic [ref=f14e102]: 33 ->get();
+                  - generic [ref=f14e103]: "34"
+                  - generic [ref=f14e104]: 35 $labels = [];
+                  - generic [ref=f14e105]: 36 $counts = [];
+                  - generic [ref=f14e106]: 37 $peakHour = 0;
+                  - generic [ref=f14e107]: 38 $maxCount = 0;
+                  - generic [ref=f14e108]: "39"
+                  - generic [ref=f14e109]: 40 // Fill all 24 hours
+                  - generic [ref=f14e110]: "41 for ($i = 0; $i < 24; $i++) {"
+                  - generic [ref=f14e111]: 42 $labels[] = sprintf('%02d:00', $i);
+                  - generic [ref=f14e112]: 43 $record = $data->firstWhere('hour', $i);
+                  - generic [ref=f14e113]: "44 $count = $record ? $record->count : 0;"
+                  - generic [ref=f14e114]: "45"
+              - generic [ref=f14e116] [cursor=pointer]:
+                - img [ref=f14e117]
+                - generic [ref=f14e121]: 69 vendor frames
+                - button [ref=f14e122]:
+                  - img [ref=f14e123]
+              - generic [ref=f14e128] [cursor=pointer]:
+                - generic [ref=f14e131]:
+                  - code [ref=f14e135]:
+                    - generic [ref=f14e136]: public/index.php
+                  - generic [ref=f14e138]: public/index.php:20
+                - button [ref=f14e140]:
+                  - img [ref=f14e141]
+              - generic [ref=f14e146] [cursor=pointer]:
+                - img [ref=f14e147]
+                - generic [ref=f14e151]: 1 vendor frame
+                - button [ref=f14e152]:
+                  - img [ref=f14e153]
+          - generic [ref=f14e157]:
+            - generic [ref=f14e158]:
+              - generic [ref=f14e159]:
+                - img [ref=f14e161]
+                - heading "Queries" [level=3] [ref=f14e163]
+              - generic [ref=f14e165]: 1-3 of 3
+            - generic [ref=f14e166]:
+              - generic [ref=f14e167]:
+                - generic [ref=f14e168]:
+                  - generic [ref=f14e169]:
+                    - img [ref=f14e170]
+                    - generic [ref=f14e172]: sqlite
+                  - code [ref=f14e176]:
+                    - generic [ref=f14e177]: select * from "sessions" where "id" = 'U2i1gRsPl9f9hGRLNEKGvN8gpZwaUE6SmYZsk2zc' limit 1
+                - generic [ref=f14e178]: 0.67ms
+              - generic [ref=f14e179]:
+                - generic [ref=f14e180]:
+                  - generic [ref=f14e181]:
+                    - img [ref=f14e182]
+                    - generic [ref=f14e184]: sqlite
+                  - code [ref=f14e188]:
+                    - generic [ref=f14e189]: select * from "cache" where "key" in ('als_tv_ary_cache_livewire-checksum-failures:127.0.0.1')
+                - generic [ref=f14e190]: 0.02ms
+              - generic [ref=f14e191]:
+                - generic [ref=f14e192]:
+                  - generic [ref=f14e193]:
+                    - img [ref=f14e194]
+                    - generic [ref=f14e196]: sqlite
+                  - code [ref=f14e200]:
+                    - generic [ref=f14e201]: select * from "users" where "id" = 1 limit 1
+                - generic [ref=f14e202]: 0.09ms
+        - generic [ref=f14e204]:
+          - generic [ref=f14e205]:
+            - heading "Headers" [level=2] [ref=f14e206]
+            - generic [ref=f14e207]:
+              - generic [ref=f14e208]:
+                - generic [ref=f14e209]: host
+                - generic [ref=f14e211]: 127.0.0.1:8000
+              - generic [ref=f14e212]:
+                - generic [ref=f14e213]: connection
+                - generic [ref=f14e215]: keep-alive
+              - generic [ref=f14e216]:
+                - generic [ref=f14e217]: content-length
+                - generic [ref=f14e219]: "1076"
+              - generic [ref=f14e220]:
+                - generic [ref=f14e221]: sec-ch-ua-platform
+                - generic [ref=f14e223]: "\"macOS\""
+              - generic [ref=f14e224]:
+                - generic [ref=f14e225]: user-agent
+                - generic [ref=f14e227]: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36
+              - generic [ref=f14e228]:
+                - generic [ref=f14e229]: sec-ch-ua
+                - generic [ref=f14e231]: "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+              - generic [ref=f14e232]:
+                - generic [ref=f14e233]: content-type
+                - generic [ref=f14e235]: application/json
+              - generic [ref=f14e236]:
+                - generic [ref=f14e237]: x-livewire
+                - generic [ref=f14e239]: "1"
+              - generic [ref=f14e240]:
+                - generic [ref=f14e241]: sec-ch-ua-mobile
+                - generic [ref=f14e243]: "?0"
+              - generic [ref=f14e244]:
+                - generic [ref=f14e245]: accept
+                - generic [ref=f14e247]: "*/*"
+              - generic [ref=f14e248]:
+                - generic [ref=f14e249]: origin
+                - generic [ref=f14e251]: http://127.0.0.1:8000
+              - generic [ref=f14e252]:
+                - generic [ref=f14e253]: sec-fetch-site
+                - generic [ref=f14e255]: same-origin
+              - generic [ref=f14e256]:
+                - generic [ref=f14e257]: sec-fetch-mode
+                - generic [ref=f14e259]: cors
+              - generic [ref=f14e260]:
+                - generic [ref=f14e261]: sec-fetch-dest
+                - generic [ref=f14e263]: empty
+              - generic [ref=f14e264]:
+                - generic [ref=f14e265]: referer
+                - generic [ref=f14e267]: http://127.0.0.1:8000/admin
+              - generic [ref=f14e268]:
+                - generic [ref=f14e269]: accept-encoding
+                - generic [ref=f14e271]: gzip, deflate, br, zstd
+              - generic [ref=f14e272]:
+                - generic [ref=f14e273]: accept-language
+                - generic [ref=f14e275]: en-US,en;q=0.9
+              - generic [ref=f14e276]:
+                - generic [ref=f14e277]: cookie
+                - generic [ref=f14e279]: XSRF-TOKEN=eyJpdiI6ImtJUTVwTlVGamNJYmpGV1pOSDhGeXc9PSIsInZhbHVlIjoiT2hGMkE4MXhXakNkSEZEQXBycWxxcFlrdndqcjQ4YXV5OUhKTWRaTjBiUXRUSVg5V2VrWk9SK1NuSXljRHdhYnU1bkF2Q0tJWTV3cExMOE5VY1V1TU1sTk1Yb3ZDOFNZcE9tcXB2ZXFncTkyM0lrMC9kU0Q1eWRnak1wVkRHbmIiLCJtYWMiOiIzNDI0NzNiNTZkNDUyZmJhMzM0Y2QxNmE5NWNiMTcxZjljZDZhMTg1ZjIxZmExMmM5ZDZkNzNlOTgyY2I2MGUzIiwidGFnIjoiIn0%3D; als_tv_ary_session=eyJpdiI6InRkMU41Wm4raksxRzV2b0trc0plNmc9PSIsInZhbHVlIjoibk8yVERaNDdFai9pejVXbG9GamlkTXdGRENJVEV6TDRudlN4eU9yQzNjQlF0THNZVjJMR0dHMytoZ1ppazAvSCt4VXZwOVA2QXJRalJmWTM0Nk5EbitlWFFKY0Z1dnhMdTJGSDBpRHJINDhCRzB0OEsrZ1l1cndYcmF3NVlVck8iLCJtYWMiOiI3ODdlOGE2OTg1OWNmYmM4ZTNmNTAwYWJjMTNkMThjMjM0NjJmM2VmMDExYWZjYTA2NjQ3ZmNiNDEwMDYwMWI5IiwidGFnIjoiIn0%3D
+          - generic [ref=f14e280]:
+            - heading "Body" [level=2] [ref=f14e281]
+            - code [ref=f14e286]:
+              - generic [ref=f14e287]: "{"
+              - generic [ref=f14e288]: "\"_token\": \"8MTT5LpmvCcWMLdGr5koqMRQRk70zWoxaW6Kosd2\","
+              - generic [ref=f14e289]: "\"components\": ["
+              - generic [ref=f14e290]: "{"
+              - generic [ref=f14e291]: "\"snapshot\": \"{\"data\":{\"dataChecksum\":null,\"filter\":null,\"componentFileAttachments\":[[],{\"s\":\"arr\"}],\"areSchemaStateUpdateHooksDisabledForTesting\":false,\"discoveredSchemaNames\":[[],{\"s\":\"arr\"}]},\"memo\":{\"id\":\"n8gTCEWl6xoaexDTRKhV\",\"name\":\"app.filament.widgets.peak-hours-chart\",\"path\":\"admin\",\"method\":\"GET\",\"release\":\"a-a-a\",\"attributes\":{\"record\":null},\"children\":[],\"scripts\":[],\"assets\":[],\"lazyLoaded\":false,\"lazyIsolated\":true,\"errors\":[],\"locale\":\"en\",\"islands\":[]},\"checksum\":\"8e1f2fb69e4a85ff61e46489e6961e33872071c9c21836ca9f9e5211f0075120\"}\","
+              - generic [ref=f14e292]: "\"updates\": [],"
+              - generic [ref=f14e293]: "\"calls\": ["
+              - generic [ref=f14e294]: "{"
+              - generic [ref=f14e295]: "\"method\": \"__lazyLoad\","
+              - generic [ref=f14e296]: "\"params\": ["
+              - generic [ref=f14e297]: "\"eyJkYXRhIjp7ImZvck1vdW50IjpbW10seyJzIjoiYXJyIn1dfSwibWVtbyI6eyJpZCI6InVRUGZmOEozSk41MzVSV3B2c2N2IiwibmFtZSI6Il9fbW91bnRQYXJhbXNDb250YWluZXIiLCJwYXRoIjoiYWRtaW4iLCJtZXRob2QiOiJHRVQiLCJyZWxlYXNlIjoiYS1hLWEifSwiY2hlY2tzdW0iOiI2ZmIzZjhiNTZjOTY2YjEwY2Y0YmFmOTE4NzU5NjZiMGQ5YjQwNjhkZDg4NmYwYjNjNjcxNjEyMThkNzE1OWIwIn0=\""
+              - generic [ref=f14e298]: "],"
+              - generic [ref=f14e299]: "\"metadata\": []"
+              - generic [ref=f14e300]: "}"
+              - generic [ref=f14e301]: "]"
+              - generic [ref=f14e302]: "}"
+              - generic [ref=f14e303]: "]"
+              - generic [ref=f14e304]: "}"
+          - generic [ref=f14e305]:
+            - heading "Routing" [level=2] [ref=f14e306]
+            - generic [ref=f14e307]:
+              - generic [ref=f14e308]:
+                - generic [ref=f14e309]: controller
+                - generic [ref=f14e311]: Livewire\Mechanisms\HandleRequests\HandleRequests@handleUpdate
+              - generic [ref=f14e312]:
+                - generic [ref=f14e313]: route name
+                - generic [ref=f14e315]: default.livewire.update
+              - generic [ref=f14e316]:
+                - generic [ref=f14e317]: middleware
+                - generic [ref=f14e319]: web
+          - generic [ref=f14e320]:
+            - heading "Routing parameters" [level=2] [ref=f14e321]
+            - generic [ref=f14e322]: // No routing parameters
+        - generic [ref=f14e325]:
+          - img [ref=f14e327]
+          - img [ref=f14e329]
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link [ref=e9] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/admin
+        - img [ref=e11]:
+          - generic [ref=e12]: السارية
+    - generic [ref=e13]:
+      - generic [ref=e16]:
+        - generic [ref=e17]: Global search
+        - generic [ref=e18]:
+          - img [ref=e20]
+          - searchbox "Global search" [ref=e23]
+      - button "User menu" [ref=e26] [cursor=pointer]:
+        - img "Avatar of Hasan" [ref=e27]
+  - generic [ref=e28]:
+    - complementary [ref=e30]:
+      - navigation [ref=e31]:
+        - list [ref=e32]:
+          - listitem [ref=e33]:
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "لوحة التحكم" [ref=e36] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin
+                  - img [ref=e37]
+                  - generic [ref=e39]: لوحة التحكم
+          - listitem [ref=e40]:
+            - generic [ref=e41] [cursor=pointer]:
+              - generic [ref=e42]: إدارة المتصلين
+              - button "إدارة المتصلين" [expanded] [ref=e43]:
+                - img [ref=e44]
+            - list [ref=e46]:
+              - listitem [ref=e47]:
+                - link "المتصلين" [ref=e48] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin/callers
+                  - img [ref=e49]
+                  - generic [ref=e51]: المتصلين
+              - listitem [ref=e52]:
+                - link "الفائزون" [ref=e53] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin/callers/winners
+                  - img [ref=e54]
+                  - generic [ref=e56]: الفائزون
+              - listitem [ref=e57]:
+                - link "التحليلات" [ref=e58] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin/analytics
+                  - img [ref=e59]
+                  - generic [ref=e61]: التحليلات
+          - listitem [ref=e62]:
+            - generic [ref=e63] [cursor=pointer]:
+              - generic [ref=e64]: إدارة المستخدمين
+              - button "إدارة المستخدمين" [expanded] [ref=e65]:
+                - img [ref=e66]
+            - list [ref=e68]:
+              - listitem [ref=e69]:
+                - link "المستخدمين" [ref=e70] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8000/admin/users
+                  - img [ref=e71]
+                  - generic [ref=e73]: المستخدمين
+    - main [ref=e75]:
+      - generic [ref=e77]:
+        - heading "لوحة التحكم" [level=1] [ref=e80]
+        - generic [ref=e87]:
+          - generic [ref=e101]:
+            - heading "🎯 مؤشرات المشاركة والنمو" [level=2] [ref=e104]
+            - generic [ref=e106]:
+              - generic [ref=e110]:
+                - generic [ref=e112]: معدل المشاركة لكل متصل
+                - generic [ref=e113]: "47.93"
+                - generic [ref=e114]:
+                  - generic [ref=e115]: 📊 متوسط المشاركات من 20129 المشاركة الإجمالية
+                  - img [ref=e116]
+              - generic [ref=e123]:
+                - generic [ref=e125]: المشاركون المتكررون
+                - generic [ref=e126]: 98.8%
+                - generic [ref=e127]:
+                  - generic [ref=e128]: 👥 415 من أصل 420 متصل
+                  - img [ref=e129]
+              - generic [ref=e134]:
+                - generic [ref=e136]: الأكثر مشاركة
+                - generic [ref=e137]: Prof. Marques Deckow
+                - generic [ref=e138]:
+                  - generic [ref=e139]: ⭐ 100 مشاركة
+                  - img [ref=e140]
+              - generic [ref=e145]:
+                - generic [ref=e147]: النمو الأسبوعي
+                - generic [ref=e148]: "366"
+                - generic [ref=e149]:
+                  - generic [ref=e150]: 📈 نمو 3966.7% (9→366)
+                  - img [ref=e151]
+          - heading "📊 اتجاهات التسجيل - آخر 30 يوم" [level=2] [ref=e156]
+          - heading "📈 توزيع حالات المتصلين" [level=2] [ref=e166]
+  - generic:
+    - status

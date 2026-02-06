@@ -23,4 +23,17 @@ Route::middleware(['api', 'auth:sanctum'])->group(function (): void {
     Route::post('/callers/{id}/live', [CallerStatusController::class, 'sendToLive']);
     Route::post('/callers/{id}/toggle-winner', [CallerStatusController::class, 'toggleWinner']);
     Route::post('/callers/{id}/toggle-family', [CallerStatusController::class, 'toggleFamily']);
+
+    // Winner selection routes
+    Route::get('/callers/eligible', function () {
+        return \App\Models\Caller::where('is_winner', false)->select('id', 'name', 'phone', 'cpr')->get();
+    });
+    Route::post('/callers/{id}/mark-winner', function (Request $request, $id) {
+        $caller = \App\Models\Caller::findOrFail($id);
+        $caller->update([
+            'is_winner' => true,
+            'status' => $request->boolean('block_from_future') ? 'blocked' : 'active'
+        ]);
+        return response()->json(['success' => true, 'message' => 'تم تحديد الفائز بنجاح']);
+    });
 });
