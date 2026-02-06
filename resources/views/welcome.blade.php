@@ -1046,8 +1046,8 @@
             <h1 class="main-title">برنامج السارية</h1>
             <p class="subtitle">على شاشة تلفزيون البحرين</p>
 
-            @auth
-                {{-- Logged-in users see Ramadan mode (Registration Open) --}}
+            @if(config('alsarya.registration.enabled', false))
+                {{-- Registration is enabled - show registration form --}}
                 <div class="open-message" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1)); border: 2px solid rgba(16, 185, 129, 0.4); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
                     <h3 style="color: #34d399; font-size: 1.5rem; margin-bottom: 0.5rem;">🌙 رمضان كريم!</h3>
                     <p style="color: rgba(255, 255, 255, 0.8);">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
@@ -1156,7 +1156,7 @@
                     <div class="date">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
                     <div class="hijri">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
                 </div>
-            @endauth
+            @endif
         </div>
 
         <!-- Footer -->

@@ -23,7 +23,7 @@ $getRamadanContext = function () {
 };
 
 // Main Entry Routes
-Route::get('/splash', fn () => view('splash'))->name('splash');
+Route::get('/splash', fn () => view('splash', $getRamadanContext()))->name('splash');
 
 Route::get('/', fn () => view('welcome', $getRamadanContext()))->name('home');
 Route::get('/welcome', fn () => view('welcome', $getRamadanContext()))->name('welcome');
