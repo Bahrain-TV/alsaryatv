@@ -25,19 +25,19 @@ class FilamentServiceProvider extends ServiceProvider
         Filament::serving(function (): void {
             // Register all CSS files using FilamentAsset facade
             FilamentAsset::register([
-                // Debug styles with high priority to fix text visibility issues
-                Css::make(
-                    'debug-styles',
-                    'css/debug-styles.css'
-                )->loadedOnRequest(),
                 // Google Font for Tajawal
                 Css::make(
                     'google-fonts',
                     'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap'
                 ),
-                // Custom CSS file (previously registered with deprecated method)
+                
+                // Beautiful custom admin theme
+                Css::make(
+                    'beautiful-admin-theme',
+                    asset('css/filament/admin/theme.css')
+                ),
 
-            ]);
+            ], 'aldoyh/alsaryatv');
 
             // Remove the deprecated registerStyles method
         });
