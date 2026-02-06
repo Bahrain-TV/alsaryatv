@@ -65,6 +65,7 @@ Route::prefix('callers')->name('callers.')->group(function (): void {
             'totalHits' => session('totalHits', HitsCounter::getTotalHits()),
             'seconds' => session('seconds', 30),
             'cpr' => $cpr,
+            'isDirtyFile' => true, // Registration successful
         ]);
     })->name('success');
 
