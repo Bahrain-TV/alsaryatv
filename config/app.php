@@ -162,6 +162,11 @@ return [
         // App\Providers\RouteServiceProvider::class, // Removed as per instruction
         // App\Providers\FilamentServiceProvider::class,
         // App\Providers\GoogleSheetsCallerServiceProvider::class,
+
+        /*
+         * Mail Environment Guard - Prevents accidental emails in development
+         */
+        App\Providers\MailEnvironmentServiceProvider::class,
     ],
 
     /*

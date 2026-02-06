@@ -134,6 +134,14 @@ return [
             'days' => 14,
         ],
 
+        'mail' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/mail.log'),
+            'level' => 'info',
+            'days' => 7,
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];

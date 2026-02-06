@@ -123,7 +123,38 @@ Mail::to($winner->email)->queue(
 
 ## Implementation Guide
 
-### Setup Requirements
+### 🔒 Email Safety & Environment Control
+
+### ⚠️ CRITICAL: Development vs Production
+
+This system has **automatic email environment guards** to prevent accidental emails being sent from development:
+
+#### Development Environment (`APP_ENV=local`)
+- ✅ Emails are **logged** to `storage/logs/mail.log`
+- ❌ Emails are **NOT actually sent** via SMTP
+- 🔍 All email details are recorded for testing/debugging
+- 📧 Safe to test email functionality without sending real emails
+
+#### Production Environment (`APP_ENV=production`)
+- ✅ Emails are **actually sent** via configured SMTP server
+- 📨 Proper mail server required and configured
+- 🔒 Environment guards ensure only production sends real emails
+
+### How It Works
+
+```
+Email Send Attempt
+        ↓
+MailEnvironmentServiceProvider listens
+        ↓
+Is APP_ENV=local/testing? → YES → Log to storage/logs/mail.log ✅
+        ↓
+Is APP_ENV=production? → YES → Send via SMTP ✅
+```
+
+---
+
+## Setup Requirements
 
 1. **Mail Configuration** (`.env`)
 ```
@@ -297,7 +328,8 @@ Route::get('/preview/winner-announcement', fn () =>
 ```
 
 ### Console Testing (Tinker)
-```bash
+
+```php
 php artisan tinker
 
 # Version Email
@@ -307,6 +339,252 @@ Mail::to('test@example.com')->send(new VersionDeployed('2026.0205.1', ['Feature 
 # Winner Email
 use App\Mail\WinnerAnnouncement;
 Mail::to('winner@example.com')->send(new WinnerAnnouncement('احمد محمد', '12345678'))
+```
+
+### Viewing Logged Emails in Development
+
+In development, emails are logged to `storage/logs/mail.log`. View them:
+
+```bash
+# View last 50 lines of mail log
+tail -50 storage/logs/mail.log
+
+# Follow mail log in real-time
+tail -f storage/logs/mail.log
+
+# View all emails from today
+grep "$(date +%Y-%m-%d)" storage/logs/mail.log
+
+# Get email report programmatically
+php artisan tinker
+>>> use App\Services\MailGuard;
+>>> MailGuard::getEmailReport()
+>>> MailGuard::getPendingEmails()
+>>> MailGuard::clearLogs() // Clear email logs
+```
+
+---
+
+## 🛡️ Environment Guard Details
+
+### MailEnvironmentServiceProvider
+
+Located at `app/Providers/MailEnvironmentServiceProvider.php`
+
+**What it does:**
+- Listens to all mail events (`MessageSending`, `MessageSent`)
+- In development: Logs email details and recipient info
+- In production: Allows normal SMTP sending
+- Prevents accidental real email sends from dev environments
+
+**Log Format (Development):**
+```
+📧 Email Intercepted in Development Mode
+- Recipient: user@example.com
+- Subject: New Version Released
+- Timestamp: 2026-02-06 14:30:45
+- Environment: local
+- Mailer: log
+
+Email Body Preview:
+<html>...</html>...
+
+✋ Email NOT sent (development environment) - Use `php artisan mail:show` to preview
+```
+
+### MailGuard Service
+
+Located at `app/Services/MailGuard.php`
+
+**Available Methods:**
+
+```php
+use App\Services\MailGuard;
+
+// Check environment
+MailGuard::isProduction();      // Returns true if APP_ENV=production
+MailGuard::isDevelopment();     // Returns true if APP_ENV=local/testing
+
+// Get email information
+MailGuard::getEmailReport();    // Get formatted report of mail config
+MailGuard::getPendingEmails();  // Get all logged emails (dev only)
+MailGuard::clearLogs();         // Clear mail.log (dev only)
+
+// Example usage in controller
+if (MailGuard::isDevelopment()) {
+    $report = MailGuard::getEmailReport();
+    Log::info('Email report', $report);
+}
+```
+
+---
+
+## ⚙️ Production Deployment Checklist
+
+Before deploying to production, ensure:
+
+- [ ] `.env` has `APP_ENV=production`
+- [ ] `.env` has valid SMTP credentials:
+  ```
+  MAIL_MAILER=smtp
+  MAIL_HOST=your-smtp-host.com
+  MAIL_PORT=587
+  MAIL_USERNAME=your-email@example.com
+  MAIL_PASSWORD=your-secure-password
+  MAIL_ENCRYPTION=tls
+  ```
+- [ ] `MAIL_FROM_ADDRESS` and `MAIL_FROM_NAME` are correct
+- [ ] SMTP server is accessible and tested
+- [ ] Queue is configured for background job processing:
+  ```
+  QUEUE_CONNECTION=redis  # or database/sqs/etc
+  ```
+- [ ] Email logs are monitored: `tail -f storage/logs/mail.log`
+- [ ] Tested sending at least one real email before going live
+
+### Production SMTP Configuration Example
+
+```bash
+# .env (Production)
+APP_ENV=production
+APP_DEBUG=false
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com        # or your SMTP provider
+MAIL_PORT=587
+MAIL_USERNAME=noreply@alsarya.tv
+MAIL_PASSWORD=your-app-password  # Use app-specific password, not personal password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@alsarya.tv
+MAIL_FROM_NAME="برنامج السارية"
+
+# Queue configuration (highly recommended)
+QUEUE_CONNECTION=redis
+REDIS_HOST=your-redis-host
+REDIS_PORT=6379
+```
+
+---
+
+## ⚠️ Common Mistakes to Avoid
+
+### ❌ DON'T: Send emails with development credentials in production
+```php
+// BAD - Credentials are hardcoded
+Mail::to($email)->send(new VersionDeployed(...));
+// This will try to use dev SMTP settings in production!
+```
+
+### ❌ DON'T: Commit `.env` with real passwords to git
+```bash
+# Never do this:
+git add .env
+git commit -m "Add email credentials"  # DANGEROUS!
+
+# Instead, use .env.example as a template
+git add .env.example
+```
+
+### ❌ DON'T: Use personal email passwords
+```bash
+# BAD - Using personal Gmail password
+MAIL_PASSWORD=my-personal-gmail-password
+
+# GOOD - Using app-specific password from Gmail
+MAIL_PASSWORD=abcd efgh ijkl mnop  # Generated by Gmail
+```
+
+### ✅ DO: Use queues for better performance
+```php
+// Good - Emails sent in background
+Mail::to($user)->queue(new VersionDeployed(...));
+
+// Not ideal - Blocks current request
+Mail::to($user)->send(new VersionDeployed(...));
+```
+
+### ✅ DO: Validate email addresses
+```php
+// Good - Check before sending
+if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    Mail::to($email)->queue(new VersionDeployed(...));
+}
+```
+
+---
+
+## 🔐 Security Best Practices
+
+1. **Never commit `.env` to version control**
+   ```bash
+   echo ".env" >> .gitignore
+   ```
+
+2. **Rotate SMTP passwords regularly**
+   - Update in production `.env` file
+   - Don't hardcode in code
+
+3. **Use environment-specific SMTP servers**
+   - Dev: `log` mailer (no credentials needed)
+   - Staging: Test SMTP account
+   - Production: Production SMTP account
+
+4. **Monitor email logs for suspicious activity**
+   ```bash
+   # Check for unexpected emails
+   grep "recipient@suspicious.com" storage/logs/mail.log
+   ```
+
+5. **Test email sending before major deployments**
+   ```bash
+   php artisan tinker
+   >>> use App\Mail\VersionDeployed;
+   >>> Mail::to('admin@example.com')->send(new VersionDeployed())
+   ```
+
+6. **Use app-specific passwords for hosted services**
+   - Gmail: Generate from Security settings
+   - Office 365: Use "App Passwords"
+   - Most providers have this option
+
+---
+
+## 📞 Support & Troubleshooting
+
+### Emails not sending in production?
+
+```bash
+# Check mail logs
+tail -50 storage/logs/mail.log
+
+# Test SMTP connection
+php artisan tinker
+>>> config('mail.mailers.smtp')
+
+# Try sending test email
+>>> Mail::to('test@example.com')->send(new \App\Mail\VersionDeployed())
+```
+
+### Getting "SMTP authentication failed"
+
+```bash
+# Verify credentials in .env
+# - Check MAIL_USERNAME and MAIL_PASSWORD
+# - Ensure no extra spaces
+# - Use correct encryption method (tls vs ssl)
+# - Check SMTP port matches provider (587 for TLS, 465 for SSL)
+
+# Test with telnet (if available)
+telnet smtp.gmail.com 587
+```
+
+### Emails going to spam?
+
+```bash
+# Check SPF, DKIM, DMARC records
+# Use sender: noreply@yourdomain.com (not generic)
+# Include proper headers in email template
+# Add unsubscribe link in footer
 ```
 
 ---
