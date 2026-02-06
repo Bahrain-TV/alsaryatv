@@ -1,4 +1,4 @@
-<div 
+<div
     x-data="{
         totalCallers: 0,
         totalWinners: 0,
@@ -6,51 +6,59 @@
         totalHits: 0,
         activeCallers: 0,
         uniqueCprs: 0,
-        
+        winRatio: 0,
+        todayTrend: 0,
+        averageHits: 0,
+
         init() {
             // Animate values when component is initialized
-            this.animateValue('totalCallers', 0, {{ $totalCallers }});
-            this.animateValue('totalWinners', 0, {{ $totalWinners }});
-            this.animateValue('todayCallers', 0, {{ $todayCallers }});
-            this.animateValue('totalHits', 0, {{ $totalHits }});
-            this.animateValue('activeCallers', 0, {{ $activeCallers }});
-            this.animateValue('uniqueCprs', 0, {{ $uniqueCprs }});
+            this.animateValue('totalCallers', 0, {{ $totalCallers ?? 0 }});
+            this.animateValue('totalWinners', 0, {{ $totalWinners ?? 0 }});
+            this.animateValue('todayCallers', 0, {{ $todayCallers ?? 0 }});
+            this.animateValue('totalHits', 0, {{ $totalHits ?? 0 }});
+            this.animateValue('activeCallers', 0, {{ $activeCallers ?? 0 }});
+            this.animateValue('uniqueCprs', 0, {{ $uniqueCprs ?? 0 }});
+            
+            // Calculate derived values
+            this.winRatio = {{ $totalCallers > 0 ? round(($totalWinners ?? 0) / $totalCallers * 100, 1) : 0 }};
+            this.todayTrend = {{ $previousDayCallers > 0 ? round((($todayCallers ?? 0) - $previousDayCallers) / $previousDayCallers * 100, 1) : 0 }};
+            this.averageHits = {{ $totalCallers > 0 ? round(($totalHits ?? 0) / $totalCallers, 1) : 0 }};
         },
-        
+
         animateValue(property, start, end) {
             if (start === end) {
                 this[property] = end;
                 return;
             }
-            
+
             let startTime = null;
             const duration = 2000; // Animation duration in ms
-            
+
             const animate = (currentTime) => {
                 if (!startTime) startTime = currentTime;
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                
+
                 // Ease-out function for smooth animation
                 const easeOut = 1 - Math.pow(1 - progress, 2);
-                
+
                 const currentValue = Math.floor(start + (end - start) * easeOut);
                 this[property] = currentValue;
-                
+
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
                     this[property] = end; // Ensure final value is exact
                 }
             };
-            
+
             requestAnimationFrame(animate);
         }
     }"
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full"
 >
     <!-- Total Callers Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">إجمالي المتصلين</p>
@@ -66,7 +74,7 @@
     </div>
 
     <!-- Winners Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">الفائزون</p>
@@ -82,7 +90,7 @@
     </div>
 
     <!-- Today's Callers Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">متصلو اليوم</p>
@@ -98,7 +106,7 @@
     </div>
 
     <!-- Total Hits Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">إجمالي المشاركات</p>
@@ -114,7 +122,7 @@
     </div>
 
     <!-- Active Callers Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">المتصلون النشطون</p>
@@ -130,7 +138,7 @@
     </div>
 
     <!-- Unique CPRs Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">أرقام فريدة (CPR)</p>

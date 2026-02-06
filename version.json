@@ -1,13 +1,13 @@
 {
-    "version": "1.0.0",
+    "version": "3.0.0",
     "name": "AlSarya TV Show Registration System",
     "description": "Caller registration platform for TV show",
     "created_at": "2026-02-05T07:23:21+00:00",
-    "updated_at": "2026-02-05T07:23:21+00:00",
+    "updated_at": "2026-02-06T05:07:09+00:00",
     "updated_by": "system",
     "changelog": [
         {
-            "version": "1.0.0",
+            "version": "0.11451.06",
             "type": "initial",
             "message": "Initial version",
             "timestamp": "2026-02-05T07:23:21+00:00"

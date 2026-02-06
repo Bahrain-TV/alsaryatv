@@ -2,16 +2,15 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
+use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,19 +25,36 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
+            ->brandName('السارية - لوحة التحكم')
+            ->brandLogo(fn () => view('filament.brand.logo'))
+            ->favicon('/images/favicon.ico')
             ->colors([
                 'primary' => Color::Amber,
+                'success' => Color::Emerald,
+                'warning' => Color::Orange,
+                'danger' => Color::Rose,
+                'info' => Color::Sky,
             ])
-            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
-            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
+            ->font('Tajawal')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\Filament\Admin\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                Widgets\AccountWidget::class,
             ])
+            ->navigationGroups([
+                '📊 التحليلات' => 'Analytics',
+                '👥 إدارة المتصلين' => 'Caller Management',
+                '🏆 الفائزين' => 'Winners',
+                '⚙️ الإعدادات' => 'Settings',
+            ])
+            ->sidebarCollapsibleOnDesktop()
+            ->spa()
+            ->topNavigation(false)
+            ->darkMode(false)
+            ->maxContentWidth('full')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
