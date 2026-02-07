@@ -1,0 +1,20 @@
+{
+  "name": "alsaryatv-remotion-tutorial",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "remotion preview",
+    "render": "remotion render",
+    "render:mp4": "remotion render TutorialVideo out/tutorial.mp4"
+  },
+  "dependencies": {
+    "@remotion/animation-utils": "^4.0.220",
+    "@remotion/cli": "^4.0.220",
+    "@remotion/core": "^4.0.220",
+    "@remotion/google-fonts": "^4.0.220",
+    "@remotion/renderer": "^4.0.220",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
