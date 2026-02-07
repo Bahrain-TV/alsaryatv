@@ -1,15 +1,33 @@
 {
-    "version": "1.0.0",
+    "version": "1.0.0-18",
     "name": "AlSarya TV Show Registration System",
-    "description": "Caller registration platform for TV show",
+    "description": "Caller registration platform for TV show (برنامج السارية)",
     "created_at": "2026-02-05T07:23:21+00:00",
-    "updated_at": "2026-02-05T07:23:21+00:00",
-    "updated_by": "system",
+    "updated_at": "2026-02-07T08:15:00+00:00",
+    "updated_by": "deploy-system",
     "changelog": [
         {
-            "version": "1.0.0",
+            "version": "1.0.0-18",
+            "type": "feature",
+            "message": "Add rotating Bahraini humor to maintenance mode + email notifications + dark mode countdown",
+            "timestamp": "2026-02-07T08:15:00+00:00"
+        },
+        {
+            "version": "1.0.0-17",
+            "type": "feature",
+            "message": "Admin winner notifications + preview branch + email testing",
+            "timestamp": "2026-02-07T08:00:00+00:00"
+        },
+        {
+            "version": "1.0.0-14",
+            "type": "fix",
+            "message": "Restore proper config reading in getRamadanContext closure",
+            "timestamp": "2026-02-06T10:00:00+00:00"
+        },
+        {
+            "version": "1.0.0-1",
             "type": "initial",
-            "message": "Initial version",
+            "message": "Initial version release",
             "timestamp": "2026-02-05T07:23:21+00:00"
         }
     ]

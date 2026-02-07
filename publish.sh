@@ -124,6 +124,12 @@ maintenance_mode() {
     fi
 }
 
+# Function to check if site is in maintenance mode
+check_maintenance_status() {
+    local status=$($SSH_COMMAND "$SERVER" "test -f $APP_DIR/storage/framework/down && echo 'down' || echo 'up'")
+    echo "$status"
+}
+
 # Argument Handling
 if [ "$1" == "--down" ]; then
     maintenance_mode "down"
@@ -135,6 +141,22 @@ fi
 
 # START STANDARD DEPLOYMENT (No arguments)
 echo "🚀 Starting Publish Process..."
+echo ""
+
+# Check if already in maintenance mode
+echo "🔍 Checking current maintenance status..."
+CURRENT_STATUS=$(check_maintenance_status)
+WAS_DOWN=$([[ "$CURRENT_STATUS" == "down" ]] && echo "true" || echo "false")
+
+if [ "$WAS_DOWN" == "true" ]; then
+    echo "⚠️  Site is currently in MAINTENANCE MODE"
+    echo "📝 Will bring it back UP after deployment"
+else
+    echo "✅ Site is LIVE - putting into maintenance mode for safe deployment"
+    maintenance_mode "down"
+fi
+
+echo ""
 
 # Auto-increment version before deployment
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -182,9 +204,28 @@ DEPLOY_EXIT_CODE=$?
 if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
     echo "✅ Remote deployment executed successfully!"
     send_discord_notification "Publish Finished ✅" "Deployment script completed successfully on server." 5763719
+
+    # Bring site back online if it wasn't already in maintenance mode
+    if [ "$WAS_DOWN" == "false" ]; then
+        echo ""
+        echo "🟢 Bringing site back ONLINE..."
+        maintenance_mode "up"
+    else
+        echo ""
+        echo "⚠️  Site remains in MAINTENANCE MODE"
+        echo "    To bring it online, run: ./publish.sh --up"
+    fi
 else
     echo "❌ Remote deployment failed (Exit Code: $DEPLOY_EXIT_CODE)"
     send_discord_notification "Publish Failed ❌" "Remote deployment script returned non-zero exit code." 15548997
+
+    # Bring site back online if we put it down and deployment failed
+    if [ "$WAS_DOWN" == "false" ]; then
+        echo ""
+        echo "🔴 Deployment failed! Bringing site back ONLINE..."
+        maintenance_mode "up"
+    fi
+
     exit 1
 fi
 
