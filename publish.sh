@@ -82,6 +82,24 @@ PY
     php -r '$p=$argv[1]; $d=@json_decode(@file_get_contents($p), true); echo $d["version"] ?? "";' "$json_file"
 }
 
+get_json_version_from_stdin() {
+    if command -v python3 >/dev/null 2>&1; then
+        python3 - <<'PY'
+import json
+import sys
+
+try:
+    data = json.load(sys.stdin)
+    print(data.get('version', ''))
+except Exception:
+    print('')
+PY
+        return
+    fi
+
+    php -r '$d=@json_decode(stream_get_contents(STDIN), true); echo $d["version"] ?? "";'
+}
+
 expected_key_length() {
     local cipher="$1"
 
@@ -579,12 +597,31 @@ else
 fi
 
 echo "🔍 Checking remote version alignment..."
-REMOTE_VERSION_JSON=$($SSH_COMMAND "$SERVER" "env APP_DIR='$APP_DIR' php -r '\$p = getenv(\"APP_DIR\") . \"/version.json\"; \$d = @json_decode(@file_get_contents(\$p), true); echo \$d[\"version\"] ?? \"\";'"
-)
-REMOTE_VERSION_FILE=$($SSH_COMMAND "$SERVER" "cat $APP_DIR/VERSION 2>/dev/null" | head -1)
+REMOTE_VERSION_JSON_RAW=$($SSH_COMMAND "$SERVER" "cat '$APP_DIR/version.json' 2>/dev/null" 2>&1)
+REMOTE_VERSION_JSON_STATUS=$?
+if [ $REMOTE_VERSION_JSON_STATUS -ne 0 ]; then
+    echo "❌ Error: SSH failed reading remote version.json"
+    echo "$REMOTE_VERSION_JSON_RAW"
+    send_discord_notification "Publish Failed ❌" "SSH failed reading remote version.json." 15548997
+    exit 1
+fi
+
+REMOTE_VERSION_JSON=$(printf '%s' "$REMOTE_VERSION_JSON_RAW" | get_json_version_from_stdin)
+
+REMOTE_VERSION_FILE_RAW=$($SSH_COMMAND "$SERVER" "cat '$APP_DIR/VERSION' 2>/dev/null" 2>&1)
+REMOTE_VERSION_FILE_STATUS=$?
+if [ $REMOTE_VERSION_FILE_STATUS -ne 0 ]; then
+    echo "❌ Error: SSH failed reading remote VERSION"
+    echo "$REMOTE_VERSION_FILE_RAW"
+    send_discord_notification "Publish Failed ❌" "SSH failed reading remote VERSION." 15548997
+    exit 1
+fi
+
+REMOTE_VERSION_FILE=$(printf '%s' "$REMOTE_VERSION_FILE_RAW" | head -1)
 
 if [ -z "$REMOTE_VERSION_JSON" ] || [ -z "$REMOTE_VERSION_FILE" ]; then
     echo "❌ Error: Could not read remote version.json or VERSION"
+    $SSH_COMMAND "$SERVER" "ls -la '$APP_DIR/version.json' '$APP_DIR/VERSION'" 2>/dev/null || true
     send_discord_notification "Publish Failed ❌" "Remote version files missing or unreadable." 15548997
     exit 1
 fi
