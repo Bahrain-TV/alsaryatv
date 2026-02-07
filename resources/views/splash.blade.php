@@ -368,6 +368,32 @@
     </div>
 
     <script>
+        // Dark mode detection with 1-second processing time
+        function detectAndApplyTheme() {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+            // Set CSS variables for theme detection (used throughout the app)
+            document.documentElement.style.setProperty('--user-theme', prefersDark ? 'dark' : 'light');
+            document.documentElement.style.setProperty('--theme-is-dark', prefersDark ? '1' : '0');
+
+            // Apply theme-specific class for accessibility
+            if (prefersDark) {
+                document.documentElement.classList.add('dark-mode-detected');
+            } else if (prefersLight) {
+                document.documentElement.classList.add('light-mode-detected');
+            }
+
+            // Log for debugging
+            console.log('🎨 Theme detected:', prefersDark ? 'Dark' : 'Light');
+        }
+
+        // Initialize theme detection immediately (allows 1 second for processing)
+        detectAndApplyTheme();
+
+        // Listen for real-time theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', detectAndApplyTheme);
+
         // Generate random stars
         function generateStars() {
             const starfield = document.getElementById('starfield');
@@ -386,12 +412,12 @@
         // Initialize stars on load
         generateStars();
 
-        // Auto-redirect after loading completes
+        // Auto-redirect after loading completes (with 1-second theme detection delay)
         window.addEventListener('load', () => {
-            // Wait for progress bar to complete (3 seconds) + 1 second buffer
+            // Total delay: 1s (theme detection) + 3s (progress bar) + 1s (buffer) = 5 seconds
             setTimeout(() => {
                 window.location.href = '/';
-            }, 4000);
+            }, 5000);
         });
 
         // Allow escape key or click to skip

@@ -7,12 +7,14 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.css" />
         <style>
             :root {
-                --countdown-label-color: oklch(0.7155 0 0); /* Light mode: readable dark text */
+                --countdown-label-color: oklch(0.35 0 0); /* Light mode: dark gray/charcoal text */
+                --countdown-rotor-color: oklch(0.2 0 0); /* Light mode: dark numbers */
             }
 
             @media (prefers-color-scheme: dark) {
                 :root {
-                    --countdown-label-color: oklch(0.85 0 0); /* Dark mode: lighter text for contrast */
+                    --countdown-label-color: oklch(0.96 0 0); /* Dark mode: nearly white text */
+                    --countdown-rotor-color: oklch(0.98 0 0); /* Dark mode: bright white numbers */
                 }
             }
 
@@ -32,6 +34,11 @@
             .flipdown .rotor-group-heading::before {
                 color: var(--countdown-label-color) !important;
                 font-family: 'Tajawal', sans-serif !important;
+                font-weight: 600 !important;
+            }
+            /* Improve rotor (number) visibility in both light and dark modes */
+            .flipdown .rotor-digit {
+                color: var(--countdown-rotor-color) !important;
             }
             .flipdown .rotor-group:nth-child(1) .rotor-group-heading::before { content: 'يوم' !important; }
             .flipdown .rotor-group:nth-child(2) .rotor-group-heading::before { content: 'ساعة' !important; }

@@ -992,6 +992,54 @@
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.2); }
         }
+
+        /* Form appearance delay - 2 seconds */
+        .registration-form,
+        .open-message,
+        .ramadan-info {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: formFadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 2s;
+        }
+
+        .registration-form {
+            animation-delay: 2s;
+        }
+
+        .open-message {
+            animation-delay: 1.8s;
+        }
+
+        .ramadan-info {
+            animation-delay: 2.2s;
+        }
+
+        @keyframes formFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading skeleton for form */
+        .form-loading {
+            background: linear-gradient(90deg,
+                rgba(251, 191, 36, 0.1) 0%,
+                rgba(251, 191, 36, 0.2) 50%,
+                rgba(251, 191, 36, 0.1) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
     </style>
 </head>
 

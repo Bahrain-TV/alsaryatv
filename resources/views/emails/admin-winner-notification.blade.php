@@ -84,6 +84,16 @@
             z-index: 1;
         }
 
+        .header-timestamp {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            margin-top: 12px;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+            opacity: 0.9;
+        }
+
         /* Content Section */
         .content {
             padding: 40px 30px;
@@ -104,6 +114,24 @@
             line-height: 1.8;
             margin: 0;
             color: rgba(255, 255, 255, 0.95);
+        }
+
+        .announcement em {
+            color: #60a5fa;
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        .winner-highlight {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(34, 197, 94, 0.1));
+            border-left: 4px solid #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .winner-highlight strong {
+            color: #10b981;
         }
 
         .winners-section h2 {
@@ -302,8 +330,9 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>📋 تقرير الفائزين</h1>
+            <h1>🏆 تقرير الفائزين</h1>
             <p class="header-subtitle">برنامج السارية المباشر على شاشة تلفزيون البحرين</p>
+            <p class="header-timestamp">⏰ {{ now()->locale('ar')->translatedFormat('j F Y \\في H:i:s') }}</p>
         </div>
 
         <!-- Content -->
@@ -316,7 +345,17 @@
             <!-- Winners Table -->
             @if(count($winners) > 0)
                 <div class="winners-section">
-                    <h2>🏆 قائمة الفائزين ({{ $winner_count }} فائز)</h2>
+                    <h2>🎯 قائمة الفائزين الفوريين ({{ $winner_count }} فائز/ة)</h2>
+
+                    @if($winner_count == 1)
+                        <div class="winner-highlight">
+                            <strong>🌟 تهانينا!</strong> تم اختيار <strong>{{ $winners[0]['name'] ?? 'الفائز' }}</strong> كفائز اليوم. تم التحديث التلقائي في النظام.
+                        </div>
+                    @elseif($winner_count > 1)
+                        <div class="winner-highlight">
+                            <strong>🎊 تهانينا الجميع!</strong> تم اختيار <strong>{{ $winner_count }} فائزين/فائزات</strong> اليوم. تم تحديث ملفاتهم في النظام تلقائياً.
+                        </div>
+                    @endif
 
                     <table class="winners-table">
                         <thead>
@@ -346,19 +385,23 @@
 
                 <!-- Statistics -->
                 <div class="stats-section">
-                    <h3>📊 إحصائيات الفائزين</h3>
+                    <h3>📊 إحصائيات وملخص الجلسة</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-number">{{ $winner_count }}</div>
-                            <div class="stat-label">إجمالي الفائزين</div>
+                            <div class="stat-label">عدد الفائزين اليوم</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-number">{{ now()->locale('ar')->translatedFormat('j F') }}</div>
-                            <div class="stat-label">التاريخ</div>
+                            <div class="stat-label">التاريخ الهجري/الميلادي</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-number">{{ now()->locale('ar')->translatedFormat('H:i') }}</div>
-                            <div class="stat-label">الوقت</div>
+                            <div class="stat-label">وقت الإرسال</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">✅</div>
+                            <div class="stat-label">تم تحديث الفائزين</div>
                         </div>
                     </div>
                 </div>
@@ -370,17 +413,20 @@
 
             <!-- Admin Actions -->
             <div class="actions-section">
-                <h3>⚙️ الإجراءات المتاحة</h3>
-                <a href="{{ url('/admin/caller-resource/winners') }}" class="admin-link">عرض جميع الفائزين</a>
-                <a href="{{ url('/admin') }}" class="admin-link">لوحة التحكم</a>
+                <h3>⚙️ خيارات الإدارة المتاحة</h3>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.95rem; margin-bottom: 16px;">يمكنك الوصول إلى لوحة التحكم لعرض التفاصيل الكاملة والتحكم في الفائزين:</p>
+                <a href="{{ url('/admin/caller-resource/winners') }}" class="admin-link">👥 عرض جميع الفائزين</a>
+                <a href="{{ url('/admin') }}" class="admin-link">📊 لوحة التحكم الرئيسية</a>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <div class="logo-text">📺 السارية</div>
-            <p class="footer-text">برنامج السارية المباشر - مسابقة رمضانية حصرية على شاشة تلفزيون البحرين</p>
-            <p class="footer-text">© {{ date('Y') }} جميع الحقوق محفوظة | تلفزيون البحرين</p>
+            <div class="logo-text">📺 برنامج السارية</div>
+            <p class="footer-text">🎯 مسابقة رمضانية حصرية على شاشة تلفزيون البحرين</p>
+            <p class="footer-text">هذا التقرير تم إنشاؤه تلقائياً بواسطة نظام اختيار الفائزين</p>
+            <p class="footer-text">© {{ date('Y') }} جميع الحقوق محفوظة | تلفزيون البحرين 🇧🇭</p>
+            <p style="color: rgba(255, 255, 255, 0.5); font-size: 0.8rem; margin-top: 12px;">⏱️ استجابة نظام فورية | التقرير محدث في الوقت الفعلي</p>
         </div>
     </div>
 </body>
