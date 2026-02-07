@@ -121,6 +121,7 @@ send_discord_message "🚀 Deployment Started" "Server is starting deployment se
 # 1. Git Sync
 log_info "Synchronizing code with origin/main..."
 execute_silent "$SUDO_PREFIX git fetch origin main" "Fetching latest changes"
+execute_silent "$SUDO_PREFIX git checkout -B main origin/main" "Checking out main branch"
 if ! execute_silent "$SUDO_PREFIX git reset --hard origin/main" "Resetting to origin/main"; then
     log_error "Git sync failed. Aborting deployment."
     send_discord_message "Deployment Failed ❌" "Git synchronization failed on server." 15548997
