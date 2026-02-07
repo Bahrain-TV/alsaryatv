@@ -110,6 +110,165 @@ execute_silent() {
     fi
 }
 
+strip_quotes() {
+    local value="$1"
+    value="${value%\"}"
+    value="${value#\"}"
+    value="${value%\'}"
+    value="${value#\'}"
+    echo "$value"
+}
+
+expected_key_length() {
+    local cipher="$1"
+
+    case "$cipher" in
+        aes-128-cbc|aes-128-gcm)
+            echo "16"
+            ;;
+        aes-256-cbc|aes-256-gcm)
+            echo "32"
+            ;;
+        *)
+            echo "0"
+            ;;
+    esac
+}
+
+decode_key_length() {
+    local key="$1"
+
+    if [[ "$key" == base64:* ]]; then
+        local key_b64="${key#base64:}"
+        local decoded
+        decoded=$(printf '%s' "$key_b64" | (base64 -D 2>/dev/null || base64 --decode 2>/dev/null))
+        if [ $? -ne 0 ]; then
+            echo "-1"
+            return 1
+        fi
+        echo -n "$decoded" | wc -c | tr -d ' '
+    else
+        echo -n "$key" | wc -c | tr -d ' '
+    fi
+}
+
+set_env_value() {
+    local env_file="$1"
+    local key="$2"
+    local value="$3"
+
+    if $SUDO_PREFIX grep -qE "^${key}=" "$env_file"; then
+        $SUDO_PREFIX perl -0777 -i -pe "s/^${key}=.*/${key}=${value}/m" "$env_file"
+    else
+        $SUDO_PREFIX bash -c "printf '\\n%s=%s\\n' '$key' '$value' >> '$env_file'"
+    fi
+}
+
+generate_key_for_cipher() {
+    local cipher="$1"
+    local expected_len
+    expected_len=$(expected_key_length "$cipher")
+
+    php -r "echo 'base64:' . base64_encode(random_bytes($expected_len));"
+}
+
+validate_env_values() {
+    local label="$1"
+    local app_key="$2"
+    local app_cipher="$3"
+
+    if [ -z "$app_cipher" ]; then
+        app_cipher="aes-256-cbc"
+    fi
+
+    case "$app_cipher" in
+        aes-128-cbc|aes-256-cbc|aes-128-gcm|aes-256-gcm)
+            ;;
+        *)
+            log_error "$label has unsupported APP_CIPHER: $app_cipher"
+            return 1
+            ;;
+    esac
+
+    if [ -z "$app_key" ]; then
+        log_error "$label missing APP_KEY"
+        return 1
+    fi
+
+    local expected_len
+    expected_len=$(expected_key_length "$app_cipher")
+    local key_len
+    key_len=$(decode_key_length "$app_key")
+    if [ "$key_len" -ne "$expected_len" ]; then
+        log_error "$label APP_KEY length $key_len does not match cipher $app_cipher (expected $expected_len)"
+        return 1
+    fi
+
+    return 0
+}
+
+repair_env_file() {
+    local env_file="$1"
+    local label="$2"
+    local app_key
+    local app_cipher
+    local expected_len
+    local key_len
+
+    app_key=$($SUDO_PREFIX bash -c "grep -E '^APP_KEY=' '$env_file' | tail -1 | cut -d= -f2-")
+    app_cipher=$($SUDO_PREFIX bash -c "grep -E '^APP_CIPHER=' '$env_file' | tail -1 | cut -d= -f2-")
+    app_key=$(strip_quotes "$app_key")
+    app_cipher=$(strip_quotes "$app_cipher")
+
+    if [ -z "$app_cipher" ]; then
+        app_cipher="aes-256-cbc"
+        set_env_value "$env_file" "APP_CIPHER" "$app_cipher"
+    fi
+
+    case "$app_cipher" in
+        aes-128-cbc|aes-256-cbc|aes-128-gcm|aes-256-gcm)
+            ;;
+        *)
+            app_cipher="aes-256-cbc"
+            set_env_value "$env_file" "APP_CIPHER" "$app_cipher"
+            ;;
+    esac
+
+    if [ -z "$app_key" ]; then
+        log_warn "$label missing APP_KEY. Generating a new one."
+        app_key=$(generate_key_for_cipher "$app_cipher")
+        set_env_value "$env_file" "APP_KEY" "$app_key"
+        return 0
+    fi
+
+    expected_len=$(expected_key_length "$app_cipher")
+    key_len=$(decode_key_length "$app_key")
+    if [ "$key_len" -ne "$expected_len" ]; then
+        log_warn "$label APP_KEY length mismatch. Regenerating."
+        app_key=$(generate_key_for_cipher "$app_cipher")
+        set_env_value "$env_file" "APP_KEY" "$app_key"
+    fi
+}
+
+require_files() {
+    local missing=false
+    local file
+
+    for file in "$@"; do
+        if [ ! -f "$APP_DIR/$file" ]; then
+            log_error "Missing required file: $file"
+            missing=true
+        fi
+    done
+
+    if [ "$missing" = "true" ]; then
+        send_discord_message "Deployment Failed ❌" "Missing required application files after git sync." 15548997
+        return 1
+    fi
+
+    return 0
+}
+
 # --- Main Deployment Steps ---
 
 echo -e "${PURPLE}${BOLD}==========================================================${NC}"
@@ -134,6 +293,30 @@ execute_silent "$SUDO_PREFIX git checkout -B $CURRENT_BRANCH origin/$CURRENT_BRA
 if ! execute_silent "$SUDO_PREFIX git reset --hard origin/$CURRENT_BRANCH" "Resetting to origin/$CURRENT_BRANCH"; then
     log_error "Git sync failed. Aborting deployment."
     send_discord_message "Deployment Failed ❌" "Git synchronization failed on server." 15548997
+    exit 1
+fi
+
+log_info "Verifying required application files..."
+if ! require_files "app/Providers/MailEnvironmentServiceProvider.php" "config/app.php"; then
+    log_error "Required files missing. Aborting deployment."
+    exit 1
+fi
+
+log_info "Validating environment configuration..."
+if [ ! -f "$APP_DIR/.env" ]; then
+    log_error "Missing .env file on server"
+    send_discord_message "Deployment Failed ❌" "Missing .env on server." 15548997
+    exit 1
+fi
+
+repair_env_file "$APP_DIR/.env" "Server .env"
+
+APP_KEY_VALUE=$($SUDO_PREFIX bash -c "grep -E '^APP_KEY=' '$APP_DIR/.env' | tail -1 | cut -d= -f2-")
+APP_CIPHER_VALUE=$($SUDO_PREFIX bash -c "grep -E '^APP_CIPHER=' '$APP_DIR/.env' | tail -1 | cut -d= -f2-")
+
+if ! validate_env_values "Server .env" "$(strip_quotes "$APP_KEY_VALUE")" "$(strip_quotes "$APP_CIPHER_VALUE")"; then
+    log_error "Invalid .env configuration. Aborting deployment."
+    send_discord_message "Deployment Failed ❌" "Invalid .env configuration on server." 15548997
     exit 1
 fi
 

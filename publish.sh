@@ -41,6 +41,253 @@ EOF
     curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK" > /dev/null 2>&1
 }
 
+strip_quotes() {
+    local value="$1"
+    value="${value%\"}"
+    value="${value#\"}"
+    value="${value%\'}"
+    value="${value#\'}"
+    echo "$value"
+}
+
+get_env_value() {
+    local env_file="$1"
+    local key="$2"
+    local raw
+
+    raw=$(grep -E "^${key}=" "$env_file" | tail -1 | cut -d= -f2-)
+    strip_quotes "$raw"
+}
+
+get_json_version() {
+    local json_file="$1"
+
+    if command -v python3 >/dev/null 2>&1; then
+        python3 - <<'PY' "$json_file"
+import json
+import sys
+
+path = sys.argv[1]
+try:
+    with open(path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    version = data.get('version', '')
+    print(version)
+except Exception:
+    print('')
+PY
+        return
+    fi
+
+    php -r '$p=$argv[1]; $d=@json_decode(@file_get_contents($p), true); echo $d["version"] ?? "";' "$json_file"
+}
+
+expected_key_length() {
+    local cipher="$1"
+
+    case "$cipher" in
+        aes-128-cbc|aes-128-gcm)
+            echo "16"
+            ;;
+        aes-256-cbc|aes-256-gcm)
+            echo "32"
+            ;;
+        *)
+            echo "0"
+            ;;
+    esac
+}
+
+decode_key_length() {
+    local key="$1"
+
+    if [[ "$key" == base64:* ]]; then
+        local key_b64="${key#base64:}"
+        local decoded
+        decoded=$(printf '%s' "$key_b64" | (base64 -D 2>/dev/null || base64 --decode 2>/dev/null))
+        if [ $? -ne 0 ]; then
+            echo "-1"
+            return 1
+        fi
+        echo -n "$decoded" | wc -c | tr -d ' '
+    else
+        echo -n "$key" | wc -c | tr -d ' '
+    fi
+}
+
+set_env_value() {
+    local env_file="$1"
+    local key="$2"
+    local value="$3"
+
+    if grep -qE "^${key}=" "$env_file"; then
+        perl -0777 -i -pe "s/^${key}=.*/${key}=${value}/m" "$env_file"
+    else
+        printf '\n%s=%s\n' "$key" "$value" >> "$env_file"
+    fi
+}
+
+generate_key_for_cipher() {
+    local cipher="$1"
+    local expected_len
+    expected_len=$(expected_key_length "$cipher")
+
+    php -r "echo 'base64:' . base64_encode(random_bytes($expected_len));"
+}
+
+repair_env_file() {
+    local env_file="$1"
+    local label="$2"
+    local app_key
+    local app_cipher
+    local expected_len
+    local key_len
+
+    app_key=$(get_env_value "$env_file" "APP_KEY")
+    app_cipher=$(get_env_value "$env_file" "APP_CIPHER")
+
+    if [ -z "$app_cipher" ]; then
+        app_cipher="aes-256-cbc"
+        set_env_value "$env_file" "APP_CIPHER" "$app_cipher"
+    fi
+
+    case "$app_cipher" in
+        aes-128-cbc|aes-256-cbc|aes-128-gcm|aes-256-gcm)
+            ;;
+        *)
+            app_cipher="aes-256-cbc"
+            set_env_value "$env_file" "APP_CIPHER" "$app_cipher"
+            ;;
+    esac
+
+    if [ -z "$app_key" ]; then
+        echo "⚠️  $label missing APP_KEY. Generating a new one..."
+        app_key=$(generate_key_for_cipher "$app_cipher")
+        set_env_value "$env_file" "APP_KEY" "$app_key"
+        return 0
+    fi
+
+    expected_len=$(expected_key_length "$app_cipher")
+    key_len=$(decode_key_length "$app_key")
+    if [ "$key_len" -ne "$expected_len" ]; then
+        echo "⚠️  $label APP_KEY length mismatch. Regenerating..."
+        app_key=$(generate_key_for_cipher "$app_cipher")
+        set_env_value "$env_file" "APP_KEY" "$app_key"
+    fi
+}
+
+repair_remote_env() {
+    local label="$1"
+
+    $SSH_COMMAND "$SERVER" "APP_DIR='$APP_DIR' php -r '
+        $env = $APP_DIR . "/.env";
+        if (!file_exists($env)) { fwrite(STDERR, "missing_env\n"); exit(2); }
+        $lines = file($env, FILE_IGNORE_NEW_LINES);
+        $map = [];
+        foreach ($lines as $line) {
+            if ($line === "" || $line[0] === "#") { continue; }
+            $parts = explode("=", $line, 2);
+            if (count($parts) === 2) { $map[$parts[0]] = $parts[1]; }
+        }
+        $cipher = $map["APP_CIPHER"] ?? "aes-256-cbc";
+        if (!in_array($cipher, ["aes-128-cbc","aes-256-cbc","aes-128-gcm","aes-256-gcm"], true)) { $cipher = "aes-256-cbc"; }
+        $len = in_array($cipher, ["aes-128-cbc","aes-128-gcm"], true) ? 16 : 32;
+        $key = $map["APP_KEY"] ?? "";
+        $valid = false;
+        if (strpos($key, "base64:") === 0) {
+            $raw = base64_decode(substr($key, 7), true);
+            $valid = $raw !== false && strlen($raw) === $len;
+        } else {
+            $valid = strlen($key) === $len;
+        }
+        if (!$valid) {
+            $key = "base64:" . base64_encode(random_bytes($len));
+        }
+        $map["APP_CIPHER"] = $cipher;
+        $map["APP_KEY"] = $key;
+        $out = [];
+        $seen = [];
+        foreach ($lines as $line) {
+            if (strpos($line, "APP_KEY=") === 0) { $out[] = "APP_KEY=" . $map["APP_KEY"]; $seen["APP_KEY"] = true; continue; }
+            if (strpos($line, "APP_CIPHER=") === 0) { $out[] = "APP_CIPHER=" . $map["APP_CIPHER"]; $seen["APP_CIPHER"] = true; continue; }
+            $out[] = $line;
+        }
+        if (empty($seen["APP_KEY"])) { $out[] = "APP_KEY=" . $map["APP_KEY"]; }
+        if (empty($seen["APP_CIPHER"])) { $out[] = "APP_CIPHER=" . $map["APP_CIPHER"]; }
+        file_put_contents($env, implode("\n", $out) . "\n");
+    '"
+
+    if [ $? -ne 0 ]; then
+        echo "❌ Error: $label .env repair failed"
+        send_discord_notification "Publish Failed ❌" "Remote .env repair failed." 15548997
+        exit 1
+    fi
+}
+
+validate_env_values() {
+    local label="$1"
+    local app_key="$2"
+    local app_cipher="$3"
+
+    if [ -z "$app_cipher" ]; then
+        app_cipher="aes-256-cbc"
+    fi
+
+    case "$app_cipher" in
+        aes-128-cbc|aes-256-cbc|aes-128-gcm|aes-256-gcm)
+            ;;
+        *)
+            echo "❌ Error: $label has unsupported APP_CIPHER: $app_cipher"
+            send_discord_notification "Publish Failed ❌" "Unsupported APP_CIPHER in $label." 15548997
+            return 1
+            ;;
+    esac
+
+    if [ -z "$app_key" ]; then
+        echo "❌ Error: $label missing APP_KEY"
+        send_discord_notification "Publish Failed ❌" "Missing APP_KEY in $label." 15548997
+        return 1
+    fi
+
+    local expected_len
+    expected_len=$(expected_key_length "$app_cipher")
+
+    if [ "$expected_len" -eq 0 ]; then
+        echo "❌ Error: $label has invalid APP_CIPHER: $app_cipher"
+        send_discord_notification "Publish Failed ❌" "Invalid APP_CIPHER in $label." 15548997
+        return 1
+    fi
+
+    local key_len
+    key_len=$(decode_key_length "$app_key")
+    if [ "$key_len" -lt 0 ]; then
+        echo "❌ Error: $label APP_KEY base64 decode failed"
+        send_discord_notification "Publish Failed ❌" "APP_KEY base64 decode failed in $label." 15548997
+        return 1
+    fi
+
+    if [ "$key_len" -ne "$expected_len" ]; then
+        echo "❌ Error: $label APP_KEY length $key_len does not match cipher $app_cipher (expected $expected_len)"
+        send_discord_notification "Publish Failed ❌" "APP_KEY length mismatch in $label." 15548997
+        return 1
+    fi
+
+    return 0
+}
+
+validate_env_file() {
+    local env_file="$1"
+    local label="$2"
+
+    local app_key
+    local app_cipher
+
+    app_key=$(get_env_value "$env_file" "APP_KEY")
+    app_cipher=$(get_env_value "$env_file" "APP_CIPHER")
+
+    validate_env_values "$label" "$app_key" "$app_cipher"
+}
+
 # Function to SCP .env.production AND deploy.sh to production server
 upload_files_to_production() {
     echo "📤 Uploading configuration and scripts to production server..."
@@ -54,6 +301,12 @@ upload_files_to_production() {
     if [ ! -f "$ENV_FILE" ]; then
         echo "❌ Error: .env.production file not found at $ENV_FILE"
         send_discord_notification "Publish Failed ❌" "Could not find .env.production file." 15548997
+        exit 1
+    fi
+
+    repair_env_file "$ENV_FILE" "Local .env.production"
+
+    if ! validate_env_file "$ENV_FILE" "Local .env.production"; then
         exit 1
     fi
 
@@ -81,6 +334,20 @@ upload_files_to_production() {
         send_discord_notification "Publish Failed ❌" "Failed to upload files via SCP." 15548997
         exit 1
     fi
+
+    echo "🔍 Validating remote .env before deploy..."
+    REMOTE_APP_KEY=$($SSH_COMMAND "$SERVER" "grep -E '^APP_KEY=' $APP_DIR/.env | tail -1 | cut -d= -f2-")
+    REMOTE_APP_CIPHER=$($SSH_COMMAND "$SERVER" "grep -E '^APP_CIPHER=' $APP_DIR/.env | tail -1 | cut -d= -f2-")
+
+    if ! validate_env_values "Remote .env" "$(strip_quotes "$REMOTE_APP_KEY")" "$(strip_quotes "$REMOTE_APP_CIPHER")"; then
+        echo "⚠️  Remote .env invalid. Attempting repair..."
+        repair_remote_env "Remote .env"
+        REMOTE_APP_KEY=$($SSH_COMMAND "$SERVER" "grep -E '^APP_KEY=' $APP_DIR/.env | tail -1 | cut -d= -f2-")
+        REMOTE_APP_CIPHER=$($SSH_COMMAND "$SERVER" "grep -E '^APP_CIPHER=' $APP_DIR/.env | tail -1 | cut -d= -f2-")
+        if ! validate_env_values "Remote .env" "$(strip_quotes "$REMOTE_APP_KEY")" "$(strip_quotes "$REMOTE_APP_CIPHER")"; then
+            exit 1
+        fi
+    fi
 }
 
 # Configuration (matching deploy.sh)
@@ -103,6 +370,15 @@ maintenance_mode() {
         SUCCESS_DESC="Site is now in maintenance mode. Bypass secret: ramadan2026"
         SUCCESS_COLOR=15548997 # Red
     else
+        if [ "$mode" == "up" ]; then
+            echo "🔍 Verifying required files before bringing site up..."
+            if ! $SSH_COMMAND "$SERVER" "test -f $APP_DIR/app/Providers/MailEnvironmentServiceProvider.php"; then
+                echo "❌ Error: Required file missing on server: app/Providers/MailEnvironmentServiceProvider.php"
+                send_discord_notification "Maintenance Update Failed ❌" "Required provider missing on server. Site remains down." 15548997
+                exit 1
+            fi
+        fi
+
         # Deactivate Maintenance Mode
         COMMAND="cd $APP_DIR && $SUDO_PREFIX php artisan up"
         SUCCESS_MSG="🟢 Maintenance Mode DISABLED"
@@ -262,7 +538,7 @@ fi
 
 if [ -f "$VERSION_FILE" ]; then
     OLD_VERSION=$(cat "$VERSION_FILE")
-    LOCAL_JSON_VERSION=$(grep -E '"version"\s*:' "$VERSION_JSON" | head -1 | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/\1/')
+    LOCAL_JSON_VERSION=$(get_json_version "$VERSION_JSON")
 
     if [ -z "$LOCAL_JSON_VERSION" ]; then
         echo "❌ Error: Could not read version from version.json"
@@ -303,7 +579,7 @@ else
 fi
 
 echo "🔍 Checking remote version alignment..."
-REMOTE_VERSION_JSON=$($SSH_COMMAND "$SERVER" "cat $APP_DIR/version.json 2>/dev/null" | grep -E '"version"\s*:' | head -1 | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/\1/')
+REMOTE_VERSION_JSON=$($SSH_COMMAND "$SERVER" "php -r '$p=\"$APP_DIR/version.json\"; $d=@json_decode(@file_get_contents($p), true); echo $d[\"version\"] ?? \"\";'")
 REMOTE_VERSION_FILE=$($SSH_COMMAND "$SERVER" "cat $APP_DIR/VERSION 2>/dev/null" | head -1)
 
 if [ -z "$REMOTE_VERSION_JSON" ] || [ -z "$REMOTE_VERSION_FILE" ]; then
@@ -363,11 +639,11 @@ else
     echo "❌ Remote deployment failed (Exit Code: $DEPLOY_EXIT_CODE)"
     send_discord_notification "Publish Failed ❌" "Remote deployment script returned non-zero exit code." 15548997
 
-    # Bring site back online if we put it down and deployment failed
+    # Keep site down if we put it into maintenance mode
     if [ "$WAS_DOWN" == "false" ]; then
         echo ""
-        echo "🔴 Deployment failed! Bringing site back ONLINE..."
-        maintenance_mode "up"
+        echo "🔴 Deployment failed! Site remains in MAINTENANCE MODE"
+        echo "    Fix the issue and then run: ./publish.sh --up"
     fi
 
     exit 1
