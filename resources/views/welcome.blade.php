@@ -221,7 +221,7 @@
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     
     <script>
-        // ==================== REGISTRATION TYPE TOGGLE ====================
+        // ==================== REGISTRATION TYPE TOGGLE WITH SPINNING ANIMATION ====================
         document.addEventListener('DOMContentLoaded', function() {
             const individualToggle = document.getElementById('individual-toggle');
             const familyToggle = document.getElementById('family-toggle');
@@ -229,37 +229,131 @@
             const familyFields = document.getElementById('family-fields');
             const nameLabel = document.querySelector('label[for="name"]');
             const cprLabel = document.querySelector('label[for="cpr"]');
+            const form = document.querySelector('form[method="POST"]');
+            const registrationForm = document.querySelector('.registration-form');
+            let isAnimating = false;
+
+            // Check if gsap is available
+            const hasGSAP = typeof gsap !== 'undefined';
+
+            function updateButtonStyles(isFamily) {
+                if (isFamily) {
+                    individualToggle.style.background = 'transparent';
+                    individualToggle.style.color = '#fbbf24';
+                    familyToggle.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+                    familyToggle.style.color = '#0f172a';
+                } else {
+                    individualToggle.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+                    individualToggle.style.color = '#0f172a';
+                    familyToggle.style.background = 'transparent';
+                    familyToggle.style.color = '#fbbf24';
+                }
+            }
 
             function setIndividualMode() {
                 registrationType.value = 'individual';
-                familyFields.style.display = 'none';
                 nameLabel.textContent = 'الاسم الكامل';
                 cprLabel.textContent = 'رقم الهوية (CPR)';
-
-                // Update button styles
-                individualToggle.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
-                individualToggle.style.color = '#0f172a';
-                familyToggle.style.background = 'transparent';
-                familyToggle.style.color = '#fbbf24';
+                familyFields.style.display = 'none';
+                familyFields.style.opacity = '0';
+                updateButtonStyles(false);
             }
 
             function setFamilyMode() {
                 registrationType.value = 'family';
+                nameLabel.textContent = 'اسم المسؤول عن العائلة';
+                cprLabel.textContent = 'رقم الهوية (CPR) للمسؤول';
                 familyFields.style.display = 'flex';
                 familyFields.style.flexDirection = 'column';
                 familyFields.style.gap = '1rem';
-                nameLabel.textContent = 'اسم المسؤول عن العائلة';
-                cprLabel.textContent = 'رقم الهوية (CPR) للمسؤول';
-
-                // Update button styles
-                individualToggle.style.background = 'transparent';
-                individualToggle.style.color = '#fbbf24';
-                familyToggle.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
-                familyToggle.style.color = '#0f172a';
+                familyFields.style.opacity = '1';
+                updateButtonStyles(true);
             }
 
-            individualToggle.addEventListener('click', setIndividualMode);
-            familyToggle.addEventListener('click', setFamilyMode);
+            function switchFormWithSpin(isFamily) {
+                if (isAnimating) return;
+
+                // Check if already on the selected mode
+                const currentMode = registrationType.value;
+                if ((isFamily && currentMode === 'family') || (!isFamily && currentMode === 'individual')) {
+                    return;
+                }
+
+                isAnimating = true;
+
+                // Disable buttons during animation
+                individualToggle.disabled = true;
+                familyToggle.disabled = true;
+
+                if (!hasGSAP) {
+                    // Fallback without GSAP
+                    if (isFamily) {
+                        setFamilyMode();
+                    } else {
+                        setIndividualMode();
+                    }
+                    isAnimating = false;
+                    individualToggle.disabled = false;
+                    familyToggle.disabled = false;
+                    return;
+                }
+
+                // Create GSAP timeline for the spinning animation
+                const tl = gsap.timeline({
+                    onComplete: function() {
+                        isAnimating = false;
+                        individualToggle.disabled = false;
+                        familyToggle.disabled = false;
+                    }
+                });
+
+                // Animate form container flip based on mode
+                if (isFamily) {
+                    // Family mode animation
+                    tl.to(registrationForm, {
+                        duration: 0.4,
+                        rotationY: 90,
+                        x: 100,
+                        opacity: 0.5,
+                        ease: "power2.inOut"
+                    }, 0)
+                    .call(() => setFamilyMode(), null, 0.2)
+                    .to(registrationForm, {
+                        duration: 0.4,
+                        rotationY: 0,
+                        x: 0,
+                        opacity: 1,
+                        ease: "power2.inOut"
+                    }, 0.2);
+                } else {
+                    // Individual mode animation
+                    tl.to(registrationForm, {
+                        duration: 0.4,
+                        rotationY: -90,
+                        x: -100,
+                        opacity: 0.5,
+                        ease: "power2.inOut"
+                    }, 0)
+                    .call(() => setIndividualMode(), null, 0.2)
+                    .to(registrationForm, {
+                        duration: 0.4,
+                        rotationY: 0,
+                        x: 0,
+                        opacity: 1,
+                        ease: "power2.inOut"
+                    }, 0.2);
+                }
+            }
+
+            individualToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                switchFormWithSpin(false);
+            });
+
+            familyToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                switchFormWithSpin(true);
+            });
 
             // Set initial state
             setIndividualMode();

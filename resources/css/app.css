@@ -1117,3 +1117,53 @@ html {
         background-position: 200% 0;
     }
 }
+
+/* ==================== FORM TRANSITION STYLES ==================== */
+
+/* Form transition container */
+.registration-form {
+    transition: all 0.3s ease;
+}
+
+/* Button disabled states during animation */
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+button:disabled:hover {
+    opacity: 0.6;
+}
+
+/* Form container 3D perspective for smooth transitions */
+.form-container {
+    transform-style: preserve-3d;
+    perspective: 1200px;
+}
+
+#individualFormContainer,
+#familyFormContainer {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+}
+
+/* Smooth input transitions within forms */
+#individualFormContainer input,
+#familyFormContainer input,
+#individualFormContainer label,
+#familyFormContainer label {
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+/* Ensure family fields transition smoothly */
+#family-fields {
+    transition: display 0.3s ease, opacity 0.3s ease, max-height 0.3s ease;
+    max-height: 500px;
+    overflow: hidden;
+}
+
+#family-fields[style*="display: none"] {
+    max-height: 0;
+    opacity: 0;
+}

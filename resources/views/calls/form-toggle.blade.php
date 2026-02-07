@@ -1,111 +1,109 @@
 <!-- Toggle buttons -->
 <div class="flex justify-center gap-3 mb-6">
     <button type="button" id="toggleIndividual"
-        class="px-6 py-2 text-base font-bold bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 active:scale-95 transition-all duration-200"
-        aria-pressed="true">أفراد</button>
+        class="px-6 py-2 text-base font-bold bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed active:scale-95 transition-all duration-200"
+        aria-pressed="true" aria-label="نمط التسجيل الفردي">أفراد</button>
     <button type="button" id="toggleFamily"
-        class="px-6 py-2 text-base font-bold bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 active:scale-95 transition-all duration-200"
-        aria-pressed="false">عائلات</button>
+        class="px-6 py-2 text-base font-bold bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 disabled:opacity-60 disabled:cursor-not-allowed active:scale-95 transition-all duration-200"
+        aria-pressed="false" aria-label="نمط التسجيل العائلي">عائلات</button>
 </div>
 
 <style>
     .form-container {
         perspective: 1200px;
         position: relative;
-        min-height: 500px;
-        height: 500px;
+        min-height: auto;
     }
 
     #individualFormContainer, #familyFormContainer {
         animation: none;
         transform-origin: center;
-        transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        position: absolute;
-        top: 0;
-        left: 0;
+        position: relative;
         width: 100%;
-        height: 100%;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    #individualFormContainer {
+        display: block;
+    }
+
+    #familyFormContainer {
+        display: none;
     }
 
     /* Rotation in effects */
     @keyframes rotateInYLeft {
         from {
             opacity: 0;
-            transform: perspective(1000px) rotateY(-100deg) scale(0.8);
+            transform: perspective(1000px) rotateY(-90deg);
         }
         to {
             opacity: 1;
-            transform: perspective(1000px) rotateY(0deg) scale(1);
+            transform: perspective(1000px) rotateY(0deg);
         }
     }
 
     @keyframes rotateOutYRight {
         from {
             opacity: 1;
-            transform: perspective(1000px) rotateY(0deg) scale(1);
+            transform: perspective(1000px) rotateY(0deg);
         }
         to {
             opacity: 0;
-            transform: perspective(1000px) rotateY(100deg) scale(0.8);
+            transform: perspective(1000px) rotateY(90deg);
         }
     }
 
     @keyframes rotateInYRight {
         from {
             opacity: 0;
-            transform: perspective(1000px) rotateY(100deg) scale(0.8);
+            transform: perspective(1000px) rotateY(90deg);
         }
         to {
             opacity: 1;
-            transform: perspective(1000px) rotateY(0deg) scale(1);
+            transform: perspective(1000px) rotateY(0deg);
         }
     }
 
     @keyframes rotateOutYLeft {
         from {
             opacity: 1;
-            transform: perspective(1000px) rotateY(0deg) scale(1);
+            transform: perspective(1000px) rotateY(0deg);
         }
         to {
             opacity: 0;
-            transform: perspective(1000px) rotateY(-100deg) scale(0.8);
-        }
-    }
-
-    @keyframes magicalGlow {
-        0%, 100% {
-            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
-        }
-        50% {
-            filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.6));
+            transform: perspective(1000px) rotateY(-90deg);
         }
     }
 
     #individualFormContainer.show {
-        animation: rotateInYLeft 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        animation: rotateInYLeft 0.6s ease-in-out forwards;
+        display: block;
     }
 
     #individualFormContainer.hide {
-        animation: rotateOutYRight 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        animation: rotateOutYRight 0.6s ease-in-out forwards;
+        display: none;
     }
 
     #familyFormContainer.show {
-        animation: rotateInYRight 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        animation: rotateInYRight 0.6s ease-in-out forwards;
+        display: block;
     }
 
     #familyFormContainer.hide {
-        animation: rotateOutYLeft 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        animation: rotateOutYLeft 0.6s ease-in-out forwards;
+        display: none;
     }
 
     #individualFormContainer.show,
     #familyFormContainer.show {
-        animation-fill-mode: forwards;
         pointer-events: auto;
     }
 
     #individualFormContainer.hide,
     #familyFormContainer.hide {
-        animation-fill-mode: forwards;
         pointer-events: none;
     }
 
@@ -124,26 +122,23 @@
         }
     }
 
-    .form-container::before {
+    .form-container.rotating::before {
         content: '';
         position: absolute;
-        top: -50%;
+        top: 0;
         left: -100%;
         width: 100%;
-        height: 200%;
-        background: linear-gradient(90deg, 
+        height: 100%;
+        background: linear-gradient(90deg,
             transparent,
-            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0.2),
             transparent);
         transform: skewX(-20deg);
         z-index: 10;
         pointer-events: none;
-        animation: magicShimmer 0.8s ease-in-out;
+        animation: magicShimmer 0.6s ease-in-out;
     }
 
-    .form-container.rotating::before {
-        animation: magicShimmer 0.8s ease-in-out;
-    }
 </style>
 
 <!-- Form rotation container -->
@@ -167,55 +162,138 @@
         const familyForm = document.getElementById('familyFormContainer');
         const formContainer = document.getElementById('formContainer');
         let isAnimating = false;
+        let hasGSAP = typeof gsap !== 'undefined';
 
         function switchForm(showIndividual) {
-            if (isAnimating) return;
-            isAnimating = true;
-            
-            // Add rotating class for shimmer effect
-            formContainer.classList.add('rotating');
-
-            if (showIndividual) {
-                // Hide family, show individual
-                familyForm.classList.remove('show');
-                familyForm.classList.add('hide');
-                
-                setTimeout(() => {
-                    individualForm.classList.remove('hide');
-                    individualForm.classList.add('show');
-                    individualBtn.setAttribute('aria-pressed', 'true');
-                    familyBtn.setAttribute('aria-pressed', 'false');
-                }, 50);
-            } else {
-                // Hide individual, show family
-                individualForm.classList.remove('show');
-                individualForm.classList.add('hide');
-                
-                setTimeout(() => {
-                    familyForm.classList.remove('hide');
-                    familyForm.classList.add('show');
-                    familyBtn.setAttribute('aria-pressed', 'true');
-                    individualBtn.setAttribute('aria-pressed', 'false');
-                }, 50);
+            // Check if already showing the requested form
+            if (showIndividual && individualForm.classList.contains('show')) {
+                return;
+            }
+            if (!showIndividual && familyForm.classList.contains('show')) {
+                return;
             }
 
-            // Remove rotating class after animation
-            setTimeout(() => {
-                formContainer.classList.remove('rotating');
-                isAnimating = false;
-            }, 800);
+            if (isAnimating) return;
+            isAnimating = true;
+
+            // Disable buttons during animation
+            individualBtn.disabled = true;
+            familyBtn.disabled = true;
+
+            // Add rotating class for shimmer effect
+            if (formContainer) {
+                formContainer.classList.add('rotating');
+            }
+
+            // Update button states immediately
+            if (showIndividual) {
+                individualBtn.setAttribute('aria-pressed', 'true');
+                familyBtn.setAttribute('aria-pressed', 'false');
+            } else {
+                familyBtn.setAttribute('aria-pressed', 'true');
+                individualBtn.setAttribute('aria-pressed', 'false');
+            }
+
+            // Use CSS animations or GSAP if available
+            if (hasGSAP && typeof gsap !== 'undefined') {
+                const tl = gsap.timeline({
+                    onComplete: function() {
+                        isAnimating = false;
+                        individualBtn.disabled = false;
+                        familyBtn.disabled = false;
+                        if (formContainer) {
+                            formContainer.classList.remove('rotating');
+                        }
+                    }
+                });
+
+                if (showIndividual) {
+                    // Remove old classes from family, add new for individual
+                    familyForm.classList.remove('show');
+                    familyForm.classList.add('hide');
+                    individualForm.classList.remove('hide');
+                    individualForm.classList.add('show');
+
+                    // Animate the container
+                    tl.to(formContainer, {
+                        duration: 0.3,
+                        rotationY: -90,
+                        x: -100,
+                        opacity: 0.7,
+                        ease: "power2.inOut"
+                    }, 0)
+                    .to(formContainer, {
+                        duration: 0.3,
+                        rotationY: 0,
+                        x: 0,
+                        opacity: 1,
+                        ease: "power2.inOut"
+                    }, 0.3);
+                } else {
+                    // Remove old classes from individual, add new for family
+                    individualForm.classList.remove('show');
+                    individualForm.classList.add('hide');
+                    familyForm.classList.remove('hide');
+                    familyForm.classList.add('show');
+
+                    // Animate the container
+                    tl.to(formContainer, {
+                        duration: 0.3,
+                        rotationY: 90,
+                        x: 100,
+                        opacity: 0.7,
+                        ease: "power2.inOut"
+                    }, 0)
+                    .to(formContainer, {
+                        duration: 0.3,
+                        rotationY: 0,
+                        x: 0,
+                        opacity: 1,
+                        ease: "power2.inOut"
+                    }, 0.3);
+                }
+            } else {
+                // Fallback without GSAP - use CSS animations
+                setTimeout(() => {
+                    if (showIndividual) {
+                        familyForm.classList.remove('show');
+                        familyForm.classList.add('hide');
+                        individualForm.classList.remove('hide');
+                        individualForm.classList.add('show');
+                    } else {
+                        individualForm.classList.remove('show');
+                        individualForm.classList.add('hide');
+                        familyForm.classList.remove('hide');
+                        familyForm.classList.add('show');
+                    }
+
+                    isAnimating = false;
+                    individualBtn.disabled = false;
+                    familyBtn.disabled = false;
+                    if (formContainer) {
+                        formContainer.classList.remove('rotating');
+                    }
+                }, 600); // Match CSS animation duration
+            }
         }
 
-        individualBtn.addEventListener('click', function() {
-            if (!individualForm.classList.contains('show')) {
+        // Prevent button click if already animating or if form is already shown
+        individualBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!isAnimating && !individualForm.classList.contains('show')) {
                 switchForm(true);
             }
         });
 
-        familyBtn.addEventListener('click', function() {
-            if (!familyForm.classList.contains('show')) {
+        familyBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!isAnimating && !familyForm.classList.contains('show')) {
                 switchForm(false);
             }
         });
+
+        // Set initial state
+        individualForm.classList.add('show');
+        familyForm.classList.add('hide');
     });
 </script>
