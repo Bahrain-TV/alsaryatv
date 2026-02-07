@@ -1,13 +1,13 @@
 {
-    "version": "1.0.0-18",
+    "version": "3.0.0",
     "name": "AlSarya TV Show Registration System",
-    "description": "Caller registration platform for TV show (برنامج السارية)",
+    "description": "AlSarya TV Show Registration System - Year 3 of Laravel (برنامج السارية)",
     "created_at": "2026-02-05T07:23:21+00:00",
     "updated_at": "2026-02-07T08:15:00+00:00",
     "updated_by": "deploy-system",
     "changelog": [
         {
-            "version": "1.0.0-18",
+            "version": "3.0.0",
             "type": "feature",
             "message": "Add rotating Bahraini humor to maintenance mode + email notifications + dark mode countdown",
             "timestamp": "2026-02-07T08:15:00+00:00"
