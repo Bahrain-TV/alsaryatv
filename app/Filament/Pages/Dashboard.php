@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\AnimatedStatsOverviewWidget;
-use App\Filament\Widgets\CallersStatsWidget;
 use App\Filament\Widgets\ParticipationRateWidget;
 use App\Filament\Widgets\PeakHoursChart;
 use App\Filament\Widgets\QuickActionsWidget;

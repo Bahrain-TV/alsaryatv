@@ -10,7 +10,7 @@ class AnimatedStatsOverviewWidget extends Widget
 {
     protected string $view = 'filament.widgets.animated-stats-overview';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 1;
 
@@ -47,7 +47,7 @@ class AnimatedStatsOverviewWidget extends Widget
         $this->totalHits = \App\Models\Caller::sum('hits');
         $this->activeCallers = \App\Models\Caller::where('status', 'accepted')->count();
         $this->uniqueCprs = \App\Models\Caller::distinct('cpr')->count('cpr');
-        
+
         // Calculate previous day callers for trend calculation
         $yesterday = today()->subDay();
         $this->previousDayCallers = \App\Models\Caller::whereDate('created_at', $yesterday)->count();

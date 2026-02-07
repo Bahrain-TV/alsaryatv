@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Caller;
-use Filament\Support\Enums\IconSize;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -12,7 +11,7 @@ class WinnersHistoryWidget extends BaseWidget
 {
     protected static ?int $sort = 5;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected ?string $pollingInterval = '60s';
 

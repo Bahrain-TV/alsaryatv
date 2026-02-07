@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Services\MailGuard;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
-use App\Services\MailGuard;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\ServiceProvider;
 
 /**
  * MailEnvironmentServiceProvider
@@ -33,20 +33,18 @@ class MailEnvironmentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Listen to mail sending events
-        $this->app['events']->listen(MessageSending::class, function (MessageSending $event) {
+        $this->app['events']->listen(MessageSending::class, function (MessageSending $event): void {
             $this->handleMessageSending($event);
         });
 
         // Listen to mail sent events
-        $this->app['events']->listen(MessageSent::class, function (MessageSent $event) {
+        $this->app['events']->listen(MessageSent::class, function (MessageSent $event): void {
             $this->handleMessageSent($event);
         });
     }
 
     /**
      * Handle email before sending
-     *
-     * @param MessageSending $event
      */
     private function handleMessageSending(MessageSending $event): void
     {
@@ -76,7 +74,7 @@ class MailEnvironmentServiceProvider extends ServiceProvider
                 $bodyObject = $event->message->getBody();
                 $body = $bodyObject ? $bodyObject->toString() : 'No body content';
                 Log::channel('mail')->debug('Email Body Preview', [
-                    'preview' => substr(strip_tags($body), 0, 500) . '...',
+                    'preview' => substr(strip_tags($body), 0, 500).'...',
                 ]);
             } catch (\Exception $e) {
                 Log::channel('mail')->debug('Email Body:', ['message' => 'Unable to extract body']);
@@ -104,8 +102,6 @@ class MailEnvironmentServiceProvider extends ServiceProvider
 
     /**
      * Handle email after sending
-     *
-     * @param MessageSent $event
      */
     private function handleMessageSent(MessageSent $event): void
     {

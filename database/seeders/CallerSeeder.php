@@ -98,8 +98,8 @@ class CallerSeeder extends Seeder
                         'level' => $level,
                         'status' => $record['Status'] ?? $record['status'] ?? 'active',
                         'notes' => $record['Notes'] ?? $record['notes'] ?? null,
-                        'is_winner' => ($record['Is Winner'] ?? $record['is_winner'] ?? false) === 'Yes' || 
-                                      ($record['Is Winner'] ?? $record['is_winner'] ?? false) === '1' || 
+                        'is_winner' => ($record['Is Winner'] ?? $record['is_winner'] ?? false) === 'Yes' ||
+                                      ($record['Is Winner'] ?? $record['is_winner'] ?? false) === '1' ||
                                       ($record['Is Winner'] ?? $record['is_winner'] ?? false) === true,
                         'created_at' => $record['created_at'] ?? now()->toDateTimeString(),
                         'updated_at' => $record['updated_at'] ?? now()->toDateTimeString(),

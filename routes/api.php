@@ -12,7 +12,7 @@ Route::middleware('api')->group(function (): void {
     })->middleware('auth:sanctum');
 
     // Version check endpoints (publicly accessible for development)
-    Route::prefix('version')->group(function () {
+    Route::prefix('version')->group(function (): void {
         Route::get('/', [VersionCheckController::class, 'getVersion']);
         Route::post('/check-difference', [VersionCheckController::class, 'checkVersionDifference']);
         Route::get('/changelog', [VersionCheckController::class, 'getChangeLog']);

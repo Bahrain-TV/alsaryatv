@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Caller;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 class RegistrationTrendsChart extends ChartWidget
 {
@@ -14,7 +13,7 @@ class RegistrationTrendsChart extends ChartWidget
 
     protected string $color = 'info';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected ?string $maxHeight = '350px';
 

@@ -27,6 +27,7 @@ class BumpVersion extends Command
 
         if ($this->option('show')) {
             $this->displayVersion($version);
+
             return Command::SUCCESS;
         }
 
@@ -46,6 +47,7 @@ class BumpVersion extends Command
     {
         if (File::exists($this->versionFile)) {
             $content = trim(File::get($this->versionFile));
+
             return $this->parseVersion($content);
         }
 
@@ -123,14 +125,14 @@ class BumpVersion extends Command
     private function saveVersion(array $version): void
     {
         File::put($this->versionFile, $version['full']);
-        $this->info("Updated VERSION file");
+        $this->info('Updated VERSION file');
     }
 
     private function updateEnvFile(array $version): void
     {
         $envPath = base_path('.env');
 
-        if (!File::exists($envPath)) {
+        if (! File::exists($envPath)) {
             return;
         }
 
@@ -159,7 +161,7 @@ class BumpVersion extends Command
         }
 
         File::put($envPath, $envContent);
-        $this->info("Updated .env file");
+        $this->info('Updated .env file');
     }
 
     private function displayVersion(array $version): void

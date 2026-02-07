@@ -9,10 +9,11 @@ class PerformanceHelper
      */
     public static function getCacheKey(string $widgetName, array $params = []): string
     {
-        $key = "dashboard_widget_" . $widgetName;
-        if (!empty($params)) {
-            $key .= "_" . md5(serialize($params));
+        $key = 'dashboard_widget_'.$widgetName;
+        if (! empty($params)) {
+            $key .= '_'.md5(serialize($params));
         }
+
         return $key;
     }
 
@@ -42,7 +43,7 @@ class PerformanceHelper
 
         $optimized = [];
         $step = floor(count($data) / $maxPoints);
-        
+
         for ($i = 0; $i < count($data); $i += $step) {
             $optimized[] = $data[$i];
         }

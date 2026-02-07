@@ -67,7 +67,7 @@ class ExportCallersCommand extends Command
             // Stream callers in chunks to prevent memory issues
             $chunk_size = 500;
             Caller::query()
-                ->chunk($chunk_size, function ($callers) use ($csv) {
+                ->chunk($chunk_size, function ($callers) use ($csv): void {
                     foreach ($callers as $caller) {
                         $csv->insertOne([
                             $caller->id,

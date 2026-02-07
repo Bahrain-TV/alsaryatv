@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 
 class FavIconMakerCommand extends Command
 {
@@ -30,12 +29,13 @@ class FavIconMakerCommand extends Command
         $imagePath = $this->argument('image');
 
         // If no image provided, search base URL for images
-        if (!$imagePath) {
+        if (! $imagePath) {
             $this->info('🔍 Searching base URL for images...');
             $imagePath = $this->searchForImages();
 
-            if (!$imagePath) {
+            if (! $imagePath) {
                 $this->error('❌ No images found. Please provide an image path.');
+
                 return self::FAILURE;
             }
 
@@ -61,7 +61,7 @@ class FavIconMakerCommand extends Command
         foreach ($priority as $keyword) {
             foreach ($imageExtensions as $ext) {
                 $files = glob("{$publicPath}/**/{$keyword}*.{$ext}", GLOB_BRACE);
-                if (!empty($files)) {
+                if (! empty($files)) {
                     return $files[0];
                 }
             }
@@ -70,7 +70,7 @@ class FavIconMakerCommand extends Command
         // If no priority matches, find any image
         foreach ($imageExtensions as $ext) {
             $files = glob("{$publicPath}/**/*.{$ext}", GLOB_BRACE);
-            if (!empty($files)) {
+            if (! empty($files)) {
                 return $files[0];
             }
         }
@@ -84,8 +84,9 @@ class FavIconMakerCommand extends Command
     private function processFavicon(string $imagePath): int
     {
         // Validate image exists
-        if (!file_exists($imagePath) && !filter_var($imagePath, FILTER_VALIDATE_URL)) {
+        if (! file_exists($imagePath) && ! filter_var($imagePath, FILTER_VALIDATE_URL)) {
             $this->error("❌ Image not found: {$imagePath}");
+
             return self::FAILURE;
         }
 
@@ -94,7 +95,7 @@ class FavIconMakerCommand extends Command
             if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
                 $this->info('📥 Downloading image from URL...');
                 $imageData = file_get_contents($imagePath);
-                if (!$imageData) {
+                if (! $imageData) {
                     throw new \Exception('Failed to download image');
                 }
                 $tmpFile = tempnam(sys_get_temp_dir(), 'favicon');
@@ -104,14 +105,14 @@ class FavIconMakerCommand extends Command
 
             // Load image
             $imageInfo = @getimagesize($imagePath);
-            if (!$imageInfo) {
+            if (! $imageInfo) {
                 throw new \Exception('Invalid image file');
             }
 
             $imageType = $imageInfo[2];
             $supportedTypes = [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP];
 
-            if (!in_array($imageType, $supportedTypes)) {
+            if (! in_array($imageType, $supportedTypes)) {
                 throw new \Exception('Unsupported image type. Supported: JPG, PNG, GIF, WEBP');
             }
 
@@ -124,7 +125,7 @@ class FavIconMakerCommand extends Command
                 default => throw new \Exception('Unsupported image type'),
             };
 
-            if (!$image) {
+            if (! $image) {
                 throw new \Exception('Failed to load image');
             }
 
@@ -132,7 +133,7 @@ class FavIconMakerCommand extends Command
             $this->info('🎨 Creating favicon variants...');
 
             $faviconDir = public_path('favicon');
-            if (!is_dir($faviconDir)) {
+            if (! is_dir($faviconDir)) {
                 mkdir($faviconDir, 0755, true);
             }
 
@@ -184,6 +185,7 @@ class FavIconMakerCommand extends Command
             return self::SUCCESS;
         } catch (\Throwable $e) {
             $this->error("❌ Error: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }

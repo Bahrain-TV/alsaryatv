@@ -33,7 +33,7 @@ class CallersStatsWidget extends BaseWidget
 
         return [
             Stat::make('إجمالي المتصلين', number_format($totalCallers))
-                ->description("📞 جميع المتصلين المسجلين في النظام")
+                ->description('📞 جميع المتصلين المسجلين في النظام')
                 ->descriptionIcon('heroicon-m-phone')
                 ->color('primary')
                 ->chart($this->getRegistrationChart()),
@@ -54,12 +54,12 @@ class CallersStatsWidget extends BaseWidget
                 ->color('warning'),
 
             Stat::make('المتصلون النشطون', number_format($activeCallers))
-                ->description("✅ " . ($totalCallers > 0 ? round(($activeCallers / $totalCallers) * 100, 1) : 0) . "% من المتصلين")
+                ->description('✅ '.($totalCallers > 0 ? round(($activeCallers / $totalCallers) * 100, 1) : 0).'% من المتصلين')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
             Stat::make('أرقام فريدة (CPR)', number_format($uniqueCprs))
-                ->description("🔐 عدد المتصلين الفريدين حسب رقم المواطن")
+                ->description('🔐 عدد المتصلين الفريدين حسب رقم المواطن')
                 ->descriptionIcon('heroicon-m-identification')
                 ->color('gray'),
         ];

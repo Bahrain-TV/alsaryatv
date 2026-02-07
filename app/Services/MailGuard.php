@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Log;
 
 /**
  * MailGuard Service
@@ -45,9 +45,9 @@ class MailGuard
     /**
      * Log email details without sending
      *
-     * @param string $recipient Email recipient
-     * @param Mailable $mailable The mailable instance
-     * @param string $subject Email subject
+     * @param  string  $recipient  Email recipient
+     * @param  Mailable  $mailable  The mailable instance
+     * @param  string  $subject  Email subject
      */
     public static function logEmail(string $recipient, Mailable $mailable, string $subject = 'Email'): void
     {
@@ -61,18 +61,16 @@ class MailGuard
 
     /**
      * Get all pending emails from log file (development only)
-     *
-     * @return array
      */
     public static function getPendingEmails(): array
     {
-        if (!self::isDevelopment()) {
+        if (! self::isDevelopment()) {
             return [];
         }
 
         $logFile = storage_path('logs/mail.log');
 
-        if (!file_exists($logFile)) {
+        if (! file_exists($logFile)) {
             return [];
         }
 
@@ -93,7 +91,7 @@ class MailGuard
      */
     public static function clearLogs(): bool
     {
-        if (!self::isDevelopment()) {
+        if (! self::isDevelopment()) {
             return false;
         }
 
@@ -102,6 +100,7 @@ class MailGuard
         if (file_exists($logFile)) {
             unlink($logFile);
             Log::channel('mail')->info('Mail logs cleared');
+
             return true;
         }
 

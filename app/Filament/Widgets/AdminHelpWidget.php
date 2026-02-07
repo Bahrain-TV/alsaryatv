@@ -8,7 +8,7 @@ class AdminHelpWidget extends Widget
 {
     protected string $view = 'filament.widgets.admin-help';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 200;
 

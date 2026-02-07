@@ -4,9 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Models\Caller;
 use Filament\Pages\Page;
-use Filament\Support\Enums\IconSize;
-use Illuminate\Support\Facades\DB;
-use BackedEnum;
 use UnitEnum;
 
 class Analytics extends Page
@@ -43,7 +40,7 @@ class Analytics extends Page
         $todayCallers = Caller::whereDate('created_at', today())->count();
         $thisWeekCallers = Caller::whereBetween('created_at', [
             now()->startOfWeek(),
-            now()->endOfWeek()
+            now()->endOfWeek(),
         ])->count();
         $thisMonthCallers = Caller::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
@@ -78,7 +75,7 @@ class Analytics extends Page
         // Growth rate
         $lastWeekCallers = Caller::whereBetween('created_at', [
             now()->subWeek()->startOfWeek(),
-            now()->subWeek()->endOfWeek()
+            now()->subWeek()->endOfWeek(),
         ])->count();
 
         $weeklyGrowthRate = $lastWeekCallers > 0
@@ -125,12 +122,12 @@ class Analytics extends Page
         // This week vs last week
         $thisWeek = Caller::whereBetween('created_at', [
             now()->startOfWeek(),
-            now()->endOfWeek()
+            now()->endOfWeek(),
         ])->count();
 
         $lastWeek = Caller::whereBetween('created_at', [
             now()->subWeek()->startOfWeek(),
-            now()->subWeek()->endOfWeek()
+            now()->subWeek()->endOfWeek(),
         ])->count();
 
         // This month vs last month

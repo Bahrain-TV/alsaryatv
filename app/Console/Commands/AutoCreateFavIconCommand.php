@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-
 use Illuminate\Console\Command;
-use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class AutoCreateFavIconCommand extends Command
 {
@@ -15,6 +14,7 @@ class AutoCreateFavIconCommand extends Command
      * @var string
      */
     protected $signature = 'make:favicon {--png : Generate a single 192x192 PNG instead of a multi-layer ICO}';
+
     protected $aliases = ['app:auto-create-fav-icon-command'];
 
     /**
@@ -22,11 +22,8 @@ class AutoCreateFavIconCommand extends Command
      *
      * @var string
      */
-    
 
     /**
-
-
     /**
      * Added --png option to toggle between ICO and PNG.
      */
@@ -34,21 +31,22 @@ class AutoCreateFavIconCommand extends Command
 
     public function handle()
     {
-        $manager = new ImageManager(new Driver());
+        $manager = new ImageManager(new Driver);
         $publicPath = public_path();
-        
+
         // 1. Search Logic
         $logoFile = collect(['logo', 'brand', 'icon'])
             ->crossJoin(['png', 'jpg', 'jpeg', 'webp'])
-            ->map(fn($pair) => $publicPath . '/' . $pair[0] . '.' . $pair[1])
-            ->first(fn($path) => file_exists($path));
+            ->map(fn ($pair) => $publicPath.'/'.$pair[0].'.'.$pair[1])
+            ->first(fn ($path) => file_exists($path));
 
-        if (!$logoFile) {
+        if (! $logoFile) {
             $this->error('Source logo not found in /public.');
+
             return 1;
         }
 
-        $this->info("Processing: " . basename($logoFile));
+        $this->info('Processing: '.basename($logoFile));
 
         if ($this->option('png')) {
             $this->generatePng($manager, $logoFile);
@@ -69,7 +67,7 @@ class AutoCreateFavIconCommand extends Command
     private function generateIco($manager, $source)
     {
         // Standard Windows ICO sizes
-        $sizes = [16, 32, 48]; 
+        $sizes = [16, 32, 48];
         $frames = [];
 
         foreach ($sizes as $size) {
@@ -78,25 +76,25 @@ class AutoCreateFavIconCommand extends Command
         }
 
         // Pack frames into an ICO container
-        // Note: For a "drop-in" file, we use a basic binary pack for ICO 
+        // Note: For a "drop-in" file, we use a basic binary pack for ICO
         $icoContent = $this->packIco($frames);
         file_put_contents(public_path('favicon.ico'), $icoContent);
-        
-        $this->info("Saved multi-resolution ICO (16, 32, 48) to public/favicon.ico");
+
+        $this->info('Saved multi-resolution ICO (16, 32, 48) to public/favicon.ico');
     }
 
     private function createSquaredCanvas($manager, $source, $size)
     {
         $img = $manager->read($source);
-        
+
         // Extract gradient colors from corners
         $c1 = $img->pickColor(0, 0)->toHex();
         $c2 = $img->pickColor($img->width() - 1, $img->height() - 1)->toHex();
 
         $canvas = $manager->create($size, $size);
-        
+
         // Fill background with primary extracted color
-        $canvas->fill($c1); 
+        $canvas->fill($c1);
 
         // Resize source to fit
         $img->scale(width: $size, height: $size);
@@ -127,16 +125,4 @@ class AutoCreateFavIconCommand extends Command
 
         return $output;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-    }
+}

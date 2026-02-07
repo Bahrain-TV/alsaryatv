@@ -13,7 +13,7 @@ class StatusDistributionChart extends ChartWidget
 
     protected string $color = 'success';
 
-    protected int | string | array $columnSpan = [
+    protected int|string|array $columnSpan = [
         'sm' => 1,
         'md' => 1,
         'lg' => 2,

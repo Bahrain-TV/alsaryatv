@@ -35,7 +35,7 @@ class FilamentServiceProvider extends ServiceProvider
                     'google-fonts',
                     'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap'
                 ),
-                
+
                 // Beautiful custom admin theme
                 Css::make(
                     'beautiful-admin-theme',
@@ -98,7 +98,7 @@ class FilamentServiceProvider extends ServiceProvider
                     document.head.appendChild(style);
                 });
             </script>';
-            
+
             // Add accessibility script to page
             echo $html;
         });

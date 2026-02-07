@@ -8,14 +8,21 @@ use Livewire\Component;
 class AnimatedStatsWidget extends Component
 {
     public $totalCallers = 0;
+
     public $totalWinners = 0;
+
     public $todayCallers = 0;
+
     public $totalHits = 0;
+
     public $activeCallers = 0;
+
     public $uniqueCprs = 0;
-    
+
     public $winRatio = 0;
+
     public $todayTrend = 0;
+
     public $averageHits = 0;
 
     public function mount()

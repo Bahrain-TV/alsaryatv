@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Caller;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 class PeakHoursChart extends ChartWidget
 {
@@ -14,7 +13,7 @@ class PeakHoursChart extends ChartWidget
 
     protected string $color = 'warning';
 
-    protected int | string | array $columnSpan = [
+    protected int|string|array $columnSpan = [
         'sm' => 1,
         'md' => 1,
         'lg' => 2,
@@ -43,7 +42,7 @@ class PeakHoursChart extends ChartWidget
             $record = $data->firstWhere('hour', $i);
             $count = $record ? $record->count : 0;
             $counts[] = $count;
-            
+
             if ($count > $maxCount) {
                 $maxCount = $count;
                 $peakHour = $i;

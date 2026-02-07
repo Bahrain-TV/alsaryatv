@@ -5,7 +5,6 @@ namespace App\Livewire\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Symfony\Component\HttpFoundation\Response;
 
 #[Layout('components.layouts.auth')]
 class Register extends Component

@@ -54,18 +54,18 @@ class TestEmailCommand extends Command
 
             $this->info('✅ Email sent successfully!');
             $this->line('');
-            $this->comment('📬 Check your inbox at: ' . $email);
+            $this->comment('📬 Check your inbox at: '.$email);
             $this->comment('💬 Also check spam folder if not in inbox');
             $this->line('');
             $this->info('ℹ️  Current Mail Configuration:');
-            $this->line('   Mailer: ' . config('mail.default'));
-            $this->line('   From: ' . config('mail.from.address'));
+            $this->line('   Mailer: '.config('mail.default'));
+            $this->line('   From: '.config('mail.from.address'));
             $this->line('   Email Type: Admin Winner Notification (Recipients: Admin)');
             $this->line('');
 
             return 0;
         } catch (\Exception $e) {
-            $this->error("❌ Failed to send email!");
+            $this->error('❌ Failed to send email!');
             $this->error("Error: {$e->getMessage()}");
             $this->line('');
             $this->comment('🔧 Troubleshooting:');
@@ -75,9 +75,9 @@ class TestEmailCommand extends Command
             $this->comment('   4. Check server firewall allows outbound SMTP (port 587 or 465)');
             $this->line('');
             $this->comment('ℹ️  Current Mail Configuration:');
-            $this->line('   Mailer: ' . config('mail.default'));
-            $this->line('   Host: ' . config('mail.mailers.smtp.host'));
-            $this->line('   Port: ' . config('mail.mailers.smtp.port'));
+            $this->line('   Mailer: '.config('mail.default'));
+            $this->line('   Host: '.config('mail.mailers.smtp.host'));
+            $this->line('   Port: '.config('mail.mailers.smtp.port'));
             $this->line('');
 
             return 1;

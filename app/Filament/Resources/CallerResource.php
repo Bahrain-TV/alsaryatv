@@ -199,11 +199,11 @@ class CallerResource extends Resource
                         $indicators = [];
 
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'من: ' . \Carbon\Carbon::parse($data['created_from'])->format('Y/m/d');
+                            $indicators[] = 'من: '.\Carbon\Carbon::parse($data['created_from'])->format('Y/m/d');
                         }
 
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'إلى: ' . \Carbon\Carbon::parse($data['created_until'])->format('Y/m/d');
+                            $indicators[] = 'إلى: '.\Carbon\Carbon::parse($data['created_until'])->format('Y/m/d');
                         }
 
                         return $indicators;
@@ -235,11 +235,11 @@ class CallerResource extends Resource
                         $indicators = [];
 
                         if ($data['hits_from'] ?? null) {
-                            $indicators[] = 'مشاركات من: ' . $data['hits_from'];
+                            $indicators[] = 'مشاركات من: '.$data['hits_from'];
                         }
 
                         if ($data['hits_to'] ?? null) {
-                            $indicators[] = 'مشاركات إلى: ' . $data['hits_to'];
+                            $indicators[] = 'مشاركات إلى: '.$data['hits_to'];
                         }
 
                         return $indicators;
@@ -255,7 +255,7 @@ class CallerResource extends Resource
                         false: fn ($query) => $query->where('hits', '<=', 5),
                     ),
             ])
-           
+
             ->actions([
                 ActionGroup::make([
                     // Export Actions
@@ -382,7 +382,7 @@ class CallerResource extends Resource
                             \Filament\Notifications\Notification::make()
                                 ->success()
                                 ->title('تم التحديث')
-                                ->body('تم تحديد ' . $records->count() . ' متصل كفائزين')
+                                ->body('تم تحديد '.$records->count().' متصل كفائزين')
                                 ->send();
                         })
                         ->requiresConfirmation()
@@ -401,14 +401,14 @@ class CallerResource extends Resource
                             \Filament\Notifications\Notification::make()
                                 ->success()
                                 ->title('تم التحديث')
-                                ->body('تم إزالة حالة الفوز من ' . $records->count() . ' متصل')
+                                ->body('تم إزالة حالة الفوز من '.$records->count().' متصل')
                                 ->send();
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
                 ])
-                ->icon('heroicon-o-ellipsis-horizontal')
-                ->tooltip('إجراءات'),
+                    ->icon('heroicon-o-ellipsis-horizontal')
+                    ->tooltip('إجراءات'),
             ])
             ->headerActions([
                 Action::make('exportAll')
@@ -417,6 +417,7 @@ class CallerResource extends Resource
                     ->color('success')
                     ->action(function () {
                         $allCallers = Caller::all();
+
                         return static::exportToCsv($allCallers);
                     }),
 
@@ -426,6 +427,7 @@ class CallerResource extends Resource
                     ->color('success')
                     ->action(function () {
                         $allCallers = Caller::all();
+
                         return static::exportToExcel($allCallers);
                     }),
 
@@ -467,7 +469,7 @@ class CallerResource extends Resource
      */
     protected static function exportToCsv($records): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $fileName = 'callers_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $fileName = 'callers_'.now()->format('Y-m-d_H-i-s').'.csv';
 
         return response()->streamDownload(function () use ($records): void {
             $handle = fopen('php://output', 'w');
@@ -495,7 +497,7 @@ class CallerResource extends Resource
                     $record->cpr,
                     $record->hits,
                     $record->is_winner ? 'نعم' : 'لا',
-                    match($record->status) {
+                    match ($record->status) {
                         'active' => 'نشط',
                         'inactive' => 'غير نشط',
                         'blocked' => 'محظور',
@@ -518,7 +520,7 @@ class CallerResource extends Resource
      */
     protected static function exportToExcel($records): \Symfony\Component\HttpFoundation\Response
     {
-        $fileName = 'callers_' . now()->format('Y-m-d_H-i-s') . '.xls';
+        $fileName = 'callers_'.now()->format('Y-m-d_H-i-s').'.xls';
 
         $html = '<!DOCTYPE html>
 <html dir="rtl">
@@ -536,7 +538,7 @@ class CallerResource extends Resource
 </head>
 <body>
     <h2>سجل المتصلين - برنامج السارية</h2>
-    <p>تاريخ التصدير: ' . now()->format('Y-m-d H:i:s') . '</p>
+    <p>تاريخ التصدير: '.now()->format('Y-m-d H:i:s').'</p>
     <table>
         <thead>
             <tr>
@@ -554,20 +556,20 @@ class CallerResource extends Resource
 
         foreach ($records as $record) {
             $rowClass = $record->is_winner ? 'winner' : ($record->status === 'blocked' ? 'blocked' : ($record->status === 'active' ? 'active' : ''));
-            $html .= '<tr class="' . $rowClass . '">
-                <td>' . htmlspecialchars($record->name) . '</td>
-                <td>' . htmlspecialchars($record->phone) . '</td>
-                <td>' . htmlspecialchars($record->cpr) . '</td>
-                <td>' . $record->hits . '</td>
-                <td>' . ($record->is_winner ? '🏆 نعم' : 'لا') . '</td>
-                <td>' . match($record->status) {
-                    'active' => 'نشط',
-                    'inactive' => 'غير نشط',
-                    'blocked' => 'محظور',
-                    default => $record->status,
-                } . '</td>
-                <td>' . $record->created_at->format('Y-m-d H:i:s') . '</td>
-                <td>' . $record->updated_at->format('Y-m-d H:i:s') . '</td>
+            $html .= '<tr class="'.$rowClass.'">
+                <td>'.htmlspecialchars($record->name).'</td>
+                <td>'.htmlspecialchars($record->phone).'</td>
+                <td>'.htmlspecialchars($record->cpr).'</td>
+                <td>'.$record->hits.'</td>
+                <td>'.($record->is_winner ? '🏆 نعم' : 'لا').'</td>
+                <td>'.match ($record->status) {
+                'active' => 'نشط',
+                'inactive' => 'غير نشط',
+                'blocked' => 'محظور',
+                default => $record->status,
+            }.'</td>
+                <td>'.$record->created_at->format('Y-m-d H:i:s').'</td>
+                <td>'.$record->updated_at->format('Y-m-d H:i:s').'</td>
             </tr>';
         }
 

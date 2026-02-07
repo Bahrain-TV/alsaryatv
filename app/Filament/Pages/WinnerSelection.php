@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Models\Caller;
 use Filament\Pages\Page;
-use BackedEnum;
 use UnitEnum;
 
 class WinnerSelection extends Page
@@ -70,11 +69,12 @@ class WinnerSelection extends Page
     {
         $winner = Caller::selectRandomWinnerByCpr();
 
-        if (!$winner) {
+        if (! $winner) {
             session()->flash('error', 'لا يوجد متصلين مؤهلين للفوز.');
+
             return;
         }
 
-        session()->flash('success', 'تم اختيار الفائز: ' . $winner->name . ' (CPR: ' . $winner->cpr . ')');
+        session()->flash('success', 'تم اختيار الفائز: '.$winner->name.' (CPR: '.$winner->cpr.')');
     }
 }

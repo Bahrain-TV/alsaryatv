@@ -5,7 +5,6 @@ namespace App\Filament\Widgets;
 use App\Models\Caller;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
 
 class ParticipationRateWidget extends BaseWidget
 {
@@ -15,7 +14,7 @@ class ParticipationRateWidget extends BaseWidget
 
     protected ?string $heading = '🎯 مؤشرات المشاركة والنمو';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getStats(): array
     {
@@ -30,7 +29,7 @@ class ParticipationRateWidget extends BaseWidget
         $thisWeek = Caller::where('created_at', '>=', now()->startOfWeek())->count();
         $lastWeek = Caller::whereBetween('created_at', [
             now()->subWeek()->startOfWeek(),
-            now()->subWeek()->endOfWeek()
+            now()->subWeek()->endOfWeek(),
         ])->count();
 
         $weeklyGrowth = $lastWeek > 0
@@ -66,8 +65,9 @@ class ParticipationRateWidget extends BaseWidget
         if ($growth > 0) {
             return "📈 نمو {$growth}% ({$lastWeek}→{$thisWeek})";
         } elseif ($growth < 0) {
-            return "📉 تراجع " . abs($growth) . "% ({$lastWeek}→{$thisWeek})";
+            return '📉 تراجع '.abs($growth)."% ({$lastWeek}→{$thisWeek})";
         }
+
         return "➡️ لا تغيير ({$lastWeek} = {$thisWeek})";
     }
 
