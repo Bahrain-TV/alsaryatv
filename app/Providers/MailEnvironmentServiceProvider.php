@@ -72,10 +72,15 @@ class MailEnvironmentServiceProvider extends ServiceProvider
             ]);
 
             // Log the email body (first 500 chars)
-            $body = $event->message->getBodyString();
-            Log::channel('mail')->debug('Email Body Preview', [
-                'preview' => substr(strip_tags($body), 0, 500) . '...',
-            ]);
+            try {
+                $bodyObject = $event->message->getBody();
+                $body = $bodyObject ? $bodyObject->toString() : 'No body content';
+                Log::channel('mail')->debug('Email Body Preview', [
+                    'preview' => substr(strip_tags($body), 0, 500) . '...',
+                ]);
+            } catch (\Exception $e) {
+                Log::channel('mail')->debug('Email Body:', ['message' => 'Unable to extract body']);
+            }
 
             Log::channel('mail')->info('✋ Email NOT sent (development environment) - Use `php artisan mail:show` to preview');
             Log::channel('mail')->info('════════════════════════════════════════════════════════════════');
