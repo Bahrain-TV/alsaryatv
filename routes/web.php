@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 $getRamadanContext = function () {
     $ramadanStartDate = config('ramadan.start_date', '2026-02-18');
     $hijriDate = config('ramadan.hijri_date', '1 رمضان 1447 هـ');
-    $registrationOpenDate = config('app.registration_open', '2026-03-01');
+    $registrationOpenDate = config('ramadan.start_date', '2026-02-18');
 
     return [
         'ramadanDate' => Carbon::parse($ramadanStartDate)->locale('ar')->translatedFormat('j F Y'),
