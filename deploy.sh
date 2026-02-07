@@ -288,9 +288,9 @@ fi
 
 log_info "Detected branch: $CURRENT_BRANCH"
 
-execute_silent "$SUDO_PREFIX git fetch origin $CURRENT_BRANCH" "Fetching latest changes from $CURRENT_BRANCH"
-execute_silent "$SUDO_PREFIX git checkout -B $CURRENT_BRANCH origin/$CURRENT_BRANCH" "Checking out $CURRENT_BRANCH branch"
-if ! execute_silent "$SUDO_PREFIX git reset --hard origin/$CURRENT_BRANCH" "Resetting to origin/$CURRENT_BRANCH"; then
+execute_silent "cd '$APP_DIR' && $SUDO_PREFIX git fetch origin $CURRENT_BRANCH" "Fetching latest changes from $CURRENT_BRANCH"
+execute_silent "cd '$APP_DIR' && $SUDO_PREFIX git checkout -B $CURRENT_BRANCH origin/$CURRENT_BRANCH" "Checking out $CURRENT_BRANCH branch"
+if ! execute_silent "cd '$APP_DIR' && $SUDO_PREFIX git reset --hard origin/$CURRENT_BRANCH" "Resetting to origin/$CURRENT_BRANCH"; then
     log_error "Git sync failed. Aborting deployment."
     send_discord_message "Deployment Failed ❌" "Git synchronization failed on server." 15548997
     exit 1
