@@ -272,7 +272,7 @@ html {
 
 /* Bismillah - Responsive Typography */
 .bismillah {
-    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    /* font-size: clamp(1rem, 3vw, 1.5rem); */
     color: var(--primary-gold);
     margin-bottom: clamp(1rem, 3vw, 1.5rem);
     text-shadow: 0 0 30px oklch(0.7686 0.1647 70.0804 / 0.5);

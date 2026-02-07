@@ -115,7 +115,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: slideInDown 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: slideInDown 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2s backwards;
         }
 
         .logo-glow {
@@ -149,7 +149,7 @@
 
         /* Text content */
         .splash-content {
-            animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+            animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s backwards;
         }
 
         .splash-title {
@@ -185,7 +185,7 @@
             flex-direction: column;
             align-items: center;
             gap: 1rem;
-            animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+            animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2.4s backwards;
         }
 
         .loading-bar {
@@ -202,7 +202,7 @@
             background: linear-gradient(90deg, #7c3aed 0%, #06b6d4 50%, #ec4899 100%);
             border-radius: 2px;
             width: 0%;
-            animation: loading 3s ease-in-out forwards;
+            animation: loading 4s ease-in-out forwards;
             box-shadow: 0 0 10px rgba(124, 58, 237, 0.6);
         }
 
@@ -290,20 +290,39 @@
         /* Responsive */
         @media (max-width: 768px) {
             .logo-image {
-                width: 200px;
+                width: 180px;
             }
 
             .logo-glow {
-                width: 240px;
-                height: 240px;
+                width: 220px;
+                height: 220px;
             }
 
             .splash-title {
-                font-size: 2rem;
+                font-size: 2.2rem;
+            }
+
+            .splash-subtitle {
+                font-size: 1.05rem;
             }
 
             .splash-container {
-                gap: 1.5rem;
+                gap: 1.25rem;
+                padding: 1.25rem;
+            }
+
+            .splash-description {
+                font-size: 0.95rem;
+                margin-bottom: 1.25rem;
+                max-width: 320px;
+            }
+
+            .loading-bar {
+                width: 160px;
+            }
+
+            .loading-text {
+                font-size: 0.8rem;
             }
 
             .orb-1 { width: 300px; height: 300px; }
@@ -414,10 +433,10 @@
 
         // Auto-redirect after loading completes (with 1-second theme detection delay)
         window.addEventListener('load', () => {
-            // Total delay: 1s (theme detection) + 3s (progress bar) + 1s (buffer) = 5 seconds
+            // Total delay: 1s (theme detection) + 4s (progress bar) + 2s (buffer) = 7 seconds
             setTimeout(() => {
                 window.location.href = '/';
-            }, 5000);
+            }, 7000);
         });
 
         // Allow escape key or click to skip
