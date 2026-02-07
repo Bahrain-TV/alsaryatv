@@ -6,6 +6,16 @@
     @push('styles')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.css" />
         <style>
+            :root {
+                --countdown-label-color: oklch(0.7155 0 0); /* Light mode: readable dark text */
+            }
+
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --countdown-label-color: oklch(0.85 0 0); /* Dark mode: lighter text for contrast */
+                }
+            }
+
             .countdown-section {
                 display: flex;
                 flex-direction: column;
@@ -20,7 +30,7 @@
                 direction: ltr !important;
             }
             .flipdown .rotor-group-heading::before {
-                color: #fbbf24 !important;
+                color: var(--countdown-label-color) !important;
                 font-family: 'Tajawal', sans-serif !important;
             }
             .flipdown .rotor-group:nth-child(1) .rotor-group-heading::before { content: 'يوم' !important; }

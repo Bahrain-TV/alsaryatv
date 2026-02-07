@@ -5,7 +5,9 @@
       "Bash(composer install:*)",
       "Bash(composer update:*)",
       "Bash(php artisan:*)",
-      "Bash(gh pr list:*)"
+      "Bash(gh pr list:*)",
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv add -A)",
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv status)"
     ]
   }
 }

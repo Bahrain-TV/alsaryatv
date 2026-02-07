@@ -1,0 +1,53 @@
+name: Deploy to Preview
+
+on:
+  push:
+    branches: [ "preview" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to preview.alsarya.tv
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        ref: preview
+        fetch-depth: 0
+
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: h6.doy.tech
+        username: root
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /home/preview.alsarya.tv/public_html
+          sudo -u alsar4210 git fetch origin preview
+          sudo -u alsar4210 git checkout -B preview origin/preview
+          sudo -u alsar4210 git reset --hard origin/preview
+          sudo -u alsar4210 php artisan migrate --force
+          sudo -u alsar4210 php artisan optimize:clear
+          sudo -u alsar4210 php artisan config:cache
+          sudo -u alsar4210 php artisan route:cache
+          sudo -u alsar4210 php artisan view:cache
+          echo "✅ Preview deployment completed successfully"
+
+    - name: Notify Discord - Success
+      if: success()
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_PREVIEW }}
+      run: |
+        curl -H "Content-Type: application/json" -X POST \
+          -d '{"embeds": [{"title": "🟢 Preview Deployment Successful ✅", "description": "https://preview.alsarya.tv is now live with the latest changes from preview branch", "color": 5763719, "footer": {"text": "AlSarya TV Preview Environment"}}]}' \
+          "$DISCORD_WEBHOOK"
+
+    - name: Notify Discord - Failure
+      if: failure()
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_PREVIEW }}
+      run: |
+        curl -H "Content-Type: application/json" -X POST \
+          -d '{"embeds": [{"title": "🔴 Preview Deployment Failed ❌", "description": "Deployment to preview.alsarya.tv failed. Check GitHub Actions logs for details", "color": 15548997, "footer": {"text": "AlSarya TV Preview Environment"}}]}' \
+          "$DISCORD_WEBHOOK"
