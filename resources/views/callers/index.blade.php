@@ -2,11 +2,28 @@
 
 @push('styles')
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Changa:wght@500;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
     
+    :root {
+        --dashboard-ink: #0b1220;
+        --dashboard-ink-soft: #0f172a;
+        --dashboard-accent: #f59e0b;
+        --dashboard-accent-2: #f97316;
+        --dashboard-blue: #38bdf8;
+        --dashboard-violet: #a855f7;
+        --dashboard-emerald: #34d399;
+        --dashboard-rose: #fb7185;
+        --dashboard-font: 'Tajawal', sans-serif;
+        --dashboard-display: 'Changa', 'Tajawal', sans-serif;
+    }
+
     /* Override Jetstream Default Layout Background */
     .min-h-screen.bg-gray-100 {
-        background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%) !important;
+        background:
+            radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.12), transparent 45%),
+            radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.15), transparent 45%),
+            radial-gradient(circle at 0% 100%, rgba(249, 115, 22, 0.12), transparent 40%),
+            linear-gradient(180deg, #0b1220 0%, #0f172a 100%) !important;
     }
     
     /* Darken the Header */
@@ -21,26 +38,110 @@
     }
 
     body {
-        font-family: 'Tajawal', sans-serif;
+        font-family: var(--dashboard-font);
         color: #e2e8f0;
     }
     
     .dashboard-container {
-        padding: clamp(1rem, 2.5vw, 2.5rem);
+        padding: clamp(1.2rem, 3vw, 3rem);
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .dashboard-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 1.5rem 2rem;
+        border-radius: 24px;
+        background: linear-gradient(120deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7));
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        box-shadow: 0 30px 80px rgba(2, 6, 23, 0.45);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(251, 191, 36, 0.18), transparent 55%);
+        pointer-events: none;
+    }
+
+    .dashboard-title {
+        font-family: var(--dashboard-display);
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+        font-weight: 800;
+        color: #fde68a;
+        letter-spacing: 0.5px;
+    }
+
+    .dashboard-subtitle {
+        color: #cbd5e1;
+        max-width: 520px;
+        margin-top: 0.5rem;
+        line-height: 1.7;
+    }
+
+    .dashboard-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
     }
 
     /* Glassmorphism Cards */
     .glass-card {
-        background: rgba(30, 41, 59, 0.7);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(18px);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 20px;
+        box-shadow: 0 25px 45px rgba(2, 6, 23, 0.35);
+    }
+
+    .stat-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
     }
 
     .stat-card {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
-        border-left: 4px solid #fbbf24;
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+        border-top: 4px solid var(--dashboard-accent);
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(251, 191, 36, 0.12), transparent 55%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .stat-card:hover::after {
+        opacity: 1;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #94a3b8;
+    }
+
+    .stat-value {
+        font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+        font-weight: 800;
+        color: #f8fafc;
+        margin-top: 0.75rem;
     }
 
     /* Table Styles */
@@ -57,6 +158,9 @@
         padding: 1rem;
         text-align: left;
         border-bottom: 2px solid rgba(251, 191, 36, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.7rem;
     }
 
     .custom-table td {
@@ -166,15 +270,15 @@
     }
 
     .robbery-button {
-        background: linear-gradient(135deg, #f97316 0%, #ef4444 45%, #b91c1c 100%);
+        background: linear-gradient(135deg, #fb923c 0%, #f97316 35%, #ef4444 70%, #b91c1c 100%);
         color: #0f172a;
-        font-size: clamp(1.25rem, 2.8vw, 2rem);
+        font-size: clamp(1.3rem, 3vw, 2.2rem);
         font-weight: 900;
-        padding: 1.25rem 2.5rem;
-        border-radius: 18px;
+        padding: 1.35rem 2.8rem;
+        border-radius: 20px;
         border: none;
         cursor: pointer;
-        box-shadow: 0 12px 24px rgba(239, 68, 68, 0.35);
+        box-shadow: 0 18px 36px rgba(239, 68, 68, 0.4);
         text-transform: uppercase;
         letter-spacing: 1px;
         transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
@@ -195,6 +299,17 @@
         0% { transform: translateY(0) scale(1); }
         50% { transform: translateY(-6px) scale(1.02); }
         100% { transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 900px) {
+        .dashboard-header {
+            padding: 1.25rem;
+        }
+
+        .dashboard-actions {
+            width: 100%;
+            justify-content: flex-start;
+        }
     }
 
     @media (max-width: 768px) {
@@ -229,30 +344,78 @@
         .robbery-button {
             width: 100%;
         }
+
+        .custom-table thead {
+            display: none;
+        }
+
+        .custom-table,
+        .custom-table tbody,
+        .custom-table tr,
+        .custom-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .custom-table tr {
+            margin-bottom: 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .custom-table td {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+        }
+
+        .custom-table td::before {
+            content: attr(data-label);
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.7rem;
+        }
     }
 </style>
 @endpush
 
 @section('content')
 <div class="dashboard-container" x-data="callerDashboard()">
-    
+    <div class="dashboard-header">
+        <div>
+            <h1 class="dashboard-title">لوحة التحكم - المتصلين</h1>
+            <p class="dashboard-subtitle">كل بيانات المشاركين في مكان واحد مع سحب فائز سريع وتصفية فورية.</p>
+        </div>
+        <div class="dashboard-actions">
+            <a href="{{ route('callers.create') }}" class="px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold rounded-xl hover:shadow-lg transition-all">
+                + إضافة متصل
+            </a>
+            <a href="{{ route('winners') }}" class="px-6 py-3 bg-white/10 text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all">
+                عرض الفائزين
+            </a>
+        </div>
+    </div>
+
     <!-- Stats Row -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="glass-card stat-card p-6">
-            <h3 class="text-gray-400 text-sm font-medium uppercase tracking-wider">Total Callers</h3>
-            <p class="text-3xl font-bold text-white mt-2" x-text="stats.total"></p>
+    <div class="stat-grid">
+        <div class="glass-card stat-card">
+            <span class="stat-label">Total Callers</span>
+            <div class="stat-value" x-text="stats.total"></div>
         </div>
-        <div class="glass-card stat-card p-6" style="border-color: #34d399;">
-            <h3 class="text-gray-400 text-sm font-medium uppercase tracking-wider">Winners</h3>
-            <p class="text-3xl font-bold text-white mt-2" x-text="stats.winners"></p>
+        <div class="glass-card stat-card" style="border-top-color: var(--dashboard-emerald);">
+            <span class="stat-label">Winners</span>
+            <div class="stat-value" x-text="stats.winners"></div>
         </div>
-        <div class="glass-card stat-card p-6" style="border-color: #a78bfa;">
-            <h3 class="text-gray-400 text-sm font-medium uppercase tracking-wider">Families</h3>
-            <p class="text-3xl font-bold text-white mt-2" x-text="stats.families"></p>
+        <div class="glass-card stat-card" style="border-top-color: var(--dashboard-violet);">
+            <span class="stat-label">Families</span>
+            <div class="stat-value" x-text="stats.families"></div>
         </div>
-        <div class="glass-card stat-card p-6" style="border-color: #f472b6;">
-            <h3 class="text-gray-400 text-sm font-medium uppercase tracking-wider">Total Hits</h3>
-            <p class="text-3xl font-bold text-white mt-2" x-text="stats.hits"></p>
+        <div class="glass-card stat-card" style="border-top-color: var(--dashboard-rose);">
+            <span class="stat-label">Total Hits</span>
+            <div class="stat-value" x-text="stats.hits"></div>
         </div>
     </div>
 
@@ -307,10 +470,6 @@
                     Winners Only
                 </button>
             </div>
-            
-            <a href="{{ route('callers.create') }}" class="px-6 py-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-bold rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
-                + Add Caller
-            </a>
         </div>
     </div>
 
@@ -332,16 +491,16 @@
                 <tbody>
                     <template x-for="caller in filteredCallers" :key="caller.id">
                         <tr class="transition-colors duration-200">
-                            <td class="font-medium text-white" x-text="caller.name"></td>
-                            <td class="font-mono text-yellow-500" x-text="caller.phone"></td>
-                            <td class="font-mono text-gray-400" x-text="caller.cpr"></td>
-                             <td>
+                            <td class="font-medium text-white" data-label="Name" x-text="caller.name"></td>
+                            <td class="font-mono text-yellow-500" data-label="Phone" x-text="caller.phone"></td>
+                            <td class="font-mono text-gray-400" data-label="CPR" x-text="caller.cpr"></td>
+                            <td data-label="Hits">
                                 <span class="badge badge-gold" x-text="caller.hits || 0"></span>
                             </td>
-                            <td>
+                            <td data-label="Type">
                                 <span class="badge" :class="caller.is_family ? 'badge-purple' : 'badge-green'" x-text="caller.is_family ? 'FAMILY' : 'INDIVIDUAL'"></span>
                             </td>
-                            <td>
+                            <td data-label="Status">
                                 <span class="badge" :class="caller.is_winner ? 'badge-green' : 'bg-gray-700 text-gray-300'">
                                     <template x-if="caller.is_winner">
                                         <span>🏆 WINNER</span>
@@ -351,7 +510,7 @@
                                     </template>
                                 </span>
                             </td>
-                            <td>
+                            <td data-label="Actions">
                                 <div class="action-stack">
                                      <!-- Winner Toggle -->
                                     <button 
