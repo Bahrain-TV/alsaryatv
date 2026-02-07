@@ -13,11 +13,11 @@ class ListWinners extends ListRecords
 {
     protected static string $resource = CallerResource::class;
 
-    protected static ?string $navigationLabel = 'Winners List';
+    protected static ?string $navigationLabel = 'الفائزون';
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-trophy';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Callers';
+    protected static \UnitEnum|string|null $navigationGroup = 'إدارة المتصلين';
 
     protected function getTableQuery(): Builder
     {
@@ -28,17 +28,20 @@ class ListWinners extends ListRecords
     {
         return [
             TextColumn::make('name')
-                ->label('Name')
+                ->label('الاسم')
                 ->sortable()
                 ->searchable(),
             TextColumn::make('phone')
-                ->label('Phone')
+                ->label('رقم الهاتف')
                 ->searchable(),
             TextColumn::make('cpr')
-                ->label('CPR')
+                ->label('الرقم الشخصي')
                 ->searchable(),
+            TextColumn::make('hits')
+                ->label('عدد المشاركات')
+                ->sortable(),
             TextColumn::make('created_at')
-                ->label('Registered On')
+                ->label('تاريخ التسجيل')
                 ->sortable()
                 ->dateTime('Y-m-d H:i:s'),
         ];
@@ -49,10 +52,11 @@ class ListWinners extends ListRecords
         return [
             Action::make('toggle_winner')
                 ->icon(fn ($record): string => $record->is_winner ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
-                ->label(fn ($record): string => $record->is_winner ? 'Unmark Winner' : 'Mark as Winner')
+                ->label(fn ($record): string => $record->is_winner ? 'إلغاء الفائز' : 'تحديد كفائز')
+                ->color(fn ($record): string => $record->is_winner ? 'success' : 'warning')
                 ->action(function ($record): void {
                     $record->update(['is_winner' => ! $record->is_winner]);
-                    $this->notify('success', 'Winner status updated.');
+                    $this->notify('success', 'تم تحديث حالة الفائز.');
                 })
                 ->requiresConfirmation(),
         ];

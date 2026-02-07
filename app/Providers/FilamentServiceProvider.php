@@ -22,6 +22,11 @@ class FilamentServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register custom Filament pages
+        Filament::registerPages([
+            \App\Filament\Pages\WinnerSelection::class,
+        ]);
+
         Filament::serving(function (): void {
             // Register all CSS files using FilamentAsset facade
             FilamentAsset::register([

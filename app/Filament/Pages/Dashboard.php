@@ -6,6 +6,7 @@ use App\Filament\Widgets\AnimatedStatsOverviewWidget;
 use App\Filament\Widgets\CallersStatsWidget;
 use App\Filament\Widgets\ParticipationRateWidget;
 use App\Filament\Widgets\PeakHoursChart;
+use App\Filament\Widgets\QuickActionsWidget;
 use App\Filament\Widgets\RecentActivityWidget;
 use App\Filament\Widgets\RegistrationTrendsChart;
 use App\Filament\Widgets\StatusDistributionChart;
@@ -23,12 +24,16 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            // ==================== QUICK ACTIONS ====================
+            // Quick Access Actions - First Row
+            QuickActionsWidget::class,
+
             // ==================== OVERVIEW SECTION ====================
-            // Main Stats - First Row
+            // Main Stats - Second Row
             AnimatedStatsOverviewWidget::class,
 
             // ==================== PARTICIPATION SECTION ====================
-            // Participation Metrics - Second Row
+            // Participation Metrics - Third Row
             ParticipationRateWidget::class,
 
             // ==================== TRENDS & ANALYTICS SECTION ====================

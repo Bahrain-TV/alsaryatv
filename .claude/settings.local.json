@@ -4,7 +4,8 @@
       "Bash(find:*)",
       "Bash(composer install:*)",
       "Bash(composer update:*)",
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "Bash(gh pr list:*)"
     ]
   }
 }
