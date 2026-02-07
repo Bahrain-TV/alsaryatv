@@ -7,7 +7,13 @@
       "Bash(php artisan:*)",
       "Bash(gh pr list:*)",
       "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv add -A)",
-      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv status)"
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv status)",
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv commit -m \"$\\(cat <<''EOF''\nfeat: Add dark mode support for countdown and preview branch infrastructure\n\n- Add CSS variable-based dark/light mode auto-detection for countdown labels\n  using @media \\(prefers-color-scheme\\) for seamless theme adaptation\n- Create preview branch infrastructure with .env.preview configuration\n- Add GitHub Actions workflow for auto-deployment to preview.alsarya.tv\n- Make deploy.sh branch-aware to support multiple deployment environments\n- Update countdown component to use OKLCH color system for consistency\n\nThis enables:\n- Countdown labels automatically adapt to system theme preference\n- Separate preview environment at https://preview.alsarya.tv\n- Automated testing environment for stakeholder review before production\n- Support for multiple deployment branches via auto-detection\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv log --oneline -1)",
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv checkout -b preview)",
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv branch -v)",
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv push -u origin preview)",
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv log --oneline -5)"
     ]
   }
 }
