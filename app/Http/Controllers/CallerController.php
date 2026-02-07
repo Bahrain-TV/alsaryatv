@@ -20,7 +20,7 @@ class CallerController extends Controller
 
     public function index()
     {
-        $callers = Caller::latest()->paginate(25);
+        $callers = Caller::latest()->get();
 
         return view('callers.index', ['callers' => $callers]);
     }
@@ -132,6 +132,34 @@ class CallerController extends Controller
             'success' => true,
             'is_winner' => $caller->is_winner,
             'message' => $caller->is_winner ? 'Caller marked as winner!' : 'Winner status removed.',
+        ]);
+    }
+
+    public function randomWinner(Request $request)
+    {
+        $caller = Caller::where('is_winner', false)->inRandomOrder()->first();
+
+        if (! $caller) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No eligible callers available.',
+            ], 422);
+        }
+
+        $caller->update(['is_winner' => true]);
+
+        return response()->json([
+            'success' => true,
+            'winner' => [
+                'id' => $caller->id,
+                'name' => $caller->name,
+                'phone' => $caller->phone,
+                'cpr' => $caller->cpr,
+                'is_winner' => true,
+                'hits' => $caller->hits,
+                'is_family' => $caller->is_family,
+            ],
+            'message' => 'Winner selected successfully.',
         ]);
     }
 

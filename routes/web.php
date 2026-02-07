@@ -72,6 +72,7 @@ Route::prefix('callers')->name('callers.')->group(function (): void {
     // Action routes
     Route::middleware('auth')->group(function (): void {
         Route::post('/{caller}/toggle-winner', [CallerController::class, 'toggleWinner'])->name('toggle-winner');
+        Route::post('/random-winner', [CallerController::class, 'randomWinner'])->name('random-winner');
         Route::delete('/{caller}', [CallerController::class, 'destroy'])->name('destroy');
         Route::put('/{caller}', [CallerController::class, 'update'])->name('update');
         Route::get('/{caller}/edit', [CallerController::class, 'edit'])->name('edit');

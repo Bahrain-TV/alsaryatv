@@ -26,7 +26,7 @@
     }
     
     .dashboard-container {
-        padding: 2rem;
+        padding: clamp(1rem, 2.5vw, 2.5rem);
     }
 
     /* Glassmorphism Cards */
@@ -107,6 +107,129 @@
         border-color: #fbbf24;
         box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
     }
+
+    .filters-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+
+    .action-stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .winner-picker {
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .winner-display {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        min-width: min(420px, 100%);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .winner-display.spinning {
+        animation: winnerSpin 1s ease-in-out infinite;
+        box-shadow: 0 0 40px rgba(251, 191, 36, 0.2);
+    }
+
+    .winner-name {
+        font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+        font-weight: 800;
+        color: #fbbf24;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
+    }
+
+    .winner-meta {
+        font-size: 0.95rem;
+        color: #cbd5e1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .robbery-button {
+        background: linear-gradient(135deg, #f97316 0%, #ef4444 45%, #b91c1c 100%);
+        color: #0f172a;
+        font-size: clamp(1.25rem, 2.8vw, 2rem);
+        font-weight: 900;
+        padding: 1.25rem 2.5rem;
+        border-radius: 18px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(239, 68, 68, 0.35);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .robbery-button:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 18px 32px rgba(239, 68, 68, 0.45);
+    }
+
+    .robbery-button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    @keyframes winnerSpin {
+        0% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-6px) scale(1.02); }
+        100% { transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+        }
+
+        .filters-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-buttons {
+            justify-content: flex-start;
+        }
+
+        .custom-table th,
+        .custom-table td {
+            padding: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .action-stack {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .winner-display {
+            min-width: 100%;
+        }
+
+        .robbery-button {
+            width: 100%;
+        }
+    }
 </style>
 @endpush
 
@@ -134,8 +257,31 @@
     </div>
 
     <!-- Filters & Actions -->
+    <div class="glass-card p-6 mb-8 winner-picker">
+        <div class="flex flex-col xl:flex-row items-center justify-between gap-6">
+            <div class="text-center xl:text-right">
+                <h2 class="text-2xl font-extrabold text-yellow-400">سحب الفائز العشوائي</h2>
+                <p class="text-sm text-gray-300 mt-2">اضغط الزر الكبير لاختيار فائز واحد مع حركة عشوائية.</p>
+            </div>
+            <div class="winner-display" :class="{ 'spinning': isPicking }">
+                <div class="winner-name" x-text="randomWinner ? randomWinner.name : 'جاهز للسحب'">
+                </div>
+                <div class="winner-meta">
+                    <span x-text="randomWinner ? '📱 ' + randomWinner.phone : '📱 ---'"></span>
+                    <span x-text="randomWinner ? '🆔 ' + randomWinner.cpr : '🆔 ---'"></span>
+                </div>
+            </div>
+            <div class="flex flex-col items-center gap-3 w-full xl:w-auto">
+                <button class="robbery-button" @click="pickRandomWinner" :disabled="isPicking || callers.length === 0">
+                    🔥 BIG ROBBERY
+                </button>
+                <span x-show="pickError" class="text-sm text-red-400" x-text="pickError"></span>
+            </div>
+        </div>
+    </div>
+
     <div class="glass-card p-6 mb-8">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="filters-actions">
             <div class="w-full md:w-1/3">
                 <div class="relative">
                     <input type="text" x-model="search" placeholder="Search by Name, CPR, or Phone..." class="search-input">
@@ -147,7 +293,7 @@
                 </div>
             </div>
             
-            <div class="flex gap-3">
+            <div class="filter-buttons">
                 <button @click="filterType = 'all'" :class="{'bg-yellow-500 text-black': filterType === 'all', 'bg-slate-700 text-white': filterType !== 'all'}" class="px-4 py-2 rounded-lg font-medium transition-colors">
                     All
                 </button>
@@ -162,7 +308,7 @@
                 </button>
             </div>
             
-             <a href="{{ route('callers.create') }}" class="px-6 py-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-bold rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
+            <a href="{{ route('callers.create') }}" class="px-6 py-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-bold rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
                 + Add Caller
             </a>
         </div>
@@ -206,7 +352,7 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="flex gap-2">
+                                <div class="action-stack">
                                      <!-- Winner Toggle -->
                                     <button 
                                         @click="toggleWinner(caller)"
@@ -265,6 +411,9 @@
             filterType: 'all', // all, family, individual
             showWinnersOnly: false,
             callers: @json($callers),
+            randomWinner: null,
+            isPicking: false,
+            pickError: null,
             
             get stats() {
                 return {
@@ -296,6 +445,62 @@
             
             toggleWinnersOnly() {
                 this.showWinnersOnly = !this.showWinnersOnly;
+            },
+
+            async pickRandomWinner() {
+                if (this.isPicking) {
+                    return;
+                }
+
+                this.pickError = null;
+                this.isPicking = true;
+
+                const spinInterval = 120;
+                const minSpinMs = 2200;
+                const startedAt = Date.now();
+                const spinner = setInterval(() => {
+                    if (this.callers.length > 0) {
+                        this.randomWinner = this.callers[Math.floor(Math.random() * this.callers.length)];
+                    }
+                }, spinInterval);
+
+                let responseData = null;
+
+                try {
+                    const response = await fetch('/callers/random-winner', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    });
+
+                    responseData = await response.json();
+
+                    if (!response.ok || !responseData.success) {
+                        throw new Error(responseData.message || 'Failed to select winner');
+                    }
+                } catch (error) {
+                    this.pickError = error.message || 'An error occurred while selecting a winner.';
+                }
+
+                const elapsed = Date.now() - startedAt;
+                const remaining = Math.max(0, minSpinMs - elapsed);
+
+                setTimeout(() => {
+                    clearInterval(spinner);
+                    this.isPicking = false;
+
+                    if (responseData && responseData.success) {
+                        const winner = responseData.winner;
+                        this.randomWinner = winner;
+
+                        const idx = this.callers.findIndex(c => c.id === winner.id);
+                        if (idx !== -1) {
+                            this.callers[idx].is_winner = true;
+                        }
+                    }
+                }, remaining);
             },
             
             async toggleWinner(caller) {
