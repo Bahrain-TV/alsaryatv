@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Route;
 
 // Shared Ramadan date logic
 $getRamadanContext = function () {
-    $ramadanStartDate = '2026-02-18';
+    $ramadanStartDate = config('ramadan.start_date', '2026-02-18');
+    $hijriDate = config('ramadan.hijri_date', '1 رمضان 1447 هـ');
     $registrationOpenDate = config('app.registration_open', '2026-03-01');
 
     return [
