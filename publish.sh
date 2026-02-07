@@ -164,16 +164,23 @@ VERSION_FILE="$SCRIPT_DIR/VERSION"
 
 if [ -f "$VERSION_FILE" ]; then
     OLD_VERSION=$(cat "$VERSION_FILE")
-    # Parse version: major.minor.patch-build
-    if [[ $OLD_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)-([0-9]+)$ ]]; then
+    # Parse version: supports both major.minor.patch and major.minor.patch-build formats
+    if [[ $OLD_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9]+))?$ ]]; then
         MAJOR="${BASH_REMATCH[1]}"
         MINOR="${BASH_REMATCH[2]}"
         PATCH="${BASH_REMATCH[3]}"
-        BUILD="${BASH_REMATCH[4]}"
-        NEW_BUILD=$((BUILD + 1))
-        NEW_VERSION="$MAJOR.$MINOR.$PATCH-$NEW_BUILD"
+        BUILD="${BASH_REMATCH[5]}"  # Build number is now in group 5 (optional group)
+
+        if [ -z "$BUILD" ]; then
+            # No build number (e.g., 3.0.0) → append -1
+            NEW_VERSION="$MAJOR.$MINOR.$PATCH-1"
+        else
+            # Has build number (e.g., 1.0.0-18) → increment it
+            NEW_BUILD=$((BUILD + 1))
+            NEW_VERSION="$MAJOR.$MINOR.$PATCH-$NEW_BUILD"
+        fi
     else
-        # Fallback: just append -1 or increment if no build number
+        # Fallback: if somehow version format is invalid, reset to base
         NEW_VERSION="1.0.0-1"
     fi
     echo "$NEW_VERSION" > "$VERSION_FILE"
