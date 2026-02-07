@@ -76,7 +76,7 @@ body {
         oklch(0.15 0 0 / 0.95) 0%,
         oklch(0.18 0 0 / 0.90) 50%,
         oklch(0.16 0 0 / 0.95) 100%),
-    url('{{ asset("images/alsarya-bg-2026-by-gemini2.jpeg") }}');
+    url('/images/alsarya-bg-2026-by-gemini-compressed.jpeg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
