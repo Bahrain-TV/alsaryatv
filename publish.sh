@@ -579,7 +579,8 @@ else
 fi
 
 echo "🔍 Checking remote version alignment..."
-REMOTE_VERSION_JSON=$($SSH_COMMAND "$SERVER" "php -r '$p=\"$APP_DIR/version.json\"; $d=@json_decode(@file_get_contents($p), true); echo $d[\"version\"] ?? \"\";'")
+REMOTE_VERSION_JSON=$($SSH_COMMAND "$SERVER" "env APP_DIR='$APP_DIR' php -r '\$p = getenv(\"APP_DIR\") . \"/version.json\"; \$d = @json_decode(@file_get_contents(\$p), true); echo \$d[\"version\"] ?? \"\";'"
+)
 REMOTE_VERSION_FILE=$($SSH_COMMAND "$SERVER" "cat $APP_DIR/VERSION 2>/dev/null" | head -1)
 
 if [ -z "$REMOTE_VERSION_JSON" ] || [ -z "$REMOTE_VERSION_FILE" ]; then
@@ -625,16 +626,9 @@ if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
     echo "✅ Remote deployment executed successfully!"
     send_discord_notification "Publish Finished ✅" "Deployment script completed successfully on server." 5763719
 
-    # Bring site back online if it wasn't already in maintenance mode
-    if [ "$WAS_DOWN" == "false" ]; then
-        echo ""
-        echo "🟢 Bringing site back ONLINE..."
-        maintenance_mode "up"
-    else
-        echo ""
-        echo "⚠️  Site remains in MAINTENANCE MODE"
-        echo "    To bring it online, run: ./publish.sh --up"
-    fi
+    echo ""
+    echo "🟢 Bringing site back ONLINE..."
+    maintenance_mode "up"
 else
     echo "❌ Remote deployment failed (Exit Code: $DEPLOY_EXIT_CODE)"
     send_discord_notification "Publish Failed ❌" "Remote deployment script returned non-zero exit code." 15548997

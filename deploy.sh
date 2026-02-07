@@ -356,6 +356,13 @@ execute_silent "$SUDO_PREFIX $ART_CMD config:cache" "Caching configuration"
 execute_silent "$SUDO_PREFIX $ART_CMD route:cache" "Caching routes"
 execute_silent "$SUDO_PREFIX $ART_CMD view:cache" "Caching views"
 
+# Extra refresh cycle to ensure fresh caches
+log_info "Running extra refresh cycle..."
+execute_silent "$SUDO_PREFIX $ART_CMD optimize:clear" "Clearing caches (refresh)"
+execute_silent "$SUDO_PREFIX $ART_CMD config:cache" "Caching configuration (refresh)"
+execute_silent "$SUDO_PREFIX $ART_CMD route:cache" "Caching routes (refresh)"
+execute_silent "$SUDO_PREFIX $ART_CMD view:cache" "Caching views (refresh)"
+
 # 7. Version Update
 NEW_VERSION=$(increment_version "$CURRENT_VERSION")
 execute_silent "echo '$NEW_VERSION' > '$VERSION_FILE' && chown $APP_USER:$APP_USER '$VERSION_FILE'" "Updating version to $NEW_VERSION"
