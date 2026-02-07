@@ -60,6 +60,52 @@
             font-feature-settings: "tnum";
             font-variant-numeric: tabular-nums;
         }
+
+        .fun-message {
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: slideIn 0.6s ease-in-out;
+            font-size: 1.5rem;
+            line-height: 1.6;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOut {
+            0% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+        }
+
+        .message-exit {
+            animation: slideOut 0.4s ease-in-out forwards;
+        }
+
+        .emoji-bounce {
+            display: inline-block;
+            animation: bounce 0.8s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -68,8 +114,8 @@
             <div class="flex justify-center mb-4">
                 <lottie-player src="lottie/crecent-moon-ramadan.json" background="transparent" speed=".1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
             </div>
-            <h1 class="text-2xl font-bold text-center mb-4">
-                السموحة، ضيعنا واير الچارچ واللي عندي منعوي.
+            <h1 class="text-2xl font-bold text-center mb-4 fun-message" id="funMessage">
+                <span class="emoji-bounce">😅</span> السموحة، ضيعنا واير الچارچ واللي عندي منعوي.
             </h1>
             {{-- <p class="text-center mb-4">قاعدين نسحب على الأسماء ... دعواتكم 🤩</p> --}}
             {{-- <div class="progress-bar mb-4">
@@ -92,6 +138,35 @@
     {{-- @include('sponsors') --}}
 
     <script>
+        // Funny maintenance messages
+        const funMessages = [
+            { text: 'السموحة، ضيعنا واير الچارچ واللي عندي منعوي.', emoji: '😅' },
+            { text: 'شكلنا يبيلنا دكه.. فيكم شده؟', emoji: '🔧' },
+            { text: 'شباب تره خلص التانكي.. أحد يعرف رقم ماي بيلر؟', emoji: '💧' },
+        ];
+
+        let currentMessageIndex = 0;
+
+        function updateFunMessage() {
+            const messageEl = document.getElementById('funMessage');
+            const message = funMessages[currentMessageIndex];
+
+            // Add exit animation
+            messageEl.classList.add('message-exit');
+
+            setTimeout(() => {
+                // Update message
+                messageEl.innerHTML = `<span class="emoji-bounce">${message.emoji}</span> ${message.text}`;
+                messageEl.classList.remove('message-exit');
+
+                // Move to next message
+                currentMessageIndex = (currentMessageIndex + 1) % funMessages.length;
+            }, 300);
+        }
+
+        // Change message every 5 seconds
+        setInterval(updateFunMessage, 5000);
+
         document.addEventListener('DOMContentLoaded', () => {
             // Get the actual hits from session
             const hits = {{ session('hits', 1) }};
