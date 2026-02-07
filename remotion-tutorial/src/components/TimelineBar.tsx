@@ -1,3 +1,4 @@
+/* eslint-disable react/no-inline-styles, react/jsx-no-inline-styles */
 import React from 'react';
 
 export const TimelineBar: React.FC<{label: string; progress: number}> = ({

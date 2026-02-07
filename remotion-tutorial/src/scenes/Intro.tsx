@@ -1,3 +1,4 @@
+/* eslint-disable react/no-inline-styles, react/jsx-no-inline-styles */
 import React from 'react';
 import {Sequence, useCurrentFrame} from '@remotion/core';
 import {spring} from '@remotion/animation-utils';
