@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Mail\WinnerAnnouncement;
+use App\Mail\AdminWinnerNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -10,28 +10,46 @@ class TestEmailCommand extends Command
 {
     protected $signature = 'test:email
                             {email=aldoyh@gmail.com : Email address to send test to}
-                            {--winner-name=محمد أحمد التجريبي : Winner name for test}
-                            {--prize=250 : Prize amount}';
+                            {--type=admin : Email type: admin (for admin notification)}';
 
-    protected $description = 'Send test winner announcement email to verify SMTP configuration';
+    protected $description = 'Send test email to verify SMTP configuration';
 
     public function handle()
     {
         $email = $this->argument('email');
-        $winnerName = $this->option('winner-name');
-        $prize = $this->option('prize');
+        $type = $this->option('type');
 
-        $this->info("📧 Sending test email to: {$email}");
-        $this->line("   Winner Name: {$winnerName}");
-        $this->line("   Prize Amount: {$prize} د.ب");
-        $this->line('');
+        $this->info("📧 Sending test {$type} email to: {$email}");
 
         try {
-            Mail::to($email)->send(new WinnerAnnouncement(
-                winnerName: $winnerName,
-                winnerCpr: '000000000',
-                prizeAmount: $prize,
-                prizeDescription: 'هذا بريد اختباري لتجربة نظام البريد الإلكتروني. جميع البيانات المعروضة تجريبية وليست حقيقية.'
+            // Sample test data for admin notification
+            $testWinners = [
+                [
+                    'name' => 'محمد أحمد إبراهيم',
+                    'phone' => '+973 3366 2211',
+                    'cpr' => '123456789012',
+                    'hits' => 5,
+                    'selected_at' => now()->locale('ar')->translatedFormat('j F Y H:i'),
+                ],
+                [
+                    'name' => 'فاطمة علي محمد',
+                    'phone' => '+973 3355 4477',
+                    'cpr' => '234567890123',
+                    'hits' => 3,
+                    'selected_at' => now()->locale('ar')->translatedFormat('j F Y H:i'),
+                ],
+                [
+                    'name' => 'علي سالم خميس',
+                    'phone' => '+973 3344 5566',
+                    'cpr' => '345678901234',
+                    'hits' => 7,
+                    'selected_at' => now()->locale('ar')->translatedFormat('j F Y H:i'),
+                ],
+            ];
+
+            Mail::to($email)->send(new AdminWinnerNotification(
+                winners: $testWinners,
+                announcement: 'هذا بريد اختباري لتجربة نظام إشعارات الفائزين. البيانات المعروضة تجريبية وليست حقيقية.'
             ));
 
             $this->info('✅ Email sent successfully!');
@@ -42,6 +60,7 @@ class TestEmailCommand extends Command
             $this->info('ℹ️  Current Mail Configuration:');
             $this->line('   Mailer: ' . config('mail.default'));
             $this->line('   From: ' . config('mail.from.address'));
+            $this->line('   Email Type: Admin Winner Notification (Recipients: Admin)');
             $this->line('');
 
             return 0;
