@@ -204,7 +204,7 @@ elif [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "Usage: ./publish.sh [OPTION]"
     echo ""
     echo "Options:"
-    echo "  (no args)     Standard deployment (version bump + full deploy)"
+    echo "  (no args)     Standard deployment (version check + full deploy)"
     echo "  --down        Put site in maintenance mode"
     echo "  --up          Bring site back online"
     echo "  --main        Switch to main branch (preserves data)"
@@ -233,42 +233,104 @@ fi
 
 echo ""
 
-# Auto-increment version before deployment
+# Compute next version without touching local VERSION (keep it pristine)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERSION_FILE="$SCRIPT_DIR/VERSION"
+VERSION_JSON="$SCRIPT_DIR/version.json"
+
+parse_version_components() {
+    local version="$1"
+
+    if [[ $version =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9]+))?$ ]]; then
+        local base="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+        local build="${BASH_REMATCH[5]}"
+        if [ -z "$build" ]; then
+            build="0"
+        fi
+        echo "$base|$build"
+        return 0
+    fi
+
+    return 1
+}
+
+if [ ! -f "$VERSION_JSON" ]; then
+    echo "❌ Error: version.json not found at $VERSION_JSON"
+    send_discord_notification "Publish Failed ❌" "Missing version.json locally." 15548997
+    exit 1
+fi
 
 if [ -f "$VERSION_FILE" ]; then
     OLD_VERSION=$(cat "$VERSION_FILE")
-    # Parse version: supports both major.minor.patch and major.minor.patch-build formats
-    if [[ $OLD_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9]+))?$ ]]; then
-        MAJOR="${BASH_REMATCH[1]}"
-        MINOR="${BASH_REMATCH[2]}"
-        PATCH="${BASH_REMATCH[3]}"
-        BUILD="${BASH_REMATCH[5]}"  # Build number is now in group 5 (optional group)
+    LOCAL_JSON_VERSION=$(grep -E '"version"\s*:' "$VERSION_JSON" | head -1 | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/\1/')
 
-        if [ -z "$BUILD" ]; then
-            # No build number (e.g., 3.0.0) → append -1
-            NEW_VERSION="$MAJOR.$MINOR.$PATCH-1"
-        else
-            # Has build number (e.g., 1.0.0-18) → increment it
-            NEW_BUILD=$((BUILD + 1))
-            NEW_VERSION="$MAJOR.$MINOR.$PATCH-$NEW_BUILD"
-        fi
-    else
-        # Fallback: if somehow version format is invalid, reset to base
-        NEW_VERSION="1.0.0-1"
+    if [ -z "$LOCAL_JSON_VERSION" ]; then
+        echo "❌ Error: Could not read version from version.json"
+        send_discord_notification "Publish Failed ❌" "version.json missing version field." 15548997
+        exit 1
     fi
-    echo "$NEW_VERSION" > "$VERSION_FILE"
-    echo "📦 Version bumped: $OLD_VERSION → $NEW_VERSION"
 
-    # Commit the version bump
-    cd "$SCRIPT_DIR"
-    git add VERSION
-    git commit -m "chore: bump version to $NEW_VERSION [skip ci]" 2>/dev/null || true
+    PARSED_LOCAL_VERSION=$(parse_version_components "$OLD_VERSION")
+    if [ -z "$PARSED_LOCAL_VERSION" ]; then
+        echo "❌ Error: VERSION file has invalid format: $OLD_VERSION"
+        send_discord_notification "Publish Failed ❌" "Local VERSION format invalid." 15548997
+        exit 1
+    fi
+
+    IFS='|' read -r BASE_VERSION CURRENT_BUILD <<< "$PARSED_LOCAL_VERSION"
+
+    if [ "$BASE_VERSION" != "$LOCAL_JSON_VERSION" ]; then
+        echo "❌ Error: version.json ($LOCAL_JSON_VERSION) and VERSION ($BASE_VERSION) do not match"
+        send_discord_notification "Publish Failed ❌" "Local version.json and VERSION mismatch." 15548997
+        exit 1
+    fi
+
+    MAJOR_VERSION=$(echo "$BASE_VERSION" | cut -d. -f1)
+    if [ "$MAJOR_VERSION" -lt 3 ]; then
+        echo "❌ Error: Base version must be 3.x or higher. Found: $BASE_VERSION"
+        send_discord_notification "Publish Failed ❌" "Base version below 3.x." 15548997
+        exit 1
+    fi
+
+    NEW_BUILD=$((CURRENT_BUILD + 1))
+    NEW_VERSION="$BASE_VERSION-$NEW_BUILD"
+
+    echo "📦 Version computed (local VERSION unchanged): $OLD_VERSION -> $NEW_VERSION"
 else
-    echo "1.0.0-1" > "$VERSION_FILE"
-    NEW_VERSION="1.0.0-1"
-    echo "📦 Created VERSION file: $NEW_VERSION"
+    echo "❌ Error: VERSION file not found at $VERSION_FILE"
+    send_discord_notification "Publish Failed ❌" "Missing VERSION file locally." 15548997
+    exit 1
+fi
+
+echo "🔍 Checking remote version alignment..."
+REMOTE_VERSION_JSON=$($SSH_COMMAND "$SERVER" "cat $APP_DIR/version.json 2>/dev/null" | grep -E '"version"\s*:' | head -1 | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/\1/')
+REMOTE_VERSION_FILE=$($SSH_COMMAND "$SERVER" "cat $APP_DIR/VERSION 2>/dev/null" | head -1)
+
+if [ -z "$REMOTE_VERSION_JSON" ] || [ -z "$REMOTE_VERSION_FILE" ]; then
+    echo "❌ Error: Could not read remote version.json or VERSION"
+    send_discord_notification "Publish Failed ❌" "Remote version files missing or unreadable." 15548997
+    exit 1
+fi
+
+PARSED_REMOTE_VERSION=$(parse_version_components "$REMOTE_VERSION_FILE")
+if [ -z "$PARSED_REMOTE_VERSION" ]; then
+    echo "❌ Error: Remote VERSION format invalid: $REMOTE_VERSION_FILE"
+    send_discord_notification "Publish Failed ❌" "Remote VERSION format invalid." 15548997
+    exit 1
+fi
+
+IFS='|' read -r REMOTE_BASE_VERSION REMOTE_BUILD <<< "$PARSED_REMOTE_VERSION"
+
+if [ "$REMOTE_VERSION_JSON" != "$BASE_VERSION" ] || [ "$REMOTE_BASE_VERSION" != "$BASE_VERSION" ]; then
+    echo "❌ Error: Remote base version mismatch. Local: $BASE_VERSION, Remote JSON: $REMOTE_VERSION_JSON, Remote VERSION: $REMOTE_BASE_VERSION"
+    send_discord_notification "Publish Failed ❌" "Remote base version mismatch." 15548997
+    exit 1
+fi
+
+if [ "$REMOTE_BUILD" != "$CURRENT_BUILD" ]; then
+    echo "❌ Error: Remote build ($REMOTE_BUILD) does not match local build ($CURRENT_BUILD)"
+    send_discord_notification "Publish Failed ❌" "Remote build mismatch." 15548997
+    exit 1
 fi
 
 send_discord_notification "🚀 Publish Started (v$NEW_VERSION)" "Initiating version **$NEW_VERSION** publish from local machine..." 3447003
@@ -280,7 +342,7 @@ upload_files_to_production
 echo "⚡ Executing deploy.sh on server via SSH..."
 send_discord_notification "Phase 2: Execution ⚡" "Triggering ./deploy.sh on remote server..." 3447003
 
-$SSH_COMMAND "$SERVER" "cd $APP_DIR && ./deploy.sh"
+$SSH_COMMAND "$SERVER" "cd $APP_DIR && PUBLISH_VERSION='$NEW_VERSION' PUBLISH_BASE_VERSION='$BASE_VERSION' PUBLISH_BUILD='$NEW_BUILD' ./deploy.sh"
 DEPLOY_EXIT_CODE=$?
 
 if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
