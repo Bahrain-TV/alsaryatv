@@ -21,8 +21,8 @@
         <!-- Styles -->
         @livewireStyles
     </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
+    <body class="jetstream-auth" style="background-color: #f3f4f6; background-image: none; color: #111827; display: block; min-height: 100%; margin: 0; padding: 0;">
+        <div class="font-sans text-gray-900 antialiased" style="font-family: Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;;">
             {{ $slot }}
         </div>
 

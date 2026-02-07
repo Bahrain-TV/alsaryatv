@@ -94,6 +94,72 @@ body {
     padding: max(env(safe-area-inset-top), 0.5rem) max(env(safe-area-inset-right), 0.5rem) max(env(safe-area-inset-bottom), 0.5rem) max(env(safe-area-inset-left), 0.5rem);
 }
 
+body.jetstream-auth {
+    font-family: Figtree, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    background: #f3f4f6 !important;
+    background-image: none !important;
+    background-attachment: scroll !important;
+    background-position: initial !important;
+    background-repeat: repeat !important;
+    background-size: auto !important;
+    color: #111827 !important;
+    min-height: 100% !important;
+    display: block !important;
+    align-items: initial !important;
+    justify-content: initial !important;
+    overflow-x: initial !important;
+    position: static !important;
+    padding: 0 !important;
+}
+
+body.jetstream-auth .font-sans {
+    font-family: Figtree, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+body.jetstream-auth .bg-gray-100 {
+    background-color: #f7f4ec;
+}
+
+body.jetstream-auth .bg-white {
+    background-color: #ffffff;
+}
+
+body.jetstream-auth .text-gray-900 {
+    color: #0f172a;
+}
+
+body.jetstream-auth .text-gray-700 {
+    color: #334155;
+}
+
+body.jetstream-auth .text-gray-600 {
+    color: #475569;
+}
+
+body.jetstream-auth .border-gray-300 {
+    border-color: #d6c9a6;
+}
+
+body.jetstream-auth .focus\:border-indigo-500:focus {
+    border-color: #c8a24b;
+}
+
+body.jetstream-auth .focus\:ring-indigo-500:focus {
+    --tw-ring-color: #c8a24b;
+}
+
+body.jetstream-auth .bg-gray-800 {
+    background-color: #0b1f36;
+}
+
+body.jetstream-auth .hover\:bg-gray-700:hover {
+    background-color: #132a47;
+}
+
+body.jetstream-auth .active\:bg-gray-900:active {
+    background-color: #081525;
+}
+
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;

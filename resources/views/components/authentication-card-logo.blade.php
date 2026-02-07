@@ -1,3 +1,3 @@
 <a href="/">
-    <img src="{{ asset('images/alsarya-logo.png') }}" alt="{{ config('app.name') }}" class="w-16 h-16" />
+    <x-application-logo class="h-16 w-auto" />
 </a>
