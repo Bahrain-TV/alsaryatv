@@ -10,6 +10,7 @@
         "blade-ui-kit/blade-heroicons": "^2.6",
         "filament/filament": "^5.1",
         "google/apiclient": "^2.19",
+        "intervention/image": "^3.11",
         "laravel/framework": "^12.49",
         "laravel/jetstream": "^5.4",
         "laravel/reverb": "^1.7",
