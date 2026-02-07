@@ -231,8 +231,8 @@ html {
 /* Downtime Card - Modern Glassmorphism with OKLCH */
 .downtime-card {
     background: oklch(0.2686 0 0 / 0.7);
-    backdrop-filter: blur(32px) saturate(180%);
     -webkit-backdrop-filter: blur(32px) saturate(180%);
+    backdrop-filter: blur(32px) saturate(180%);
     border: 1px solid oklch(0.3715 0 0 / 0.3);
     border-top: 1px solid oklch(0.9219 0 0 / 0.15);
     border-left: 1px solid oklch(0.9219 0 0 / 0.1);

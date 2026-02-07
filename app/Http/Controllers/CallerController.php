@@ -8,7 +8,8 @@ use App\Models\Caller;
 use App\Providers\HitsCounter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 
 class CallerController extends Controller
@@ -116,7 +117,7 @@ class CallerController extends Controller
         // Log the check attempt for security audit
         Log::channel('security')->info('CPR check requested', [
             'ip' => $request->ip(),
-            'user_id' => auth()->id() ?? 'guest',
+            'user_id' => Auth::id() ?? 'guest',
         ]);
 
         return response()->json([

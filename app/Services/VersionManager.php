@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Auth;
 
 class VersionManager
 {
@@ -62,7 +63,7 @@ class VersionManager
         $data = self::getVersionData();
         $data['version'] = $version;
         $data['updated_at'] = now()->toIso8601String();
-        $data['updated_by'] = auth()->user()?->email ?? 'system';
+        $data['updated_by'] = Auth::user()?->email ?? 'system';
 
         self::writeVersionData($data);
 
@@ -174,7 +175,7 @@ class VersionManager
         $newVersion = implode('.', $parts);
         $data['version'] = $newVersion;
         $data['updated_at'] = now()->toIso8601String();
-        $data['updated_by'] = auth()->user()?->email ?? 'system';
+        $data['updated_by'] = Auth::user()?->email ?? 'system';
 
         self::writeVersionData($data);
 

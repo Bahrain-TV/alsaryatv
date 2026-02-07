@@ -269,27 +269,41 @@
         gap: 0.35rem;
     }
 
-    .robbery-button {
-        background: linear-gradient(135deg, #fb923c 0%, #f97316 35%, #ef4444 70%, #b91c1c 100%);
+    .rubber-button {
+        background: linear-gradient(160deg, #fbbf24 0%, #f59e0b 35%, #d97706 100%);
         color: #0f172a;
-        font-size: clamp(1.3rem, 3vw, 2.2rem);
+        font-size: clamp(1.2rem, 2.8vw, 2rem);
         font-weight: 900;
-        padding: 1.35rem 2.8rem;
-        border-radius: 20px;
-        border: none;
+        padding: 1.2rem 2.6rem;
+        border-radius: 9999px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
         cursor: pointer;
-        box-shadow: 0 18px 36px rgba(239, 68, 68, 0.4);
+        box-shadow:
+            inset 0 -6px 12px rgba(124, 45, 18, 0.35),
+            inset 0 4px 8px rgba(255, 255, 255, 0.25),
+            0 14px 30px rgba(245, 158, 11, 0.4);
         text-transform: uppercase;
         letter-spacing: 1px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     }
 
-    .robbery-button:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 18px 32px rgba(239, 68, 68, 0.45);
+    .rubber-button:hover {
+        transform: translateY(-1px) scale(1.01);
+        box-shadow:
+            inset 0 -6px 12px rgba(124, 45, 18, 0.4),
+            inset 0 4px 10px rgba(255, 255, 255, 0.3),
+            0 18px 36px rgba(245, 158, 11, 0.45);
     }
 
-    .robbery-button:disabled {
+    .rubber-button:active {
+        transform: translateY(2px) scale(0.99);
+        box-shadow:
+            inset 0 -2px 6px rgba(124, 45, 18, 0.5),
+            inset 0 2px 6px rgba(255, 255, 255, 0.2),
+            0 10px 18px rgba(245, 158, 11, 0.35);
+    }
+
+    .rubber-button:disabled {
         opacity: 0.55;
         cursor: not-allowed;
         transform: none;
@@ -341,7 +355,7 @@
             min-width: 100%;
         }
 
-        .robbery-button {
+        .rubber-button {
             width: 100%;
         }
 
@@ -435,8 +449,8 @@
                 </div>
             </div>
             <div class="flex flex-col items-center gap-3 w-full xl:w-auto">
-                <button class="robbery-button" @click="pickRandomWinner" :disabled="isPicking || callers.length === 0">
-                    🔥 BIG ROBBERY
+                <button class="rubber-button" @click="pickRandomWinner" :disabled="isPicking || callers.length === 0">
+                    اختيار الفائز العشوائي
                 </button>
                 <span x-show="pickError" class="text-sm text-red-400" x-text="pickError"></span>
             </div>

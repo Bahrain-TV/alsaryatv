@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\VersionManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VersionCheckController extends Controller
 {
@@ -124,7 +125,7 @@ class VersionCheckController extends Controller
         };
 
         \Illuminate\Support\Facades\Log::warning('Version incremented by user', [
-            'user' => auth()->user()?->email,
+            'user' => Auth::user()?->email,
             'type' => $type,
             'new_version' => $newVersion,
         ]);
