@@ -130,12 +130,87 @@ check_maintenance_status() {
     echo "$status"
 }
 
+# Function to switch branch on production server (data-preserving)
+switch_branch() {
+    local target_branch="$1"
+    local description="$2"
+
+    echo "🔄 Switching to $description branch..."
+    send_discord_notification "🔄 Branch Switch Started" "Switching production to **$target_branch** branch..." 3447003
+
+    # Execute branch switch on server with data preservation
+    $SSH_COMMAND "$SERVER" "cd /home/alsarya.tv/public_html && \
+    echo '📍 Current branch:' && \
+    git rev-parse --abbrev-ref HEAD && \
+    echo '🔄 Fetching latest from origin...' && \
+    sudo -u alsar4210 git fetch origin $target_branch && \
+    echo '💾 Switching to $target_branch (data-safe)...' && \
+    sudo -u alsar4210 git checkout -B $target_branch origin/$target_branch && \
+    echo '🔄 Running migrations (if any)...' && \
+    sudo -u alsar4210 php artisan migrate --force 2>&1 | grep -E 'Migrating|Migration completed|nothing to migrate' && \
+    echo '🧹 Clearing caches...' && \
+    sudo -u alsar4210 php artisan config:cache > /dev/null 2>&1 && \
+    sudo -u alsar4210 php artisan route:cache > /dev/null 2>&1 && \
+    sudo -u alsar4210 php artisan view:cache > /dev/null 2>&1 && \
+    echo '✅ Branch switch completed successfully!'"
+
+    if [ $? -eq 0 ]; then
+        send_discord_notification "✅ Branch Switch Complete" "Production is now on **$target_branch** branch. Database and caller data preserved." 5763719
+        echo "✅ Successfully switched to $description"
+        return 0
+    else
+        send_discord_notification "❌ Branch Switch Failed" "Could not switch to $target_branch. Check server logs." 15548997
+        echo "❌ Failed to switch branch"
+        return 1
+    fi
+}
+
 # Argument Handling
 if [ "$1" == "--down" ]; then
     maintenance_mode "down"
     exit 0
 elif [ "$1" == "--up" ]; then
     maintenance_mode "up"
+    exit 0
+elif [ "$1" == "--prod" ]; then
+    echo "🚀 Switching to PRODUCTION branch..."
+    echo ""
+    switch_branch "production" "Production (Live)"
+    if [ $? -eq 0 ]; then
+        echo ""
+        echo "🟢 Bringing site BACK ONLINE..."
+        maintenance_mode "up"
+        echo ""
+        echo "✅ Production branch is now LIVE!"
+        echo "📝 All caller data has been preserved."
+    fi
+    exit 0
+elif [ "$1" == "--main" ]; then
+    echo "🚀 Switching to MAIN branch..."
+    echo ""
+    switch_branch "main" "Main (Development)"
+    if [ $? -eq 0 ]; then
+        echo ""
+        echo "🟢 Bringing site BACK ONLINE..."
+        maintenance_mode "up"
+        echo ""
+        echo "✅ Main branch is now active!"
+        echo "📝 All caller data has been preserved."
+    fi
+    exit 0
+elif [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
+    echo "AlSarya TV Publish Script"
+    echo ""
+    echo "Usage: ./publish.sh [OPTION]"
+    echo ""
+    echo "Options:"
+    echo "  (no args)     Standard deployment (version bump + full deploy)"
+    echo "  --down        Put site in maintenance mode"
+    echo "  --up          Bring site back online"
+    echo "  --main        Switch to main branch (preserves data)"
+    echo "  --prod        Switch to production branch (preserves data)"
+    echo "  --help, -h    Show this help message"
+    echo ""
     exit 0
 fi
 
