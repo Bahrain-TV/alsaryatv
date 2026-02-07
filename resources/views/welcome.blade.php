@@ -222,7 +222,7 @@
     
     <script>
         // ==================== REGISTRATION TYPE TOGGLE WITH SPINNING ANIMATION ====================
-        document.addEventListener('DOMContentLoaded', function() {
+        function setupRegistrationToggle() {
             const individualToggle = document.getElementById('individual-toggle');
             const familyToggle = document.getElementById('family-toggle');
             const registrationType = document.getElementById('registration_type');
@@ -233,8 +233,14 @@
             const registrationForm = document.querySelector('.registration-form');
             let isAnimating = false;
 
+            // Ensure all required elements exist
+            if (!individualToggle || !familyToggle || !registrationType) {
+                console.warn('Registration form elements not found');
+                return;
+            }
+
             // Check if gsap is available
-            const hasGSAP = typeof gsap !== 'undefined';
+            const hasGSAP = typeof window.gsap !== 'undefined';
 
             function updateButtonStyles(isFamily) {
                 if (isFamily) {
@@ -357,6 +363,21 @@
 
             // Set initial state
             setIndividualMode();
+        }
+
+        // Initialize on DOMContentLoaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupRegistrationToggle);
+        } else {
+            // DOM is already loaded
+            setupRegistrationToggle();
+        }
+
+        // Also setup if GSAP loads late
+        window.addEventListener('load', function() {
+            if (typeof window.gsap !== 'undefined' && document.getElementById('individual-toggle')) {
+                setupRegistrationToggle();
+            }
         });
 
         // ==================== PRELOADER / SPLASH SCREEN ====================

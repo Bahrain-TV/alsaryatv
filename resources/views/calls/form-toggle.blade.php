@@ -155,14 +155,21 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    function setupFormToggle() {
         const individualBtn = document.getElementById('toggleIndividual');
         const familyBtn = document.getElementById('toggleFamily');
         const individualForm = document.getElementById('individualFormContainer');
         const familyForm = document.getElementById('familyFormContainer');
         const formContainer = document.getElementById('formContainer');
         let isAnimating = false;
-        let hasGSAP = typeof gsap !== 'undefined';
+
+        // Ensure all required elements exist
+        if (!individualBtn || !familyBtn || !individualForm || !familyForm) {
+            console.warn('Form toggle elements not found');
+            return;
+        }
+
+        let hasGSAP = typeof window.gsap !== 'undefined';
 
         function switchForm(showIndividual) {
             // Check if already showing the requested form
@@ -295,5 +302,20 @@
         // Set initial state
         individualForm.classList.add('show');
         familyForm.classList.add('hide');
+    }
+
+    // Initialize on DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupFormToggle);
+    } else {
+        // DOM is already loaded
+        setupFormToggle();
+    }
+
+    // Also setup if GSAP loads late
+    window.addEventListener('load', function() {
+        if (typeof window.gsap !== 'undefined' && document.getElementById('toggleIndividual')) {
+            setupFormToggle();
+        }
     });
 </script>

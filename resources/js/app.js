@@ -11,6 +11,9 @@ import { TornadoEffect } from './tornado-effect';
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
+// Make GSAP available globally for inline scripts in blade templates
+window.gsap = gsap;
+
 // Make TornadoEffect available globally
 window.TornadoEffect = TornadoEffect;
 
