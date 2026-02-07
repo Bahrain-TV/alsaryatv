@@ -13,10 +13,10 @@
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
                         <div class="space-y-3">
-                            <a href="{{ route('admin.callers.index') }}" class="block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-center transition-colors">
+                            <a href="{{ url('/admin/callers') }}" class="block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-center transition-colors">
                                 Manage Callers
                             </a>
-                            <a href="{{ route('admin.callers.winners') }}" class="block bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-center transition-colors">
+                            <a href="{{ url('/admin') }}" class="block bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-center transition-colors">
                                 View Winners
                             </a>
                         </div>
