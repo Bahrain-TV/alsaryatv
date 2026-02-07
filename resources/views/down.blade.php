@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="{{ $refresh ?? session('seconds', 40) }}">
     <title>لحظات وسنعود...</title>
 
     <!-- Fonts -->
@@ -128,7 +129,7 @@
             <div class="mt-6 text-center">
                 <p class="text-sm">عدد الزيارات: <span id="hits-counter" class="count-number text-orange-300"></span></p>
                 <p class="text-sm">شكثر وقت باقي؟: <span id="countdown" class="text-orange-300">
-                    {{ session('seconds', 60) }}
+                    {{ $refresh ?? session('seconds', 40) }}
                     </span> ثواني</p>
             </div>
 
@@ -145,29 +146,14 @@
             { text: 'شباب تره خلص التانكي.. أحد يعرف رقم ماي بيلر؟', emoji: '💧' },
         ];
 
-        let currentMessageIndex = 0;
-
-        function updateFunMessage() {
+        function setFunMessageOnce() {
             const messageEl = document.getElementById('funMessage');
-            const message = funMessages[currentMessageIndex];
-
-            // Add exit animation
-            messageEl.classList.add('message-exit');
-
-            setTimeout(() => {
-                // Update message
-                messageEl.innerHTML = `<span class="emoji-bounce">${message.emoji}</span> ${message.text}`;
-                messageEl.classList.remove('message-exit');
-
-                // Move to next message
-                currentMessageIndex = (currentMessageIndex + 1) % funMessages.length;
-            }, 300);
+            const message = funMessages[Math.floor(Math.random() * funMessages.length)];
+            messageEl.innerHTML = `<span class="emoji-bounce">${message.emoji}</span> ${message.text}`;
         }
 
-        // Change message every 5 seconds
-        setInterval(updateFunMessage, 5000);
-
         document.addEventListener('DOMContentLoaded', () => {
+            setFunMessageOnce();
             // Get the actual hits from session
             const hits = {{ session('hits', 1) }};
             const hitsCounter = document.getElementById('hits-counter');
@@ -194,7 +180,7 @@
             progressBar.style.width = '0%';
 
             // Start countdown
-            let secondsLeft = {{ session('seconds', 60) }};
+            let secondsLeft = {{ $refresh ?? session('seconds', 40) }};
             progressBar.style.width = '100%';
 
             const countdownInterval = setInterval(() => {
@@ -203,7 +189,7 @@
 
                 if (secondsLeft <= 0) {
                     clearInterval(countdownInterval);
-                    window.location.href = '/'; // Redirect back to homepage
+                    window.location.reload(); // Retry the page after refresh window
                 }
             }, 1000);
         });
