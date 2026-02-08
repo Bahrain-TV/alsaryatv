@@ -1,0 +1,198 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XYZ - Splash Screen (Slow Motion)</title>
+    <!-- GSAP for Professional Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Tailwind for Layout & Theme -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            /* Shadcn-inspired palette (Zinc & Violet) */
+            --background: #09090b;
+            --foreground: #fafafa;
+            --primary: #7c3aed;
+            --primary-foreground: #fafafa;
+            --secondary: #27272a;
+            --muted: #27272a;
+            --accent: #7c3aed;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            overflow: hidden;
+            margin: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        #splash-container {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        /* The Clock Weight (Plumb Bob) styling */
+        .plumb-bob {
+            filter: drop-shadow(0 0 25px rgba(124, 58, 237, 0.5));
+        }
+
+        .bob-metal {
+            fill: url(#bobGradient);
+            stroke: var(--primary);
+            stroke-width: 0.5;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            font-size: 5rem;
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+
+        /* Background Grain Overlay for Premium Feel */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <div id="splash-container">
+        <!-- The Physics Element: String and Bob -->
+        <svg id="anchor" width="200" height="100vh" viewBox="0 0 200 800" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+            <defs>
+                <linearGradient id="bobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#a78bfa" />
+                    <stop offset="50%" style="stop-color:#7c3aed" />
+                    <stop offset="100%" style="stop-color:#4c1d95" />
+                </linearGradient>
+            </defs>
+            
+            <!-- The String (Dashed for clock look) -->
+            <path id="string" d="M100,0 L100,-500" stroke="#71717a" stroke-width="1.5" stroke-dasharray="4 2" />
+            
+            <!-- The Plumb Bob Weight -->
+            <g id="weight-group">
+                <path class="plumb-bob bob-metal" d="M100,40 L115,10 L100,0 L85,10 Z" />
+                <circle cx="100" cy="0" r="3" fill="#71717a" />
+            </g>
+        </svg>
+
+        <!-- Final Logo -->
+        <div id="logo" class="logo-text absolute">XYZ</div>
+        
+        <!-- Subtle Skip Prompt -->
+        <button id="skip-btn" class="absolute bottom-12 text-zinc-500 text-xs uppercase tracking-widest opacity-0 hover:text-white transition-colors">
+            Skip Intro
+        </button>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            // Every duration has been doubled for a more dramatic, cinematic effect
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    // Logic for post-animation
+                }
+            });
+
+            const string = document.querySelector('#string');
+            const weight = document.querySelector('#weight-group');
+            const logo = document.querySelector('#logo');
+            const skip = document.querySelector('#skip-btn');
+
+            // Set initial hidden state for weight
+            gsap.set(weight, { y: -500 });
+            gsap.set(string, { attr: { d: "M100,0 L100,-500" } });
+
+            // 1. THE DROP: Doubled to 2.8s
+            tl.to(weight, {
+                y: 500,
+                duration: 2.8,
+                ease: "bounce.out",
+                onUpdate: function() {
+                    const currentY = gsap.getProperty(weight, "y");
+                    string.setAttribute('d', `M100,0 L100,${currentY}`);
+                }
+            });
+
+            // 2. THE DANGLE: Harmonic motion doubled
+            tl.to("#anchor", {
+                rotation: 8,
+                duration: 1.2,
+                transformOrigin: "top center",
+                ease: "power2.inOut"
+            }, "-=0.6")
+            .to("#anchor", {
+                rotation: -5,
+                duration: 1.6,
+                ease: "power2.inOut"
+            })
+            .to("#anchor", {
+                rotation: 0,
+                duration: 4.0,
+                ease: "elastic.out(1, 0.3)"
+            })
+            
+            // Show skip button during the slower dangle
+            .to(skip, { opacity: 1, duration: 2 }, "-=3.0")
+
+            // 3. THE SCARE: Doubled tension and explosion
+            .to(weight, {
+                y: "+=20",
+                duration: 0.8,
+                ease: "power4.in"
+            }, "+=1.0")
+            .to(weight, {
+                scale: 60,
+                opacity: 0,
+                duration: 1.6,
+                ease: "expo.inOut",
+                transformOrigin: "center center"
+            })
+            .to(string, {
+                opacity: 0,
+                duration: 0.4
+            }, "<")
+            .to("body", {
+                backgroundColor: "#000000",
+                duration: 1.0
+            }, "<")
+            
+            // 4. LOGO REVEAL: Doubled reveal time
+            .to(logo, {
+                opacity: 1,
+                scale: 1,
+                duration: 2.4,
+                ease: "back.out(1.2)"
+            }, "-=0.8")
+            .to(logo, {
+                textShadow: "0 0 40px rgba(124, 58, 237, 0.7)",
+                duration: 4,
+                repeat: -1,
+                yoyo: true
+            });
+
+            // Skip functionality
+            skip.addEventListener('click', () => {
+                tl.timeScale(5); // Speed up significantly to "skip" smoothly
+            });
+        });
+    </script>
+</body>
+</html>
