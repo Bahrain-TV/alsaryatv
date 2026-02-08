@@ -265,10 +265,10 @@
                 gsap.killTweensOf(elements);
                 gsap.set(elements, { opacity: 0, y: 12 });
 
-                gsap.timeline().to(elements, {
+                gsap.timeline().from(elements, {
                     opacity: 1,
                     y: 0,
-                    duration: 0.4,
+                    duration: 0.6,
                     ease: 'power2.out',
                     stagger: 0.05
                 });
