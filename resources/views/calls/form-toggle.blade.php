@@ -1,10 +1,10 @@
 <!-- Toggle buttons -->
 <div class="flex justify-center gap-3 mb-6">
     <button type="button" id="toggleIndividual"
-        class="px-6 py-2 text-base font-bold bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed active:scale-95 transition-all duration-200"
+        class="px-6 py-2 text-base font-bold bg-amber-400 text-slate-900 rounded-lg shadow-lg hover:bg-amber-300 disabled:opacity-60 disabled:cursor-not-allowed active:scale-95 transition-all duration-200"
         aria-pressed="true" aria-label="نمط التسجيل الفردي">أفراد</button>
     <button type="button" id="toggleFamily"
-        class="px-6 py-2 text-base font-bold bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 disabled:opacity-60 disabled:cursor-not-allowed active:scale-95 transition-all duration-200"
+        class="px-6 py-2 text-base font-bold bg-slate-800 text-amber-100 rounded-lg shadow-lg hover:bg-slate-700 disabled:opacity-60 disabled:cursor-not-allowed active:scale-95 transition-all duration-200"
         aria-pressed="false" aria-label="نمط التسجيل العائلي">عائلات</button>
 </div>
 

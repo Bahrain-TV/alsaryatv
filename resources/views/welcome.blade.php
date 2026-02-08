@@ -256,6 +256,24 @@
                 }
             }
 
+            function animateFormEntrance() {
+                if (!hasGSAP || !registrationForm) return;
+
+                const elements = registrationForm.querySelectorAll('label, input, select, button');
+                if (!elements.length) return;
+
+                gsap.killTweensOf(elements);
+                gsap.set(elements, { opacity: 0, y: 12 });
+
+                gsap.timeline().to(elements, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.4,
+                    ease: 'power2.out',
+                    stagger: 0.05
+                });
+            }
+
             function setIndividualMode() {
                 registrationType.value = 'individual';
                 nameLabel.textContent = 'الاسم الكامل';
@@ -263,6 +281,7 @@
                 familyFields.style.display = 'none';
                 familyFields.style.opacity = '0';
                 updateButtonStyles(false);
+                animateFormEntrance();
             }
 
             function setFamilyMode() {
@@ -274,6 +293,7 @@
                 familyFields.style.gap = '1rem';
                 familyFields.style.opacity = '1';
                 updateButtonStyles(true);
+                animateFormEntrance();
             }
 
             function switchFormWithSpin(isFamily) {

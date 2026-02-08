@@ -5,12 +5,12 @@
     });
 @endphp
 
-<div class="bg-indigo-800 bg-opacity-85 rounded-lg mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md shadow-lg">
+<div class="bg-slate-950/80 border border-amber-400/30 rounded-xl mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md shadow-xl shadow-black/30 backdrop-blur-sm">
     <div class="w-full p-4 sm:p-5">
-        <h2 class="text-xl sm:text-2xl text-slate-100 font-tajawal font-bold mb-3 sm:mb-4 text-center">{{ $title }}</h2>
+        <h2 class="text-xl sm:text-2xl text-amber-200 font-tajawal font-bold mb-3 sm:mb-4 text-center">{{ $title }}</h2>
 
         @if ($errors->any())
-        <div class="mb-3 p-3 bg-red-100 bg-opacity-90 text-red-700 rounded text-xs sm:text-sm">
+        <div class="mb-3 p-3 bg-red-500/15 text-red-200 border border-red-400/30 rounded text-xs sm:text-sm">
             <ul class="list-disc list-inside space-y-1">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -62,7 +62,7 @@
 
             <div class="mt-4">
                 <button type="submit"
-                    class="w-full px-4 py-3 sm:py-2.5 rounded-lg text-sm sm:text-base font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 transition-colors duration-200 touch-action-manipulation">
+                    class="w-full px-4 py-3 sm:py-2.5 rounded-lg text-sm sm:text-base font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 active:bg-amber-500 transition-colors duration-200 touch-action-manipulation">
                     {{ $buttonText ?? 'إرسال' }}
                 </button>
             </div>

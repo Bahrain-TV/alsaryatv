@@ -9,12 +9,12 @@
     }
 @endphp
 
-<div id="family-form" class="bg-orange-800 bg-opacity-85 rounded-lg mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md shadow-lg">
+<div id="family-form" class="bg-slate-950/80 border border-amber-400/30 rounded-xl mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md shadow-xl shadow-black/30 backdrop-blur-sm">
     <div class="w-full p-4 sm:p-5">
-        <h2 class="text-xl sm:text-2xl text-slate-100 font-tajawal font-bold mb-3 sm:mb-4 text-center">{{ $title ?? 'تسجيل العائلات' }}</h2>
+        <h2 class="text-xl sm:text-2xl text-amber-200 font-tajawal font-bold mb-3 sm:mb-4 text-center">{{ $title ?? 'تسجيل العائلات' }}</h2>
 
         @if ($errors->any())
-            <div class="mb-3 p-3 bg-red-100 bg-opacity-90 text-red-700 rounded text-xs sm:text-sm">
+            <div class="mb-3 p-3 bg-red-500/15 text-red-200 border border-red-400/30 rounded text-xs sm:text-sm">
                 <ul class="list-disc list-inside space-y-1">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -47,22 +47,22 @@
                     <x-form-input name="cpr" label="الرقم الشخصي" :value="old('cpr')" required />
                 @else
                     <div class="mt-5">
-                        <label class="block text-right text-base sm:text-lg font-bold text-white mb-5 drop-shadow-lg">الاسم كاملاً</label>
-                        <input type="text" name="name" required placeholder="الإسم الرباعي كاملاً" value="{{ old('name') }}" class="w-full px-4 py-3 sm:py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                        <label class="block text-right text-base sm:text-lg font-bold text-amber-200 mb-4 drop-shadow-lg">الاسم كاملاً</label>
+                        <input type="text" name="name" required placeholder="الإسم الرباعي كاملاً" value="{{ old('name') }}" class="w-full px-4 py-3 sm:py-3 bg-slate-900/70 text-slate-100 border-2 border-amber-300/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm sm:text-base">
                     </div>
                     <div class="mt-5">
-                        <label class="block text-right text-base sm:text-lg font-bold text-white mb-5 drop-shadow-lg">رقم الهاتف</label>
-                        <input type="tel" name="phone_number" required placeholder="3333 5555" value="{{ old('phone_number') }}" class="w-full px-4 py-3 sm:py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                        <label class="block text-right text-base sm:text-lg font-bold text-amber-200 mb-4 drop-shadow-lg">رقم الهاتف</label>
+                        <input type="tel" name="phone_number" required placeholder="3333 5555" value="{{ old('phone_number') }}" class="w-full px-4 py-3 sm:py-3 bg-slate-900/70 text-slate-100 border-2 border-amber-300/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm sm:text-base">
                     </div>
                     <div class="mt-5">
-                        <label class="block text-right text-base sm:text-lg font-bold text-white mb-5 drop-shadow-lg">الرقم الشخصي</label>
-                        <input type="text" name="cpr" required value="{{ old('cpr') }}" class="w-full px-4 py-3 sm:py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
+                        <label class="block text-right text-base sm:text-lg font-bold text-amber-200 mb-4 drop-shadow-lg">الرقم الشخصي</label>
+                        <input type="text" name="cpr" required value="{{ old('cpr') }}" class="w-full px-4 py-3 sm:py-3 bg-slate-900/70 text-slate-100 border-2 border-amber-300/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm sm:text-base">
                     </div>
                 @endif
 
                 <div class="flex items-start mt-4">
                     <input id="policy_agreement" name="policy_agreement" type="checkbox" required class="h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 flex-shrink-0 mt-0.5 sm:mt-0">
-                    <label for="policy_agreement" class="mr-2 sm:ml-2 text-xs sm:text-sm text-white font-medium">
+                    <label for="policy_agreement" class="mr-2 sm:ml-2 text-xs sm:text-sm text-slate-200 font-medium">
                         أوافق على شروط المشاركة
                     </label>
                 </div>
@@ -70,7 +70,7 @@
 
             <div class="mt-4">
                 <button type="submit"
-                    class="w-full px-4 py-3 sm:py-2.5 rounded-lg text-sm sm:text-base font-bold text-white bg-orange-600 hover:bg-orange-700 active:bg-orange-800 transition-colors duration-200 touch-action-manipulation">
+                    class="w-full px-4 py-3 sm:py-2.5 rounded-lg text-sm sm:text-base font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 active:bg-amber-500 transition-colors duration-200 touch-action-manipulation">
                     {{ $buttonText ?? 'إرسال' }}
                 </button>
             </div>

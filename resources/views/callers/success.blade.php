@@ -41,17 +41,17 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
-            background: linear-gradient(135deg, rgba(10, 10, 20, 0.85) 0%, rgba(30, 15, 40, 0.85) 100%);
+            background: linear-gradient(135deg, rgba(9, 12, 18, 0.9) 0%, rgba(16, 24, 40, 0.85) 100%);
         }
 
         .success-card {
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(10, 12, 20, 0.7);
             backdrop-filter: blur(15px);
-            border: 2px solid rgba(79, 70, 229, 0.3);
+            border: 2px solid rgba(251, 191, 36, 0.35);
             border-radius: 24px;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
-                        0 0 50px rgba(79, 70, 229, 0.2),
-                        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+                        0 0 50px rgba(251, 191, 36, 0.2),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.08);
             animation: slideIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
             max-width: 450px;
             width: 100%;
@@ -67,7 +67,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 30% 20%, rgba(79, 70, 229, 0.1) 0%, transparent 50%);
+            background: radial-gradient(circle at 30% 20%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
             pointer-events: none;
         }
 
@@ -88,8 +88,8 @@
         }
 
         @keyframes pulse-glow {
-            0%, 100% { filter: drop-shadow(0 0 10px rgba(79, 70, 229, 0.5)); }
-            50% { filter: drop-shadow(0 0 20px rgba(79, 70, 229, 0.8)); }
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.85)); }
         }
 
         @keyframes spin {
@@ -144,7 +144,7 @@
             font-weight: 800;
             text-align: center;
             margin-bottom: 24px;
-            background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #fde68a 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -160,8 +160,8 @@
         }
 
         .beyon-section {
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
-            border: 1px solid rgba(79, 70, 229, 0.3);
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(16, 185, 129, 0.12) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.3);
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 32px;
@@ -175,7 +175,7 @@
         }
 
         .beyon-section .app-name {
-            color: #60a5fa;
+            color: #fbbf24;
             font-weight: 700;
             font-size: 1.1rem;
         }
@@ -197,11 +197,11 @@
         }
 
         .stats-container {
-            background: rgba(79, 70, 229, 0.1);
+            background: rgba(251, 191, 36, 0.08);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
-            border: 1px solid rgba(79, 70, 229, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.2);
         }
 
         .stat-label {
@@ -215,7 +215,7 @@
             font-size: 3rem;
             font-weight: 900;
             text-align: center;
-            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            background: linear-gradient(135deg, #fbbf24 0%, #34d399 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -269,10 +269,10 @@
 
         .progress-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #4F46E5 0%, #9333EA 50%, #EC4899 100%);
+            background: linear-gradient(90deg, #fbbf24 0%, #34d399 60%, #0ea5e9 100%);
             border-radius: 4px;
             transition: width 0.1s linear;
-            box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
         }
 
         .countdown-text {
@@ -286,7 +286,7 @@
         .countdown-number {
             font-size: 2.5rem;
             font-weight: 900;
-            color: #60a5fa;
+            color: #fbbf24;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum";
             min-width: 90px;
@@ -300,22 +300,22 @@
         .action-button {
             display: inline-block;
             padding: 14px 32px;
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-            color: white;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #0f172a;
             border: none;
             border-radius: 12px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.35);
             text-decoration: none;
             font-family: 'Tajawal', sans-serif;
         }
 
         .action-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.45);
         }
 
         .action-button:active {
@@ -372,7 +372,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: conic-gradient(#fca5a5, #fed7aa);
+            background: conic-gradient(#fbbf24, #f97316, #34d399);
             padding: 4px;
             position: relative;
             animation: rotate 3s linear infinite;
@@ -401,7 +401,7 @@
         .timer-value {
             font-size: 2.5rem;
             font-weight: 900;
-            color: #fca5a5;
+            color: #fbbf24;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum";
         }
