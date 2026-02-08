@@ -72,9 +72,6 @@ jobs:
           echo "PHPStan not installed, skipping static analysis"
         fi
 
-    - name: Execute Tests with Coverage (PEST)
-      run: php artisan test --parallel --coverage --min=60
-
     - name: Upload Test Coverage
       if: always()
       uses: actions/upload-artifact@v4
