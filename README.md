@@ -1,5 +1,7 @@
 # برنامج السارية المباشر من تلفزيون البحرين
 
+[![CI/CD Pipeline](https://github.com/Bahrain-TV/alsaryatv/actions/workflows/ci.yml/badge.svg)](https://github.com/Bahrain-TV/alsaryatv/actions/workflows/ci.yml)
+
 برنامج السارية المباشر من تلفزيون البحرين
 
 ![alt text](Screenshot.jpg)
