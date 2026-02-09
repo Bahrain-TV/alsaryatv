@@ -658,9 +658,9 @@ if [ "$REMOTE_VERSION_JSON" != "$BASE_VERSION" ] || [ "$REMOTE_BASE_VERSION" != 
     exit 1
 fi
 
-if [ "$REMOTE_BUILD" != "$CURRENT_BUILD" ]; then
-    echo "❌ Error: Remote build ($REMOTE_BUILD) does not match local build ($CURRENT_BUILD)"
-    send_discord_notification "Publish Failed ❌" "Remote build mismatch." 15548997
+if [ "$REMOTE_BUILD" == "$CURRENT_BUILD" ]; then
+    echo "❌ Error: Remote build ($REMOTE_BUILD) matches local build ($CURRENT_BUILD) - no new version to deploy"
+    send_discord_notification "Publish Failed ❌" "No version change detected - deploy aborted." 15548997
     exit 1
 fi
 

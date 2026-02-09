@@ -205,57 +205,54 @@
         }
 
         /* Logo flip animation for brand transition */
-        @keyframes logoFlipOut {
+        @keyframes flipCard {
             0% {
-                opacity: 1;
-                transform: scale(1) rotateY(0);
+                transform: rotateY(0deg);
+            }
+            50% {
+                transform: rotateY(90deg);
             }
             100% {
-                opacity: 0;
-                transform: scale(0.95) rotateY(180deg);
+                transform: rotateY(180deg);
             }
         }
 
-        @keyframes logoFlipIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.95) rotateY(-180deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotateY(0);
-            }
-        }
-
-        @keyframes glowFadeInOut {
-            0%, 90% { opacity: 0.3; }
+        @keyframes fadeOutFront {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
             100% { opacity: 0; }
         }
 
-        .logo-wrapper.flip-animation .logo-flip-card {
-            animation: flipCard 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0s forwards;
-            transform-style: preserve-3d;
+        @keyframes fadeInBack {
+            0% { opacity: 0; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
         }
 
-        @keyframes flipCard {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(180deg); }
+        @keyframes expandGlow {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.8; }
+        }
+
+        .logo-wrapper.flip-animation .logo-flip-card {
+            animation: flipCard 1.5s ease-in-out 0s forwards !important;
         }
 
         .logo-wrapper.flip-animation .logo-glow.front {
-            animation: pulse-glow 3s ease-in-out infinite, glowFadeInOut 1.5s ease-in-out 0s forwards;
+            animation: fadeOutFront 1.5s ease-in-out 0s forwards !important;
         }
 
         .logo-wrapper.flip-animation .logo-glow.back {
-            animation: pulse-glow 3s ease-in-out 1.5s, glow-expand 1s cubic-bezier(0.34, 1.56, 0.64, 1) 1.5s forwards;
+            animation: expandGlow 1.5s ease-in-out 0s forwards !important;
         }
 
         .logo-wrapper.flip-animation .logo-image.front-image {
-            animation: bounce 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite, logoFlipOut 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0s forwards;
+            animation: fadeOutFront 1.5s ease-in-out 0s forwards !important;
         }
 
         .logo-wrapper.flip-animation .logo-image.back-image {
-            animation: logoFlipIn 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0s forwards;
+            animation: fadeInBack 1.5s ease-in-out 0s forwards !important;
         }
 
         /* Text content */
