@@ -459,6 +459,38 @@ switch_branch() {
     fi
 }
 
+# Function to send welcome emails to callers on production server
+send_remote_welcome_emails() {
+    local count="${1:-0}" # Optional: number of emails to send (0 = all pending)
+    local description="sending welcome emails"
+
+    if [ "$count" -gt 0 ]; then
+        description="sending $count welcome email(s)"
+    fi
+
+    echo "📧 Sending welcome emails to callers..."
+    send_discord_notification "📧 Welcome Email Send Started" "Initiating $description on production server..." 3447003
+
+    # Execute the welcome email command on the remote server
+    if [ "$count" -gt 0 ]; then
+        $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan send:welcome-email --count=$count 2>&1"
+    else
+        $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan send:welcome-email 2>&1"
+    fi
+
+    SEND_EMAIL_EXIT_CODE=$?
+
+    if [ $SEND_EMAIL_EXIT_CODE -eq 0 ]; then
+        echo "✅ Welcome emails sent successfully!"
+        send_discord_notification "✅ Welcome Emails Sent" "Successfully completed $description on production." 5763719
+        return 0
+    else
+        echo "❌ Failed to send welcome emails (Exit Code: $SEND_EMAIL_EXIT_CODE)"
+        send_discord_notification "❌ Welcome Email Send Failed" "Could not complete $description. Check server logs." 15548997
+        return 1
+    fi
+}
+
 # Argument Handling
 if [ "$1" == "--down" ]; then
     maintenance_mode "down"
@@ -492,18 +524,37 @@ elif [ "$1" == "--main" ]; then
         echo "📝 All caller data has been preserved."
     fi
     exit 0
+elif [ "$1" == "--email" ] || [ "$1" == "--send-emails" ]; then
+    echo "📧 Sending Welcome Emails..."
+    echo ""
+    if [ -n "$2" ] && [ "$2" -gt 0 ] 2>/dev/null; then
+        # Send specific number of emails
+        send_remote_welcome_emails "$2"
+    else
+        # Send all pending emails
+        send_remote_welcome_emails
+    fi
+    exit $?
 elif [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "AlSarya TV Publish Script"
     echo ""
-    echo "Usage: ./publish.sh [OPTION]"
+    echo "Usage: ./publish.sh [OPTION] [ARGUMENT]"
     echo ""
     echo "Options:"
-    echo "  (no args)     Standard deployment (version check + full deploy)"
-    echo "  --down        Put site in maintenance mode"
-    echo "  --up          Bring site back online"
-    echo "  --main        Switch to main branch (preserves data)"
-    echo "  --prod        Switch to production branch (preserves data)"
-    echo "  --help, -h    Show this help message"
+    echo "  (no args)         Standard deployment (version check + full deploy)"
+    echo "  --down            Put site in maintenance mode"
+    echo "  --up              Bring site back online"
+    echo "  --main            Switch to main branch (preserves data)"
+    echo "  --prod            Switch to production branch (preserves data)"
+    echo "  --email [N]       Send welcome emails (N = optional number, 0 or empty = all pending)"
+    echo "  --send-emails [N] Alias for --email"
+    echo "  --help, -h        Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  ./publish.sh              # Standard deployment"
+    echo "  ./publish.sh --email      # Send all pending welcome emails"
+    echo "  ./publish.sh --email 10   # Send 10 welcome emails"
+    echo "  ./publish.sh --prod       # Switch to production and bring online"
     echo ""
     exit 0
 fi
@@ -517,7 +568,7 @@ echo "🔄 Synchronizing version files..."
 if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
     php artisan version:sync --from=VERSION
     SYNC_EXIT_CODE=$?
-    
+
     if [ $SYNC_EXIT_CODE -ne 0 ]; then
         echo "⚠️  Warning: Version sync command failed, but continuing..."
     else
@@ -525,6 +576,30 @@ if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
     fi
 else
     echo "⚠️  Warning: PHP or artisan not found, skipping version sync"
+fi
+
+echo ""
+
+# Synchronize environment variables between .env and .env.production
+echo "🔄 Synchronizing environment variables (.env ↔ .env.production)..."
+if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
+    php artisan env:sync-vars --master=.env --dry-run > /dev/null 2>&1
+    SYNC_STATUS=$?
+
+    if [ $SYNC_STATUS -eq 0 ]; then
+        php artisan env:sync-vars --master=.env
+        ENV_SYNC_EXIT=$?
+
+        if [ $ENV_SYNC_EXIT -eq 0 ]; then
+            echo "✅ Environment variables synchronized successfully"
+        else
+            echo "⚠️  Warning: Environment sync had issues, but continuing..."
+        fi
+    else
+        echo "⚠️  Warning: Environment sync validation failed, but continuing..."
+    fi
+else
+    echo "⚠️  Warning: PHP or artisan not found, skipping environment sync"
 fi
 
 echo ""
