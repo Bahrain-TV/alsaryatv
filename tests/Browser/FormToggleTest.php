@@ -8,72 +8,69 @@ use Tests\DuskTestCase;
 class FormToggleTest extends DuskTestCase
 {
     /**
-     * Test the form toggle animation between individual and family forms
-     *
-     * @return void
+     * Test the form toggle between individual and family forms on the home page.
      */
-    public function test_form_toggle_animation_works()
+    public function test_form_toggle_animation_works(): void
     {
         $this->browse(function (Browser $browser): void {
-            // Visit the home page
             $browser->visit('/')
-                ->waitForText('تسجيل', 5) // Wait for registration text to appear
-                ->assertSee('أفراد') // Ensure individual button is visible
-                ->assertSee('عائلات'); // Ensure family button is visible
+                ->waitForText('سجل الآن', 10)
+                ->assertSee('أفراد')
+                ->assertSee('عائلات');
 
-            // Take a screenshot of the initial state
-            $browser->screenshot('form-toggle-initial');
+            // Screenshot: Individual form (default)
+            $browser->screenshot('home-individual-form');
 
-            // Click the family toggle button
-            $browser->click('#toggleFamily') // Using the ID of the family toggle button
-                ->pause(1000) // Wait for animation to complete
-                ->assertSee('تسجيل العائلة') // Ensure family form text appears
-                ->screenshot('form-toggle-family-view'); // Take screenshot after switching to family view
+            // Toggle to family form
+            $browser->click('#toggleFamily')
+                ->pause(1000)
+                ->assertSee('سجل عائلتك الآن')
+                ->screenshot('home-family-form');
 
-            // Click the individual toggle button
-            $browser->click('#toggleIndividual') // Using the ID of the individual toggle button
-                ->pause(1000) // Wait for animation to complete
-                ->assertSee('تسجيل') // Ensure individual form text appears
-                ->screenshot('form-toggle-individual-view'); // Take screenshot after switching to individual view
-
-            // Verify that the animation happened by checking that screenshots exist
-            $this->assertFileExists(public_path('screenshots/form-toggle-initial.png'));
-            $this->assertFileExists(public_path('screenshots/form-toggle-family-view.png'));
-            $this->assertFileExists(public_path('screenshots/form-toggle-individual-view.png'));
+            // Toggle back to individual form
+            $browser->click('#toggleIndividual')
+                ->pause(1000)
+                ->assertSee('سجل الآن للمشاركة')
+                ->screenshot('home-individual-form-restored');
         });
     }
 
     /**
-     * Test the form toggle animation on the calls/register page
-     *
-     * @return void
+     * Test the form toggle on the /register page.
      */
-    public function test_form_toggle_animation_on_register_page()
+    public function test_form_toggle_animation_on_register_page(): void
     {
         $this->browse(function (Browser $browser): void {
-            // Visit the registration page
-            $browser->visit('/calls/register')
-                ->waitForText('اختر نوع التسجيل', 5) // Wait for registration type text to appear
-                ->assertSee('أفراد') // Ensure individual button is visible
-                ->assertSee('عائلات'); // Ensure family button is visible
+            $browser->visit('/register')
+                ->waitForText('اختر نوع التسجيل', 10)
+                ->assertSee('أفراد')
+                ->assertSee('عائلات');
 
-            // Take a screenshot of the initial state
-            $browser->screenshot('register-page-initial');
+            // Screenshot: Individual form (default)
+            $browser->screenshot('register-individual-form');
 
-            // Click the family toggle button
-            $browser->click('#toggleFamily') // Using the ID of the family toggle button
-                ->pause(1000) // Wait for animation to complete
-                ->screenshot('register-page-family-view'); // Take screenshot after switching to family view
+            // Toggle to family form
+            $browser->click('#toggleFamily')
+                ->pause(1000)
+                ->screenshot('register-family-form');
 
-            // Click the individual toggle button
-            $browser->click('#toggleIndividual') // Using the ID of the individual toggle button
-                ->pause(1000) // Wait for animation to complete
-                ->screenshot('register-page-individual-view'); // Take screenshot after switching to individual view
+            // Toggle back to individual
+            $browser->click('#toggleIndividual')
+                ->pause(1000)
+                ->screenshot('register-individual-form-restored');
+        });
+    }
 
-            // Verify that the animation happened by checking that screenshots exist
-            $this->assertFileExists(public_path('screenshots/register-page-initial.png'));
-            $this->assertFileExists(public_path('screenshots/register-page-family-view.png'));
-            $this->assertFileExists(public_path('screenshots/register-page-individual-view.png'));
+    /**
+     * Test dashboard screenshot (authenticated).
+     */
+    public function test_dashboard_screenshot(): void
+    {
+        $this->browse(function (Browser $browser): void {
+            $browser->loginAs(\App\Models\User::first())
+                ->visit('/dashboard')
+                ->pause(2000)
+                ->screenshot('dashboard');
         });
     }
 }
