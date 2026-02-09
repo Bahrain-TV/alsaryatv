@@ -512,6 +512,23 @@ fi
 echo "🚀 Starting Publish Process..."
 echo ""
 
+# Synchronize version files before deployment
+echo "🔄 Synchronizing version files..."
+if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
+    php artisan version:sync --from=VERSION
+    SYNC_EXIT_CODE=$?
+    
+    if [ $SYNC_EXIT_CODE -ne 0 ]; then
+        echo "⚠️  Warning: Version sync command failed, but continuing..."
+    else
+        echo "✅ Version files synchronized successfully"
+    fi
+else
+    echo "⚠️  Warning: PHP or artisan not found, skipping version sync"
+fi
+
+echo ""
+
 # Check if already in maintenance mode
 echo "🔍 Checking current maintenance status..."
 CURRENT_STATUS=$(check_maintenance_status)
