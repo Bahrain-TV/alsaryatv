@@ -483,6 +483,57 @@ send_remote_welcome_emails() {
     fi
 }
 
+# Function to reset the callers table on production server
+reset_remote_database() {
+    echo "🗑️  DATABASE RESET WARNING"
+    echo "=========================================="
+    echo "This will PERMANENTLY DELETE all caller data on production!"
+    echo "Table: callers"
+    echo "Server: $SERVER"
+    echo ""
+    echo "⚠️  THIS ACTION CANNOT BE UNDONE!"
+    echo ""
+    read -p "Type 'YES' to confirm database reset: " confirmation
+
+    if [ "$confirmation" != "YES" ]; then
+        echo "❌ Database reset cancelled."
+        return 1
+    fi
+
+    echo ""
+    echo "🔧 Putting site into maintenance mode..."
+    maintenance_mode "down"
+
+    echo ""
+    echo "🗑️  Truncating callers table on production server..."
+
+    # Execute truncate command via SSH
+    $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan tinker --execute='DB::table(\"callers\")->truncate(); echo \"✅ Callers table truncated successfully.\n\";'" 2>&1
+    TRUNCATE_STATUS=$?
+
+    if [ $TRUNCATE_STATUS -eq 0 ]; then
+        echo "✅ Callers table truncated successfully!"
+        echo ""
+        echo "🧹 Clearing caches on production..."
+        $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan config:cache > /dev/null 2>&1 && echo '✅ Caches cleared.'"
+
+        echo ""
+        echo "🟢 Bringing site back ONLINE..."
+        maintenance_mode "up"
+
+        echo ""
+        echo "✅ Database reset completed successfully!"
+        echo "📊 Ready for fresh caller registrations."
+        return 0
+    else
+        echo "❌ Failed to truncate callers table!"
+        echo ""
+        echo "🔴 Site remains in MAINTENANCE MODE"
+        echo "    Fix the issue and then run: ./publish.sh --up"
+        return 1
+    fi
+}
+
 # Argument Handling
 if [ "$1" == "--down" ]; then
     maintenance_mode "down"
@@ -527,6 +578,11 @@ elif [ "$1" == "--email" ] || [ "$1" == "--send-emails" ]; then
         send_remote_welcome_emails
     fi
     exit $?
+elif [ "$1" == "--reset-db" ]; then
+    echo "🗑️  Database Reset Tool"
+    echo ""
+    reset_remote_database
+    exit $?
 elif [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "AlSarya TV Publish Script"
     echo ""
@@ -540,6 +596,7 @@ elif [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "  --prod            Switch to production branch (preserves data)"
     echo "  --email [N]       Send welcome emails (N = optional number, 0 or empty = all pending)"
     echo "  --send-emails [N] Alias for --email"
+    echo "  --reset-db        DANGEROUS: Truncate callers table and reset database"
     echo "  --help, -h        Show this help message"
     echo ""
     echo "Examples:"
@@ -547,6 +604,7 @@ elif [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "  ./publish.sh --email      # Send all pending welcome emails"
     echo "  ./publish.sh --email 10   # Send 10 welcome emails"
     echo "  ./publish.sh --prod       # Switch to production and bring online"
+    echo "  ./publish.sh --reset-db   # Reset callers table (requires confirmation)"
     echo ""
     exit 0
 fi

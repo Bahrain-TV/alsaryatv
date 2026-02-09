@@ -25,8 +25,8 @@ class PeakHoursChart extends ChartWidget
 
     protected function getData(): array
     {
-        // Get registration counts by hour
-        $data = Caller::selectRaw('HOUR(created_at) as hour, COUNT(*) as count')
+        // Get registration counts by hour - SQLite compatible syntax
+        $data = Caller::selectRaw("CAST(strftime('%H', created_at) AS INTEGER) as hour, COUNT(*) as count")
             ->groupBy('hour')
             ->orderBy('hour')
             ->get();
