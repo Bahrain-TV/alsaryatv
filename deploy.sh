@@ -274,7 +274,7 @@ echo -e "${PURPLE}${BOLD}=======================================================
 echo -e "${PURPLE}${BOLD}🚀 AlSarya TV - Automated Deployment Sequence${NC}"
 echo -e "${PURPLE}${BOLD}==========================================================${NC}"
 
-send_discord_message "🚀 Deployment Started" "Server is starting deployment sequence for version $(increment_version "$CURRENT_VERSION")..." 3447003
+send_discord_message "🚀 Deployment Started" "Server is starting deployment sequence for current version $CURRENT_VERSION..." 3447003
 
 # 1. Git Sync - Detect and sync to current branch
 log_info "Synchronizing code with origin..."
@@ -317,9 +317,35 @@ if ! validate_env_values "Server .env" "$(strip_quotes "$APP_KEY_VALUE")" "$(str
 fi
 
 # 2. Cleanup (use sudo directly for root-owned files, preserving public_html ownership)
-execute_silent "sudo rm -rf .github PROJECT_DOCS tests .vscode .claude .gitignore README.md CLAUDE.md TODO.md" "Cleaning up development files"
+execute_silent "cd '$APP_DIR' && sudo rm -rf .github PROJECT_DOCS tests .vscode .claude .gitignore README.md CLAUDE.md TODO.md" "Cleaning up development files"
 
-# 3. Pre-deployment Backup
+# 3. Install and Build Frontend Assets
+log_info "Building frontend assets with npm/Vite..."
+if command -v npm >/dev/null 2>&1; then
+    if ! execute_silent "$SUDO_PREFIX bash -c 'cd $APP_DIR && npm ci --prefer-offline --no-audit'" "Installing npm dependencies"; then
+        log_warn "npm install had issues, trying npm install fallback..."
+        if ! execute_silent "$SUDO_PREFIX bash -c 'cd $APP_DIR && npm install'" "Installing npm dependencies (fallback)"; then
+            log_error "Both npm ci and npm install failed. Aborting build."
+            exit 1
+        fi
+    fi
+
+    if ! execute_silent "$SUDO_PREFIX bash -c 'cd $APP_DIR && npm run build'" "Building frontend with npm run build"; then
+        log_error "Frontend build failed. Critical error."
+        exit 1
+    fi
+
+    # Verify build output
+    if ! $SUDO_PREFIX test -f "$APP_DIR/public/build/manifest.json"; then
+        log_error "Build verification failed: manifest.json not found."
+        exit 1
+    fi
+else
+    log_error "npm not found on server. Cannot build frontend assets."
+    exit 1
+fi
+
+# 4. Pre-deployment Backup
 if [ "$BACKUP_ENABLE" == "true" ]; then
     log_info "Creating pre-deployment data backup..."
     if ! execute_silent "$SUDO_PREFIX $ART_CMD app:persist-data --export-csv --verify" "Exporting callers database"; then
@@ -327,14 +353,14 @@ if [ "$BACKUP_ENABLE" == "true" ]; then
     fi
 fi
 
-# 4. Migrations
+# 5. Migrations
 log_info "Running database migrations..."
 if ! execute_silent "$SUDO_PREFIX $ART_CMD migrate --force" "Executing artisan migrate"; then
     log_error "Migration failed. Critical error."
     exit 1
 fi
 
-# 5. Data Restoration
+# 6. Data Restoration
 if [ "$BACKUP_ENABLE" == "true" ]; then
     log_info "Restoring data from latest backup..."
     if ! execute_silent "$SUDO_PREFIX $ART_CMD app:callers:import --force" "Executing data import"; then
@@ -343,7 +369,7 @@ if [ "$BACKUP_ENABLE" == "true" ]; then
     fi
 fi
 
-# 6. Optimization
+# 7. Optimization
 log_info "Optimizing application performance..."
 execute_silent "$SUDO_PREFIX $ART_CMD optimize:clear" "Clearing caches"
 execute_silent "$SUDO_PREFIX $ART_CMD config:cache" "Caching configuration"
@@ -357,7 +383,7 @@ execute_silent "$SUDO_PREFIX $ART_CMD config:cache" "Caching configuration (refr
 execute_silent "$SUDO_PREFIX $ART_CMD route:cache" "Caching routes (refresh)"
 execute_silent "$SUDO_PREFIX $ART_CMD view:cache" "Caching views (refresh)"
 
-# 7. Version Update
+# 8. Version Update
 NEW_VERSION=$(increment_version "$CURRENT_VERSION")
 execute_silent "echo '$NEW_VERSION' > '$VERSION_FILE' && chown $APP_USER:$APP_USER '$VERSION_FILE'" "Updating version to $NEW_VERSION"
 
@@ -366,6 +392,6 @@ echo -e "${GREEN}${BOLD}✅ Deployment Completed Successfully!${NC}"
 echo -e "${GREEN}${BOLD}New Version: $NEW_VERSION${NC}"
 echo -e "${GREEN}${BOLD}==========================================================${NC}"
 
-send_discord_message "Deployment Successful ✅" "AlSarya TV successfully deployed version **$NEW_VERSION**." 5763719
+send_discord_message "🟢 Deployment Successful ✅" "AlSarya TV successfully deployed version $NEW_VERSION." 5763719
 
 exit 0

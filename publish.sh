@@ -5,6 +5,8 @@ SERVER="root@h6.doy.tech"
 SSH_COMMAND="ssh -i ~/.ssh/id_oct24"
 
 APP_DIR="/home/alsarya.tv/public_html"
+APP_USER="alsar4210"
+SUDO_PREFIX="sudo -u $APP_USER"
 DISCORD_WEBHOOK="https://discord.com/api/webhooks/1248966065417883659/hAnbGrEOLw9fWF6UCObAuuXHzW6ZM5I1babbBC4rBAdbUAB6YcfHqHhxZXEU4LYIyZp2"
 
 # Function to send "Dramatic" Discord Notifications
@@ -357,10 +359,6 @@ upload_files_to_production() {
         fi
     fi
 }
-
-# Configuration (matching deploy.sh)
-APP_USER="alsar4210"
-SUDO_PREFIX="sudo -u $APP_USER"
 
 # Function to handle Maintenance Mode
 maintenance_mode() {
