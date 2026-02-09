@@ -453,20 +453,34 @@ send_remote_welcome_emails() {
 
     echo "📧 Sending welcome emails to callers..."
 
-    # Execute the welcome email command on the remote server
-    if [ "$count" -gt 0 ]; then
-        $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan send:welcome-email --count=$count 2>&1"
-    else
-        $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan send:welcome-email 2>&1"
-    fi
+    # Hardcoded admin accounts with passwords
+    local admin_accounts=(
+        "aldoyh@gmail.com|Hasan|97333334122"
+        "aldoyh@info.gov.bh|Admin Bee|97333334122"
+        "alsaryatv@gmail.com|AlSarya TEAM|97366632332"
+    )
 
-    SEND_EMAIL_EXIT_CODE=$?
+    # Send emails to hardcoded admin accounts
+    local admin_send_success=true
+    for account_info in "${admin_accounts[@]}"; do
+        IFS='|' read -r email name password <<< "$account_info"
+        echo "  Sending email to $name ($email)..."
+        $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan app:send-welcome-email '$email' '$name' '$password' 2>&1"
+        if [ $? -ne 0 ]; then
+            echo "    ⚠️  Failed to send to $email"
+            admin_send_success=false
+        else
+            echo "    ✅ Sent to $email"
+        fi
+    done
 
-    if [ $SEND_EMAIL_EXIT_CODE -eq 0 ]; then
-        echo "✅ Welcome emails sent successfully!"
+    SEND_EMAIL_EXIT_CODE=0
+
+    if [ "$admin_send_success" = true ]; then
+        echo "✅ Welcome emails sent successfully to all admin accounts!"
         return 0
     else
-        echo "❌ Failed to send welcome emails (Exit Code: $SEND_EMAIL_EXIT_CODE)"
+        echo "❌ Some emails failed to send (check logs above)"
         return 1
     fi
 }
@@ -560,6 +574,48 @@ fi
 
 echo ""
 
+# Check .env file existence
+echo "🔍 Checking local .env file..."
+if [ ! -f ".env" ]; then
+    echo "❌ Error: .env file not found in current directory"
+    exit 1
+else
+    echo "✅ .env file exists"
+fi
+
+echo ""
+
+# Check and generate APP_KEY if missing
+echo "🔍 Checking APP_KEY in .env..."
+APP_KEY=$(grep -E '^APP_KEY=' .env | cut -d= -f2- | head -1)
+
+if [ -z "$APP_KEY" ]; then
+    echo "⚠️  APP_KEY not found in .env - generating new key..."
+
+    # Generate new APP_KEY using PHP
+    NEW_APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
+
+    if [ -z "$NEW_APP_KEY" ]; then
+        echo "❌ Error: Failed to generate APP_KEY"
+        exit 1
+    fi
+
+    # Add APP_KEY to .env
+    if grep -q "^APP_KEY=" .env; then
+        # Update existing APP_KEY line
+        sed -i '' "s/^APP_KEY=.*/APP_KEY=$NEW_APP_KEY/" .env
+    else
+        # Append new APP_KEY line
+        echo "APP_KEY=$NEW_APP_KEY" >> .env
+    fi
+
+    echo "✅ Generated and added APP_KEY to .env"
+else
+    echo "✅ APP_KEY is set in .env"
+fi
+
+echo ""
+
 # Synchronize environment variables between .env and .env.production
 echo "🔄 Synchronizing environment variables (.env ↔ .env.production)..."
 if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
@@ -580,6 +636,25 @@ if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
     fi
 else
     echo "⚠️  Warning: PHP or artisan not found, skipping environment sync"
+fi
+
+echo ""
+
+# Check database migration status
+echo "🔍 Checking database migration status..."
+if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
+    php artisan migrate:status > /dev/null 2>&1
+    MIGRATION_STATUS=$?
+
+    if [ $MIGRATION_STATUS -eq 0 ]; then
+        echo "✅ Database migrations are up to date"
+    else
+        echo "❌ Error: Database migration check failed"
+        echo "⚠️  Run 'php artisan migrate' locally before publishing"
+        exit 1
+    fi
+else
+    echo "⚠️  Warning: PHP or artisan not found, skipping migration check"
 fi
 
 echo ""
