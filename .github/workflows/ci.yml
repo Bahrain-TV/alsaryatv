@@ -134,6 +134,92 @@ jobs:
         retention-days: 7
 
   # =========================
+  # Screenshots (Forms + Dashboard)
+  # =========================
+  screenshots:
+    runs-on: ubuntu-latest
+    name: Screenshots (Forms & Dashboard)
+    needs: [frontend]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.5'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, fileinfo
+        coverage: none
+
+    - name: Cache Composer Dependencies
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+
+    - name: Install Composer Dependencies
+      run: composer install --prefer-dist --no-interaction --no-progress
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install NPM Dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: npx playwright install chromium --with-deps
+
+    - name: Build Frontend Assets
+      run: npm run build
+
+    - name: Setup Environment
+      run: |
+        cp .env.example .env
+        php artisan key:generate
+        mkdir -p database
+        touch database/database.sqlite
+
+    - name: Enable Registration & Seed Database
+      run: |
+        echo "REGISTRATION_ENABLED=true" >> .env
+        php artisan migrate --force
+        php artisan db:seed --force || echo "No seeders configured"
+
+    - name: Start Laravel Server
+      run: php artisan serve --port=8000 &
+      env:
+        APP_URL: http://127.0.0.1:8000
+
+    - name: Wait for Server
+      run: |
+        for i in $(seq 1 15); do
+          curl -s http://127.0.0.1:8000 > /dev/null 2>&1 && break
+          sleep 2
+        done
+
+    - name: Capture Screenshots
+      run: npm run screenshots -- --base-url http://127.0.0.1:8000 --output-dir screenshots
+      env:
+        APP_URL: http://127.0.0.1:8000
+        ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
+    - name: Upload Screenshots
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: form-screenshots
+        path: screenshots/
+        retention-days: 14
+        if-no-files-found: warn
+
+  # =========================
   # Database & Seeding Test
   # =========================
   database:
@@ -183,14 +269,14 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     name: Notify Results
-    needs: [backend, frontend, database]
+    needs: [backend, frontend, database, screenshots]
     if: always()
 
     steps:
     - name: Determine Status
       id: status
       run: |
-        if [ "${{ needs.backend.result }}" == "success" ] && [ "${{ needs.frontend.result }}" == "success" ] && [ "${{ needs.database.result }}" == "success" ]; then
+        if [ "${{ needs.backend.result }}" == "success" ] && [ "${{ needs.frontend.result }}" == "success" ] && [ "${{ needs.database.result }}" == "success" ] && [ "${{ needs.screenshots.result }}" == "success" ]; then
           echo "status=success" >> $GITHUB_OUTPUT
           echo "color=5763719" >> $GITHUB_OUTPUT
           echo "emoji=✅" >> $GITHUB_OUTPUT
@@ -216,7 +302,8 @@ jobs:
             \"fields\": [
               {\"name\": \"Backend\", \"value\": \"${{ needs.backend.result }}\", \"inline\": true},
               {\"name\": \"Frontend\", \"value\": \"${{ needs.frontend.result }}\", \"inline\": true},
-              {\"name\": \"Database\", \"value\": \"${{ needs.database.result }}\", \"inline\": true}
+              {\"name\": \"Database\", \"value\": \"${{ needs.database.result }}\", \"inline\": true},
+              {\"name\": \"Screenshots\", \"value\": \"${{ needs.screenshots.result }}\", \"inline\": true}
             ],
             \"footer\": {\"text\": \"AlSarya TV • ${{ github.workflow }}\"},
             \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
