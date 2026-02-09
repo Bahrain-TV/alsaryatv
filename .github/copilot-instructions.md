@@ -334,6 +334,33 @@ php artisan migrate:rollback
 php artisan tinker
 ```
 
+### 📌 Version Management
+
+**Purpose**: Keep VERSION file and version.json synchronized to prevent deployment errors.
+
+```bash
+# Synchronize version.json with VERSION file (default)
+php artisan version:sync
+
+# Preview changes without applying them
+php artisan version:sync --dry-run
+
+# Also update APP_VERSION in .env files
+php artisan version:sync --update-env
+
+# Reverse sync: Update VERSION from version.json
+php artisan version:sync --from=version.json
+```
+
+**Integration with Deployment**:
+- The `publish.sh` script automatically runs `php artisan version:sync --from=VERSION`
+- This prevents "version mismatch" errors during deployment
+- Runs before maintenance mode is enabled
+
+**Version File Formats**:
+- `VERSION`: `3.3.1-32` (base version + build number)
+- `version.json`: `{"version": "3.3.1", ...}` (base version only)
+
 ### 📦 Filament Admin Customization
 
 ```bash
