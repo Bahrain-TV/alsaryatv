@@ -16,6 +16,15 @@ class AnimatedStatsOverviewWidget extends Widget
 
     protected static string $cacheKey = 'dashboard_animated_stats';
 
+    // Define public properties to make them accessible to the view
+    public int $totalCallers = 0;
+    public int $totalWinners = 0;
+    public int $todayCallers = 0;
+    public int $totalHits = 0;
+    public int $activeCallers = 0;
+    public int $uniqueCprs = 0;
+    public int $previousDayCallers = 0;
+
     public function mount(): void
     {
         $cacheKey = PerformanceHelper::getCacheKey(self::$cacheKey, []);
@@ -23,7 +32,9 @@ class AnimatedStatsOverviewWidget extends Widget
 
         if ($cachedData) {
             foreach ($cachedData as $property => $value) {
-                $this->{$property} = $value;
+                if (property_exists($this, $property)) {
+                    $this->{$property} = $value;
+                }
             }
         } else {
             $this->loadData();
@@ -44,8 +55,8 @@ class AnimatedStatsOverviewWidget extends Widget
         $this->totalCallers = \App\Models\Caller::count();
         $this->totalWinners = \App\Models\Caller::where('is_winner', true)->count();
         $this->todayCallers = \App\Models\Caller::whereDate('created_at', today())->count();
-        $this->totalHits = \App\Models\Caller::sum('hits');
-        $this->activeCallers = \App\Models\Caller::where('status', 'accepted')->count();
+        $this->totalHits = \App\Models\Caller::sum('hits') ?? 0;
+        $this->activeCallers = \App\Models\Caller::where('status', 'active')->count();
         $this->uniqueCprs = \App\Models\Caller::distinct('cpr')->count('cpr');
 
         // Calculate previous day callers for trend calculation

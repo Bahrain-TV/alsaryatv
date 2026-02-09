@@ -13,7 +13,15 @@
       "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv checkout -b preview)",
       "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv branch -v)",
       "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv push -u origin preview)",
-      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv log --oneline -5)"
+      "Bash(git -C /Users/aldoyh/Sites/RAMADAN/alsaryatv log --oneline -5)",
+      "Bash(chmod:*)",
+      "Bash(php -l:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_run_code",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_console_messages"
     ]
   }
 }

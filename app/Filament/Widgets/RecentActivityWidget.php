@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Caller;
-use Filament\Support\Enums\IconSize;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -39,7 +38,6 @@ class RecentActivityWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('phone')
                     ->label('📱 الهاتف')
                     ->icon('heroicon-m-phone')
-                    ->iconSize(IconSize::Small)
                     ->size('sm'),
 
                 Tables\Columns\BadgeColumn::make('hits')

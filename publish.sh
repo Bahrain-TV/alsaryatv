@@ -5,6 +5,8 @@ SERVER="root@h6.doy.tech"
 SSH_COMMAND="ssh -i ~/.ssh/id_oct24"
 
 APP_DIR="/home/alsarya.tv/public_html"
+APP_USER="alsar4210"
+SUDO_PREFIX="sudo -u $APP_USER"
 DISCORD_WEBHOOK="https://discord.com/api/webhooks/1248966065417883659/hAnbGrEOLw9fWF6UCObAuuXHzW6ZM5I1babbBC4rBAdbUAB6YcfHqHhxZXEU4LYIyZp2"
 
 # Function to send "Dramatic" Discord Notifications
@@ -237,7 +239,6 @@ repair_remote_env() {
 
     if [ $? -ne 0 ]; then
         echo "❌ Error: $label .env repair failed"
-        send_discord_notification "Publish Failed ❌" "Remote .env repair failed." 15548997
         exit 1
     fi
 }
@@ -256,14 +257,12 @@ validate_env_values() {
             ;;
         *)
             echo "❌ Error: $label has unsupported APP_CIPHER: $app_cipher"
-            send_discord_notification "Publish Failed ❌" "Unsupported APP_CIPHER in $label." 15548997
             return 1
             ;;
     esac
 
     if [ -z "$app_key" ]; then
         echo "❌ Error: $label missing APP_KEY"
-        send_discord_notification "Publish Failed ❌" "Missing APP_KEY in $label." 15548997
         return 1
     fi
 
@@ -272,7 +271,6 @@ validate_env_values() {
 
     if [ "$expected_len" -eq 0 ]; then
         echo "❌ Error: $label has invalid APP_CIPHER: $app_cipher"
-        send_discord_notification "Publish Failed ❌" "Invalid APP_CIPHER in $label." 15548997
         return 1
     fi
 
@@ -280,13 +278,11 @@ validate_env_values() {
     key_len=$(decode_key_length "$app_key")
     if [ "$key_len" -lt 0 ]; then
         echo "❌ Error: $label APP_KEY base64 decode failed"
-        send_discord_notification "Publish Failed ❌" "APP_KEY base64 decode failed in $label." 15548997
         return 1
     fi
 
     if [ "$key_len" -ne "$expected_len" ]; then
         echo "❌ Error: $label APP_KEY length $key_len does not match cipher $app_cipher (expected $expected_len)"
-        send_discord_notification "Publish Failed ❌" "APP_KEY length mismatch in $label." 15548997
         return 1
     fi
 
@@ -309,16 +305,15 @@ validate_env_file() {
 # Function to SCP .env.production AND deploy.sh to production server
 upload_files_to_production() {
     echo "📤 Uploading configuration and scripts to production server..."
-    
+
     # Get the directory where this script is located
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     ENV_FILE="$SCRIPT_DIR/.env.production"
     DEPLOY_SCRIPT="$SCRIPT_DIR/deploy.sh"
-    
+
     # Validate .env
     if [ ! -f "$ENV_FILE" ]; then
         echo "❌ Error: .env.production file not found at $ENV_FILE"
-        send_discord_notification "Publish Failed ❌" "Could not find .env.production file." 15548997
         exit 1
     fi
 
@@ -331,10 +326,9 @@ upload_files_to_production() {
     # Validate deploy.sh
     if [ ! -f "$DEPLOY_SCRIPT" ]; then
         echo "❌ Error: deploy.sh file not found at $DEPLOY_SCRIPT"
-        send_discord_notification "Publish Failed ❌" "Could not find deploy.sh file." 15548997
         exit 1
     fi
-    
+
     # SCP the .env.production file
     scp -i ~/.ssh/id_oct24 "$ENV_FILE" "$SERVER:$APP_DIR/.env"
     ENV_STATUS=$?
@@ -346,10 +340,8 @@ upload_files_to_production() {
 
     if [ $ENV_STATUS -eq 0 ] && [ $DEPLOY_STATUS -eq 0 ]; then
         echo "✅ Files successfully uploaded to production"
-        send_discord_notification "Phase 1: Upload Complete 📤" "Environment variables and deployment scripts have been securely uploaded to the server." 5763719
     else
         echo "❌ Failed to upload files to production"
-        send_discord_notification "Publish Failed ❌" "Failed to upload files via SCP." 15548997
         exit 1
     fi
 
@@ -368,10 +360,6 @@ upload_files_to_production() {
     fi
 }
 
-# Configuration (matching deploy.sh)
-APP_USER="alsar4210"
-SUDO_PREFIX="sudo -u $APP_USER"
-
 # Function to handle Maintenance Mode
 maintenance_mode() {
     local mode="$1" # 'up' or 'down'
@@ -379,7 +367,6 @@ maintenance_mode() {
     local color="$3"
 
     echo "🔧 Switching maintenance mode to: $mode..."
-    send_discord_notification "Maintenance Mode 🔧" "Switching site to **$mode** mode..." 3447003
 
     if [ "$mode" == "down" ]; then
         # Activate Maintenance Mode with 'down' view and secret bypass
@@ -392,7 +379,6 @@ maintenance_mode() {
             echo "🔍 Verifying required files before bringing site up..."
             if ! $SSH_COMMAND "$SERVER" "test -f $APP_DIR/app/Providers/MailEnvironmentServiceProvider.php"; then
                 echo "❌ Error: Required file missing on server: app/Providers/MailEnvironmentServiceProvider.php"
-                send_discord_notification "Maintenance Update Failed ❌" "Required provider missing on server. Site remains down." 15548997
                 exit 1
             fi
         fi
@@ -410,10 +396,8 @@ maintenance_mode() {
 
     if [ $EXIT_CODE -eq 0 ]; then
         echo "✅ Maintenance mode updated successfully."
-        send_discord_notification "$SUCCESS_MSG" "$SUCCESS_DESC" $SUCCESS_COLOR
     else
         echo "❌ Failed to update maintenance mode."
-        send_discord_notification "Maintenance Update Failed ❌" "Could not run 'php artisan $mode'." 15548997
         exit 1
     fi
 }
@@ -430,7 +414,6 @@ switch_branch() {
     local description="$2"
 
     echo "🔄 Switching to $description branch..."
-    send_discord_notification "🔄 Branch Switch Started" "Switching production to **$target_branch** branch..." 3447003
 
     # Execute branch switch on server with data preservation
     $SSH_COMMAND "$SERVER" "cd /home/alsarya.tv/public_html && \
@@ -449,12 +432,104 @@ switch_branch() {
     echo '✅ Branch switch completed successfully!'"
 
     if [ $? -eq 0 ]; then
-        send_discord_notification "✅ Branch Switch Complete" "Production is now on **$target_branch** branch. Database and caller data preserved." 5763719
         echo "✅ Successfully switched to $description"
         return 0
     else
-        send_discord_notification "❌ Branch Switch Failed" "Could not switch to $target_branch. Check server logs." 15548997
         echo "❌ Failed to switch branch"
+        return 1
+    fi
+}
+
+# Function to send welcome emails to callers on production server
+send_remote_welcome_emails() {
+    local count="${1:-0}" # Optional: number of emails to send (0 = all pending)
+    local description="sending welcome emails"
+
+    if [ "$count" -gt 0 ]; then
+        description="sending $count welcome email(s)"
+    fi
+
+    echo "📧 Sending welcome emails to callers..."
+
+    # Hardcoded admin accounts with passwords
+    local admin_accounts=(
+        "aldoyh@gmail.com|Hasan|97333334122"
+        "aldoyh@info.gov.bh|Admin Bee|97333334122"
+        "alsaryatv@gmail.com|AlSarya TEAM|97366632332"
+    )
+
+    # Send emails to hardcoded admin accounts
+    local admin_send_success=true
+    for account_info in "${admin_accounts[@]}"; do
+        IFS='|' read -r email name password <<< "$account_info"
+        echo "  Sending email to $name ($email)..."
+        $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan app:send-welcome-email '$email' '$name' '$password' 2>&1"
+        if [ $? -ne 0 ]; then
+            echo "    ⚠️  Failed to send to $email"
+            admin_send_success=false
+        else
+            echo "    ✅ Sent to $email"
+        fi
+    done
+
+    SEND_EMAIL_EXIT_CODE=0
+
+    if [ "$admin_send_success" = true ]; then
+        echo "✅ Welcome emails sent successfully to all admin accounts!"
+        return 0
+    else
+        echo "❌ Some emails failed to send (check logs above)"
+        return 1
+    fi
+}
+
+# Function to reset the callers table on production server
+reset_remote_database() {
+    echo "🗑️  DATABASE RESET WARNING"
+    echo "=========================================="
+    echo "This will PERMANENTLY DELETE all caller data on production!"
+    echo "Table: callers"
+    echo "Server: $SERVER"
+    echo ""
+    echo "⚠️  THIS ACTION CANNOT BE UNDONE!"
+    echo ""
+    read -p "Type 'YES' to confirm database reset: " confirmation
+
+    if [ "$confirmation" != "YES" ]; then
+        echo "❌ Database reset cancelled."
+        return 1
+    fi
+
+    echo ""
+    echo "🔧 Putting site into maintenance mode..."
+    maintenance_mode "down"
+
+    echo ""
+    echo "🗑️  Truncating callers table on production server..."
+
+    # Execute truncate command via SSH
+    $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan tinker --execute='DB::table(\"callers\")->truncate(); echo \"✅ Callers table truncated successfully.\n\";'" 2>&1
+    TRUNCATE_STATUS=$?
+
+    if [ $TRUNCATE_STATUS -eq 0 ]; then
+        echo "✅ Callers table truncated successfully!"
+        echo ""
+        echo "🧹 Clearing caches on production..."
+        $SSH_COMMAND "$SERVER" "cd $APP_DIR && $SUDO_PREFIX php artisan config:cache > /dev/null 2>&1 && echo '✅ Caches cleared.'"
+
+        echo ""
+        echo "🟢 Bringing site back ONLINE..."
+        maintenance_mode "up"
+
+        echo ""
+        echo "✅ Database reset completed successfully!"
+        echo "📊 Ready for fresh caller registrations."
+        return 0
+    else
+        echo "❌ Failed to truncate callers table!"
+        echo ""
+        echo "🔴 Site remains in MAINTENANCE MODE"
+        echo "    Fix the issue and then run: ./publish.sh --up"
         return 1
     fi
 }
@@ -492,24 +567,152 @@ elif [ "$1" == "--main" ]; then
         echo "📝 All caller data has been preserved."
     fi
     exit 0
+elif [ "$1" == "--email" ] || [ "$1" == "--send-emails" ]; then
+    echo "📧 Sending Welcome Emails..."
+    echo ""
+    if [ -n "$2" ] && [ "$2" -gt 0 ] 2>/dev/null; then
+        # Send specific number of emails
+        send_remote_welcome_emails "$2"
+    else
+        # Send all pending emails
+        send_remote_welcome_emails
+    fi
+    exit $?
+elif [ "$1" == "--reset-db" ]; then
+    echo "🗑️  Database Reset Tool"
+    echo ""
+    reset_remote_database
+    exit $?
 elif [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "AlSarya TV Publish Script"
     echo ""
-    echo "Usage: ./publish.sh [OPTION]"
+    echo "Usage: ./publish.sh [OPTION] [ARGUMENT]"
     echo ""
     echo "Options:"
-    echo "  (no args)     Standard deployment (version check + full deploy)"
-    echo "  --down        Put site in maintenance mode"
-    echo "  --up          Bring site back online"
-    echo "  --main        Switch to main branch (preserves data)"
-    echo "  --prod        Switch to production branch (preserves data)"
-    echo "  --help, -h    Show this help message"
+    echo "  (no args)         Standard deployment (version check + full deploy)"
+    echo "  --down            Put site in maintenance mode"
+    echo "  --up              Bring site back online"
+    echo "  --main            Switch to main branch (preserves data)"
+    echo "  --prod            Switch to production branch (preserves data)"
+    echo "  --email [N]       Send welcome emails (N = optional number, 0 or empty = all pending)"
+    echo "  --send-emails [N] Alias for --email"
+    echo "  --reset-db        DANGEROUS: Truncate callers table and reset database"
+    echo "  --help, -h        Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  ./publish.sh              # Standard deployment"
+    echo "  ./publish.sh --email      # Send all pending welcome emails"
+    echo "  ./publish.sh --email 10   # Send 10 welcome emails"
+    echo "  ./publish.sh --prod       # Switch to production and bring online"
+    echo "  ./publish.sh --reset-db   # Reset callers table (requires confirmation)"
     echo ""
     exit 0
 fi
 
 # START STANDARD DEPLOYMENT (No arguments)
 echo "🚀 Starting Publish Process..."
+echo ""
+
+# Synchronize version files before deployment
+echo "🔄 Synchronizing version files..."
+if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
+    php artisan version:sync --from=VERSION
+    SYNC_EXIT_CODE=$?
+
+    if [ $SYNC_EXIT_CODE -ne 0 ]; then
+        echo "⚠️  Warning: Version sync command failed, but continuing..."
+    else
+        echo "✅ Version files synchronized successfully"
+    fi
+else
+    echo "⚠️  Warning: PHP or artisan not found, skipping version sync"
+fi
+
+echo ""
+
+# Check .env file existence
+echo "🔍 Checking local .env file..."
+if [ ! -f ".env" ]; then
+    echo "❌ Error: .env file not found in current directory"
+    exit 1
+else
+    echo "✅ .env file exists"
+fi
+
+echo ""
+
+# Check and generate APP_KEY if missing
+echo "🔍 Checking APP_KEY in .env..."
+APP_KEY=$(grep -E '^APP_KEY=' .env | cut -d= -f2- | head -1)
+
+if [ -z "$APP_KEY" ]; then
+    echo "⚠️  APP_KEY not found in .env - generating new key..."
+
+    # Generate new APP_KEY using PHP
+    NEW_APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
+
+    if [ -z "$NEW_APP_KEY" ]; then
+        echo "❌ Error: Failed to generate APP_KEY"
+        exit 1
+    fi
+
+    # Add APP_KEY to .env
+    if grep -q "^APP_KEY=" .env; then
+        # Update existing APP_KEY line
+        sed -i '' "s/^APP_KEY=.*/APP_KEY=$NEW_APP_KEY/" .env
+    else
+        # Append new APP_KEY line
+        echo "APP_KEY=$NEW_APP_KEY" >> .env
+    fi
+
+    echo "✅ Generated and added APP_KEY to .env"
+else
+    echo "✅ APP_KEY is set in .env"
+fi
+
+echo ""
+
+# Synchronize environment variables between .env and .env.production
+echo "🔄 Synchronizing environment variables (.env ↔ .env.production)..."
+if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
+    php artisan env:sync-vars --master=.env --dry-run > /dev/null 2>&1
+    SYNC_STATUS=$?
+
+    if [ $SYNC_STATUS -eq 0 ]; then
+        php artisan env:sync-vars --master=.env
+        ENV_SYNC_EXIT=$?
+
+        if [ $ENV_SYNC_EXIT -eq 0 ]; then
+            echo "✅ Environment variables synchronized successfully"
+        else
+            echo "⚠️  Warning: Environment sync had issues, but continuing..."
+        fi
+    else
+        echo "⚠️  Warning: Environment sync validation failed, but continuing..."
+    fi
+else
+    echo "⚠️  Warning: PHP or artisan not found, skipping environment sync"
+fi
+
+echo ""
+
+# Check database migration status
+echo "🔍 Checking database migration status..."
+if command -v php >/dev/null 2>&1 && [ -f "artisan" ]; then
+    php artisan migrate:status > /dev/null 2>&1
+    MIGRATION_STATUS=$?
+
+    if [ $MIGRATION_STATUS -eq 0 ]; then
+        echo "✅ Database migrations are up to date"
+    else
+        echo "❌ Error: Database migration check failed"
+        echo "⚠️  Run 'php artisan migrate' locally before publishing"
+        exit 1
+    fi
+else
+    echo "⚠️  Warning: PHP or artisan not found, skipping migration check"
+fi
+
 echo ""
 
 # Check if already in maintenance mode
@@ -550,7 +753,6 @@ parse_version_components() {
 
 if [ ! -f "$VERSION_JSON" ]; then
     echo "❌ Error: version.json not found at $VERSION_JSON"
-    send_discord_notification "Publish Failed ❌" "Missing version.json locally." 15548997
     exit 1
 fi
 
@@ -560,14 +762,12 @@ if [ -f "$VERSION_FILE" ]; then
 
     if [ -z "$LOCAL_JSON_VERSION" ]; then
         echo "❌ Error: Could not read version from version.json"
-        send_discord_notification "Publish Failed ❌" "version.json missing version field." 15548997
         exit 1
     fi
 
     PARSED_LOCAL_VERSION=$(parse_version_components "$OLD_VERSION")
     if [ -z "$PARSED_LOCAL_VERSION" ]; then
         echo "❌ Error: VERSION file has invalid format: $OLD_VERSION"
-        send_discord_notification "Publish Failed ❌" "Local VERSION format invalid." 15548997
         exit 1
     fi
 
@@ -575,14 +775,12 @@ if [ -f "$VERSION_FILE" ]; then
 
     if [ "$BASE_VERSION" != "$LOCAL_JSON_VERSION" ]; then
         echo "❌ Error: version.json ($LOCAL_JSON_VERSION) and VERSION ($BASE_VERSION) do not match"
-        send_discord_notification "Publish Failed ❌" "Local version.json and VERSION mismatch." 15548997
         exit 1
     fi
 
     MAJOR_VERSION=$(echo "$BASE_VERSION" | cut -d. -f1)
     if [ "$MAJOR_VERSION" -lt 3 ]; then
         echo "❌ Error: Base version must be 3.x or higher. Found: $BASE_VERSION"
-        send_discord_notification "Publish Failed ❌" "Base version below 3.x." 15548997
         exit 1
     fi
 
@@ -592,7 +790,6 @@ if [ -f "$VERSION_FILE" ]; then
     echo "📦 Version computed (local VERSION unchanged): $OLD_VERSION -> $NEW_VERSION"
 else
     echo "❌ Error: VERSION file not found at $VERSION_FILE"
-    send_discord_notification "Publish Failed ❌" "Missing VERSION file locally." 15548997
     exit 1
 fi
 
@@ -602,7 +799,6 @@ REMOTE_VERSION_JSON_STATUS=$?
 if [ $REMOTE_VERSION_JSON_STATUS -ne 0 ]; then
     echo "❌ Error: SSH failed reading remote version.json"
     echo "$REMOTE_VERSION_JSON_RAW"
-    send_discord_notification "Publish Failed ❌" "SSH failed reading remote version.json." 15548997
     exit 1
 fi
 
@@ -613,7 +809,6 @@ REMOTE_VERSION_FILE_STATUS=$?
 if [ $REMOTE_VERSION_FILE_STATUS -ne 0 ]; then
     echo "❌ Error: SSH failed reading remote VERSION"
     echo "$REMOTE_VERSION_FILE_RAW"
-    send_discord_notification "Publish Failed ❌" "SSH failed reading remote VERSION." 15548997
     exit 1
 fi
 
@@ -622,14 +817,12 @@ REMOTE_VERSION_FILE=$(printf '%s' "$REMOTE_VERSION_FILE_RAW" | head -1)
 if [ -z "$REMOTE_VERSION_JSON" ] || [ -z "$REMOTE_VERSION_FILE" ]; then
     echo "❌ Error: Could not read remote version.json or VERSION"
     $SSH_COMMAND "$SERVER" "ls -la '$APP_DIR/version.json' '$APP_DIR/VERSION'" 2>/dev/null || true
-    send_discord_notification "Publish Failed ❌" "Remote version files missing or unreadable." 15548997
     exit 1
 fi
 
 PARSED_REMOTE_VERSION=$(parse_version_components "$REMOTE_VERSION_FILE")
 if [ -z "$PARSED_REMOTE_VERSION" ]; then
     echo "❌ Error: Remote VERSION format invalid: $REMOTE_VERSION_FILE"
-    send_discord_notification "Publish Failed ❌" "Remote VERSION format invalid." 15548997
     exit 1
 fi
 
@@ -637,13 +830,11 @@ IFS='|' read -r REMOTE_BASE_VERSION REMOTE_BUILD <<< "$PARSED_REMOTE_VERSION"
 
 if [ "$REMOTE_VERSION_JSON" != "$BASE_VERSION" ] || [ "$REMOTE_BASE_VERSION" != "$BASE_VERSION" ]; then
     echo "❌ Error: Remote base version mismatch. Local: $BASE_VERSION, Remote JSON: $REMOTE_VERSION_JSON, Remote VERSION: $REMOTE_BASE_VERSION"
-    send_discord_notification "Publish Failed ❌" "Remote base version mismatch." 15548997
     exit 1
 fi
 
-if [ "$REMOTE_BUILD" != "$CURRENT_BUILD" ]; then
-    echo "❌ Error: Remote build ($REMOTE_BUILD) does not match local build ($CURRENT_BUILD)"
-    send_discord_notification "Publish Failed ❌" "Remote build mismatch." 15548997
+if [ "$REMOTE_BUILD" == "$CURRENT_BUILD" ]; then
+    echo "❌ Error: Remote build ($REMOTE_BUILD) matches local build ($CURRENT_BUILD) - no new version to deploy"
     exit 1
 fi
 
@@ -654,21 +845,20 @@ upload_files_to_production
 
 # Execute deploy.sh via SSH
 echo "⚡ Executing deploy.sh on server via SSH..."
-send_discord_notification "Phase 2: Execution ⚡" "Triggering ./deploy.sh on remote server..." 3447003
 
 $SSH_COMMAND "$SERVER" "cd $APP_DIR && PUBLISH_VERSION='$NEW_VERSION' PUBLISH_BASE_VERSION='$BASE_VERSION' PUBLISH_BUILD='$NEW_BUILD' ./deploy.sh"
 DEPLOY_EXIT_CODE=$?
 
 if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
     echo "✅ Remote deployment executed successfully!"
-    send_discord_notification "Publish Finished ✅" "Deployment script completed successfully on server." 5763719
 
     echo ""
     echo "🟢 Bringing site back ONLINE..."
     maintenance_mode "up"
+
+    send_discord_notification "Publish Successful ✅" "Version **$NEW_VERSION** deployed successfully." 5763719
 else
     echo "❌ Remote deployment failed (Exit Code: $DEPLOY_EXIT_CODE)"
-    send_discord_notification "Publish Failed ❌" "Remote deployment script returned non-zero exit code." 15548997
 
     # Keep site down if we put it into maintenance mode
     if [ "$WAS_DOWN" == "false" ]; then
@@ -676,6 +866,8 @@ else
         echo "🔴 Deployment failed! Site remains in MAINTENANCE MODE"
         echo "    Fix the issue and then run: ./publish.sh --up"
     fi
+
+    send_discord_notification "Publish Failed ❌" "Version **$NEW_VERSION** deployment failed. Check server logs." 15548997
 
     exit 1
 fi
