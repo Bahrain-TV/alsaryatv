@@ -262,7 +262,6 @@ require_files() {
     done
 
     if [ "$missing" = "true" ]; then
-        send_discord_message "Deployment Failed ❌" "Missing required application files after git sync." 15548997
         return 1
     fi
 
@@ -292,7 +291,6 @@ execute_silent "cd '$APP_DIR' && $SUDO_PREFIX git fetch origin $CURRENT_BRANCH" 
 execute_silent "cd '$APP_DIR' && $SUDO_PREFIX git checkout -B $CURRENT_BRANCH origin/$CURRENT_BRANCH" "Checking out $CURRENT_BRANCH branch"
 if ! execute_silent "cd '$APP_DIR' && $SUDO_PREFIX git reset --hard origin/$CURRENT_BRANCH" "Resetting to origin/$CURRENT_BRANCH"; then
     log_error "Git sync failed. Aborting deployment."
-    send_discord_message "Deployment Failed ❌" "Git synchronization failed on server." 15548997
     exit 1
 fi
 
@@ -305,7 +303,6 @@ fi
 log_info "Validating environment configuration..."
 if [ ! -f "$APP_DIR/.env" ]; then
     log_error "Missing .env file on server"
-    send_discord_message "Deployment Failed ❌" "Missing .env on server." 15548997
     exit 1
 fi
 
@@ -316,7 +313,6 @@ APP_CIPHER_VALUE=$($SUDO_PREFIX bash -c "grep -E '^APP_CIPHER=' '$APP_DIR/.env' 
 
 if ! validate_env_values "Server .env" "$(strip_quotes "$APP_KEY_VALUE")" "$(strip_quotes "$APP_CIPHER_VALUE")"; then
     log_error "Invalid .env configuration. Aborting deployment."
-    send_discord_message "Deployment Failed ❌" "Invalid .env configuration on server." 15548997
     exit 1
 fi
 
@@ -335,7 +331,6 @@ fi
 log_info "Running database migrations..."
 if ! execute_silent "$SUDO_PREFIX $ART_CMD migrate --force" "Executing artisan migrate"; then
     log_error "Migration failed. Critical error."
-    send_discord_message "Deployment Failed ❌" "Database migration failed on server." 15548997
     exit 1
 fi
 
@@ -344,7 +339,6 @@ if [ "$BACKUP_ENABLE" == "true" ]; then
     log_info "Restoring data from latest backup..."
     if ! execute_silent "$SUDO_PREFIX $ART_CMD app:callers:import --force" "Executing data import"; then
         log_error "Data restoration failed! The database might be inconsistent."
-        send_discord_message "Deployment Warning ⚠️" "Data restoration failed during deployment. Manual check required." 15548997
         # Note: We don't exit here as the code is already updated and migrated.
     fi
 fi
