@@ -90,21 +90,21 @@
 
             @if(config('alsarya.registration.enabled', false) || auth()->check())
                 {{-- Registration is enabled - show registration form --}}
-                <div class="open-message" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1)); border: 2px solid rgba(16, 185, 129, 0.4); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="color: #34d399; font-size: 1.5rem; margin-bottom: 0.5rem;">🌙 رمضان كريم!</h3>
-                    <p style="color: rgba(255, 255, 255, 0.8);">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
+                <div class="open-message bg-gradient-to-r from-brand-maroon/20 to-brand-cream/20 border-2 border-brand-maroon/40 rounded-2xl p-6 mb-8 backdrop-blur-sm">
+                    <h3 class="text-brand-cream text-2xl font-bold mb-2">🌙 رمضان كريم!</h3>
+                    <p class="text-white/80 text-lg">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
                 </div>
 
                 {{-- Registration Form for Logged-in Users --}}
-                <div class="registration-form" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; opacity: 1 !important;">
+                <div class="registration-form bg-dark-card border border-brand-cream/20 rounded-2xl p-8 mb-8 opacity-100 backdrop-blur-md">
                     {{-- Registration Type Toggle --}}
-                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center;">
+                    <div class="flex gap-4 mb-6 justify-center">
                         <button type="button" id="individual-toggle"
-                                style="flex: 1; padding: 0.875rem 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; border: 2px solid #fbbf24; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1rem; opacity: 1 !important;">
+                                class="flex-1 py-3 px-4 bg-brand-gradient text-white font-bold border-2 border-brand-cream rounded-xl cursor-pointer transition-all duration-300 text-base hover:shadow-lg hover:shadow-brand-maroon/50 opacity-100">
                             👤 تسجيل فردي
                         </button>
                         <button type="button" id="family-toggle"
-                                style="flex: 1; padding: 0.875rem 1rem; background: transparent; color: #fbbf24; font-weight: 700; border: 2px solid #fbbf24; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1rem; opacity: 1 !important;">
+                                class="flex-1 py-3 px-4 bg-transparent text-brand-cream font-bold border-2 border-brand-cream rounded-xl cursor-pointer transition-all duration-300 text-base hover:bg-brand-cream/10 opacity-100">
                             👨‍👩‍👧‍👦 تسجيل عائلي
                         </button>
                     </div>
@@ -117,64 +117,64 @@
 
                         {{-- Name --}}
                         <div>
-                            <label for="name" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">الاسم الكامل</label>
-                            <input type="text" id="name" name="name" required value="{{ old('name') }}" 
-                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;"
+                            <label for="name" class="block text-brand-cream mb-2 font-semibold">الاسم الكامل</label>
+                            <input type="text" id="name" name="name" required value="{{ old('name') }}"
+                                   class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base placeholder-white/50 focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100"
                                    placeholder="أدخل اسمك الكامل">
-                            @error('name') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                            @error('name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- CPR --}}
                         <div>
-                            <label for="cpr" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">رقم الهوية (CPR)</label>
+                            <label for="cpr" class="block text-brand-cream mb-2 font-semibold">رقم الهوية (CPR)</label>
                             <input type="text" id="cpr" name="cpr" required value="{{ old('cpr') }}" pattern="\d*"
-                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;"
+                                   class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base placeholder-white/50 focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100"
                                    placeholder="أدخل رقم الهوية">
-                            @error('cpr') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                            @error('cpr') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- Phone --}}
                         <div>
-                            <label for="phone_number" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">رقم الهاتف</label>
+                            <label for="phone_number" class="block text-brand-cream mb-2 font-semibold">رقم الهاتف</label>
                             <input type="tel" id="phone_number" name="phone_number" required value="{{ old('phone_number') }}"
-                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;"
+                                   class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base placeholder-white/50 focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100"
                                    placeholder="أدخل رقم الهاتف">
-                            @error('phone_number') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                            @error('phone_number') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- Family Fields (Hidden by default) --}}
-                        <div id="family-fields" style="display: none;">
+                        <div id="family-fields" class="hidden">
                             {{-- Family Name --}}
                             <div>
-                                <label for="family_name" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">اسم العائلة</label>
+                                <label for="family_name" class="block text-brand-cream mb-2 font-semibold">اسم العائلة</label>
                                 <input type="text" id="family_name" name="family_name" value="{{ old('family_name') }}"
-                                       style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;"
+                                       class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base placeholder-white/50 focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100"
                                        placeholder="أدخل اسم العائلة (اختياري)">
-                                @error('family_name') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                                @error('family_name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                             </div>
 
                             {{-- Number of Family Members --}}
                             <div>
-                                <label for="family_members" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">عدد أفراد العائلة</label>
+                                <label for="family_members" class="block text-brand-cream mb-2 font-semibold">عدد أفراد العائلة</label>
                                 <input type="number" id="family_members" name="family_members" min="2" max="10" value="{{ old('family_members', 2) }}"
-                                       style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;">
-                                @error('family_members') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
+                                       class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100">
+                                @error('family_members') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
                         {{-- Submit Button --}}
                         <button type="submit"
-                                style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; font-size: 1.125rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 0.5rem; transition: all 0.3s; opacity: 1 !important;">
+                                class="w-full py-4 bg-brand-gradient text-white font-bold text-lg rounded-xl cursor-pointer mt-2 transition-all duration-300 hover:shadow-lg hover:shadow-brand-maroon/50 hover:scale-105 active:scale-95 opacity-100">
                             🎯 سجّل الآن
                         </button>
                     </form>
                 </div>
 
                 {{-- Current Ramadan Info --}}
-                <div class="ramadan-info">
-                    <h4>🌙 أهلاً بكم في شهر رمضان المبارك</h4>
-                    <div class="date">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
-                    <div class="hijri" style="color: #34d399;">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
+                <div class="ramadan-info bg-gradient-to-r from-brand-maroon/20 to-brand-cream/20 border-2 border-brand-cream/40 rounded-2xl p-6 backdrop-blur-sm text-center">
+                    <h4 class="text-brand-cream text-2xl font-bold mb-3">🌙 أهلاً بكم في شهر رمضان المبارك</h4>
+                    <div class="text-brand-cream text-lg font-semibold mb-2">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
+                    <div class="text-brand-light-cream text-xl font-bold">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
                 </div>
             @else
                 {{-- Guests see the countdown timer --}}
@@ -245,14 +245,14 @@
             function updateButtonStyles(isFamily) {
                 if (isFamily) {
                     individualToggle.style.background = 'transparent';
-                    individualToggle.style.color = '#fbbf24';
-                    familyToggle.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
-                    familyToggle.style.color = '#0f172a';
+                    individualToggle.style.color = '#E8D7C3';
+                    familyToggle.style.background = 'linear-gradient(135deg, #A81C2E, #E8D7C3)';
+                    familyToggle.style.color = '#FFFFFF';
                 } else {
-                    individualToggle.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
-                    individualToggle.style.color = '#0f172a';
+                    individualToggle.style.background = 'linear-gradient(135deg, #A81C2E, #E8D7C3)';
+                    individualToggle.style.color = '#FFFFFF';
                     familyToggle.style.background = 'transparent';
-                    familyToggle.style.color = '#fbbf24';
+                    familyToggle.style.color = '#E8D7C3';
                 }
             }
 

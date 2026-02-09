@@ -64,7 +64,7 @@
         .orb-1 {
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, #7c3aed 0%, rgba(124, 58, 237, 0) 70%);
+            background: radial-gradient(circle, #A81C2E 0%, rgba(168, 28, 46, 0) 70%);
             top: -100px;
             left: -100px;
             animation: float 20s ease-in-out infinite;
@@ -73,7 +73,7 @@
         .orb-2 {
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, #06b6d4 0%, rgba(6, 182, 212, 0) 70%);
+            background: radial-gradient(circle, #E8D7C3 0%, rgba(232, 215, 195, 0) 70%);
             bottom: -150px;
             right: -150px;
             animation: float 25s ease-in-out infinite reverse;
@@ -82,7 +82,7 @@
         .orb-3 {
             width: 350px;
             height: 350px;
-            background: radial-gradient(circle, #ec4899 0%, rgba(236, 72, 153, 0) 70%);
+            background: radial-gradient(circle, #7A1422 0%, rgba(122, 20, 34, 0) 70%);
             top: 50%;
             right: 10%;
             animation: float 22s ease-in-out infinite;
@@ -115,7 +115,41 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            perspective: 1200px;
+            width: 320px;
+            height: 320px;
             animation: slideInDown 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2s backwards;
+        }
+
+        .logo-flip-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .logo-wrapper.flip-active .logo-flip-card {
+            transform: rotateY(180deg);
+        }
+
+        .logo-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+        }
+
+        .logo-face.front {
+            z-index: 2;
+        }
+
+        .logo-face.back {
+            transform: rotateY(180deg);
+            z-index: 1;
         }
 
         .logo-glow {
@@ -123,13 +157,30 @@
             width: 320px;
             height: 320px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(168, 28, 46, 0.4) 0%, rgba(232, 215, 195, 0.3) 50%, transparent 70%);
+            animation: pulse-glow 3s ease-in-out infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .logo-glow.front {
             animation: pulse-glow 3s ease-in-out infinite;
         }
 
+        .logo-glow.back {
+            animation: pulse-glow 3s ease-in-out infinite, glow-expand 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 4s forwards;
+        }
+
         @keyframes pulse-glow {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.5; }
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.5; }
+        }
+
+        @keyframes glow-expand {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
         }
 
         .logo-image {
@@ -137,14 +188,74 @@
             z-index: 2;
             width: 280px;
             height: auto;
-            filter: drop-shadow(0 20px 40px rgba(124, 58, 237, 0.4))
-                    drop-shadow(0 0 30px rgba(6, 182, 212, 0.2));
+            filter: drop-shadow(0 20px 40px rgba(168, 28, 46, 0.5))
+                    drop-shadow(0 0 30px rgba(232, 215, 195, 0.4));
             animation: bounce 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        .logo-image.back-image {
+            animation: none;
+            filter: drop-shadow(0 20px 40px rgba(168, 28, 46, 0.7))
+                    drop-shadow(0 0 40px rgba(232, 215, 195, 0.6));
         }
 
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
+        }
+
+        /* Logo flip animation for brand transition */
+        @keyframes logoFlipOut {
+            0% {
+                opacity: 1;
+                transform: scale(1) rotateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.95) rotateY(180deg);
+            }
+        }
+
+        @keyframes logoFlipIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.95) rotateY(-180deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0);
+            }
+        }
+
+        @keyframes glowFadeInOut {
+            0%, 90% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        .logo-wrapper.flip-animation .logo-flip-card {
+            animation: flipCard 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0s forwards;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes flipCard {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(180deg); }
+        }
+
+        .logo-wrapper.flip-animation .logo-glow.front {
+            animation: pulse-glow 3s ease-in-out infinite, glowFadeInOut 1.5s ease-in-out 0s forwards;
+        }
+
+        .logo-wrapper.flip-animation .logo-glow.back {
+            animation: pulse-glow 3s ease-in-out 1.5s, glow-expand 1s cubic-bezier(0.34, 1.56, 0.64, 1) 1.5s forwards;
+        }
+
+        .logo-wrapper.flip-animation .logo-image.front-image {
+            animation: bounce 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite, logoFlipOut 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0s forwards;
+        }
+
+        .logo-wrapper.flip-animation .logo-image.back-image {
+            animation: logoFlipIn 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0s forwards;
         }
 
         /* Text content */
@@ -155,7 +266,7 @@
         .splash-title {
             font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
-            background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #c4b5fd 100%);
+            background: linear-gradient(135deg, #E8D7C3 0%, #F5DEB3 50%, #A81C2E 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -191,24 +302,24 @@
         .loading-bar {
             width: 200px;
             height: 4px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(232, 215, 195, 0.2);
             border-radius: 2px;
             overflow: hidden;
-            box-shadow: inset 0 0 10px rgba(124, 58, 237, 0.2);
+            box-shadow: inset 0 0 10px rgba(168, 28, 46, 0.2);
         }
 
         .loading-progress {
             height: 100%;
-            background: linear-gradient(90deg, #7c3aed 0%, #06b6d4 50%, #ec4899 100%);
+            background: linear-gradient(90deg, #A81C2E 0%, #E8D7C3 50%, #F5DEB3 100%);
             border-radius: 2px;
             width: 0%;
-            animation: loading 4s ease-in-out forwards;
-            box-shadow: 0 0 10px rgba(124, 58, 237, 0.6);
+            animation: loading 9s ease-in-out forwards;
+            box-shadow: 0 0 10px rgba(168, 28, 46, 0.9);
         }
 
         @keyframes loading {
             0% { width: 0%; }
-            90% { width: 90%; }
+            80% { width: 80%; }
             100% { width: 100%; }
         }
 
@@ -360,10 +471,20 @@
 
     <!-- Main splash screen -->
     <div class="splash-container">
-        <!-- Logo with glow -->
+        <!-- Logo with glow - Animated flip -->
         <div class="logo-wrapper">
-            <div class="logo-glow"></div>
-            <img src="{{ asset('images/btv-logo-ar.png') }}" alt="BTV Logo" class="logo-image">
+            <div class="logo-flip-card">
+                <!-- Front face -->
+                <div class="logo-face front">
+                    <div class="logo-glow front"></div>
+                    <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="logo-image front-image" title="Al-Sarya TV Show">
+                </div>
+                <!-- Back face -->
+                <div class="logo-face back">
+                    <div class="logo-glow back"></div>
+                    <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="logo-image back-image" title="Al-Sarya TV Show">
+                </div>
+            </div>
         </div>
 
         <!-- Content -->
@@ -431,12 +552,25 @@
         // Initialize stars on load
         generateStars();
 
-        // Auto-redirect after loading completes (with 1-second theme detection delay)
+        // Trigger logo flip animation after loading completes
+        function triggerLogoFlip() {
+            const logoWrapper = document.querySelector('.logo-wrapper');
+            if (logoWrapper) {
+                logoWrapper.classList.add('flip-animation');
+            }
+        }
+
+        // Auto-redirect after loading and animation completes
         window.addEventListener('load', () => {
-            // Total delay: 1s (theme detection) + 4s (progress bar) + 2s (buffer) = 7 seconds
+            // Trigger flip at 4 seconds (after initial logo display)
+            setTimeout(() => {
+                triggerLogoFlip();
+            }, 4000);
+
+            // Redirect after full animation: slide-in (2s) + first logo (2s) + flip (1.5s) + second logo (4s) = 9.5s
             setTimeout(() => {
                 window.location.href = '/';
-            }, 7000);
+            }, 9500);
         });
 
         // Allow escape key or click to skip
