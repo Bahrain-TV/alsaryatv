@@ -1,27 +1,25 @@
 <?php
 
-use App\Livewire\Auth\Register;
-use Livewire\Livewire;
-
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-test('registration screen can be rendered', function (): void {
-    $response = $this->get('/register');
+// Main registration screen
+test('splash screen can be rendered', function (): void {
+    $response = $this->get('/splash');
 
     $response->assertStatus(200);
+    $response->assertViewIs('splash');
 });
 
-test('new users can register', function (): void {
-    $response = Livewire::test(Register::class)
-        ->set('name', 'Test User')
-        ->set('email', 'test@example.com')
-        ->set('password', 'password')
-        ->set('password_confirmation', 'password')
-        ->call('register');
+test('home registration page can be rendered', function (): void {
+    $response = $this->get('/');
 
-    $response
-        ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+    $response->assertStatus(200);
+    $response->assertViewIs('welcome');
+});
 
-    $this->assertAuthenticated();
+test('family registration page can be rendered', function (): void {
+    $response = $this->get('/family');
+
+    $response->assertStatus(200);
+    $response->assertViewIs('welcome');
 });
