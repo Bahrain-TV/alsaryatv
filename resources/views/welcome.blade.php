@@ -96,15 +96,15 @@
                 </div>
 
                 {{-- Registration Form for Logged-in Users --}}
-                <div class="registration-form" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+                <div class="registration-form" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; opacity: 1 !important;">
                     {{-- Registration Type Toggle --}}
                     <div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center;">
                         <button type="button" id="individual-toggle"
-                                style="flex: 1; padding: 0.875rem 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; border: 2px solid #fbbf24; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1rem;">
+                                style="flex: 1; padding: 0.875rem 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; border: 2px solid #fbbf24; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1rem; opacity: 1 !important;">
                             👤 تسجيل فردي
                         </button>
                         <button type="button" id="family-toggle"
-                                style="flex: 1; padding: 0.875rem 1rem; background: transparent; color: #fbbf24; font-weight: 700; border: 2px solid #fbbf24; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1rem;">
+                                style="flex: 1; padding: 0.875rem 1rem; background: transparent; color: #fbbf24; font-weight: 700; border: 2px solid #fbbf24; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 1rem; opacity: 1 !important;">
                             👨‍👩‍👧‍👦 تسجيل عائلي
                         </button>
                     </div>
@@ -119,7 +119,7 @@
                         <div>
                             <label for="name" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">الاسم الكامل</label>
                             <input type="text" id="name" name="name" required value="{{ old('name') }}" 
-                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
+                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;"
                                    placeholder="أدخل اسمك الكامل">
                             @error('name') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
                         </div>
@@ -128,7 +128,7 @@
                         <div>
                             <label for="cpr" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">رقم الهوية (CPR)</label>
                             <input type="text" id="cpr" name="cpr" required value="{{ old('cpr') }}" pattern="\d*"
-                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
+                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;"
                                    placeholder="أدخل رقم الهوية">
                             @error('cpr') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
                         </div>
@@ -137,7 +137,7 @@
                         <div>
                             <label for="phone_number" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">رقم الهاتف</label>
                             <input type="tel" id="phone_number" name="phone_number" required value="{{ old('phone_number') }}"
-                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
+                                   style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;"
                                    placeholder="أدخل رقم الهاتف">
                             @error('phone_number') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
                         </div>
@@ -148,7 +148,7 @@
                             <div>
                                 <label for="family_name" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">اسم العائلة</label>
                                 <input type="text" id="family_name" name="family_name" value="{{ old('family_name') }}"
-                                       style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;"
+                                       style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;"
                                        placeholder="أدخل اسم العائلة (اختياري)">
                                 @error('family_name') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
                             </div>
@@ -157,14 +157,14 @@
                             <div>
                                 <label for="family_members" style="display: block; color: #fbbf24; margin-bottom: 0.5rem; font-weight: 600;">عدد أفراد العائلة</label>
                                 <input type="number" id="family_members" name="family_members" min="2" max="10" value="{{ old('family_members', 2) }}"
-                                       style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem;">
+                                       style="width: 100%; padding: 0.875rem 1rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 12px; color: white; font-size: 1rem; opacity: 1 !important;">
                                 @error('family_members') <span style="color: #f87171; font-size: 0.875rem;">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
                         {{-- Submit Button --}}
-                        <button type="submit" 
-                                style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; font-size: 1.125rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 0.5rem; transition: all 0.3s;">
+                        <button type="submit"
+                                style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #0f172a; font-weight: 700; font-size: 1.125rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 0.5rem; transition: all 0.3s; opacity: 1 !important;">
                             🎯 سجّل الآن
                         </button>
                     </form>
@@ -257,21 +257,15 @@
             }
 
             function animateFormEntrance() {
+                // Animation disabled - forms appear immediately with inline styles
                 if (!hasGSAP || !registrationForm) return;
 
                 const elements = registrationForm.querySelectorAll('label, input, select, button');
                 if (!elements.length) return;
 
+                // Ensure all elements are visible
                 gsap.killTweensOf(elements);
-                gsap.set(elements, { opacity: 0, y: 12 });
-
-                gsap.timeline().from(elements, {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.6,
-                    ease: 'power2.out',
-                    stagger: 0.05
-                });
+                gsap.set(elements, { opacity: 1, y: 0 });
             }
 
             function setIndividualMode() {
