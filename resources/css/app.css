@@ -94,6 +94,29 @@ body {
     padding: max(env(safe-area-inset-top), 0.5rem) max(env(safe-area-inset-right), 0.5rem) max(env(safe-area-inset-bottom), 0.5rem) max(env(safe-area-inset-left), 0.5rem);
 }
 
+body.jetstream-app {
+    font-family: Figtree, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    background: #f3f4f6 !important;
+    background-image: none !important;
+    background-attachment: scroll !important;
+    background-position: initial !important;
+    background-repeat: repeat !important;
+    background-size: auto !important;
+    color: #111827 !important;
+    min-height: 100% !important;
+    display: block !important;
+    align-items: initial !important;
+    justify-content: initial !important;
+    overflow-x: initial !important;
+    position: static !important;
+    padding: 0 !important;
+}
+
+html.dark body.jetstream-app {
+    background: #0f172a !important;
+    color: #e5e7eb !important;
+}
+
 body.jetstream-auth {
     font-family: Figtree, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     background: #f3f4f6 !important;

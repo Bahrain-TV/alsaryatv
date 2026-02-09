@@ -2,7 +2,19 @@
     use Illuminate\Support\Facades\Auth;
 @endphp
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav
+    x-data="{
+        open: false,
+        theme: document.documentElement.dataset.theme || 'light',
+        setTheme(next) {
+            this.theme = next;
+            document.documentElement.classList.toggle('dark', next === 'dark');
+            document.documentElement.dataset.theme = next;
+            localStorage.setItem('theme', next);
+        }
+    }"
+    class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800"
+>
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -29,6 +41,40 @@
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <div class="flex items-center gap-2">
+                    <div class="inline-flex rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                        <form method="POST" action="{{ route('locale.switch', 'en') }}">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="px-3 py-1 text-xs font-semibold rounded-l-md transition-colors {{ app()->getLocale() === 'en' ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900' : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white' }}"
+                                aria-pressed="{{ app()->getLocale() === 'en' ? 'true' : 'false' }}"
+                            >
+                                EN
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('locale.switch', 'ar') }}">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="px-3 py-1 text-xs font-semibold rounded-r-md transition-colors {{ app()->getLocale() === 'ar' ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900' : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white' }}"
+                                aria-pressed="{{ app()->getLocale() === 'ar' ? 'true' : 'false' }}"
+                            >
+                                AR
+                            </button>
+                        </form>
+                    </div>
+
+                    <button
+                        type="button"
+                        @click="setTheme(theme === 'dark' ? 'light' : 'dark')"
+                        class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-md border border-gray-200 dark:border-gray-700 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white bg-white dark:bg-gray-800"
+                    >
+                        <span x-cloak x-show="theme === 'dark'">{{ __('Light') }}</span>
+                        <span x-cloak x-show="theme !== 'dark'">{{ __('Dark') }}</span>
+                    </button>
+                </div>
+
                 <!-- Teams Dropdown -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
                     <div class="ms-3 relative">
@@ -161,7 +207,43 @@
         </div>
 
         <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
+        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-700">
+            <div class="px-4 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="inline-flex rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                        <form method="POST" action="{{ route('locale.switch', 'en') }}">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="px-3 py-1 text-xs font-semibold rounded-l-md transition-colors {{ app()->getLocale() === 'en' ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900' : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white' }}"
+                                aria-pressed="{{ app()->getLocale() === 'en' ? 'true' : 'false' }}"
+                            >
+                                EN
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('locale.switch', 'ar') }}">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="px-3 py-1 text-xs font-semibold rounded-r-md transition-colors {{ app()->getLocale() === 'ar' ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900' : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white' }}"
+                                aria-pressed="{{ app()->getLocale() === 'ar' ? 'true' : 'false' }}"
+                            >
+                                AR
+                            </button>
+                        </form>
+                    </div>
+
+                    <button
+                        type="button"
+                        @click="setTheme(theme === 'dark' ? 'light' : 'dark')"
+                        class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-md border border-gray-200 dark:border-gray-700 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white bg-white dark:bg-gray-800"
+                    >
+                        <span x-cloak x-show="theme === 'dark'">{{ __('Light') }}</span>
+                        <span x-cloak x-show="theme !== 'dark'">{{ __('Dark') }}</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="flex items-center px-4">
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="shrink-0 me-3">

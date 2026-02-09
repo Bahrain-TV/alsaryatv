@@ -48,6 +48,18 @@ Route::get('/privacy', fn () => view('privacy', [
     'policy' => Markdown::parse(file_get_contents(resource_path('markdown/privacy.md'))),
 ]))->name('privacy');
 
+Route::post('/locale/{locale}', function (string $locale) {
+    $supported = ['ar', 'en'];
+
+    if (! in_array($locale, $supported, true)) {
+        abort(404);
+    }
+
+    session(['locale' => $locale]);
+
+    return back();
+})->name('locale.switch');
+
 // Caller registration routes
 Route::prefix('callers')->name('callers.')->group(function (): void {
     Route::get('/create', [CallerController::class, 'create'])->name('create');

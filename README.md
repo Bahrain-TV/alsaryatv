@@ -21,8 +21,6 @@
 - v 2.0.20250116
 - v 3.1.22233440
 
-## CHANGELOG
-
 You can force republish vendor files by executing an Artisan command. In a terminal, run:
 
 ```markdown
