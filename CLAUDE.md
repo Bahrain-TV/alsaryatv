@@ -176,6 +176,21 @@ php artisan migrate:fresh --seed
 php artisan tinker
 ```
 
+### Version Management
+```bash
+# Synchronize version.json with VERSION file
+php artisan version:sync
+
+# Sync with dry-run (shows changes without applying)
+php artisan version:sync --dry-run
+
+# Also update APP_VERSION in .env files
+php artisan version:sync --update-env
+
+# Sync from version.json to VERSION (reverse direction)
+php artisan version:sync --from=version.json
+```
+
 ### Deployment
 ```bash
 # See deploy.sh for full deployment workflow
@@ -186,6 +201,9 @@ php artisan config:cache
 php artisan view:cache
 npm run build
 php artisan migrate --force
+
+# Publish to production (includes version sync)
+./publish.sh
 ```
 
 ---
