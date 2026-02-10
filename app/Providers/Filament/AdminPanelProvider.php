@@ -53,7 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->spa()
             ->topNavigation(false)
-            ->darkMode(false)
+            ->darkMode(true)
             ->maxContentWidth('full')
             ->middleware([
                 EncryptCookies::class,

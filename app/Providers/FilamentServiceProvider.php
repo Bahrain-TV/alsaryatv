@@ -6,6 +6,7 @@ use Filament\Facades\Filament;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\App;
 
 class FilamentServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,9 @@ class FilamentServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Set Arabic locale for Filament admin panel
+        App::setLocale('ar');
+
         // Register custom Filament pages
         Filament::registerPages([
             \App\Filament\Pages\WinnerSelection::class,
@@ -44,10 +48,14 @@ class FilamentServiceProvider extends ServiceProvider
 
             ], 'aldoyh/alsaryatv');
 
-            // Add accessibility improvements
+            // Add RTL and accessibility improvements
             $html = '
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
+                    // Set RTL layout for Arabic
+                    document.documentElement.setAttribute("dir", "rtl");
+                    document.documentElement.setAttribute("lang", "ar");
+
                     // Add skip link for screen readers
                     const skipLink = document.createElement("a");
                     skipLink.href = "#main";

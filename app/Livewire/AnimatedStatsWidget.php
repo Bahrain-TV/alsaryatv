@@ -19,6 +19,8 @@ class AnimatedStatsWidget extends Component
 
     public $uniqueCprs = 0;
 
+    public $previousDayCallers = 0;
+
     public $winRatio = 0;
 
     public $todayTrend = 0;
@@ -45,7 +47,8 @@ class AnimatedStatsWidget extends Component
         $uniqueCprs = Caller::distinct('cpr')->count('cpr');
 
         // Calculate trends
-        $yesterdayCallers = Caller::whereDate('created_at', today()->subDay())->count();
+        $previousDayCallers = Caller::whereDate('created_at', today()->subDay())->count();
+        $yesterdayCallers = $previousDayCallers;
         $todayTrend = $yesterdayCallers > 0
             ? round((($todayCallers - $yesterdayCallers) / $yesterdayCallers) * 100, 1)
             : ($todayCallers > 0 ? 100 : 0);
@@ -60,6 +63,7 @@ class AnimatedStatsWidget extends Component
         $this->totalHits = $totalHits;
         $this->activeCallers = $activeCallers;
         $this->uniqueCprs = $uniqueCprs;
+        $this->previousDayCallers = $previousDayCallers;
         $this->winRatio = $winRatio;
         $this->todayTrend = $todayTrend;
         $this->averageHits = $averageHits;

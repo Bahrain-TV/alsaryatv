@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER', 'gmail'),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,6 +36,17 @@ return [
     */
 
     'mailers' => [
+
+        'gmail' => [
+            'transport' => 'smtp',
+            'host' => 'smtp.gmail.com',
+            'port' => 587,
+            'encryption' => 'tls',
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'verify_peer' => false,
+        ],
 
         'smtp' => [
             'transport' => 'smtp',
@@ -82,6 +93,7 @@ return [
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
+                'gmail',
                 'smtp',
                 'log',
             ],

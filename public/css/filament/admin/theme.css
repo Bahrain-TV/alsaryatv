@@ -55,6 +55,13 @@ body {
     transition: all 0.3s ease;
 }
 
+/* RTL Support - Sidebar */
+[dir="rtl"] .fi-sidebar {
+    border-right: none !important;
+    border-left: 1px solid var(--sidebar-border) !important;
+    box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.05);
+}
+
 /* Sidebar header */
 .fi-sidebar-header {
     padding: 1.25rem;
@@ -89,6 +96,17 @@ body {
 
 .fi-sidebar-item:hover::before {
     left: 100%;
+}
+
+/* RTL Support - Sidebar Item Animation */
+[dir="rtl"] .fi-sidebar-item::before {
+    left: auto;
+    right: -100%;
+    background: linear-gradient(-90deg, transparent, rgba(245, 158, 11, 0.1), transparent);
+}
+
+[dir="rtl"] .fi-sidebar-item:hover::before {
+    right: 100%;
 }
 
 .fi-sidebar-item > a {
@@ -221,6 +239,11 @@ body {
     transform: scaleX(1);
 }
 
+/* RTL Support - Widget */
+[dir="rtl"] .fi-widget::before {
+    transform-origin: right;
+}
+
 /* Dashboard grid */
 .fi-dashboard {
     padding: 1.5rem;
@@ -259,6 +282,11 @@ body {
     font-size: 0.875rem;
 }
 
+/* RTL Support - Footer */
+[dir="rtl"] .fi-footer {
+    direction: rtl;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .fi-sidebar {
@@ -266,9 +294,20 @@ body {
         border-right: none !important;
         border-bottom: 1px solid var(--sidebar-border) !important;
     }
-    
+
     .fi-main {
         margin-left: 0 !important;
+    }
+
+    /* RTL Responsive */
+    [dir="rtl"] .fi-sidebar {
+        border-left: none !important;
+        border-bottom: 1px solid var(--sidebar-border) !important;
+    }
+
+    [dir="rtl"] .fi-main {
+        margin-right: 0 !important;
+        margin-left: auto !important;
     }
 }
 
@@ -311,4 +350,64 @@ body {
 
 .dark ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(#1d4ed8, #1e40af);
+}
+
+/* Comprehensive RTL Support */
+[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+/* Ensure proper text alignment for RTL */
+[dir="rtl"] * {
+    text-align: inherit;
+}
+
+/* RTL - Header adjustments */
+[dir="rtl"] .fi-header {
+    border-left: 1px solid var(--sidebar-border) !important;
+    border-right: none !important;
+}
+
+/* RTL - Input and Select */
+[dir="rtl"] .fi-input,
+[dir="rtl"] .fi-select {
+    text-align: right;
+    direction: rtl;
+}
+
+/* RTL - Badges and Pills */
+[dir="rtl"] .fi-badge {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+/* RTL - Forms */
+[dir="rtl"] form {
+    direction: rtl;
+}
+
+[dir="rtl"] label {
+    margin-right: 0.5rem;
+    margin-left: 0;
+}
+
+/* RTL - Lists */
+[dir="rtl"] ul,
+[dir="rtl"] ol {
+    margin-right: 1.25rem;
+    margin-left: 0;
+    padding-right: 1.25rem;
+    padding-left: 0;
+}
+
+/* RTL - Icons positioning */
+[dir="rtl"] .fi-icon {
+    margin-right: 0.5rem;
+    margin-left: 0;
+}
+
+[dir="rtl"] .fi-sidebar-item > a {
+    padding-right: 1rem;
+    padding-left: 0.75rem;
 }

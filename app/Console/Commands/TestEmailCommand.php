@@ -10,7 +10,8 @@ class TestEmailCommand extends Command
 {
     protected $signature = 'test:email
                             {email=aldoyh@gmail.com : Email address to send test to}
-                            {--type=admin : Email type: admin (for admin notification)}';
+                            {--type=admin : Email type: admin (for admin notification)}
+                            {--mailer=gmail : Mailer to use: gmail, smtp, log, or failover}';
 
     protected $description = 'Send test email to verify SMTP configuration';
 
@@ -18,6 +19,11 @@ class TestEmailCommand extends Command
     {
         $email = $this->argument('email');
         $type = $this->option('type');
+        $mailer = $this->option('mailer');
+
+        // Display email configuration
+        $this->displayConfiguration($mailer);
+        $this->line('');
 
         $this->info("📧 Sending test {$type} email to: {$email}");
 
@@ -47,20 +53,15 @@ class TestEmailCommand extends Command
                 ],
             ];
 
-            Mail::to($email)->send(new AdminWinnerNotification(
+            Mail::mailer($mailer)->to($email)->send(new AdminWinnerNotification(
                 winners: $testWinners,
                 announcement: 'هذا بريد اختباري لتجربة نظام إشعارات الفائزين. البيانات المعروضة تجريبية وليست حقيقية.'
             ));
 
-            $this->info('✅ Email sent successfully!');
+            $this->info("✅ Email sent successfully via {$mailer}!");
             $this->line('');
             $this->comment('📬 Check your inbox at: '.$email);
             $this->comment('💬 Also check spam folder if not in inbox');
-            $this->line('');
-            $this->info('ℹ️  Current Mail Configuration:');
-            $this->line('   Mailer: '.config('mail.default'));
-            $this->line('   From: '.config('mail.from.address'));
-            $this->line('   Email Type: Admin Winner Notification (Recipients: Admin)');
             $this->line('');
 
             return 0;
@@ -69,18 +70,45 @@ class TestEmailCommand extends Command
             $this->error("Error: {$e->getMessage()}");
             $this->line('');
             $this->comment('🔧 Troubleshooting:');
-            $this->comment('   1. Check SMTP settings in .env file');
-            $this->comment('   2. Verify MAIL_MAILER is set to "smtp" (not "log")');
-            $this->comment('   3. Confirm SMTP credentials are correct');
-            $this->comment('   4. Check server firewall allows outbound SMTP (port 587 or 465)');
+            $this->comment('   1. Check Gmail credentials in .env (MAIL_USERNAME, MAIL_PASSWORD)');
+            $this->comment('   2. Verify Gmail App Password (not regular password)');
+            $this->comment('   3. Enable 2-FA on your Google Account');
+            $this->comment('   4. Check server firewall allows outbound SMTP (port 587)');
+            $this->comment('   5. Verify firewall rules: https://myaccount.google.com/apppasswords');
             $this->line('');
             $this->comment('ℹ️  Current Mail Configuration:');
-            $this->line('   Mailer: '.config('mail.default'));
-            $this->line('   Host: '.config('mail.mailers.smtp.host'));
-            $this->line('   Port: '.config('mail.mailers.smtp.port'));
+            $this->line('   Default Mailer: '.config('mail.default'));
+            $this->line('   Gmail Host: '.config('mail.mailers.gmail.host'));
+            $this->line('   Gmail Port: '.config('mail.mailers.gmail.port'));
+            $this->line('   Gmail Username: '.config('mail.mailers.gmail.username'));
             $this->line('');
 
             return 1;
         }
+    }
+
+    private function displayConfiguration(string $mailer): void
+    {
+        $this->info('⚙️  Email Configuration:');
+        $this->line('   Primary Mailer: Gmail');
+        $this->line('   Using: '.$mailer);
+        $this->line('');
+
+        if ($mailer === 'gmail') {
+            $this->comment('📧 Gmail Configuration:');
+            $this->line('   Host: '.config('mail.mailers.gmail.host'));
+            $this->line('   Port: '.config('mail.mailers.gmail.port'));
+            $this->line('   Encryption: '.config('mail.mailers.gmail.encryption'));
+            $this->line('   Username: '.config('mail.mailers.gmail.username'));
+        } elseif ($mailer === 'smtp') {
+            $this->comment('📧 SMTP Configuration:');
+            $this->line('   Host: '.config('mail.mailers.smtp.host'));
+            $this->line('   Port: '.config('mail.mailers.smtp.port'));
+            $this->line('   Encryption: '.config('mail.mailers.smtp.encryption'));
+            $this->line('   Username: '.config('mail.mailers.smtp.username'));
+        }
+
+        $this->line('   From Address: '.config('mail.from.address'));
+        $this->line('   From Name: '.config('mail.from.name'));
     }
 }
