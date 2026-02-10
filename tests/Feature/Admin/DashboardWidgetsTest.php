@@ -35,7 +35,7 @@ class DashboardWidgetsTest extends TestCase
 
     public function test_animated_stats_widget_mounts(): void
     {
-        $widget = new AnimatedStatsOverviewWidget();
+        $widget = new AnimatedStatsOverviewWidget;
         $widget->mount();
 
         $this->assertIsInt($widget->totalCallers);
@@ -45,7 +45,7 @@ class DashboardWidgetsTest extends TestCase
 
     public function test_animated_stats_widget_calculates_totals(): void
     {
-        $widget = new AnimatedStatsOverviewWidget();
+        $widget = new AnimatedStatsOverviewWidget;
         $widget->mount();
 
         $this->assertEquals(Caller::count(), $widget->totalCallers);
@@ -54,7 +54,7 @@ class DashboardWidgetsTest extends TestCase
 
     public function test_quick_actions_widget_returns_actions(): void
     {
-        $widget = new QuickActionsWidget();
+        $widget = new QuickActionsWidget;
         $actions = $widget->getQuickActions();
 
         $this->assertCount(4, $actions);
@@ -64,13 +64,13 @@ class DashboardWidgetsTest extends TestCase
 
     public function test_recent_activity_widget_instantiates(): void
     {
-        $widget = new RecentActivityWidget();
+        $widget = new RecentActivityWidget;
         $this->assertNotNull($widget);
     }
 
     public function test_winners_history_widget_instantiates(): void
     {
-        $widget = new WinnersHistoryWidget();
+        $widget = new WinnersHistoryWidget;
         $this->assertNotNull($widget);
     }
 
@@ -83,11 +83,11 @@ class DashboardWidgetsTest extends TestCase
 
     public function test_animated_stats_caches_data(): void
     {
-        $widget1 = new AnimatedStatsOverviewWidget();
+        $widget1 = new AnimatedStatsOverviewWidget;
         $widget1->mount();
         $total1 = $widget1->totalCallers;
 
-        $widget2 = new AnimatedStatsOverviewWidget();
+        $widget2 = new AnimatedStatsOverviewWidget;
         $widget2->mount();
         $total2 = $widget2->totalCallers;
 
@@ -97,7 +97,7 @@ class DashboardWidgetsTest extends TestCase
     public function test_animated_stats_with_zero_callers(): void
     {
         Caller::truncate();
-        $widget = new AnimatedStatsOverviewWidget();
+        $widget = new AnimatedStatsOverviewWidget;
         $widget->mount();
 
         $this->assertEquals(0, $widget->totalCallers);
@@ -105,7 +105,7 @@ class DashboardWidgetsTest extends TestCase
 
     public function test_quick_actions_contain_valid_urls(): void
     {
-        $widget = new QuickActionsWidget();
+        $widget = new QuickActionsWidget;
         $actions = $widget->getQuickActions();
 
         foreach ($actions as $action) {

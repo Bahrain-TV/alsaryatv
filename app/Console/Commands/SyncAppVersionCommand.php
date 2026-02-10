@@ -15,8 +15,9 @@ class SyncAppVersionCommand extends Command
     {
         $versionFile = base_path('VERSION');
 
-        if (!File::exists($versionFile)) {
-            $this->error('VERSION file not found at ' . $versionFile);
+        if (! File::exists($versionFile)) {
+            $this->error('VERSION file not found at '.$versionFile);
+
             return 1;
         }
 
@@ -24,6 +25,7 @@ class SyncAppVersionCommand extends Command
 
         if (empty($versionFromFile)) {
             $this->error('VERSION file is empty');
+
             return 1;
         }
 
@@ -39,8 +41,9 @@ class SyncAppVersionCommand extends Command
         $updated = 0;
 
         foreach ($envFiles as $name => $path) {
-            if (!File::exists($path)) {
+            if (! File::exists($path)) {
                 $this->comment("⊘ {$name} not found");
+
                 continue;
             }
 
@@ -61,7 +64,7 @@ class SyncAppVersionCommand extends Command
                     $this->comment("→ {$name}: Already set to {$versionFromFile}");
                 }
             } else {
-                $newContent = rtrim($content) . "\nAPP_VERSION={$versionFromFile}\n";
+                $newContent = rtrim($content)."\nAPP_VERSION={$versionFromFile}\n";
                 File::put($path, $newContent);
                 $this->info("✅ {$name}: APP_VERSION added as {$versionFromFile}");
                 $updated++;
@@ -72,9 +75,11 @@ class SyncAppVersionCommand extends Command
 
         if ($updated > 0) {
             $this->info("✅ Synchronized {$updated} file(s) with VERSION file");
+
             return 0;
         } else {
-            $this->comment("ℹ️  All files already synchronized");
+            $this->comment('ℹ️  All files already synchronized');
+
             return 0;
         }
     }

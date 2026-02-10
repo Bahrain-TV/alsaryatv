@@ -36,6 +36,7 @@ Route::middleware([
     'verified',
 ])->group(function (): void {
     Route::get('/dashboard', [CallerController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/obs-overlay', fn () => view('obs.overlay'))->name('obs.overlay');
     Route::get('/winners', [CallerController::class, 'winners'])->name('winners');
     Route::get('/families', [CallerController::class, 'families'])->name('families');
 

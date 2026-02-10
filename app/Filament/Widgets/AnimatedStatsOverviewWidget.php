@@ -18,11 +18,17 @@ class AnimatedStatsOverviewWidget extends Widget
 
     // Define public properties to make them accessible to the view
     public int $totalCallers = 0;
+
     public int $totalWinners = 0;
+
     public int $todayCallers = 0;
+
     public int $totalHits = 0;
+
     public int $activeCallers = 0;
+
     public int $uniqueCprs = 0;
+
     public int $previousDayCallers = 0;
 
     public function mount(): void

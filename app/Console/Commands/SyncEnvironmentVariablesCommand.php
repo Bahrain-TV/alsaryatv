@@ -52,12 +52,12 @@ class SyncEnvironmentVariablesCommand extends Command
             return;
         }
 
-        $this->line("<fg=green>Master file selected:</> <fg=cyan>".basename($masterFile).'</>');
+        $this->line('<fg=green>Master file selected:</> <fg=cyan>'.basename($masterFile).'</>');
         $this->line('');
 
         // Parse master file
         $masterVars = $this->parseEnvFile($masterFile);
-        $this->info("Found <fg=yellow>".count($masterVars).'</> variables in master file');
+        $this->info('Found <fg=yellow>'.count($masterVars).'</> variables in master file');
 
         if (! $this->option('skip-validation')) {
             $this->validateMasterFile($masterVars);
@@ -74,7 +74,7 @@ class SyncEnvironmentVariablesCommand extends Command
             return;
         }
 
-        $this->info("Will sync to <fg=yellow>".count($targetFiles).'</> file(s)');
+        $this->info('Will sync to <fg=yellow>'.count($targetFiles).'</> file(s)');
         $this->line('');
 
         // Perform sync
@@ -248,13 +248,13 @@ class SyncEnvironmentVariablesCommand extends Command
      */
     protected function handleInteractiveMode(string $targetFile, array $masterVars, array $missing, array $extra, array $different, array &$result): void
     {
-        $this->line("\n<fg=cyan>Syncing ".basename($targetFile)."</>");
+        $this->line("\n<fg=cyan>Syncing ".basename($targetFile).'</>');
 
         $changes = [];
 
         // Missing variables
         if (! empty($missing)) {
-            $this->line("<fg=yellow>Missing ".count($missing).' variables</>');
+            $this->line('<fg=yellow>Missing '.count($missing).' variables</>');
             foreach ($missing as $key => $value) {
                 $display = strlen($value) > 40 ? substr($value, 0, 40).'...' : $value;
                 if ($this->confirm("Add <fg=cyan>$key</> = <fg=gray>$display</>?")) {
@@ -266,7 +266,7 @@ class SyncEnvironmentVariablesCommand extends Command
 
         // Extra variables
         if (! empty($extra)) {
-            $this->line("<fg=yellow>Extra ".count($extra).' variables</>');
+            $this->line('<fg=yellow>Extra '.count($extra).' variables</>');
             foreach (array_keys($extra) as $key) {
                 if ($this->confirm("Remove <fg=cyan>$key</>?")) {
                     $result['actions']++;
@@ -367,7 +367,7 @@ class SyncEnvironmentVariablesCommand extends Command
             }
 
             if ($result['actions'] === 0) {
-                $this->line("    <fg=gray>No changes needed</>");
+                $this->line('    <fg=gray>No changes needed</>');
             }
         }
 

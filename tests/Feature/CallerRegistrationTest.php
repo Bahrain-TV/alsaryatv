@@ -44,6 +44,7 @@ class CallerRegistrationTest extends TestCase
     {
         // Extract CSRF token from the HTML response
         preg_match('/<meta name="csrf-token" content="([^"]+)"/', $response->getContent(), $matches);
+
         return $matches[1] ?? '';
     }
 

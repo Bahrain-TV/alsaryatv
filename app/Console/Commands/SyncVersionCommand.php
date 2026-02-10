@@ -82,7 +82,7 @@ class SyncVersionCommand extends Command
             if ($versionJsonContent['version'] === $sourceVersion) {
                 $this->info("✅ version.json is already synchronized with VERSION file ($sourceVersion)");
             } else {
-                $this->warn("⚠️  Version mismatch detected:");
+                $this->warn('⚠️  Version mismatch detected:');
                 $this->line("   version.json: {$versionJsonContent['version']} → $sourceVersion");
 
                 if (! $isDryRun) {
@@ -117,7 +117,7 @@ class SyncVersionCommand extends Command
             if ($baseVersion === $sourceVersion) {
                 $this->info("✅ VERSION file is already synchronized with version.json ($sourceVersion)");
             } else {
-                $this->warn("⚠️  Version mismatch detected:");
+                $this->warn('⚠️  Version mismatch detected:');
                 $this->line("   VERSION file: $versionContent → $sourceVersion-$buildNumber");
 
                 if (! $isDryRun) {

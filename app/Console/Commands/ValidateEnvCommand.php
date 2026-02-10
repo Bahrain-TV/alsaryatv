@@ -32,11 +32,12 @@ class ValidateEnvCommand extends Command
 
         if ($envFiles->isEmpty()) {
             $this->error('No .env files found!');
+
             return;
         }
 
-        $this->info("Found ".count($envFiles).' environment file(s):');
-        $envFiles->each(fn ($path) => $this->line("  - ".Str::after($path, $basePath.'/')));
+        $this->info('Found '.count($envFiles).' environment file(s):');
+        $envFiles->each(fn ($path) => $this->line('  - '.Str::after($path, $basePath.'/')));
         $this->line('');
 
         // Parse all environment files
@@ -48,7 +49,7 @@ class ValidateEnvCommand extends Command
             $masterFile = $this->selectMasterFile($envFiles);
         }
 
-        $this->line("Master file: ".basename($masterFile));
+        $this->line('Master file: '.basename($masterFile));
         $this->line('');
 
         // Validate and report
@@ -122,7 +123,7 @@ class ValidateEnvCommand extends Command
         foreach (explode("\n", $lines) as $line) {
             $line = trim($line);
 
-            if (empty($line) || str_starts_with($line, '#') || !str_contains($line, '=')) {
+            if (empty($line) || str_starts_with($line, '#') || ! str_contains($line, '=')) {
                 continue;
             }
 
@@ -173,7 +174,7 @@ class ValidateEnvCommand extends Command
                 'extra' => array_keys($extra),
             ];
 
-            if (!empty($missing)) {
+            if (! empty($missing)) {
                 $report['missing_variables'][$fileName] = array_keys($missing);
             }
         }
@@ -206,8 +207,8 @@ class ValidateEnvCommand extends Command
 
         // Summary
         $this->line('Summary:');
-        $this->line("  Total variables: ".$report['total_keys']);
-        $this->line("  Total files: ".$report['total_files']);
+        $this->line('  Total variables: '.$report['total_keys']);
+        $this->line('  Total files: '.$report['total_files']);
         $this->line('');
 
         // Per-file breakdown
@@ -216,16 +217,16 @@ class ValidateEnvCommand extends Command
             $isMaster = $fileName === $report['master_file'];
             $badge = $isMaster ? ' [MASTER]' : '';
             $this->line("  $fileName$badge");
-            $this->line("    Variables: ".$fileData['total_vars']);
+            $this->line('    Variables: '.$fileData['total_vars']);
 
-            if (!empty($fileData['missing'])) {
+            if (! empty($fileData['missing'])) {
                 $count = count($fileData['missing']);
                 $preview = implode(', ', array_slice($fileData['missing'], 0, 3));
                 $suffix = $count > 3 ? '...' : '';
                 $this->line("    MISSING: $count - $preview$suffix");
             }
 
-            if (!empty($fileData['extra'])) {
+            if (! empty($fileData['extra'])) {
                 $count = count($fileData['extra']);
                 $preview = implode(', ', array_slice($fileData['extra'], 0, 3));
                 $suffix = $count > 3 ? '...' : '';
@@ -236,7 +237,7 @@ class ValidateEnvCommand extends Command
         $this->line('');
 
         // Inconsistencies
-        if (!empty($report['inconsistencies'])) {
+        if (! empty($report['inconsistencies'])) {
             $this->line('Value Inconsistencies Found: '.count($report['inconsistencies']).' variables');
             foreach (array_slice($report['inconsistencies'], 0, 5) as $key => $values) {
                 $this->line("  $key:");
@@ -246,7 +247,7 @@ class ValidateEnvCommand extends Command
                 }
             }
             if (count($report['inconsistencies']) > 5) {
-                $this->line("  ...and ".(count($report['inconsistencies']) - 5).' more');
+                $this->line('  ...and '.(count($report['inconsistencies']) - 5).' more');
             }
             $this->line('');
         }
@@ -267,34 +268,34 @@ class ValidateEnvCommand extends Command
         $reportPath = base_path('storage/logs/env-validation-'.now()->format('Y-m-d_H-i-s').'.txt');
 
         $content = "Environment File Validation Report\n";
-        $content .= "Generated: ".now()->toDateTimeString()."\n";
+        $content .= 'Generated: '.now()->toDateTimeString()."\n";
         $content .= str_repeat('=', 80)."\n\n";
 
         $content .= "SUMMARY\n";
-        $content .= "Total Variables: ".$report['total_keys']."\n";
-        $content .= "Total Files: ".$report['total_files']."\n";
-        $content .= "Master File: ".$report['master_file']."\n\n";
+        $content .= 'Total Variables: '.$report['total_keys']."\n";
+        $content .= 'Total Files: '.$report['total_files']."\n";
+        $content .= 'Master File: '.$report['master_file']."\n\n";
 
         $content .= "DETAILED BREAKDOWN\n";
         $content .= str_repeat('-', 80)."\n";
         foreach ($report['files'] as $fileName => $fileData) {
             $content .= "\n$fileName\n";
-            $content .= "  Variables: ".$fileData['total_vars']."\n";
-            if (!empty($fileData['missing'])) {
-                $content .= "  Missing (".count($fileData['missing'])."):\n";
+            $content .= '  Variables: '.$fileData['total_vars']."\n";
+            if (! empty($fileData['missing'])) {
+                $content .= '  Missing ('.count($fileData['missing'])."):\n";
                 foreach ($fileData['missing'] as $var) {
                     $content .= "    - $var\n";
                 }
             }
-            if (!empty($fileData['extra'])) {
-                $content .= "  Extra (" . count($fileData['extra']) . "):\n";
+            if (! empty($fileData['extra'])) {
+                $content .= '  Extra ('.count($fileData['extra'])."):\n";
                 foreach ($fileData['extra'] as $var) {
                     $content .= "    - $var\n";
                 }
             }
         }
 
-        if (!empty($report['inconsistencies'])) {
+        if (! empty($report['inconsistencies'])) {
             $content .= "\n\nINCONSISTENCIES\n";
             $content .= str_repeat('-', 80)."\n";
             foreach ($report['inconsistencies'] as $key => $values) {
@@ -306,7 +307,7 @@ class ValidateEnvCommand extends Command
         }
 
         File::put($reportPath, $content);
-        $this->info("Report saved: storage/logs/".basename($reportPath));
+        $this->info('Report saved: storage/logs/'.basename($reportPath));
     }
 
     /**
@@ -334,12 +335,13 @@ class ValidateEnvCommand extends Command
 
             if (empty($missing)) {
                 $this->line("  OK: $fileName - no missing variables");
+
                 continue;
             }
 
             $this->line("  FIXING: $fileName - ".count($missing).' missing variables');
 
-            if (!$dryRun) {
+            if (! $dryRun) {
                 $content = File::get($filePath);
                 $newVars = [];
 

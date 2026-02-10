@@ -80,7 +80,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                     .filter(item => item.href && item.text);
             ');
 
-            echo "Found " . count($menuItems[0]) . " menu items\n";
+            echo 'Found '.count($menuItems[0])." menu items\n";
 
             // Test Dashboard/Home
             $browser->screenshot('admin-dashboard-default');
@@ -102,7 +102,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                     ->pause(1500);
 
                 // Take screenshot
-                $screenshotName = 'admin-menu-' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $menuText));
+                $screenshotName = 'admin-menu-'.strtolower(preg_replace('/[^a-z0-9]+/i', '-', $menuText));
                 $browser->screenshot($screenshotName);
 
                 // Verify page loaded without errors
@@ -116,8 +116,8 @@ class AdminPanelNavigationTest extends DuskTestCase
 
                 if (is_array($errors) && count($errors) > 0) {
                     $errorData = $errors[0];
-                    echo "  Page loaded: " . ($errorData['isLoaded'] ? 'Yes' : 'No') . "\n";
-                    echo "  Title: " . $errorData['pageTitle'] . "\n";
+                    echo '  Page loaded: '.($errorData['isLoaded'] ? 'Yes' : 'No')."\n";
+                    echo '  Title: '.$errorData['pageTitle']."\n";
                 }
 
                 // Assert the sidebar is still visible
@@ -157,7 +157,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                 };
             ');
 
-            echo "Sidebar initial state: " . json_encode($sidebarInitialState[0]) . "\n";
+            echo 'Sidebar initial state: '.json_encode($sidebarInitialState[0])."\n";
 
             // Try to find and click collapse button if it exists
             $collapseBtn = $browser->elements('[aria-label*="collapse"], [data-testid*="collapse"]');
@@ -200,7 +200,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                 };
             ');
 
-            echo "Mobile sidebar state: " . json_encode($sidebarVisible[0]) . "\n";
+            echo 'Mobile sidebar state: '.json_encode($sidebarVisible[0])."\n";
             echo "✓ Mobile responsive design tested\n";
 
             // Reset to desktop view
@@ -233,7 +233,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                 };
             ');
 
-            echo "Dark mode info: " . json_encode($darkModeInfo[0]) . "\n";
+            echo 'Dark mode info: '.json_encode($darkModeInfo[0])."\n";
             echo "✓ Dark mode styling verified\n";
         });
     }
@@ -266,7 +266,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                 };
             ');
 
-            echo "RTL layout info: " . json_encode($rtlInfo[0]) . "\n";
+            echo 'RTL layout info: '.json_encode($rtlInfo[0])."\n";
 
             if ($rtlInfo[0]['shouldBeRTL']) {
                 echo "✓ RTL layout properly implemented\n";
@@ -302,7 +302,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                 };
             ');
 
-            echo "Form elements found: " . json_encode($formElements[0]) . "\n";
+            echo 'Form elements found: '.json_encode($formElements[0])."\n";
 
             if ($formElements[0]['buttonCount'] > 0) {
                 echo "✓ Form elements detected and accessible\n";
@@ -332,7 +332,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                 };
             ');
 
-            echo "Widget information: " . json_encode($widgetInfo[0]) . "\n";
+            echo 'Widget information: '.json_encode($widgetInfo[0])."\n";
 
             if ($widgetInfo[0]['widgetCount'] > 0 || $widgetInfo[0]['statsCount'] > 0) {
                 echo "✓ Dashboard widgets rendering correctly\n";
@@ -372,7 +372,7 @@ class AdminPanelNavigationTest extends DuskTestCase
                 };
             ');
 
-            echo "Keyboard navigation info: " . json_encode($focusInfo[0]) . "\n";
+            echo 'Keyboard navigation info: '.json_encode($focusInfo[0])."\n";
             echo "✓ Keyboard navigation tested\n";
         });
     }

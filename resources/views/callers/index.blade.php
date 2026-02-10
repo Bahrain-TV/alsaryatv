@@ -1,16 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $obsOverlayUrl = url('/dashboard/obs-overlay');
+@endphp
+
 <div class="py-8" x-data="callerDashboard()">
     <div @class([
         'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6',
         'text-right' => app()->getLocale() === 'ar',
     ])>
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 space-y-6">
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ __('Callers Dashboard') }}</h1>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('Manage callers, winners, and family registrations.') }}</p>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ __('Callers Dashboard') }}</h1>
+                        <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200">
+                            {{ __('Live') }}
+                        </span>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                        {{ __('Manage callers, winners, and family registrations with a real-time operational view.') }}
+                    </p>
                 </div>
                 <div class="flex flex-wrap gap-3">
                     <a
@@ -25,26 +36,58 @@
                     >
                         {{ __('View Winners') }}
                     </a>
+                    <a
+                        href="{{ $obsOverlayUrl }}"
+                        target="_blank"
+                        class="inline-flex items-center justify-center rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200"
+                    >
+                        {{ __('Open OBS Overlay') }}
+                    </a>
                 </div>
             </div>
-        </div>
 
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Total Callers') }}</p>
-                <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-100" x-text="stats.total"></p>
-            </div>
-            <div class="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Total Winners') }}</p>
-                <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-100" x-text="stats.winners"></p>
-            </div>
-            <div class="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Family Registrations') }}</p>
-                <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-100" x-text="stats.families"></p>
-            </div>
-            <div class="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Total Hits') }}</p>
-                <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-100" x-text="stats.hits"></p>
+            <div class="grid gap-4 lg:grid-cols-3">
+                <div class="lg:col-span-2 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
+                    @livewire('dashboard-live-stats')
+                </div>
+
+                <div class="space-y-4">
+                    <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                        <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ __('OBS overlay') }}</h2>
+                        <p class="mt-2 text-xs text-gray-600 dark:text-gray-300">
+                            {{ __('Use this link in an OBS Browser Source to mirror the live dashboard stats in real time.') }}
+                        </p>
+                        <div class="mt-3 space-y-2">
+                            <label class="text-xs font-semibold uppercase tracking-wide text-gray-500" for="obs-overlay-url">
+                                {{ __('OBS Browser Source URL') }}
+                            </label>
+                            <input
+                                id="obs-overlay-url"
+                                type="text"
+                                readonly
+                                value="{{ $obsOverlayUrl }}"
+                                dir="ltr"
+                                onclick="this.select()"
+                                class="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-xs font-mono text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                            >
+                            <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                                <span>{{ __('Livewire updates every 2 seconds.') }}</span>
+                                <span class="hidden sm:inline">•</span>
+                                <span>{{ __('Overlay is authenticated like the dashboard.') }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                        <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ __('Operator guidance') }}</h2>
+                        <ul class="mt-3 space-y-2 text-xs text-gray-600 dark:text-gray-300 list-disc ps-4">
+                            <li>{{ __('Confirm registrations appear here before going live on air.') }}</li>
+                            <li>{{ __('Use the Random Winner tool only after verifying caller eligibility.') }}</li>
+                            <li>{{ __('Keep this dashboard open to maintain session access for the OBS overlay.') }}</li>
+                            <li>{{ __('If the overlay stops updating, refresh the OBS browser source.') }}</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -315,15 +358,6 @@
             selectWinnerFallback: @json(__('An error occurred while selecting a winner.')),
             statusUpdateError: @json(__('Failed to update status.')),
             statusUpdateFallback: @json(__('An error occurred while updating winner status.')),
-
-            get stats() {
-                return {
-                    total: this.callers.length,
-                    winners: this.callers.filter(c => c.is_winner).length,
-                    families: this.callers.filter(c => c.is_family).length,
-                    hits: this.callers.reduce((acc, curr) => acc + (parseInt(curr.hits) || 0), 0),
-                };
-            },
 
             get filteredCallers() {
                 return this.callers.filter(caller => {
