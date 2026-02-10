@@ -27,11 +27,19 @@ class UserSeeder extends Seeder
                 'name' => 'Hasan',
                 'email' => 'aldoyh@gmail.com',
                 'password' => '97333334122',
+                'role' => 'admin',
             ],
             [
                 'name' => 'Admin Bee',
                 'email' => 'aldoyh@info.gov.bh',
                 'password' => '97333334122',
+                'role' => 'admin',
+            ],
+            [
+                'name' => 'Super Admin',
+                'email' => 'superadmin@alsarya.tv',
+                'password' => '97333334122',
+                'role' => 'super_admin',
             ],
             // [
             //     'name' => 'AlSarya TEAM',
@@ -51,7 +59,7 @@ class UserSeeder extends Seeder
                     'password' => Hash::make($admin['password']),
                     'email_verified_at' => now(),
                     'is_admin' => true,
-                    'role' => 'admin',
+                    'role' => $admin['role'] ?? 'admin',
                 ]
             );
 

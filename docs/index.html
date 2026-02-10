@@ -1,8 +1,9 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XYZ - Splash Screen (Slow Motion)</title>
+    <title>يا هلا ومرحبا ✋🏻🏻 - برنامج السارية</title>
     <!-- GSAP for Professional Animation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <!-- Tailwind for Layout & Theme -->
@@ -60,7 +61,10 @@
         /* Background Grain Overlay for Premium Feel */
         .noise {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             opacity: 0.03;
             pointer-events: none;
             background-image: url('https://grainy-gradients.vercel.app/noise.svg');
@@ -68,13 +72,15 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="noise"></div>
 
     <div id="splash-container">
         <!-- The Physics Element: String and Bob -->
-        <svg id="anchor" width="200" height="100vh" viewBox="0 0 200 800" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+        <svg id="anchor" width="200" height="100vh" viewBox="0 0 200 800" fill="none" xmlns="http://www.w3.org/2000/svg"
+            style="overflow: visible;">
             <defs>
                 <linearGradient id="bobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" style="stop-color:#a78bfa" />
@@ -82,10 +88,10 @@
                     <stop offset="100%" style="stop-color:#4c1d95" />
                 </linearGradient>
             </defs>
-            
+
             <!-- The String (Dashed for clock look) -->
             <path id="string" d="M100,0 L100,-500" stroke="#71717a" stroke-width="1.5" stroke-dasharray="4 2" />
-            
+
             <!-- The Plumb Bob Weight -->
             <g id="weight-group">
                 <path class="plumb-bob bob-metal" d="M100,40 L115,10 L100,0 L85,10 Z" />
@@ -94,11 +100,12 @@
         </svg>
 
         <!-- Final Logo -->
-        <div id="logo" class="logo-text absolute">XYZ</div>
-        
+        <div id="logo" class="logo-text absolute">الســاريــة</div>
+
         <!-- Subtle Skip Prompt -->
-        <button id="skip-btn" class="absolute bottom-12 text-zinc-500 text-xs uppercase tracking-widest opacity-0 hover:text-white transition-colors">
-            Skip Intro
+        <button id="skip-btn"
+            class="absolute bottom-12 text-zinc-500 text-xs uppercase tracking-widest opacity-0 hover:text-white transition-colors">
+            Skip Intro شقح
         </button>
     </div>
 
@@ -125,7 +132,7 @@
                 y: 500,
                 duration: 2.8,
                 ease: "bounce.out",
-                onUpdate: function() {
+                onUpdate: function () {
                     const currentY = gsap.getProperty(weight, "y");
                     string.setAttribute('d', `M100,0 L100,${currentY}`);
                 }
@@ -138,55 +145,55 @@
                 transformOrigin: "top center",
                 ease: "power2.inOut"
             }, "-=0.6")
-            .to("#anchor", {
-                rotation: -5,
-                duration: 1.6,
-                ease: "power2.inOut"
-            })
-            .to("#anchor", {
-                rotation: 0,
-                duration: 4.0,
-                ease: "elastic.out(1, 0.3)"
-            })
-            
-            // Show skip button during the slower dangle
-            .to(skip, { opacity: 1, duration: 2 }, "-=3.0")
+                .to("#anchor", {
+                    rotation: -5,
+                    duration: 1.6,
+                    ease: "power2.inOut"
+                })
+                .to("#anchor", {
+                    rotation: 0,
+                    duration: 4.0,
+                    ease: "elastic.out(1, 0.3)"
+                })
 
-            // 3. THE SCARE: Doubled tension and explosion
-            .to(weight, {
-                y: "+=20",
-                duration: 0.8,
-                ease: "power4.in"
-            }, "+=1.0")
-            .to(weight, {
-                scale: 60,
-                opacity: 0,
-                duration: 1.6,
-                ease: "expo.inOut",
-                transformOrigin: "center center"
-            })
-            .to(string, {
-                opacity: 0,
-                duration: 0.4
-            }, "<")
-            .to("body", {
-                backgroundColor: "#000000",
-                duration: 1.0
-            }, "<")
-            
-            // 4. LOGO REVEAL: Doubled reveal time
-            .to(logo, {
-                opacity: 1,
-                scale: 1,
-                duration: 2.4,
-                ease: "back.out(1.2)"
-            }, "-=0.8")
-            .to(logo, {
-                textShadow: "0 0 40px rgba(124, 58, 237, 0.7)",
-                duration: 4,
-                repeat: -1,
-                yoyo: true
-            });
+                // Show skip button during the slower dangle
+                .to(skip, { opacity: 1, duration: 2 }, "-=3.0")
+
+                // 3. THE SCARE: Doubled tension and explosion
+                .to(weight, {
+                    y: "+=20",
+                    duration: 0.8,
+                    ease: "power4.in"
+                }, "+=1.0")
+                .to(weight, {
+                    scale: 60,
+                    opacity: 0,
+                    duration: 1.6,
+                    ease: "expo.inOut",
+                    transformOrigin: "center center"
+                })
+                .to(string, {
+                    opacity: 0,
+                    duration: 0.4
+                }, "<")
+                .to("body", {
+                    backgroundColor: "#000000",
+                    duration: 1.0
+                }, "<")
+
+                // 4. LOGO REVEAL: Doubled reveal time
+                .to(logo, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 2.4,
+                    ease: "back.out(1.2)"
+                }, "-=0.8")
+                .to(logo, {
+                    textShadow: "0 0 40px rgba(124, 58, 237, 0.7)",
+                    duration: 4,
+                    repeat: -1,
+                    yoyo: true
+                });
 
             // Skip functionality
             skip.addEventListener('click', () => {
@@ -195,4 +202,5 @@
         });
     </script>
 </body>
+
 </html>

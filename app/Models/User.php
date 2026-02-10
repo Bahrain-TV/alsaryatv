@@ -30,6 +30,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'is_admin',
     ];
 
     /**
@@ -65,5 +67,29 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Determine if the user has one of the given roles.
+     */
+    public function hasRole(string ...$roles): bool
+    {
+        return in_array($this->role, $roles, true);
+    }
+
+    /**
+     * Alias for admin privileges (includes super-admins).
+     */
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin || $this->hasRole('admin', 'super_admin');
+    }
+
+    /**
+     * Highest-level privileged user flag.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super_admin');
     }
 }
