@@ -54,7 +54,7 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto py-12 px-4">
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
         <h1 class="text-3xl font-bold text-yellow-500">📝 Edit Caller</h1>
         <a href="{{ route('dashboard') }}" class="px-6 py-2 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-600 transition-all">
             Cancel

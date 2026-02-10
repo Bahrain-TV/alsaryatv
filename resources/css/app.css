@@ -112,6 +112,11 @@ body.jetstream-app {
     padding: 0 !important;
 }
 
+html[dir="rtl"] body.jetstream-app,
+html[dir="rtl"] body.jetstream-app .font-sans {
+    font-family: "Tajawal", ui-sans-serif, system-ui, sans-serif;
+}
+
 html.dark body.jetstream-app {
     background: #0f172a !important;
     color: #e5e7eb !important;

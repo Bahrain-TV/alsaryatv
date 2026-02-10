@@ -73,7 +73,7 @@
 
 @section('content')
 <div class="dashboard-container">
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
         <h1 class="text-3xl font-bold text-purple-400">👨‍👩‍👧‍👦 Family Entries</h1>
         <a href="{{ route('dashboard') }}" class="px-6 py-2 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-600 transition-all">
             Back to Dashboard
@@ -89,7 +89,37 @@
         </div>
     @else
         <div class="glass-card overflow-hidden">
-            <div class="overflow-x-auto">
+            <div class="md:hidden space-y-3 p-4">
+                @foreach($families as $family)
+                    <div class="rounded-lg border border-white/10 bg-slate-900/40 p-4">
+                        <div class="text-base font-semibold text-white">{{ $family->name }}</div>
+                        <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Phone</p>
+                                <p class="mt-1 font-mono text-yellow-500">{{ $family->phone }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">CPR</p>
+                                <p class="mt-1 font-mono text-gray-300">{{ $family->cpr }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Status</p>
+                                <span class="mt-1 inline-flex items-center badge badge-purple">FAMILY</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Winner Status</p>
+                                @if($family->is_winner)
+                                    <span class="mt-1 inline-flex items-center badge badge-green">🏆 WINNER</span>
+                                @else
+                                    <span class="mt-1 inline-flex items-center bg-gray-700 text-gray-300 badge">Active</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="hidden md:block overflow-x-auto touch-pan-x">
                 <table class="custom-table">
                     <thead>
                         <tr>

@@ -33,11 +33,11 @@ class UserSeeder extends Seeder
                 'email' => 'aldoyh@info.gov.bh',
                 'password' => '97333334122',
             ],
-            [
-                'name' => 'AlSarya TEAM',
-                'email' => 'alsaryatv@gmail.com',
-                'password' => '97366632332',
-            ],
+            // [
+            //     'name' => 'AlSarya TEAM',
+            //     'email' => 'alsaryatv@gmail.com',
+            //     'password' => '97366632332',
+            // ],
         ];
 
         foreach ($admins as $admin) {

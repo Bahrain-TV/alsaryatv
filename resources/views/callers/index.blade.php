@@ -3,7 +3,7 @@
 @section('content')
 <div class="py-8" x-data="callerDashboard()">
     <div @class([
-        'max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6',
+        'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6',
         'text-right' => app()->getLocale() === 'ar',
     ])>
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
@@ -81,9 +81,28 @@
                         id="caller-search"
                         type="text"
                         x-model="search"
-                        placeholder="{{ __('Search by name, CPR, or phone') }}"
+                        :placeholder="searchMode === 'cpr_phone' ? searchPlaceholderCprPhone : searchPlaceholderAll"
+                        :inputmode="searchMode === 'cpr_phone' ? 'numeric' : 'text'"
                         class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
                     >
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            @click="searchMode = 'all'"
+                            :class="searchMode === 'all' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'"
+                            class="rounded-md px-3 py-2 text-xs font-semibold"
+                        >
+                            {{ __('Search All') }}
+                        </button>
+                        <button
+                            type="button"
+                            @click="searchMode = 'cpr_phone'"
+                            :class="searchMode === 'cpr_phone' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'"
+                            class="rounded-md px-3 py-2 text-xs font-semibold"
+                        >
+                            {{ __('CPR / Phone') }}
+                        </button>
+                    </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button
@@ -123,7 +142,71 @@
         </div>
 
         <div class="rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
+            <div class="md:hidden space-y-3 p-4">
+                <template x-for="caller in filteredCallers" :key="caller.id">
+                    <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                        <div class="text-base font-semibold text-gray-900 dark:text-gray-100" x-text="caller.name"></div>
+                        <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Phone') }}</p>
+                                <p class="mt-1 text-gray-700 dark:text-gray-200 font-mono" x-text="caller.phone"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('CPR') }}</p>
+                                <p class="mt-1 text-gray-700 dark:text-gray-200 font-mono" x-text="caller.cpr"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Hits') }}</p>
+                                <span class="mt-1 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800" x-text="caller.hits || 0"></span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Type') }}</p>
+                                <span
+                                    class="mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                                    :class="caller.is_family ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'"
+                                    x-text="caller.is_family ? '{{ __('Family') }}' : '{{ __('Individual') }}'"
+                                ></span>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Status') }}</p>
+                                <span
+                                    class="mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                                    :class="caller.is_winner ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'"
+                                    x-text="caller.is_winner ? '{{ __('Winner') }}' : '{{ __('Active') }}'"
+                                ></span>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                @click="toggleWinner(caller)"
+                                class="rounded-md px-3 py-1 text-xs font-semibold"
+                                :class="caller.is_winner ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'"
+                                x-text="caller.is_winner ? '{{ __('Unmark Winner') }}' : '{{ __('Mark Winner') }}'"
+                            ></button>
+                            <a
+                                :href="`/callers/${caller.id}/edit`"
+                                class="rounded-md bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700"
+                            >
+                                {{ __('Edit') }}
+                            </a>
+                            <button
+                                type="button"
+                                @click="confirmDelete(caller)"
+                                class="rounded-md bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700"
+                            >
+                                {{ __('Delete') }}
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="filteredCallers.length === 0" class="py-10 text-center text-sm text-gray-500">
+                    {{ __('No callers found matching your criteria.') }}
+                </div>
+            </div>
+
+            <div class="hidden md:block overflow-x-auto touch-pan-x">
                 <table @class([
                     'min-w-full divide-y divide-gray-200 dark:divide-gray-700',
                     'text-right' => app()->getLocale() === 'ar',
@@ -218,12 +301,15 @@
     function callerDashboard() {
         return {
             search: '',
+            searchMode: 'all',
             filterType: 'all',
             showWinnersOnly: false,
             callers: @json($callers),
             randomWinner: null,
             isPicking: false,
             pickError: null,
+            searchPlaceholderAll: @json(__('Search by name, CPR, or phone')),
+            searchPlaceholderCprPhone: @json(__('Search by CPR or phone')),
             deleteMessage: @json(__('Are you sure you want to delete :name?')),
             selectWinnerError: @json(__('Failed to select winner.')),
             selectWinnerFallback: @json(__('An error occurred while selecting a winner.')),
@@ -241,11 +327,33 @@
 
             get filteredCallers() {
                 return this.callers.filter(caller => {
-                    const matchesSearch = (
-                        (caller.name || '').toLowerCase().includes(this.search.toLowerCase()) ||
-                        (caller.cpr || '').includes(this.search) ||
-                        (caller.phone || '').includes(this.search)
-                    );
+                    const rawSearch = this.search.trim();
+                    const searchLower = rawSearch.toLowerCase();
+                    const searchDigits = rawSearch.replace(/\D/g, '');
+
+                    const nameValue = (caller.name || '').toLowerCase();
+                    const cprValue = (caller.cpr || '').toString();
+                    const phoneValue = (caller.phone || '').toString();
+                    const cprDigits = cprValue.replace(/\D/g, '');
+                    const phoneDigits = phoneValue.replace(/\D/g, '');
+
+                    let matchesSearch = true;
+                    if (rawSearch.length > 0) {
+                        if (this.searchMode === 'cpr_phone') {
+                            matchesSearch = cprValue.includes(rawSearch) || phoneValue.includes(rawSearch);
+                            if (!matchesSearch && searchDigits.length > 0) {
+                                matchesSearch = cprDigits.includes(searchDigits) || phoneDigits.includes(searchDigits);
+                            }
+                        } else {
+                            matchesSearch =
+                                nameValue.includes(searchLower) ||
+                                cprValue.includes(rawSearch) ||
+                                phoneValue.includes(rawSearch);
+                            if (!matchesSearch && searchDigits.length > 0) {
+                                matchesSearch = cprDigits.includes(searchDigits) || phoneDigits.includes(searchDigits);
+                            }
+                        }
+                    }
 
                     const matchesType =
                         this.filterType === 'all' ? true :
