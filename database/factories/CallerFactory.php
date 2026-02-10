@@ -24,8 +24,9 @@ class CallerFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
-            'cpr' => $this->faker->unique()->numerify('##########'),
+            'cpr' => $this->faker->unique()->numerify('#########'),
 
+            'is_family' => false,
             'is_winner' => false,
             'ip_address' => $this->faker->ipv4(),
             'hits' => $this->faker->numberBetween(1, 100),
@@ -35,6 +36,18 @@ class CallerFactory extends Factory
             'created_at' => $this->faker->dateTimeThisYear(),
             'updated_at' => $this->faker->dateTimeThisYear(),
         ];
+    }
+
+    /**
+     * Indicate that the caller belongs to a family registration.
+     */
+    public function family(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'is_family' => true,
+            ];
+        });
     }
 
     /**
