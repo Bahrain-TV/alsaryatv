@@ -1,0 +1,1764 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UI Audit Report</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f4ef;
+      --card: #ffffff;
+      --text: #1f2124;
+      --muted: #6c7178;
+      --border: #e4dfd7;
+      --accent: #3a6b5e;
+      --warn: #d9480f;
+    }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header.report {
+      padding: 32px 48px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(120deg, #f4ede2, #f0f7f2);
+    }
+    header.report h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+    header.report p {
+      margin: 4px 0;
+      color: var(--muted);
+    }
+    main {
+      padding: 24px 48px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    section.card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(31, 33, 36, 0.08);
+    }
+    section.card.ok {
+      border-left: 6px solid var(--accent);
+    }
+    section.card.warn {
+      border-left: 6px solid var(--warn);
+    }
+    section.card header h3 {
+      margin: 0 0 4px;
+      font-size: 22px;
+    }
+    section.card header p {
+      margin: 4px 0;
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) minmax(280px, 0.8fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 16px;
+    }
+    .snapshot img {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #f2efe9;
+    }
+    .bar {
+      width: 100%;
+      height: 8px;
+      background: #efe9df;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar span {
+      display: block;
+      height: 100%;
+      background: var(--accent);
+    }
+    .stack {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    h4 {
+      margin: 18px 0 8px;
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .error {
+      color: var(--warn);
+      font-weight: 600;
+    }
+    @media (max-width: 960px) {
+      header.report, main {
+        padding: 20px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="report">
+    <h1>UI Audit Report</h1>
+    <p><strong>Base URL:</strong> http://127.0.0.1:8000</p>
+    <p><strong>Detected port source:</strong> port:8000</p>
+    <p><strong>Start time:</strong> 2026-02-11T15:35:30.867Z</p>
+    <p><strong>End time:</strong> 2026-02-11T15:36:31.152Z</p>
+  </header>
+  <main>
+    <section class="card">
+      <header>
+        <h3>Summary</h3>
+        <p class="muted">Pages captured: 19</p>
+        <p class="muted">Admin pages captured: 9</p>
+        <p class="muted">Front end pages captured: 10</p>
+        <p class="muted">Warnings: 0</p>
+        <p><strong>Notes:</strong> GitHub token not provided. PR/issue distribution may be limited or skipped.</p>
+      </header>
+    </section>
+    <section class="card">
+      <header>
+        <h3>Activity Timeline</h3>
+        <p class="muted">Commits, PRs, and issues distribution across the repository timeline.</p>
+      </header>
+      <div class="grid">
+        <div>
+          <h4>Commits</h4>
+          
+      <div class="stack">
+        <p><strong>Total commits:</strong> 212</p>
+        <p><strong>First commit:</strong> 2026-02-03T10:00:31.000Z</p>
+        <p><strong>Last commit:</strong> 2026-02-11T10:36:30.000Z</p>
+        <p><strong>Duration:</strong> 8d 0h 35m</p>
+      </div>
+      <h4>Commit distribution</h4>
+      
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Count</th>
+          <th>Distribution</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>2026-02</td>
+            <td>212</td>
+            <td><div class="bar"><span style="width:100%"></span></div></td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+        </div>
+        <div>
+          <h4>PRs and Issues</h4>
+          
+      <p><strong>PRs captured:</strong> 12</p>
+      <h4>PR distribution</h4>
+      
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Count</th>
+          <th>Distribution</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>2026-02</td>
+            <td>12</td>
+            <td><div class="bar"><span style="width:100%"></span></div></td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+          
+      <p><strong>Issues captured:</strong> 1</p>
+      <h4>Issue distribution</h4>
+      
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Count</th>
+          <th>Distribution</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>2026-02</td>
+            <td>1</td>
+            <td><div class="bar"><span style="width:100%"></span></div></td>
+          </tr>
+        
+      </tbody>
+    </table>
+  
+    
+        </div>
+      </div>
+    </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Splash</h3>
+          <p class="muted">http://127.0.0.1:8000/splash</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/front-end-splash.png" alt="Front End - Splash">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Tajawal</p>
+         <p><strong>Unique fonts:</strong> Tajawal</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Tajawal, sans-serif</td>
+          <td>56px</td>
+          <td>800</td>
+        </tr>
+      <tr><td>h2</td><td colspan="3">Not found</td></tr><tr><td>h3</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>p</td>
+          <td>Tajawal, sans-serif</td>
+          <td>20px</td>
+          <td>500</td>
+        </tr>
+      <tr><td>button</td><td colspan="3">Not found</td></tr><tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Home</h3>
+          <p class="muted">http://127.0.0.1:8000/</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/front-end-home.png" alt="Front End - Home">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Tajawal</p>
+         <p><strong>Unique fonts:</strong> Tajawal</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Tajawal, sans-serif</td>
+          <td>40px</td>
+          <td>800</td>
+        </tr>
+      <tr><td>h2</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>h3</td>
+          <td>Tajawal, sans-serif</td>
+          <td>24px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>Tajawal, sans-serif</td>
+          <td>20px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>button</td><td colspan="3">Not found</td></tr><tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>a</td>
+          <td>Tajawal, sans-serif</td>
+          <td>14.4px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Welcome</h3>
+          <p class="muted">http://127.0.0.1:8000/welcome</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/front-end-welcome.png" alt="Front End - Welcome">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Tajawal</p>
+         <p><strong>Unique fonts:</strong> Tajawal</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Tajawal, sans-serif</td>
+          <td>40px</td>
+          <td>800</td>
+        </tr>
+      <tr><td>h2</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>h3</td>
+          <td>Tajawal, sans-serif</td>
+          <td>24px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>Tajawal, sans-serif</td>
+          <td>20px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>button</td><td colspan="3">Not found</td></tr><tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>a</td>
+          <td>Tajawal, sans-serif</td>
+          <td>14.4px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Family Registration</h3>
+          <p class="muted">http://127.0.0.1:8000/family</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/front-end-family-registration.png" alt="Front End - Family Registration">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Tajawal</p>
+         <p><strong>Unique fonts:</strong> Tajawal</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Tajawal, sans-serif</td>
+          <td>40px</td>
+          <td>800</td>
+        </tr>
+      <tr><td>h2</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>h3</td>
+          <td>Tajawal, sans-serif</td>
+          <td>24px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>Tajawal, sans-serif</td>
+          <td>20px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>button</td><td colspan="3">Not found</td></tr><tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>a</td>
+          <td>Tajawal, sans-serif</td>
+          <td>14.4px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Registration Form</h3>
+          <p class="muted">http://127.0.0.1:8000/register</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/front-end-registration-form.png" alt="Front End - Registration Form">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> ui-sans-serif</p>
+         <p><strong>Unique fonts:</strong> ui-sans-serif</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>18px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>20px</td>
+          <td>300</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Privacy Policy</h3>
+          <p class="muted">http://127.0.0.1:8000/privacy</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/front-end-privacy-policy.png" alt="Front End - Privacy Policy">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Tajawal</p>
+         <p><strong>Unique fonts:</strong> Tajawal</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Tajawal, sans-serif</td>
+          <td>36px</td>
+          <td>700</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>Tajawal, sans-serif</td>
+          <td>30px</td>
+          <td>700</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>Tajawal, sans-serif</td>
+          <td>24px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>Tajawal, sans-serif</td>
+          <td>18px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>Tajawal, sans-serif</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>a</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>nav</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - CSRF Test Page</h3>
+          <p class="muted">http://127.0.0.1:8000/csrf-test</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/front-end-csrf-test-page.png" alt="Front End - CSRF Test Page">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Figtree</p>
+         <p><strong>Unique fonts:</strong> Figtree, ui-monospace</p>
+         <p><strong>Inconsistencies:</strong> ui-monospace</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>24px</td>
+          <td>700</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>700</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>700</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, &quot;Liberation Mono&quot;, &quot;Courier New&quot;, monospace</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>700</td>
+        </tr>
+      
+        <tr>
+          <td>input</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Caller Create</h3>
+          <p class="muted">http://127.0.0.1:8000/callers/create</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/front-end-caller-create.png" alt="Front End - Caller Create">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> ui-sans-serif</p>
+         <p><strong>Unique fonts:</strong> ui-sans-serif</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>18px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>20px</td>
+          <td>300</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Success Page (Individual Registration)</h3>
+          <p class="muted">http://127.0.0.1:8000/callers/success</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/success-page-individual.png" alt="Front End - Success Page (Individual Registration)">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Tajawal</p>
+         <p><strong>Unique fonts:</strong> Tajawal</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>h1</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>h2</td>
+          <td>Tajawal, sans-serif</td>
+          <td>40px</td>
+          <td>800</td>
+        </tr>
+      <tr><td>h3</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>p</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>button</td><td colspan="3">Not found</td></tr><tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>a</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Front End - Success Page (Family Registration)</h3>
+          <p class="muted">http://127.0.0.1:8000/callers/success</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/success-page-family.png" alt="Front End - Success Page (Family Registration)">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Tajawal</p>
+         <p><strong>Unique fonts:</strong> Tajawal</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>h1</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>h2</td>
+          <td>Tajawal, sans-serif</td>
+          <td>40px</td>
+          <td>800</td>
+        </tr>
+      <tr><td>h3</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>p</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>button</td><td colspan="3">Not found</td></tr><tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>a</td>
+          <td>Tajawal, sans-serif</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - admin</h3>
+          <p class="muted">http://127.0.0.1:8000/admin</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-admin.png" alt="Admin - admin">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Tajawal</p>
+         <p><strong>Unique fonts:</strong> Tajawal</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>700</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>input</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>label</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>nav</td>
+          <td>Tajawal, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - dashboard</h3>
+          <p class="muted">http://127.0.0.1:8000/dashboard</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-dashboard.png" alt="Admin - dashboard">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Figtree</p>
+         <p><strong>Unique fonts:</strong> Figtree</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>24px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>600</td>
+        </tr>
+      <tr><td>h3</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>p</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>500</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>input</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>label</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>12px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>nav</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>table</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>th</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>12px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>td</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>500</td>
+        </tr>
+      
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - winners</h3>
+          <p class="muted">http://127.0.0.1:8000/winners</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-winners.png" alt="Admin - winners">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Figtree</p>
+         <p><strong>Unique fonts:</strong> Figtree</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>700</td>
+        </tr>
+      <tr><td>h2</td><td colspan="3">Not found</td></tr><tr><td>h3</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>p</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>500</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>input</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>label</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>a</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>nav</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>table</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>th</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>td</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>500</td>
+        </tr>
+      
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - families</h3>
+          <p class="muted">http://127.0.0.1:8000/families</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-families.png" alt="Admin - families">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> Figtree</p>
+         <p><strong>Unique fonts:</strong> Figtree</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>700</td>
+        </tr>
+      <tr><td>h2</td><td colspan="3">Not found</td></tr><tr><td>h3</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>p</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>500</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>input</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>label</td><td colspan="3">Not found</td></tr>
+        <tr>
+          <td>a</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>nav</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>table</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>th</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>td</td>
+          <td>Figtree, ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>500</td>
+        </tr>
+      
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - admin/callers</h3>
+          <p class="muted">http://127.0.0.1:8000/admin/callers</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-admin-callers.png" alt="Admin - admin/callers">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> ui-sans-serif</p>
+         <p><strong>Unique fonts:</strong> ui-sans-serif</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>18px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>20px</td>
+          <td>300</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - admin/callers/winners</h3>
+          <p class="muted">http://127.0.0.1:8000/admin/callers/winners</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-admin-callers-winners.png" alt="Admin - admin/callers/winners">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> ui-sans-serif</p>
+         <p><strong>Unique fonts:</strong> ui-sans-serif</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>18px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>20px</td>
+          <td>300</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - admin/winner-selection</h3>
+          <p class="muted">http://127.0.0.1:8000/admin/winner-selection</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-admin-winner-selection.png" alt="Admin - admin/winner-selection">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> ui-sans-serif</p>
+         <p><strong>Unique fonts:</strong> ui-sans-serif</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>18px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>20px</td>
+          <td>300</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - admin/analytics</h3>
+          <p class="muted">http://127.0.0.1:8000/admin/analytics</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-admin-analytics.png" alt="Admin - admin/analytics">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> ui-sans-serif</p>
+         <p><strong>Unique fonts:</strong> ui-sans-serif</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>18px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>20px</td>
+          <td>300</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+      <section class="card ok">
+        <header>
+          <h3>Admin - admin/users</h3>
+          <p class="muted">http://127.0.0.1:8000/admin/users</p>
+          <p><strong>Status:</strong> ok</p>
+          
+        </header>
+        <div class="grid">
+          <div class="snapshot">
+            <img src="reports/ui-audit/2026-02-11-18-35-30/screenshots/admin-admin-users.png" alt="Admin - admin/users">
+          </div>
+          <div class="fonts">
+            <p><strong>Dominant font:</strong> ui-sans-serif</p>
+         <p><strong>Unique fonts:</strong> ui-sans-serif</p>
+         <p><strong>Inconsistencies:</strong> None</p>
+            
+        <table>
+          <thead>
+            <tr>
+              <th>Selector</th>
+              <th>Font family</th>
+              <th>Font size</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr>
+          <td>body</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>400</td>
+        </tr>
+      
+        <tr>
+          <td>h1</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>30px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h2</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>18px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>h3</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>16px</td>
+          <td>600</td>
+        </tr>
+      
+        <tr>
+          <td>p</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>20px</td>
+          <td>300</td>
+        </tr>
+      
+        <tr>
+          <td>button</td>
+          <td>ui-sans-serif, system-ui, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;</td>
+          <td>14px</td>
+          <td>400</td>
+        </tr>
+      <tr><td>input</td><td colspan="3">Not found</td></tr><tr><td>label</td><td colspan="3">Not found</td></tr><tr><td>a</td><td colspan="3">Not found</td></tr><tr><td>nav</td><td colspan="3">Not found</td></tr><tr><td>table</td><td colspan="3">Not found</td></tr><tr><td>th</td><td colspan="3">Not found</td></tr><tr><td>td</td><td colspan="3">Not found</td></tr>
+          </tbody>
+        </table>
+      
+          </div>
+        </div>
+      </section>
+    
+  </main>
+</body>
+</html>
+  

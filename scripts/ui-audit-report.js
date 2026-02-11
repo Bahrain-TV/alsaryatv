@@ -198,7 +198,8 @@ const renderDistributionTable = (rows) => {
 
 const getGitCommitStats = () => {
   try {
-    const output = execSync('git log --pretty=%H|%cI|%s', { encoding: 'utf8' }).trim();
+    // Quote the pretty format so the pipe characters are passed to git, not the shell
+    const output = execSync("git log --pretty='%H|%cI|%s'", { encoding: 'utf8' }).trim();
     if (!output) {
       return null;
     }
@@ -725,6 +726,134 @@ const main = async () => {
     { title: 'Caller Create', path: '/callers/create' },
   ];
 
+  // Helper function to submit a form and capture the success page
+  const submitRegistrationForm = async (page, baseUrl, formType) => {
+    const pages = [];
+
+    try {
+      // First, log in as a test user to ensure registration form is visible
+      console.log(`  Logging in test user for ${formType} form submission...`);
+      await page.goto(`${baseUrl}/login`, { waitUntil: 'networkidle', timeout: 30000 });
+
+      const emailInput = page.locator('input[name="email"]');
+      const passwordInput = page.locator('input[name="password"]');
+      const loginBtn = page.locator('button[type="submit"]');
+
+      if (await emailInput.count() > 0 && await passwordInput.count() > 0) {
+        await emailInput.waitFor({ state: 'visible' });
+        await passwordInput.waitFor({ state: 'visible' });
+        await emailInput.fill('test@example.com');
+        await passwordInput.fill('password123');
+
+        if (await loginBtn.count() > 0) {
+          const navigationPromise = page.waitForNavigation({ waitUntil: 'networkidle' }).catch(() => null);
+          await loginBtn.click();
+          await navigationPromise;
+          await page.waitForTimeout(1000);
+        }
+      }
+
+      // Now navigate to the home page
+      await page.goto(`${baseUrl}/`, { waitUntil: 'networkidle', timeout: 30000 });
+      await page.waitForTimeout(1000);
+
+      // Wait for the registration form to be visible
+      const registrationForm = page.locator('.registration-form');
+      if (await registrationForm.count() === 0) {
+        throw new Error('Registration form not found on page');
+      }
+      await registrationForm.waitFor({ state: 'visible' });
+
+      // Toggle to family if needed
+      if (formType === 'family') {
+        const familyBtn = page.locator('#family-toggle');
+        if (await familyBtn.count() > 0) {
+          await familyBtn.click();
+          await page.waitForTimeout(1500);
+        }
+      }
+
+      // Fill form fields using Playwright locators
+      const nameInput = page.locator('#name');
+      const cprInput = page.locator('#cpr');
+      const phoneInput = page.locator('#phone_number');
+
+      // Wait for inputs to be visible
+      if (await nameInput.count() > 0) {
+        await nameInput.waitFor({ state: 'visible' });
+        await nameInput.fill('أحمد محمد');
+      }
+
+      if (await cprInput.count() > 0) {
+        await cprInput.waitFor({ state: 'visible' });
+        const cpr = formType === 'family' ? '98765432109' : '12345678901';
+        await cprInput.fill(cpr);
+      }
+
+      if (await phoneInput.count() > 0) {
+        await phoneInput.waitFor({ state: 'visible' });
+        await phoneInput.fill('+97366123456');
+      }
+
+      // Fill family fields if family registration
+      if (formType === 'family') {
+        const familyNameInput = page.locator('#family_name');
+        const familyMembersInput = page.locator('#family_members');
+
+        if (await familyNameInput.count() > 0) {
+          await familyNameInput.waitFor({ state: 'visible' });
+          await familyNameInput.fill('عائلة أحمد');
+        }
+        if (await familyMembersInput.count() > 0) {
+          await familyMembersInput.waitFor({ state: 'visible' });
+          await familyMembersInput.fill('4');
+        }
+      }
+
+      // Submit the form
+      const submitBtn = page.locator('button[type="submit"]');
+      if (await submitBtn.count() > 0) {
+        await submitBtn.waitFor({ state: 'visible' });
+        // Wait for potential navigation
+        const navigationPromise = page.waitForNavigation({ waitUntil: 'networkidle' }).catch(() => null);
+        await submitBtn.click();
+        await navigationPromise;
+        await page.waitForTimeout(1500);
+      } else {
+        throw new Error('Submit button not found on form');
+      }
+
+      // Capture the success page
+      const screenshotPath = path.join(screenshotDir, `success-page-${formType}.png`);
+      await page.screenshot({ path: screenshotPath, fullPage: true });
+      const fontSnapshot = await collectFontSnapshot(page);
+
+      pages.push({
+        title: `Front End - Success Page (${formType === 'family' ? 'Family' : 'Individual'} Registration)`,
+        url: page.url(),
+        group: 'front-end',
+        status: 'ok',
+        screenshot: path.relative(process.cwd(), screenshotPath),
+        fontSnapshot: fontSnapshot,
+        fontSummary: summarizeFonts(fontSnapshot),
+        error: null,
+      });
+    } catch (error) {
+      pages.push({
+        title: `Front End - Success Page (${formType === 'family' ? 'Family' : 'Individual'} Registration)`,
+        url: `${baseUrl}/success`,
+        group: 'front-end',
+        status: 'error',
+        screenshot: null,
+        fontSnapshot: null,
+        fontSummary: null,
+        error: error?.message ?? String(error),
+      });
+    }
+
+    return pages;
+  };
+
   const adminPaths = [
     { title: 'Admin Home', path: '/admin' },
     { title: 'Dashboard', path: '/dashboard' },
@@ -745,6 +874,14 @@ const main = async () => {
       group: 'front-end',
     }));
   }
+
+  // Add form submission tests
+  console.log('Capturing form submission screenshots...');
+  const individualSubmissionPages = await submitRegistrationForm(page, baseUrl, 'individual');
+  pages.push(...individualSubmissionPages);
+
+  const familySubmissionPages = await submitRegistrationForm(page, baseUrl, 'family');
+  pages.push(...familySubmissionPages);
 
   const adminLogin = await maybeLoginToAdmin({ page, baseUrl });
   if (!adminLogin.loggedIn) {

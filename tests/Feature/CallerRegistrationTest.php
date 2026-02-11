@@ -1,16 +1,12 @@
 <?php
 
 use App\Models\Caller;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CallerRegistrationTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        // Clear callers before each test
-        Caller::truncate();
-    }
+    use RefreshDatabase;
 
     public function test_individual_registration_form_can_be_submitted(): void
     {
