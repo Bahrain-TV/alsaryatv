@@ -5,7 +5,8 @@
         "build": "vite build",
         "dev": "vite",
         "report:ui": "node scripts/ui-audit-report.js",
-        "screenshots": "node scripts/ci-screenshots.js"
+        "screenshots": "node scripts/ci-screenshots.js",
+        "check:questions": "php -r \"if (file_exists('PROJECT_DOCS/questions.json')) { echo 'Plaintext PROJECT_DOCS/questions.json found.'; exit(1);} echo 'OK';\""
     },
     "dependencies": {
         "@tailwindcss/forms": "^0.5.11",

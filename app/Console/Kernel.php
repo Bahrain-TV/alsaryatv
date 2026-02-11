@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        // Project question encryption/import commands
+        \App\Console\Commands\QuestionsEncrypt::class,
+        \App\Console\Commands\QuestionsImport::class,
     ];
 
     /**

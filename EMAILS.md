@@ -5,12 +5,14 @@ This document covers the professional HTML email templates created for the AlSar
 ## Templates Overview
 
 ### 1. **Version Deployment Email** (`version-deployed.blade.php`)
+
 Announces new version releases to users with feature highlights and update information.
 
 **File Location:** `resources/views/emails/version-deployed.blade.php`
 **Mailable Class:** `App\Mail\VersionDeployed`
 
-#### Features:
+#### Features
+
 - 🚀 Golden gradient header with version badge
 - ✓ Dynamic feature list
 - 📋 Version details and requirements
@@ -18,7 +20,7 @@ Announces new version releases to users with feature highlights and update infor
 - Responsive mobile design
 - Dark theme matching homepage
 
-#### Usage Example:
+#### Usage Example
 
 ```php
 use App\Mail\VersionDeployed;
@@ -47,14 +49,16 @@ Mail::to('user@example.com')->queue(
 );
 ```
 
-#### Template Variables:
+#### Template Variables
+
 ```blade
 {{ $version }}        // Version number (e.g., "2026.0205.1")
 {{ $features }}       // Array of feature descriptions
 {{ $update_link }}    // URL to update page
 ```
 
-#### Color Scheme:
+#### Color Scheme
+
 - Primary: Gold/Amber (`#fbbf24`, `#f59e0b`)
 - Accent: Emerald Green (`#34d399`, `#10b981`)
 - Background: Dark (`#0f172a`, `#1e1b4b`)
@@ -62,12 +66,14 @@ Mail::to('user@example.com')->queue(
 ---
 
 ### 2. **Winner Announcement Email** (`winner-announcement.blade.php`)
+
 Announces winners of the AlSarya show with prize details and instructions.
 
 **File Location:** `resources/views/emails/winner-announcement.blade.php`
 **Mailable Class:** `App\Mail\WinnerAnnouncement`
 
-#### Features:
+#### Features
+
 - 🏆 Victory green header with animated celebration
 - 🎉 Winner information card with details
 - 💰 Prize information section
@@ -76,7 +82,7 @@ Announces winners of the AlSarya show with prize details and instructions.
 - Responsive mobile design
 - Animated elements (bouncing emojis, glowing borders)
 
-#### Usage Example:
+#### Usage Example
 
 ```php
 use App\Mail\WinnerAnnouncement;
@@ -105,7 +111,8 @@ Mail::to($winner->email)->queue(
 );
 ```
 
-#### Template Variables:
+#### Template Variables
+
 ```blade
 {{ $winner_name }}            // Winner's full name
 {{ $winner_cpr }}             // Winner's CPR (national ID) - displayed partially
@@ -113,7 +120,8 @@ Mail::to($winner->email)->queue(
 {{ $prize_description }}      // Detailed prize description
 ```
 
-#### Color Scheme:
+#### Color Scheme
+
 - Primary: Emerald Green (`#10b981`, `#059669`)
 - Accent: Gold (`#fbbf24`)
 - Background: Dark (`#0f172a`, `#1e1b4b`)
@@ -130,12 +138,14 @@ Mail::to($winner->email)->queue(
 This system has **automatic email environment guards** to prevent accidental emails being sent from development:
 
 #### Development Environment (`APP_ENV=local`)
+
 - ✅ Emails are **logged** to `storage/logs/mail.log`
 - ❌ Emails are **NOT actually sent** via SMTP
 - 🔍 All email details are recorded for testing/debugging
 - 📧 Safe to test email functionality without sending real emails
 
 #### Production Environment (`APP_ENV=production`)
+
 - ✅ Emails are **actually sent** via configured SMTP server
 - 📨 Proper mail server required and configured
 - 🔒 Environment guards ensure only production sends real emails
@@ -157,6 +167,7 @@ Is APP_ENV=production? → YES → Send via SMTP ✅
 ## Setup Requirements
 
 1. **Mail Configuration** (`.env`)
+
 ```
 MAIL_MAILER=smtp
 MAIL_HOST=your-smtp-host
@@ -168,13 +179,15 @@ MAIL_FROM_NAME="برنامج السارية"
 ```
 
 Or for development/testing:
+
 ```
 MAIL_MAILER=log
 MAIL_FROM_ADDRESS=noreply@alsarya.tv
 MAIL_FROM_NAME="برنامج السارية"
 ```
 
-2. **Queue Configuration** (optional but recommended)
+1. **Queue Configuration** (optional but recommended)
+
 ```
 QUEUE_CONNECTION=database  # or redis, for background processing
 ```
@@ -276,6 +289,7 @@ if ($caller->update(['is_winner' => true])) {
 To add new variables to emails:
 
 1. Update the Mailable class constructor:
+
 ```php
 public function __construct(
     public string $customField = 'default value',
@@ -284,7 +298,8 @@ public function __construct(
 }
 ```
 
-2. Pass the variable to the view:
+1. Pass the variable to the view:
+
 ```php
 public function content(): Content
 {
@@ -297,7 +312,8 @@ public function content(): Content
 }
 ```
 
-3. Use in template:
+1. Use in template:
+
 ```blade
 {{ $custom_field }}
 ```
@@ -307,6 +323,7 @@ public function content(): Content
 ## Testing Emails
 
 ### Preview in Browser
+
 ```bash
 # Add route to resources/views/emails
 Route::get('/preview/version-deployed', fn () =>
@@ -372,12 +389,14 @@ php artisan tinker
 Located at `app/Providers/MailEnvironmentServiceProvider.php`
 
 **What it does:**
+
 - Listens to all mail events (`MessageSending`, `MessageSent`)
 - In development: Logs email details and recipient info
 - In production: Allows normal SMTP sending
 - Prevents accidental real email sends from dev environments
 
 **Log Format (Development):**
+
 ```
 📧 Email Intercepted in Development Mode
 - Recipient: user@example.com
@@ -425,6 +444,7 @@ Before deploying to production, ensure:
 
 - [ ] `.env` has `APP_ENV=production`
 - [ ] `.env` has valid SMTP credentials:
+
   ```
   MAIL_MAILER=smtp
   MAIL_HOST=your-smtp-host.com
@@ -433,12 +453,15 @@ Before deploying to production, ensure:
   MAIL_PASSWORD=your-secure-password
   MAIL_ENCRYPTION=tls
   ```
+
 - [ ] `MAIL_FROM_ADDRESS` and `MAIL_FROM_NAME` are correct
 - [ ] SMTP server is accessible and tested
 - [ ] Queue is configured for background job processing:
+
   ```
   QUEUE_CONNECTION=redis  # or database/sqs/etc
   ```
+
 - [ ] Email logs are monitored: `tail -f storage/logs/mail.log`
 - [ ] Tested sending at least one real email before going live
 
@@ -469,6 +492,7 @@ REDIS_PORT=6379
 ## ⚠️ Common Mistakes to Avoid
 
 ### ❌ DON'T: Send emails with development credentials in production
+
 ```php
 // BAD - Credentials are hardcoded
 Mail::to($email)->send(new VersionDeployed(...));
@@ -476,6 +500,7 @@ Mail::to($email)->send(new VersionDeployed(...));
 ```
 
 ### ❌ DON'T: Commit `.env` with real passwords to git
+
 ```bash
 # Never do this:
 git add .env
@@ -486,6 +511,7 @@ git add .env.example
 ```
 
 ### ❌ DON'T: Use personal email passwords
+
 ```bash
 # BAD - Using personal Gmail password
 MAIL_PASSWORD=my-personal-gmail-password
@@ -495,6 +521,7 @@ MAIL_PASSWORD=abcd efgh ijkl mnop  # Generated by Gmail
 ```
 
 ### ✅ DO: Use queues for better performance
+
 ```php
 // Good - Emails sent in background
 Mail::to($user)->queue(new VersionDeployed(...));
@@ -504,6 +531,7 @@ Mail::to($user)->send(new VersionDeployed(...));
 ```
 
 ### ✅ DO: Validate email addresses
+
 ```php
 // Good - Check before sending
 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -516,6 +544,7 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 ## 🔐 Security Best Practices
 
 1. **Never commit `.env` to version control**
+
    ```bash
    echo ".env" >> .gitignore
    ```
@@ -530,12 +559,14 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
    - Production: Production SMTP account
 
 4. **Monitor email logs for suspicious activity**
+
    ```bash
    # Check for unexpected emails
    grep "recipient@suspicious.com" storage/logs/mail.log
    ```
 
 5. **Test email sending before major deployments**
+
    ```bash
    php artisan tinker
    >>> use App\Mail\VersionDeployed;
@@ -592,6 +623,7 @@ telnet smtp.gmail.com 587
 ## Email Client Support
 
 ✅ **Supported:**
+
 - Gmail
 - Outlook
 - Apple Mail
@@ -599,6 +631,7 @@ telnet smtp.gmail.com 587
 - Mobile clients (iOS Mail, Gmail app, etc.)
 
 ✅ **Features:**
+
 - Responsive design (mobile, tablet, desktop)
 - Dark mode support
 - Animated elements
@@ -610,21 +643,25 @@ telnet smtp.gmail.com 587
 ## Best Practices
 
 1. **Always queue emails** for background processing:
+
    ```php
    Mail::to($user)->queue(new VersionDeployed(...));
    ```
 
 2. **Test before sending** to all users:
+
    ```php
    Mail::to('admin@example.com')->send(new VersionDeployed(...));
    ```
 
 3. **Monitor delivery** with mail logs:
+
    ```bash
    tail -f storage/logs/laravel.log
    ```
 
 4. **Validate email addresses** before sending:
+
    ```php
    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
        Mail::to($email)->queue(...);
@@ -639,6 +676,7 @@ telnet smtp.gmail.com 587
 ## Troubleshooting
 
 ### Emails not sending?
+
 ```bash
 # Check mail configuration
 php artisan config:cache
@@ -649,11 +687,13 @@ php artisan queue:work
 ```
 
 ### Images not loading?
+
 - Use absolute URLs (not relative paths)
 - Use HTTPS URLs for security
 - Test images with Email on Acid (emailonacid.com)
 
 ### RTL text broken?
+
 - Ensure `dir="rtl"` is in the HTML tag
 - Test with popular email clients
 - Use text-align directives carefully

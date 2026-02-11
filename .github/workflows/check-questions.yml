@@ -1,0 +1,25 @@
+name: Check Questions Security
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  check-questions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure PHP is available
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: '8.1'
+      - name: Check for plaintext questions file
+        run: |
+          if [ -f PROJECT_DOCS/questions.json ]; then
+            echo "ERROR: PROJECT_DOCS/questions.json exists in repository (plaintext)." >&2
+            ls -la PROJECT_DOCS
+            exit 1
+          fi
+      - name: Run package.json check script
+        run: npm run check:questions

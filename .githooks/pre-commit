@@ -1,0 +1,7 @@
+#!/bin/sh
+# Prevent committing plaintext PROJECT_DOCS/questions.json
+if git diff --cached --name-only | grep -E '^PROJECT_DOCS/questions.json$' >/dev/null; then
+  echo "ERROR: PROJECT_DOCS/questions.json (plaintext) is staged for commit. Use 'php artisan questions:encrypt' and commit the .enc file instead." >&2
+  exit 1
+fi
+exit 0

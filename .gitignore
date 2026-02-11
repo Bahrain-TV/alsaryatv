@@ -28,3 +28,7 @@ screenshot.png
 # Deployment & Admin Scripts (local only)
 publish.sh
 deploy.sh
+
+# Questions data (store only encrypted)
+PROJECT_DOCS/questions.json
+PROJECT_DOCS/questions.json.enc # encrypted file is safe to commit
