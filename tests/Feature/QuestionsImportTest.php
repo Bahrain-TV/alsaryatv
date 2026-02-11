@@ -6,7 +6,7 @@ use App\Models\Question;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\File;
-use Illuminate\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class QuestionsImportTest extends TestCase
