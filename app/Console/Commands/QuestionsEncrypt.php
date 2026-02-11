@@ -27,6 +27,10 @@ class QuestionsEncrypt extends Command
             return 1;
         }
 
+        if (empty(config('app.key'))) {
+            $this->warn('APP_KEY not set locally; encryption will still succeed but the encrypted file will only be decryptable by an app with the same APP_KEY.');
+        }
+
         $encrypted = Crypt::encryptString($json);
         $out = $this->option('out') ?: $file.'.enc';
         $files->put($out, $encrypted);

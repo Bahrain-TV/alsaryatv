@@ -24,6 +24,11 @@ class QuestionsImport extends Command
         $this->info('Reading encrypted file...');
         $encrypted = $files->get($file);
 
+        if (empty(config('app.key'))) {
+            $this->error('APP_KEY is not set. Decryption requires the application key to be configured.');
+            return 1;
+        }
+
         try {
             $json = Crypt::decryptString($encrypted);
         } catch (\Exception $e) {
