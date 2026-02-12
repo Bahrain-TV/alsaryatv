@@ -14,9 +14,10 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                @foreach($this->getQuickActions() as $action)
+                @foreach($this->getQuickActions() as $key => $action)
                     <a href="{{ $action['url'] }}"
-                       class="group relative bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-xl p-6 transition-all duration-300 transform hover:-translate-y-1 border border-white/20 hover:border-white/40 overflow-hidden">
+                       class="action-card group relative bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-xl p-6 transition-all duration-300 transform hover:-translate-y-1 border border-white/20 hover:border-white/40 overflow-hidden"
+                       style="animation-delay: {{ $key * 0.1 }}s;">
                         <!-- Shine effect -->
                         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 -translate-x-full group-hover:translate-x-full transition-all duration-500"></div>
 
@@ -50,11 +51,28 @@
             33% { transform: translate(30px, -50px) scale(1.1); }
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .animate-blob {
             animation: blob 7s infinite;
         }
+
         .animation-delay-2000 {
             animation-delay: 2s;
+        }
+
+        .action-card {
+            animation: slideInUp 0.6s ease-out forwards;
         }
     </style>
 </x-filament-widgets::widget>

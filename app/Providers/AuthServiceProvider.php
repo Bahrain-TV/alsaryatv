@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Caller;
+use App\Models\User;
 use App\Policies\CallerPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -16,7 +18,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Caller::class => CallerPolicy::class,
-
+        User::class => UserPolicy::class,
     ];
 
     /**

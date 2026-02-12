@@ -33,4 +33,40 @@ class CallerPolicy
         // Only authenticated users can update callers
         return true;
     }
+
+    /**
+     * Determine whether the user can delete the model.
+     * Only Super Admins can perform hard deletes.
+     *
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function delete(User $user, Caller $caller)
+    {
+        // Only super admins can delete
+        return $user->isSuperAdmin();
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     * Only Super Admins can perform force deletes.
+     *
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function forceDelete(User $user, Caller $caller)
+    {
+        // Only super admins can force delete
+        return $user->isSuperAdmin();
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     * Only Super Admins can restore deleted records.
+     *
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function restore(User $user, Caller $caller)
+    {
+        // Only super admins can restore deleted records
+        return $user->isSuperAdmin();
+    }
 }
