@@ -1,11 +1,17 @@
 {
-    "version": "3.3.1-33",
+    "version": "3.9.16",
     "name": "AlSarya TV Show Registration System",
     "description": "AlSarya TV Show Registration System - Year 3 of Laravel (برنامج السارية)",
     "created_at": "2026-02-05T07:23:21+00:00",
-    "updated_at": "2026-02-10T00:00:00+00:00",
+    "updated_at": "2026-02-12T04:01:25+00:00",
     "updated_by": "version:sync-command",
     "changelog": [
+        {
+            "version": "3.9.16",
+            "type": "sync",
+            "message": "Synchronized version.json with VERSION file (base: 3.9.16, build: 4)",
+            "timestamp": "2026-02-12T04:01:25+00:00"
+        },
         {
             "version": "3.3.1-33",
             "type": "sync",
