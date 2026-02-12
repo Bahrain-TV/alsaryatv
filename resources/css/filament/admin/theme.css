@@ -312,3 +312,18 @@ body {
 .dark ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(#1d4ed8, #1e40af);
 }
+
+/* Global SVG icon sizing fix - use pixel-based sizing */
+svg {
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-block;
+}
+
+/* SVG icons in buttons use smaller size */
+button svg,
+.fi-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0;
+}

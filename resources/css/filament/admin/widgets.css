@@ -315,3 +315,50 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Fix oversized SVG icons - use fixed pixel sizing */
+svg {
+    /* Default to a reasonable size */
+    width: 24px !important;
+    height: 24px !important;
+    display: inline-block;
+}
+
+/* SVGs with explicit Tailwind size classes - override defaults */
+svg.w-4,
+svg.h-4 {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+svg.w-6,
+svg.h-6 {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+svg.w-8,
+svg.h-8 {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+svg.w-10,
+svg.h-10 {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+/* Filament stat icons - controlled sizing */
+.fi-stat-description svg,
+.fi-stat-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+/* General icon styling */
+[class*="icon"] svg,
+.fi-icon svg {
+    width: 24px !important;
+    height: 24px !important;
+}

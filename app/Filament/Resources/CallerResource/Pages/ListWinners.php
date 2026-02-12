@@ -61,4 +61,9 @@ class ListWinners extends ListRecords
                 ->requiresConfirmation(),
         ];
     }
+
+    protected function getTableRecordsPerPageSelectOptions(): array
+    {
+        return [10, 25, 50, 100];
+    }
 }

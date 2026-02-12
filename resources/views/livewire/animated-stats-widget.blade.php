@@ -65,7 +65,7 @@
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2" x-text="totalCallers.toLocaleString()"></p>
             </div>
             <div class="p-3 rounded-lg bg-amber-100 dark:bg-amber-500/20">
-                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-amber-500" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                 </svg>
             </div>
@@ -81,7 +81,7 @@
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2" x-text="totalWinners.toLocaleString()"></p>
             </div>
             <div class="p-3 rounded-lg bg-emerald-100 dark:bg-emerald-500/20">
-                <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-emerald-500" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
                 </svg>
             </div>
@@ -97,7 +97,7 @@
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2" x-text="todayCallers.toLocaleString()"></p>
             </div>
             <div class="p-3 rounded-lg bg-sky-100 dark:bg-sky-500/20">
-                <svg class="w-6 h-6 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-sky-500" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
             </div>
@@ -113,7 +113,7 @@
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2" x-text="totalHits.toLocaleString()"></p>
             </div>
             <div class="p-3 rounded-lg bg-purple-100 dark:bg-purple-500/20">
-                <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-purple-500" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
@@ -129,7 +129,7 @@
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2" x-text="activeCallers.toLocaleString()"></p>
             </div>
             <div class="p-3 rounded-lg bg-green-100 dark:bg-green-500/20">
-                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-green-500" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
@@ -145,7 +145,7 @@
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2" x-text="uniqueCprs.toLocaleString()"></p>
             </div>
             <div class="p-3 rounded-lg bg-rose-100 dark:bg-rose-500/20">
-                <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-rose-500" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
             </div>
