@@ -9,6 +9,7 @@ use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -52,7 +53,7 @@ class CallerResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('بيانات المتصل')
+                Section::make('بيانات المتصل')
                     ->description('المعلومات الأساسية للمتصل')
                     ->schema([
                         Forms\Components\TextInput::make('name')
@@ -79,7 +80,7 @@ class CallerResource extends Resource
                             ->disabled(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('الحالة')
+                Section::make('الحالة')
                     ->schema([
                         Forms\Components\Toggle::make('is_winner')
                             ->label('فائز')
@@ -403,7 +404,7 @@ class CallerResource extends Resource
                                 ->body('تم إزالة حالة الفوز من '.$records->count().' متصل')
                                 ->send();
                         })
-                        ->requiresConfirmation()
+                        ->requiresConfirmation()˝
                         ->deselectRecordsAfterCompletion(),
                 ])
                     ->icon('heroicon-o-ellipsis-horizontal')
