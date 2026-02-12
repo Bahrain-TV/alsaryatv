@@ -7,9 +7,9 @@ use App\Models\Caller;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -48,9 +48,9 @@ class CallerResource extends Resource
         ];
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('بيانات المتصل')
                     ->description('المعلومات الأساسية للمتصل')
