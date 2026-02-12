@@ -76,6 +76,7 @@ class WinnersHistoryWidget extends BaseWidget
             ])
             ->defaultSort('updated_at', 'desc')
             ->paginated([5, 10, 25])
+            ->defaultPaginationPageOption(5)
             ->emptyStateHeading('🏜️ لا يوجد فائزون')
             ->emptyStateDescription('لم يتم اختيار أي فائز بعد. ابدأ باختيار الفائزين من قائمة المتصلين.')
             ->emptyStateIcon('heroicon-o-trophy');

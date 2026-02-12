@@ -1,7 +1,9 @@
-/* Enhanced Navigation and Sidebar Styling */
+/* =============================================
+   Enhanced Navigation and Sidebar Styling — RTL
+   ============================================= */
 
 /* Navigation group headers */
-.fi-sidebar-group-header {
+.fi-sidebar-group-label {
     padding: 0.75rem 1rem !important;
     font-weight: 700 !important;
     text-transform: uppercase;
@@ -9,27 +11,34 @@
     font-size: 0.75rem !important;
     color: #64748b !important;
     position: relative;
+    text-align: start !important;
 }
 
-.fi-sidebar-group-header::after {
+.fi-sidebar-group-label::after {
     content: '';
     position: absolute;
     bottom: 0;
-    left: 1rem;
-    right: 1rem;
+    inset-inline-start: 1rem;
+    inset-inline-end: 1rem;
     height: 1px;
-    background: linear-gradient(90deg, rgba(245, 158, 11, 0.3), transparent);
+    background: linear-gradient(to inline-end, rgba(245, 158, 11, 0.3), transparent);
 }
 
 /* Navigation items with icons */
-.fi-sidebar-item-link {
+.fi-sidebar-item-button,
+.fi-sidebar-item a {
     display: flex !important;
     align-items: center !important;
     gap: 0.75rem !important;
+    flex-direction: row !important;
+    text-align: start !important;
 }
 
 .fi-sidebar-item-icon {
     transition: all 0.3s ease !important;
+    flex-shrink: 0;
+    order: 0;
+    /* Icon first in RTL (visually on the right) */
 }
 
 .fi-sidebar-item:hover .fi-sidebar-item-icon {
@@ -37,20 +46,24 @@
 }
 
 /* Active and hover states */
-.fi-sidebar-item.active .fi-sidebar-item-link,
-.fi-sidebar-item:hover .fi-sidebar-item-link {
+.fi-sidebar-item.fi-active .fi-sidebar-item-button,
+.fi-sidebar-item.fi-active a,
+.fi-sidebar-item:hover .fi-sidebar-item-button,
+.fi-sidebar-item:hover a {
     background: rgba(245, 158, 11, 0.1) !important;
     color: #f59e0b !important;
 }
 
-/* Submenu styling */
-.fi-sidebar-subgroup {
-    border-left: 2px solid rgba(245, 158, 11, 0.2) !important;
+/* Submenu styling — RTL border */
+.fi-sidebar-group-items {
+    border-inline-start: 2px solid rgba(245, 158, 11, 0.2) !important;
+    border-inline-end: none !important;
     margin: 0.25rem 0 !important;
-    padding-left: 1.5rem !important;
+    padding-inline-start: 1.5rem !important;
+    padding-inline-end: 0 !important;
 }
 
-.fi-sidebar-subgroup .fi-sidebar-item {
+.fi-sidebar-group-items .fi-sidebar-item {
     margin: 0.125rem 0 !important;
 }
 
@@ -62,20 +75,32 @@
     padding: 0.125rem 0.5rem !important;
     font-size: 0.75rem !important;
     font-weight: 600 !important;
+    margin-inline-start: auto !important;
+    margin-inline-end: 0 !important;
 }
 
-/* Collapsed sidebar */
-.fi-sidebar.collapsed {
-    width: 5rem !important;
+/* Collapsed sidebar — RTL */
+.fi-sidebar-nav-collapse-btn {
+    /* Collapse button alignment */
 }
 
-.fi-sidebar.collapsed .fi-sidebar-item-label,
-.fi-sidebar.collapsed .fi-sidebar-group-header {
+.fi-sidebar[data-collapsed] .fi-sidebar-item-label,
+.fi-sidebar[data-collapsed] .fi-sidebar-group-label {
     display: none !important;
 }
 
-.fi-sidebar.collapsed .fi-sidebar-item-icon {
-    margin-right: 0 !important;
+.fi-sidebar[data-collapsed] .fi-sidebar-item-icon {
+    margin-inline-end: 0 !important;
+    margin-inline-start: 0 !important;
+}
+
+/* Collapse toggle button — flip chevron for RTL */
+.fi-sidebar-nav-collapse-btn svg {
+    transition: transform 0.3s ease;
+}
+
+[dir="rtl"] .fi-sidebar-nav-collapse-btn svg {
+    transform: scaleX(-1);
 }
 
 /* User profile section */
@@ -84,52 +109,19 @@
     border-top: 1px solid var(--sidebar-border) !important;
 }
 
-.fi-sidebar-user-avatar {
+.fi-sidebar-footer .fi-user-avatar {
     border: 2px solid #f59e0b !important;
     transition: all 0.3s ease !important;
 }
 
-.fi-sidebar-user-avatar:hover {
+.fi-sidebar-footer .fi-user-avatar:hover {
     transform: scale(1.05);
     box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3) !important;
 }
 
-/* Search in sidebar */
-.fi-sidebar-search {
-    margin: 0.5rem 1rem !important;
-    position: relative;
-}
-
-.fi-sidebar-search-input {
-    padding: 0.5rem 0.75rem 0.5rem 2.5rem !important;
-    border-radius: 0.5rem !important;
-    border: 1px solid var(--sidebar-border) !important;
-    background: rgba(255, 255, 255, 0.8) !important;
-    transition: all 0.3s ease !important;
-}
-
-.fi-sidebar-search-input:focus {
-    background: white !important;
-    border-color: #f59e0b !important;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
-}
-
-.fi-sidebar-search-icon {
-    position: absolute !important;
-    left: 0.75rem !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    color: #94a3b8 !important;
-}
-
-/* Navigation divider */
-.fi-sidebar-divider {
-    height: 1px !important;
-    background: linear-gradient(90deg, transparent, var(--sidebar-border), transparent) !important;
-    margin: 0.5rem 0 !important;
-}
-
-/* Dropdown menus */
+/* =============================================
+   Navigation Dropdowns — RTL
+   ============================================= */
 .fi-dropdown {
     border-radius: 1rem !important;
     overflow: hidden !important;
@@ -137,51 +129,82 @@
     border: 1px solid var(--card-border) !important;
 }
 
-.fi-dropdown-content {
+.fi-dropdown-panel {
+    direction: rtl;
+    text-align: start !important;
+}
+
+.fi-dropdown-list {
     padding: 0.5rem 0 !important;
 }
 
-.fi-dropdown-item {
+.fi-dropdown-list-item {
     padding: 0.75rem 1rem !important;
     transition: all 0.2s ease !important;
+    text-align: start !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
 }
 
-.fi-dropdown-item:hover {
+.fi-dropdown-list-item:hover {
     background: rgba(245, 158, 11, 0.1) !important;
     color: #f59e0b !important;
 }
 
-/* Mobile navigation */
-@media (max-width: 768px) {
+/* =============================================
+   Navigation Item Active Indicator — RTL
+   ============================================= */
+
+/* Active item left/right border indicator */
+.fi-sidebar-item.fi-active::after {
+    content: '';
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    inset-inline-start: 0;
+    width: 3px;
+    background: #f59e0b;
+    border-radius: 0 4px 4px 0;
+}
+
+[dir="rtl"] .fi-sidebar-item.fi-active::after {
+    border-radius: 4px 0 0 4px;
+}
+
+/* =============================================
+   Mobile navigation — RTL-aware
+   ============================================= */
+@media (max-width: 1023px) {
     .fi-sidebar {
         position: fixed !important;
         top: 0 !important;
-        left: 0 !important;
+        inset-inline-end: 0 !important;
+        inset-inline-start: auto !important;
         height: 100vh !important;
         z-index: 9999 !important;
-        transform: translateX(-100%) !important;
         transition: transform 0.3s ease !important;
     }
-    
-    .fi-sidebar.open {
-        transform: translateX(0) !important;
+
+    /* In RTL, sidebar slides from the right */
+    [dir="rtl"] .fi-sidebar {
+        inset-inline-start: auto !important;
+        inset-inline-end: 0 !important;
     }
-    
-    .fi-sidebar-overlay {
+
+    .fi-sidebar-close-overlay {
         position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
+        inset: 0 !important;
         background: rgba(0, 0, 0, 0.5) !important;
         z-index: 9998 !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        transition: all 0.3s ease !important;
     }
-    
-    .fi-sidebar-overlay.open {
-        opacity: 1 !important;
-        visibility: visible !important;
-    }
+}
+
+/* =============================================
+   Navigation Divider
+   ============================================= */
+.fi-sidebar-group+.fi-sidebar-group {
+    border-top: 1px solid var(--sidebar-border);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
 }

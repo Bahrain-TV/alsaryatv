@@ -1,0 +1,537 @@
+/* =============================================
+   Al-Sarya TV - Filament Admin RTL Theme
+   =============================================
+   Complete RTL support for Arabic admin panel.
+   Uses CSS logical properties for direction-aware layout.
+   ============================================= */
+
+/* =============================================
+   CSS Custom Variables
+   ============================================= */
+:root {
+    --sidebar-border: #e2e8f0;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+}
+
+.dark {
+    --sidebar-border: #334155;
+    --card-bg: #1e293b;
+    --card-border: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+}
+
+/* =============================================
+   RTL Foundation
+   ============================================= */
+
+/* Force entire admin to RTL */
+html {
+    direction: rtl;
+}
+
+body,
+.fi-body,
+.fi-layout {
+    direction: rtl;
+    text-align: right;
+}
+
+/* =============================================
+   Sidebar — RTL
+   ============================================= */
+.fi-sidebar {
+    border-inline-end: 1px solid var(--sidebar-border) !important;
+    border-inline-start: none !important;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+/* Sidebar header */
+.fi-sidebar-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--sidebar-border);
+}
+
+/* Navigation items */
+.fi-sidebar-nav {
+    padding: 1rem 0;
+}
+
+.fi-sidebar-item {
+    margin: 0.25rem 0.75rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ensure nav items flow correctly in RTL */
+.fi-sidebar-item-button,
+.fi-sidebar-item a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    text-align: start !important;
+    width: 100% !important;
+}
+
+/* Icon should not flip */
+.fi-sidebar-item-icon {
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.fi-sidebar-item:hover .fi-sidebar-item-icon {
+    transform: scale(1.1);
+}
+
+/* Label text alignment */
+.fi-sidebar-item-label {
+    text-align: start !important;
+    flex: 1;
+}
+
+/* Navigation group labels */
+.fi-sidebar-group-label {
+    text-align: start !important;
+    padding-inline-start: 1rem !important;
+    padding-inline-end: 1rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    font-size: 0.75rem !important;
+    color: #64748b !important;
+}
+
+/* Submenu styling — RTL border */
+.fi-sidebar-group-items {
+    border-inline-start: 2px solid rgba(245, 158, 11, 0.2) !important;
+    border-inline-end: none !important;
+    margin: 0.25rem 0 !important;
+    padding-inline-start: 1rem !important;
+    padding-inline-end: 0 !important;
+}
+
+/* Badge notifications in sidebar */
+.fi-sidebar-item-badge {
+    margin-inline-start: auto !important;
+    margin-inline-end: 0 !important;
+}
+
+/* Collapsed sidebar icon alignment */
+.fi-sidebar[data-collapsed] .fi-sidebar-item-icon {
+    margin-inline-end: 0 !important;
+    margin-inline-start: 0 !important;
+}
+
+/* Collapse toggle — flip chevron for RTL */
+.fi-sidebar-nav-collapse-btn svg {
+    transform: scaleX(-1);
+}
+
+/* =============================================
+   Header / Topbar — RTL
+   ============================================= */
+.fi-header {
+    border-bottom: 1px solid var(--sidebar-border) !important;
+}
+
+.fi-topbar {
+    direction: rtl;
+}
+
+/* Breadcrumbs */
+.fi-breadcrumbs {
+    direction: rtl;
+}
+
+.fi-breadcrumbs ol {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Flip breadcrumb separator arrows for RTL */
+.fi-breadcrumbs-item-separator svg {
+    transform: scaleX(-1);
+}
+
+/* Global search */
+.fi-global-search-input {
+    text-align: start !important;
+    direction: rtl;
+}
+
+/* User menu */
+.fi-user-menu {
+    margin-inline-start: auto;
+}
+
+/* =============================================
+   Cards & Sections — RTL
+   ============================================= */
+.fi-section-header {
+    text-align: start !important;
+}
+
+.fi-section-header-heading {
+    text-align: start !important;
+}
+
+.fi-section-header-description {
+    text-align: start !important;
+}
+
+/* =============================================
+   Buttons — RTL spacing
+   ============================================= */
+.fi-btn {
+    direction: rtl;
+}
+
+/* Button icon + label gap */
+.fi-btn .fi-btn-icon {
+    margin-inline-end: 0.5rem;
+    margin-inline-start: 0;
+}
+
+/* =============================================
+   Tables — RTL alignment
+   ============================================= */
+.fi-ta {
+    direction: rtl;
+}
+
+.fi-ta-header-cell {
+    text-align: start !important;
+}
+
+.fi-ta-cell {
+    text-align: start !important;
+}
+
+.fi-ta th {
+    text-align: start !important;
+}
+
+/* Table actions column */
+.fi-ta-actions {
+    text-align: start !important;
+}
+
+/* Table checkbox alignment */
+.fi-ta-checkbox-cell {
+    padding-inline-start: 1rem !important;
+    padding-inline-end: 0.5rem !important;
+}
+
+/* Table sorting indicator */
+.fi-ta-header-cell-sort-indicator {
+    margin-inline-start: 0.25rem;
+}
+
+/* Table empty state */
+.fi-ta-empty-state {
+    text-align: center !important;
+}
+
+/* =============================================
+   Forms — RTL
+   ============================================= */
+.fi-fo {
+    direction: rtl;
+}
+
+.fi-fo-field-wrp {
+    text-align: start !important;
+}
+
+.fi-fo-field-wrp label {
+    text-align: start !important;
+}
+
+/* Input alignment */
+.fi-input-wrp input,
+.fi-input-wrp textarea,
+.fi-input-wrp select {
+    text-align: start !important;
+    direction: rtl;
+}
+
+/* Select dropdown */
+.fi-select-option {
+    text-align: start !important;
+}
+
+/* Helper text */
+.fi-fo-field-wrp-helper-text {
+    text-align: start !important;
+}
+
+/* Input fields focus */
+.fi-input:focus,
+.fi-select:focus {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
+}
+
+/* =============================================
+   Badges — RTL
+   ============================================= */
+.fi-badge {
+    direction: rtl;
+}
+
+/* =============================================
+   Widgets — RTL
+   ============================================= */
+
+/* Stats widget content alignment */
+.fi-wi-stats-overview-stat {
+    text-align: start !important;
+}
+
+.fi-wi-stats-overview-stat-label {
+    text-align: start !important;
+}
+
+.fi-wi-stats-overview-stat-value {
+    text-align: start !important;
+}
+
+.fi-wi-stats-overview-stat-description {
+    text-align: start !important;
+}
+
+/* Stat icon position */
+.fi-wi-stats-overview-stat-icon {
+    margin-inline-end: 0.75rem !important;
+    margin-inline-start: 0 !important;
+}
+
+/* Charts remain LTR for proper axis rendering */
+.fi-wi-chart canvas {
+    direction: ltr !important;
+}
+
+.fi-wi-chart-heading {
+    text-align: start !important;
+}
+
+/* =============================================
+   Dashboard
+   ============================================= */
+.fi-dashboard {
+    direction: rtl;
+}
+
+.fi-page {
+    direction: rtl;
+}
+
+.fi-page-header {
+    text-align: start !important;
+}
+
+.fi-page-heading {
+    text-align: start !important;
+}
+
+.fi-page-sub-heading {
+    text-align: start !important;
+}
+
+/* =============================================
+   Typography
+   ============================================= */
+.fi-header-heading {
+    text-align: start !important;
+}
+
+/* =============================================
+   Modals & Slide-overs — RTL
+   ============================================= */
+.fi-modal {
+    direction: rtl;
+    text-align: start;
+}
+
+.fi-modal-heading {
+    text-align: start !important;
+}
+
+.fi-modal-description {
+    text-align: start !important;
+}
+
+.fi-modal-footer {
+    direction: rtl;
+}
+
+/* Slide-over should come from inline-end */
+.fi-modal-slideOver-window {
+    inset-inline-end: 0 !important;
+    inset-inline-start: auto !important;
+}
+
+/* =============================================
+   Notifications — RTL
+   ============================================= */
+.fi-no {
+    direction: rtl;
+    text-align: start;
+}
+
+.fi-no-wrp {
+    inset-inline-end: 0 !important;
+    inset-inline-start: auto !important;
+}
+
+.fi-no-title {
+    text-align: start !important;
+}
+
+.fi-no-body {
+    text-align: start !important;
+}
+
+/* Notification close button */
+.fi-no-close-btn {
+    inset-inline-end: 0.5rem !important;
+    inset-inline-start: auto !important;
+}
+
+/* =============================================
+   Pagination — RTL
+   ============================================= */
+.fi-pagination {
+    direction: rtl;
+}
+
+/* Flip the prev/next arrows */
+.fi-pagination-previous-btn svg,
+.fi-pagination-next-btn svg {
+    transform: scaleX(-1);
+}
+
+/* =============================================
+   Info-lists / Entries — RTL
+   ============================================= */
+.fi-in {
+    direction: rtl;
+    text-align: start;
+}
+
+.fi-in-entry-wrp {
+    text-align: start !important;
+}
+
+/* =============================================
+   Actions — RTL
+   ============================================= */
+.fi-ac {
+    direction: rtl;
+}
+
+/* Dropdown action menus */
+.fi-dropdown-panel {
+    direction: rtl;
+    text-align: start !important;
+}
+
+.fi-dropdown-list {
+    text-align: start !important;
+}
+
+.fi-dropdown-list-item {
+    text-align: start !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+/* =============================================
+   Tabs — RTL
+   ============================================= */
+.fi-tabs {
+    direction: rtl;
+}
+
+.fi-tabs-tab {
+    text-align: start !important;
+}
+
+/* =============================================
+   Responsive — RTL-aware
+   ============================================= */
+@media (max-width: 1023px) {
+    .fi-sidebar {
+        border-inline-end: none !important;
+        border-bottom: 1px solid var(--sidebar-border) !important;
+    }
+
+    .fi-main {
+        margin-inline-start: 0 !important;
+    }
+}
+
+/* =============================================
+   Collapse group button chevrons — RTL fix
+   ============================================= */
+
+/* Filament's sidebar group collapse toggle arrow direction */
+.fi-sidebar-group-collapse-button svg {
+    transition: transform 0.2s ease;
+}
+
+/* When the group is expanded in RTL, the chevron should point down */
+/* When collapsed, it should point inline-start */
+
+/* =============================================
+   Account widget (user greeting) — RTL
+   ============================================= */
+.fi-account-widget {
+    direction: rtl;
+    text-align: start;
+}
+
+/* =============================================
+   Custom scrollbar
+   ============================================= */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(#f59e0b, #d97706);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(#d97706, #b45309);
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #334155;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: linear-gradient(#3b82f6, #1d4ed8);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(#1d4ed8, #1e40af);
+}

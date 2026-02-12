@@ -8,7 +8,7 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/css/splash-screen.css',
-                'resources/css/thank-you-screen.css'
+                'resources/css/thank-you-screen.css',
             ],
             refresh: true,
         }),

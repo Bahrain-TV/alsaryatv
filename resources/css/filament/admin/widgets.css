@@ -1,14 +1,17 @@
-/* Custom Widgets Styling */
+/* =============================================
+   Custom Widgets Styling — RTL-aware
+   ============================================= */
 
 /* Stats overview widget */
-.fi-stats-widget {
+.fi-wi-stats-overview {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
     margin-bottom: 1.5rem;
+    direction: rtl;
 }
 
-.fi-stat-card {
+.fi-wi-stats-overview-stat {
     background: var(--card-bg) !important;
     border: 1px solid var(--card-border) !important;
     border-radius: 1rem !important;
@@ -16,32 +19,32 @@
     transition: all 0.3s ease !important;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--tw-shadow-card) !important;
+    text-align: start !important;
 }
 
-.fi-stat-card::before {
+.fi-wi-stats-overview-stat::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
     height: 4px;
     background: var(--primary-gradient);
     transform: scaleX(0);
-    transform-origin: left;
+    transform-origin: inline-start;
     transition: transform 0.5s ease;
 }
 
-.fi-stat-card:hover::before {
+.fi-wi-stats-overview-stat:hover::before {
     transform: scaleX(1);
 }
 
-.fi-stat-card:hover {
+.fi-wi-stats-overview-stat:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
 }
 
-.fi-stat-value {
+.fi-wi-stats-overview-stat-value {
     font-size: 2rem !important;
     font-weight: 700 !important;
     margin: 0.5rem 0 !important;
@@ -49,42 +52,50 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    text-align: start !important;
 }
 
-.fi-stat-description {
+.fi-wi-stats-overview-stat-description {
     color: var(--text-secondary) !important;
     font-size: 0.875rem !important;
     margin: 0 !important;
+    text-align: start !important;
+}
+
+.fi-wi-stats-overview-stat-label {
+    text-align: start !important;
+}
+
+/* Stat icon position — RTL */
+.fi-wi-stats-overview-stat-icon {
+    margin-inline-end: 0.75rem !important;
+    margin-inline-start: 0 !important;
 }
 
 /* Chart widgets */
-.fi-chart-widget {
+.fi-wi-chart {
     background: var(--card-bg) !important;
     border: 1px solid var(--card-border) !important;
     border-radius: 1rem !important;
     padding: 1.5rem !important;
-    box-shadow: var(--tw-shadow-card) !important;
     transition: all 0.3s ease !important;
 }
 
-.fi-chart-container {
-    height: 300px !important;
-    width: 100% !important;
+/* Charts are always LTR for axes rendering */
+.fi-wi-chart canvas {
+    direction: ltr !important;
 }
 
-.fi-chart-title {
+.fi-wi-chart-heading {
     font-weight: 700 !important;
     margin-bottom: 1rem !important;
     color: var(--text-primary) !important;
+    text-align: start !important;
 }
 
-/* Activity widget */
-.fi-activity-widget {
-    background: var(--card-bg) !important;
-    border: 1px solid var(--card-border) !important;
-    border-radius: 1rem !important;
-    padding: 1.5rem !important;
-    box-shadow: var(--tw-shadow-card) !important;
+/* Activity widget — RTL aligned */
+.fi-wi-custom-welcome {
+    direction: rtl;
 }
 
 .fi-activity-item {
@@ -93,6 +104,7 @@
     display: flex !important;
     align-items: center !important;
     gap: 1rem !important;
+    text-align: start !important;
 }
 
 .fi-activity-item:last-child {
@@ -108,37 +120,42 @@
     justify-content: center !important;
     background: rgba(245, 158, 11, 0.1) !important;
     color: #f59e0b !important;
+    flex-shrink: 0;
 }
 
 .fi-activity-content {
     flex: 1 !important;
+    text-align: start !important;
 }
 
 .fi-activity-title {
     font-weight: 600 !important;
     margin: 0 0 0.25rem 0 !important;
     color: var(--text-primary) !important;
+    text-align: start !important;
 }
 
 .fi-activity-description {
     font-size: 0.875rem !important;
     color: var(--text-secondary) !important;
     margin: 0 !important;
+    text-align: start !important;
 }
 
 .fi-activity-time {
     font-size: 0.75rem !important;
     color: var(--text-muted) !important;
-    text-align: right !important;
+    text-align: start !important;
+    flex-shrink: 0;
 }
 
-/* Winners history widget */
+/* Winners history widget — RTL */
 .fi-winners-widget {
     background: var(--card-bg) !important;
     border: 1px solid var(--card-border) !important;
     border-radius: 1rem !important;
     padding: 1.5rem !important;
-    box-shadow: var(--tw-shadow-card) !important;
+    direction: rtl;
 }
 
 .fi-winner-item {
@@ -169,79 +186,27 @@
     justify-content: center !important;
     color: white !important;
     font-weight: bold !important;
+    flex-shrink: 0;
 }
 
 .fi-winner-details {
     display: flex !important;
     flex-direction: column !important;
+    text-align: start !important;
 }
 
 .fi-winner-name {
     font-weight: 600 !important;
     color: var(--text-primary) !important;
     margin: 0 0 0.25rem 0 !important;
+    text-align: start !important;
 }
 
 .fi-winner-date {
     font-size: 0.75rem !important;
     color: var(--text-muted) !important;
     margin: 0 !important;
-}
-
-/* Animated stats widget */
-.fi-animated-stats-widget {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.fi-animated-stat {
-    background: var(--card-bg) !important;
-    border: 1px solid var(--card-border) !important;
-    border-radius: 1rem !important;
-    padding: 1.5rem !important;
-    text-align: center !important;
-    transition: all 0.3s ease !important;
-    box-shadow: var(--tw-shadow-card) !important;
-    position: relative;
-    overflow: hidden;
-}
-
-.fi-animated-stat::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.1), transparent);
-    transition: left 0.8s;
-}
-
-.fi-animated-stat:hover::before {
-    left: 100%;
-}
-
-.fi-animated-stat:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-}
-
-.fi-animated-stat-value {
-    font-size: 2rem !important;
-    font-weight: 700 !important;
-    margin: 0.5rem 0 !important;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.fi-animated-stat-label {
-    color: var(--text-secondary) !important;
-    font-size: 0.875rem !important;
-    margin: 0 !important;
+    text-align: start !important;
 }
 
 /* Progress bars in widgets */
@@ -250,6 +215,7 @@
     background: rgba(0, 0, 0, 0.05) !important;
     border-radius: 4px !important;
     overflow: hidden !important;
+    direction: rtl;
 }
 
 .fi-progress-bar-fill {
@@ -259,43 +225,44 @@
     transition: width 0.5s ease !important;
 }
 
-/* Widget header */
-.fi-widget-header {
+/* Widget header — RTL */
+.fi-wi-header,
+.fi-section-header {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     margin-bottom: 1rem !important;
     padding-bottom: 0.75rem !important;
     border-bottom: 1px solid var(--card-border) !important;
+    direction: rtl;
 }
 
-.fi-widget-title {
+.fi-section-header-heading {
     font-weight: 700 !important;
     font-size: 1.25rem !important;
     color: var(--text-primary) !important;
     margin: 0 !important;
+    text-align: start !important;
 }
 
-.fi-widget-actions {
+.fi-section-header-actions {
     display: flex !important;
     gap: 0.5rem !important;
 }
 
 /* Responsive widget layouts */
 @media (max-width: 640px) {
-    .fi-stats-widget,
-    .fi-animated-stats-widget {
+    .fi-wi-stats-overview {
         grid-template-columns: 1fr !important;
     }
-    
-    .fi-stat-card,
-    .fi-animated-stat {
+
+    .fi-wi-stats-overview-stat {
         min-height: auto !important;
     }
 }
 
 /* Loading states */
-.fi-widget-loading {
+.fi-wi-loading {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -312,6 +279,11 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

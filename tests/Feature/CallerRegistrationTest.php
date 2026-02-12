@@ -210,7 +210,7 @@ class CallerRegistrationTest extends TestCase
         $this->assertEquals(5, Caller::count());
 
         // Verify each has required fields
-        Caller::all()->each(function (Caller $caller) {
+        Caller::all()->each(function (Caller $caller): void {
             $this->assertNotNull($caller->name);
             $this->assertNotNull($caller->cpr);
             $this->assertNotNull($caller->phone);

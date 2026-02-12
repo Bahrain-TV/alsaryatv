@@ -76,7 +76,8 @@ class RecentActivityWidget extends BaseWidget
                     ->size('sm')
                     ->dateTimeTooltip('Y-m-d H:i:s'),
             ])
-            ->paginated(false)
+            ->paginated([5, 10])
+            ->defaultPaginationPageOption(5)
             ->emptyStateHeading('📭 لا توجد تسجيلات حديثة')
             ->emptyStateDescription('لم يتم تسجيل أي متصلين بعد.')
             ->emptyStateIcon('heroicon-o-inbox');
