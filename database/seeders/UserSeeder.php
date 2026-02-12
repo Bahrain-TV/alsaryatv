@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
                 'name' => 'Hasan',
                 'email' => 'aldoyh@gmail.com',
                 'password' => '97333334122',
-                'role' => 'admin',
+                'role' => 'super_admin',
             ],
             [
                 'name' => 'Admin Bee',
