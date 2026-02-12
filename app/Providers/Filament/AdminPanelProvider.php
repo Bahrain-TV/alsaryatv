@@ -25,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->brandName('السارية - لوحة التحكم')
+            ->brandName('تلفزيون البحرين - السارية')
             ->brandLogo(fn () => view('filament.brand.logo'))
             ->favicon('/images/favicon.ico')
             ->colors([
@@ -34,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Orange,
                 'danger' => Color::Rose,
                 'info' => Color::Sky,
+                'gray' => Color::Slate,
             ])
             ->font('Tajawal')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

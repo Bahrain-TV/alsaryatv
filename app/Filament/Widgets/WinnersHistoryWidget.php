@@ -25,7 +25,7 @@ class WinnersHistoryWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('👤 الاسم')
+                    ->label('الاسم')
                     ->searchable()
                     ->weight('bold')
                     ->size('lg')
@@ -33,46 +33,28 @@ class WinnersHistoryWidget extends BaseWidget
                     ->formatStateUsing(fn (string $state): string => "🎉 {$state}"),
 
                 Tables\Columns\TextColumn::make('phone')
-                    ->label('📱 الهاتف')
+                    ->label('الهاتف')
                     ->icon('heroicon-m-phone')
                     ->copyable()
-                    ->copyMessage('تم نسخ رقم الهاتف')
-                    ->tooltip('اضغط لنسخ الرقم'),
+                    ->color('gray'),
 
                 Tables\Columns\TextColumn::make('cpr')
-                    ->label('🆔 الرقم الشخصي')
+                    ->label('الرقم الشخصي')
                     ->icon('heroicon-m-identification')
                     ->copyable()
-                    ->copyMessage('تم نسخ رقم المواطن')
-                    ->tooltip('اضغط لنسخ الرقم'),
+                    ->color('gray'),
 
-                Tables\Columns\BadgeColumn::make('hits')
-                    ->label('👋 المشاركات')
-                    ->formatStateUsing(fn (int $state): string => "{$state} مشاركة")
-                    ->color('warning')
-                    ->icon('heroicon-m-hand-raised'),
-
-                Tables\Columns\BadgeColumn::make('status')
-                    ->label('📊 الحالة')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => '✅ نشط',
-                        'inactive' => '⏸️ غير نشط',
-                        'blocked' => '🚫 محظور',
-                        default => $state,
-                    })
-                    ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'warning',
-                        'blocked' => 'danger',
-                        default => 'gray',
-                    }),
+                Tables\Columns\TextColumn::make('hits')
+                    ->label('المشاركات')
+                    ->badge()
+                    ->color('warning'),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('🕐 تاريخ الفوز')
-                    ->dateTime('Y-m-d H:i')
-                    ->sortable()
-                    ->tooltip(fn (Caller $record): string => $record->updated_at->format('l، d F Y H:i:s'))
-                    ->description(fn (Caller $record): string => $record->updated_at->diffForHumans()),
+                    ->label('وقت التتويج')
+                    ->since()
+                    ->dateTimeTooltip('Y-m-d H:i')
+                    ->color('success')
+                    ->description(fn (Caller $record): string => $record->updated_at->format('H:i')),
             ])
             ->defaultSort('updated_at', 'desc')
             ->paginated([5, 10, 25])

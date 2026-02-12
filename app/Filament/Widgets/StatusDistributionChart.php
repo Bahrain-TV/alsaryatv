@@ -7,19 +7,18 @@ use Filament\Widgets\ChartWidget;
 
 class StatusDistributionChart extends ChartWidget
 {
-    protected ?string $heading = '📈 توزيع حالات المتصلين';
+    protected ?string $heading = 'توزيع الحالات';
 
     protected static ?int $sort = 7;
 
     protected string $color = 'success';
 
     protected int|string|array $columnSpan = [
-        'sm' => 1,
-        'md' => 1,
-        'lg' => 2,
+        'md' => 3,
+        'lg' => 6,
     ];
 
-    protected ?string $maxHeight = '320px';
+    protected ?string $maxHeight = '300px';
 
     protected ?string $pollingInterval = '120s';
 
@@ -28,35 +27,20 @@ class StatusDistributionChart extends ChartWidget
         $active = Caller::where('status', 'active')->count();
         $inactive = Caller::where('status', 'inactive')->count();
         $blocked = Caller::where('status', 'blocked')->count();
-        $total = $active + $inactive + $blocked;
-
-        $activePercent = $total > 0 ? round(($active / $total) * 100, 1) : 0;
-        $inactivePercent = $total > 0 ? round(($inactive / $total) * 100, 1) : 0;
-        $blockedPercent = $total > 0 ? round(($blocked / $total) * 100, 1) : 0;
 
         return [
             'datasets' => [
                 [
-                    'label' => 'عدد المتصلين',
+                    'label' => 'المتصلين',
                     'data' => [$active, $inactive, $blocked],
                     'backgroundColor' => [
-                        'rgba(34, 197, 94, 0.85)',      // green for active
-                        'rgba(251, 191, 36, 0.85)',     // yellow for inactive
-                        'rgba(239, 68, 68, 0.85)',      // red for blocked
+                        '#10b981', // emerald-500
+                        '#f59e0b', // amber-500
+                        '#ef4444', // red-500
                     ],
-                    'borderColor' => [
-                        'rgb(34, 197, 94)',
-                        'rgb(251, 191, 36)',
-                        'rgb(239, 68, 68)',
-                    ],
-                    'borderWidth' => 2,
                 ],
             ],
-            'labels' => [
-                "نشط ($active) {$activePercent}%",
-                "غير نشط ($inactive) {$inactivePercent}%",
-                "محظور ($blocked) {$blockedPercent}%",
-            ],
+            'labels' => ['نشط', 'غير نشط', 'محظور'],
         ];
     }
 
@@ -68,25 +52,10 @@ class StatusDistributionChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
-            'maintainAspectRatio' => true,
             'plugins' => [
                 'legend' => [
                     'display' => true,
-                    'position' => 'right',
-                    'labels' => [
-                        'padding' => 15,
-                        'font' => [
-                            'size' => 12,
-                        ],
-                        'generateLabels' => 'function(chart) { return chart.data.labels.map((label, i) => ({text: label, fillStyle: chart.data.datasets[0].backgroundColor[i]})); }',
-                    ],
-                ],
-                'tooltip' => [
-                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
-                    'padding' => 12,
-                    'titleFont' => ['size' => 12],
-                    'bodyFont' => ['size' => 11],
+                    'position' => 'bottom',
                 ],
             ],
         ];

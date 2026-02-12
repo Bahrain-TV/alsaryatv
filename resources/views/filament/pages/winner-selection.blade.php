@@ -270,4 +270,4 @@
         }
     </script>
     @endpush
-</x-filament-layouts::page>
+</x-filament-panels::page>

@@ -4,64 +4,55 @@ namespace App\Filament\Widgets;
 
 use App\Models\Caller;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Facades\Cache;
 
 class PeakHoursChart extends ChartWidget
 {
-    protected ?string $heading = '⏰ ساعات الذروة للتسجيل';
+    protected ?string $heading = 'ساعات الذروة';
 
     protected static ?int $sort = 3;
 
     protected string $color = 'warning';
 
     protected int|string|array $columnSpan = [
-        'sm' => 1,
-        'md' => 1,
-        'lg' => 2,
+        'md' => 3,
+        'lg' => 6,
     ];
 
-    protected ?string $maxHeight = '320px';
+    protected ?string $maxHeight = '300px';
 
-    protected ?string $pollingInterval = '120s';
+    protected ?string $pollingInterval = '300s';
 
     protected function getData(): array
     {
-        // Get registration counts by hour - SQLite compatible syntax
-        $data = Caller::selectRaw("CAST(strftime('%H', created_at) AS INTEGER) as hour, COUNT(*) as count")
-            ->groupBy('hour')
-            ->orderBy('hour')
-            ->get();
+        return Cache::remember('dashboard_peak_hours', 300, function () {
+            // Get registration counts by hour
+            $data = Caller::selectRaw("CAST(strftime('%H', created_at) AS INTEGER) as hour, COUNT(*) as count")
+                ->groupBy('hour')
+                ->orderBy('hour')
+                ->get();
 
-        $labels = [];
-        $counts = [];
-        $peakHour = 0;
-        $maxCount = 0;
+            $labels = [];
+            $counts = [];
 
-        // Fill all 24 hours
-        for ($i = 0; $i < 24; $i++) {
-            $labels[] = sprintf('%02d:00', $i);
-            $record = $data->firstWhere('hour', $i);
-            $count = $record ? $record->count : 0;
-            $counts[] = $count;
-
-            if ($count > $maxCount) {
-                $maxCount = $count;
-                $peakHour = $i;
+            for ($i = 0; $i < 24; $i++) {
+                $labels[] = sprintf('%02d:00', $i);
+                $record = $data->firstWhere('hour', $i);
+                $counts[] = $record ? $record->count : 0;
             }
-        }
 
-        return [
-            'datasets' => [
-                [
-                    'label' => "عدد التسجيلات (الذروة في {$labels[$peakHour]})",
-                    'data' => $counts,
-                    'backgroundColor' => 'rgba(251, 191, 36, 0.7)',
-                    'borderColor' => 'rgb(251, 191, 36)',
-                    'borderWidth' => 2,
-                    'borderRadius' => 4,
+            return [
+                'datasets' => [
+                    [
+                        'label' => 'التسجيلات',
+                        'data' => $counts,
+                        'backgroundColor' => '#f59e0b',
+                        'borderRadius' => 4,
+                    ],
                 ],
-            ],
-            'labels' => $labels,
-        ];
+                'labels' => $labels,
+            ];
+        });
     }
 
     protected function getType(): string
@@ -72,24 +63,9 @@ class PeakHoursChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-            'responsive' => true,
-            'maintainAspectRatio' => true,
             'plugins' => [
                 'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                    'labels' => [
-                        'padding' => 10,
-                        'font' => ['size' => 11],
-                    ],
-                ],
-                'tooltip' => [
-                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
-                    'padding' => 10,
-                    'titleFont' => ['size' => 12],
-                    'callbacks' => [
-                        'label' => 'function(context) { return "التسجيلات: " + context.parsed.y; }',
-                    ],
+                    'display' => false,
                 ],
             ],
             'scales' => [
@@ -97,22 +73,6 @@ class PeakHoursChart extends ChartWidget
                     'beginAtZero' => true,
                     'ticks' => [
                         'precision' => 0,
-                        'font' => ['size' => 10],
-                    ],
-                    'title' => [
-                        'display' => true,
-                        'text' => 'العدد',
-                        'font' => ['size' => 11],
-                    ],
-                ],
-                'x' => [
-                    'ticks' => [
-                        'font' => ['size' => 9],
-                    ],
-                    'title' => [
-                        'display' => true,
-                        'text' => 'الساعة',
-                        'font' => ['size' => 11],
                     ],
                 ],
             ],

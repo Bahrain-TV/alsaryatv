@@ -6,9 +6,12 @@ use Filament\Widgets\Widget;
 
 class QuickActionsWidget extends Widget
 {
-    protected string $view = 'filament.widgets.quick-actions';
+    protected static string $view = 'filament.widgets.quick-actions';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = [
+        'md' => 2,
+        'lg' => 4,
+    ];
 
     protected static ?int $sort = 0;
 
@@ -16,31 +19,27 @@ class QuickActionsWidget extends Widget
     {
         return [
             [
-                'title' => 'اختيار فائز يدوي',
-                'description' => 'استخدم الدوران لاختيار فائز من المتصلين',
-                'icon' => '🏆',
+                'title' => 'اختيار فائز',
                 'url' => '/admin/winner-selection',
+                'icon' => 'heroicon-m-sparkles',
                 'color' => 'warning',
             ],
             [
-                'title' => 'إضافة متصل جديد',
-                'description' => 'سجل متصل جديد في النظام',
-                'icon' => '➕',
+                'title' => 'إضافة متصل',
                 'url' => '/admin/callers/create',
+                'icon' => 'heroicon-m-plus-circle',
                 'color' => 'info',
             ],
             [
                 'title' => 'قائمة الفائزين',
-                'description' => 'اعرض جميع الفائزين المسجلين',
-                'icon' => '👑',
                 'url' => '/admin/callers/winners',
+                'icon' => 'heroicon-m-trophy',
                 'color' => 'success',
             ],
             [
-                'title' => 'التحليلات المتقدمة',
-                'description' => 'عرض التحليلات الشاملة والإحصائيات',
-                'icon' => '📊',
+                'title' => 'التحليلات',
                 'url' => '/admin/analytics',
+                'icon' => 'heroicon-m-chart-bar',
                 'color' => 'primary',
             ],
         ];

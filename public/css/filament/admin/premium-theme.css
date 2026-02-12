@@ -1,0 +1,79 @@
+/* Custom Admin Premium Styles */
+
+.fi-sidebar {
+    background: linear-gradient(to bottom, #111827, #1f2937) !important;
+}
+
+[dir="rtl"] .fi-sidebar {
+    border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-right: none !important;
+}
+
+.fi-sidebar-item-button {
+    border-radius: 8px !important;
+    margin: 2px 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.fi-sidebar-item-button:hover {
+    background: rgba(245, 158, 11, 0.1) !important;
+    transform: translateX(-4px);
+}
+
+[dir="rtl"] .fi-sidebar-item-button:hover {
+    transform: translateX(4px) !important;
+}
+
+.fi-wi-widget {
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.fi-wi-stats-overview-stat {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+.fi-wi-stats-overview-stat::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: currentColor;
+    opacity: 0.3;
+}
+
+/* Premium Card Effects */
+.fi-section {
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .fi-section {
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background: #0f172a !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

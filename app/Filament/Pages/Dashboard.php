@@ -2,8 +2,8 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\AnimatedStatsOverviewWidget;
-use App\Filament\Widgets\ParticipationRateWidget;
+use App\Filament\Widgets\CallersStatsWidget;
+use App\Filament\Widgets\DashboardWelcome;
 use App\Filament\Widgets\PeakHoursChart;
 use App\Filament\Widgets\QuickActionsWidget;
 use App\Filament\Widgets\RecentActivityWidget;
@@ -14,40 +14,33 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    protected static ?string $navigationIcon = 'heroicon-o-home';
 
-    protected static ?string $navigationLabel = 'لوحة التحكم';
+    protected static ?string $navigationLabel = 'الرئيسية';
 
-    protected static ?string $title = 'لوحة التحكم';
+    protected static ?string $title = 'لوحة التحكم المركزية';
 
     public function getWidgets(): array
     {
         return [
-            // ==================== QUICK ACTIONS ====================
-            // Quick Access Actions - First Row
+            // Row 1: Welcome message (Full width)
+            DashboardWelcome::class,
+
+            // Row 2: Stats (Responsive)
+            CallersStatsWidget::class,
+
+            // Row 3: Main Trend Chart (Wide) and Quick Actions (Narrow)
+            RegistrationTrendsChart::class,
             QuickActionsWidget::class,
 
-            // ==================== OVERVIEW SECTION ====================
-            // Main Stats - Second Row
-            AnimatedStatsOverviewWidget::class,
-
-            // ==================== PARTICIPATION SECTION ====================
-            // Participation Metrics - Third Row
-            ParticipationRateWidget::class,
-
-            // ==================== TRENDS & ANALYTICS SECTION ====================
-            // Charts Row - Third Row
-            RegistrationTrendsChart::class,
-
-            // Charts - Fourth Row (Side by Side)
+            // Row 4: Analytics Charts (Side by side)
             PeakHoursChart::class,
             StatusDistributionChart::class,
 
-            // ==================== ACTIVITY & HISTORY SECTION ====================
-            // Activity Tables - Fifth Row (Side by Side)
+            // Row 5: Recent Activity (Table)
             RecentActivityWidget::class,
 
-            // Winners History - Sixth Row (Full Width)
+            // Row 6: Winners History (Full width footer)
             WinnersHistoryWidget::class,
         ];
     }
@@ -55,9 +48,9 @@ class Dashboard extends BaseDashboard
     public function getColumns(): array|int
     {
         return [
-            'sm' => 1,   // Mobile: 1 column
-            'md' => 2,   // Tablet: 2 columns
-            'lg' => 4,   // Desktop: 4 columns
+            'sm' => 1,
+            'md' => 6,
+            'lg' => 12,
         ];
     }
 }

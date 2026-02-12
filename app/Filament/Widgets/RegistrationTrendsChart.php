@@ -13,7 +13,10 @@ class RegistrationTrendsChart extends ChartWidget
 
     protected string $color = 'info';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = [
+        'md' => 4,
+        'lg' => 8,
+    ];
 
     protected ?string $maxHeight = '350px';
 

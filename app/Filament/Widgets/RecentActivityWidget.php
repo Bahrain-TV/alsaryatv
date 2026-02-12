@@ -11,11 +11,7 @@ class RecentActivityWidget extends BaseWidget
 {
     protected static ?int $sort = 4;
 
-    protected int|string|array $columnSpan = [
-        'sm' => 1,
-        'md' => 1,
-        'lg' => 2,
-    ];
+    protected int|string|array $columnSpan = 'full';
 
     protected ?string $pollingInterval = '30s';
 
@@ -29,25 +25,23 @@ class RecentActivityWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('👤 الاسم')
+                    ->label('الاسم')
                     ->searchable()
                     ->weight('bold')
-                    ->color('primary')
-                    ->size('sm'),
+                    ->color('primary'),
 
                 Tables\Columns\TextColumn::make('phone')
-                    ->label('📱 الهاتف')
+                    ->label('الهاتف')
                     ->icon('heroicon-m-phone')
-                    ->size('sm'),
+                    ->color('gray'),
 
-                Tables\Columns\BadgeColumn::make('hits')
-                    ->label('👋 المشاركات')
-                    ->formatStateUsing(fn (int $state): string => "{$state}")
-                    ->color('info')
-                    ->icon('heroicon-m-hand-raised'),
+                Tables\Columns\TextColumn::make('hits')
+                    ->label('المشاركات')
+                    ->badge()
+                    ->color('info'),
 
                 Tables\Columns\IconColumn::make('is_winner')
-                    ->label('🏆 فائز')
+                    ->label('فائز')
                     ->boolean()
                     ->trueIcon('heroicon-s-trophy')
                     ->trueColor('success')
@@ -55,12 +49,12 @@ class RecentActivityWidget extends BaseWidget
                     ->falseColor('gray'),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->label('📊 الحالة')
+                    ->label('الحالة')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => '✅ نشط',
-                        'inactive' => '⏸️ غير نشط',
-                        'blocked' => '🚫 محظور',
+                        'active' => 'نشط',
+                        'inactive' => 'غير نشط',
+                        'blocked' => 'محظور',
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -71,9 +65,8 @@ class RecentActivityWidget extends BaseWidget
                     }),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('🕐 التاريخ')
+                    ->label('وقت التسجيل')
                     ->since()
-                    ->size('sm')
                     ->dateTimeTooltip('Y-m-d H:i:s'),
             ])
             ->paginated(false)
