@@ -1,5 +1,22 @@
-<div
-    x-data="{
+<!-- Statistics Panel Wrapper -->
+<div class="stats-panel-wrapper">
+    <!-- Statistics Panel Toggle Button -->
+    <button
+        class="stats-toggle-btn"
+        @click="toggleStats()"
+        title="Toggle Statistics Panel"
+        x-show="true"
+        x-transition
+    >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+    </button>
+
+    <!-- Statistics Panel Container -->
+    <div class="stats-panel-container" style="opacity: 1; transform: translateY(0);">
+    <div
+        x-data="{
         totalCallers: 0,
         totalWinners: 0,
         todayCallers: 0,
@@ -9,56 +26,141 @@
         winRatio: 0,
         todayTrend: 0,
         averageHits: 0,
+        gsap: null,
+        showStats: true,
+        animationRunning: false,
 
-        init() {
-            // Animate values when component is initialized
-            this.animateValue('totalCallers', 0, {{ $totalCallers ?? 0 }});
-            this.animateValue('totalWinners', 0, {{ $totalWinners ?? 0 }});
-            this.animateValue('todayCallers', 0, {{ $todayCallers ?? 0 }});
-            this.animateValue('totalHits', 0, {{ $totalHits ?? 0 }});
-            this.animateValue('activeCallers', 0, {{ $activeCallers ?? 0 }});
-            this.animateValue('uniqueCprs', 0, {{ $uniqueCprs ?? 0 }});
+        async init() {
+            // Import GSAP
+            const { default: gsapLib } = await import('gsap');
+            this.gsap = gsapLib;
 
-            // Calculate derived values
-            this.winRatio = {{ $totalCallers > 0 ? round(($totalWinners ?? 0) / $totalCallers * 100, 1) : 0 }};
-            this.todayTrend = {{ $previousDayCallers > 0 ? round((($todayCallers ?? 0) - $previousDayCallers) / $previousDayCallers * 100, 1) : 0 }};
-            this.averageHits = {{ $totalCallers > 0 ? round(($totalHits ?? 0) / $totalCallers, 1) : 0 }};
+            // Wait for DOM to be ready
+            this.$nextTick(() => {
+                this.resetValues();
+                this.setupAnimations();
+            });
         },
 
-        animateValue(property, start, end) {
-            if (start === end) {
-                this[property] = end;
-                return;
-            }
+        resetValues() {
+            // Reset all values to 0 before animation
+            this.totalCallers = 0;
+            this.totalWinners = 0;
+            this.todayCallers = 0;
+            this.totalHits = 0;
+            this.activeCallers = 0;
+            this.uniqueCprs = 0;
+            this.winRatio = 0;
+            this.todayTrend = 0;
+            this.averageHits = 0;
 
-            let startTime = null;
-            const duration = 2000; // Animation duration in ms
+            // Reset DOM values
+            const valueElements = this.$el.querySelectorAll('[data-value]');
+            valueElements.forEach(el => {
+                el.textContent = '0';
+            });
+        },
 
-            const animate = (currentTime) => {
-                if (!startTime) startTime = currentTime;
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
+        setupAnimations() {
+            if (this.animationRunning) return;
+            this.animationRunning = true;
 
-                // Ease-out function for smooth animation
-                const easeOut = 1 - Math.pow(1 - progress, 2);
+            const cards = this.$el.querySelectorAll('.stat-card');
+            const cardDelay = 0.15; // Delay between each card
 
-                const currentValue = Math.floor(start + (end - start) * easeOut);
-                this[property] = currentValue;
+            // Create GSAP timeline
+            const tl = this.gsap.timeline();
 
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    this[property] = end; // Ensure final value is exact
+            // Get the animation targets
+            const targets = [
+                { selector: '.stat-card-0', property: 'totalCallers', value: {{ $totalCallers ?? 0 }} },
+                { selector: '.stat-card-1', property: 'totalWinners', value: {{ $totalWinners ?? 0 }} },
+                { selector: '.stat-card-2', property: 'todayCallers', value: {{ $todayCallers ?? 0 }} },
+                { selector: '.stat-card-3', property: 'totalHits', value: {{ $totalHits ?? 0 }} },
+                { selector: '.stat-card-4', property: 'activeCallers', value: {{ $activeCallers ?? 0 }} },
+                { selector: '.stat-card-5', property: 'uniqueCprs', value: {{ $uniqueCprs ?? 0 }} },
+            ];
+
+            // Animate each card
+            targets.forEach((target, index) => {
+                const card = this.$el.querySelector(target.selector);
+                if (!card) return;
+
+                // Card reveal animation - staggered
+                tl.fromTo(card,
+                    {
+                        opacity: 0,
+                        y: 30,
+                        scale: 0.95
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.6,
+                        ease: 'expo.out'
+                    },
+                    index * cardDelay // Stagger timing
+                );
+
+                // Number counter animation - starts when card appears
+                const valueElement = card.querySelector('[data-value]');
+                if (valueElement) {
+                    const counterObj = { value: 0 };
+
+                    tl.to(counterObj,
+                        {
+                            value: target.value,
+                            duration: 2.5,
+                            ease: 'power2.out',
+                            onUpdate: () => {
+                                valueElement.textContent = Math.floor(counterObj.value).toLocaleString();
+                            }
+                        },
+                        index * cardDelay + 0.1 // Start counter slightly after card appears
+                    );
                 }
-            };
+            });
 
-            requestAnimationFrame(animate);
+            // Calculate and set derived values after animations
+            tl.call(() => {
+                this.winRatio = {{ $totalCallers > 0 ? round(($totalWinners ?? 0) / $totalCallers * 100, 1) : 0 }};
+                this.todayTrend = {{ $previousDayCallers > 0 ? round((($todayCallers ?? 0) - $previousDayCallers) / $previousDayCallers * 100, 1) : 0 }};
+                this.averageHits = {{ $totalCallers > 0 ? round(($totalHits ?? 0) / $totalCallers, 1) : 0 }};
+                this.animationRunning = false;
+            }, null, '-=1.5'); // Start calculating halfway through final animation
+        },
+
+        toggleStats() {
+            const panel = this.$el.closest('.stats-panel-container');
+            if (!panel) return;
+
+            if (this.showStats) {
+                // Hide panel
+                this.gsap.to(panel, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.4,
+                    ease: 'power2.inOut',
+                    pointerEvents: 'none'
+                });
+            } else {
+                // Show panel
+                this.gsap.to(panel, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.4,
+                    ease: 'power2.inOut',
+                    pointerEvents: 'auto'
+                });
+            }
+            this.showStats = !this.showStats;
         }
     }"
     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 w-full"
 >
     <!-- Total Callers Card -->
-    <div class="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
+    <div class="stat-card stat-card-0 group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
         <!-- Gradient accent bar -->
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
 
@@ -69,7 +171,7 @@
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                     <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">إجمالي المتصلين</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent" x-text="totalCallers.toLocaleString()"></p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent" data-value>0</p>
                 </div>
                 <div class="p-4 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-800/20 group-hover:scale-110 transition-transform duration-300">
                     <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +184,7 @@
     </div>
 
     <!-- Winners Card -->
-    <div class="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
+    <div class="stat-card stat-card-1 group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
         <!-- Gradient accent bar -->
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-emerald-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
 
@@ -93,7 +195,7 @@
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                     <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">الفائزون</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent" x-text="totalWinners.toLocaleString()"></p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent" data-value>0</p>
                 </div>
                 <div class="p-4 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-800/20 group-hover:scale-110 transition-transform duration-300">
                     <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +208,7 @@
     </div>
 
     <!-- Today's Callers Card -->
-    <div class="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
+    <div class="stat-card stat-card-2 group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
         <!-- Gradient accent bar -->
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-400 via-sky-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
 
@@ -117,7 +219,7 @@
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                     <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">متصلو اليوم</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-sky-600 to-sky-500 bg-clip-text text-transparent" x-text="todayCallers.toLocaleString()"></p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-sky-600 to-sky-500 bg-clip-text text-transparent" data-value>0</p>
                 </div>
                 <div class="p-4 rounded-xl bg-gradient-to-br from-sky-100 to-sky-50 dark:from-sky-900/30 dark:to-sky-800/20 group-hover:scale-110 transition-transform duration-300">
                     <svg class="w-6 h-6 text-sky-600 dark:text-sky-400" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +232,7 @@
     </div>
 
     <!-- Total Hits Card -->
-    <div class="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
+    <div class="stat-card stat-card-3 group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
         <!-- Gradient accent bar -->
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-purple-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
 
@@ -141,7 +243,7 @@
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                     <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">إجمالي المشاركات</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-purple-600 to-purple-500 bg-clip-text text-transparent" x-text="totalHits.toLocaleString()"></p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-purple-600 to-purple-500 bg-clip-text text-transparent" data-value>0</p>
                 </div>
                 <div class="p-4 rounded-xl bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20 group-hover:scale-110 transition-transform duration-300">
                     <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +256,7 @@
     </div>
 
     <!-- Active Callers Card -->
-    <div class="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
+    <div class="stat-card stat-card-4 group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
         <!-- Gradient accent bar -->
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 via-green-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
 
@@ -165,7 +267,7 @@
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                     <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">المتصلون النشطون</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent" x-text="activeCallers.toLocaleString()"></p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent" data-value>0</p>
                 </div>
                 <div class="p-4 rounded-xl bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/20 group-hover:scale-110 transition-transform duration-300">
                     <svg class="w-6 h-6 text-green-600 dark:text-green-400" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +280,7 @@
     </div>
 
     <!-- Unique CPRs Card -->
-    <div class="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
+    <div class="stat-card stat-card-5 group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg hover:shadow-2xl transition-all duration-300 ease-out transform hover:-translate-y-2 overflow-hidden">
         <!-- Gradient accent bar -->
         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
 
@@ -189,7 +291,7 @@
             <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                     <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">أرقام فريدة (CPR)</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-rose-600 to-rose-500 bg-clip-text text-transparent" x-text="uniqueCprs.toLocaleString()"></p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white mt-3 bg-gradient-to-r from-rose-600 to-rose-500 bg-clip-text text-transparent" data-value>0</p>
                 </div>
                 <div class="p-4 rounded-xl bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-900/30 dark:to-rose-800/20 group-hover:scale-110 transition-transform duration-300">
                     <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,3 +303,7 @@
         </div>
     </div>
 </div>
+    </div>
+    <!-- End of Statistics Panel Container -->
+</div>
+<!-- End of Statistics Panel Wrapper -->
