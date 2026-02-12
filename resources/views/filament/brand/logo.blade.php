@@ -1,11 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40" width="100" height="40">
-    <defs>
-        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
-        </linearGradient>
-    </defs>
-    <text x="50%" y="25" text-anchor="middle" fill="url(#logoGradient)" font-family="Tajawal, sans-serif" font-size="20" font-weight="bold">
+<div class="flex items-center gap-3">
+    <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" 
+         alt="السارية" 
+         class="h-10 w-auto object-contain"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+    />
+    <span style="display:none;" class="text-xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
         السارية
-    </text>
-</svg>
+    </span>
+</div>

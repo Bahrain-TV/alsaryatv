@@ -78,7 +78,7 @@
     <div class="main-container">
         <!-- Logo -->
         <div class="logo-section">
-            {{-- <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" /> --}}
+            <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="السارية" class="main-logo" />
         </div>
 
         <!-- Downtime Card -->

@@ -1,5 +1,5 @@
 <div class="email-logo" style="text-align: center; margin-bottom: 20px;">
-    <img src="{{ asset('images/alsarya-logo-2024-tiny.png') }}" 
+    <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" 
          alt="AlSaryaTV Logo"
          style="max-width: 200px; height: auto;"
     />

@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->brandName('تلفزيون البحرين - السارية')
             ->brandLogo(fn () => view('filament.brand.logo'))
-            ->favicon('/images/favicon.ico')
+            ->favicon('/favicon/favicon.ico')
             ->colors([
                 'primary' => Color::Amber,
                 'success' => Color::Emerald,

@@ -1,24 +1,28 @@
 <x-filament-panels::page.simple>
     <x-slot name="card">
-        <div class="w-full flex justify-center mb-4">
-            @if (filled($logo = filament()->getLogoUrl()))
-                <img src="{{ $logo }}" alt="{{ config('app.name') }}" class="h-16">
-            @else
-                <div class="bg-primary-500 h-16 w-16 rounded-full flex items-center justify-center">
-                    <span class="text-white text-2xl font-bold">
-                        {{ strtoupper(substr(config('app.name'), 0, 1)) }}
-                    </span>
-                </div>
-            @endif
+        <div class="w-full flex flex-col items-center mb-6">
+            <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" 
+                 alt="السارية" 
+                 class="h-20 w-auto object-contain mb-2"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+            />
+            <div style="display:none;" class="text-center">
+                <span class="text-3xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+                    السارية
+                </span>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">تلفزيون البحرين</p>
         </div>
 
-        <h2 class="text-center text-2xl font-bold tracking-tight text-gray-950">
+        <h2 class="text-center text-2xl font-bold tracking-tight text-gray-950 dark:text-white">
             {{ $this->getHeading() }}
         </h2>
 
-        <p class="mt-2 text-center text-sm text-gray-500">
-            {{ $this->getSubheading() }}
-        </p>
+        @if ($this->getSubheading())
+            <p class="mt-2 text-center text-sm text-gray-500 dark:text-gray-400">
+                {{ $this->getSubheading() }}
+            </p>
+        @endif
 
         {{ $this->form }}
 
