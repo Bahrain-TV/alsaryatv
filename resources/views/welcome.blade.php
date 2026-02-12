@@ -318,7 +318,7 @@
                     return;
                 }
 
-                // Create GSAP timeline for the spinning animation
+                // Create GSAP timeline for the spinning animation with slower transition and overlap
                 const tl = gsap.timeline({
                     onComplete: function() {
                         isAnimating = false;
@@ -327,41 +327,41 @@
                     }
                 });
 
-                // Animate form container flip based on mode
+                // Animate form container flip based on mode - slowed down with 0.3s overlap
                 if (isFamily) {
-                    // Family mode animation
+                    // Family mode animation - 0.6s each half with 0.3s overlap
                     tl.to(registrationForm, {
-                        duration: 0.4,
+                        duration: 0.6,
                         rotationY: 90,
                         x: 100,
                         opacity: 0.5,
                         ease: "power2.inOut"
                     }, 0)
-                    .call(() => setFamilyMode(), null, 0.2)
+                    .call(() => setFamilyMode(), null, 0.3)
                     .to(registrationForm, {
-                        duration: 0.4,
+                        duration: 0.6,
                         rotationY: 0,
                         x: 0,
                         opacity: 1,
                         ease: "power2.inOut"
-                    }, 0.2);
+                    }, 0.3);
                 } else {
-                    // Individual mode animation
+                    // Individual mode animation - 0.6s each half with 0.3s overlap
                     tl.to(registrationForm, {
-                        duration: 0.4,
+                        duration: 0.6,
                         rotationY: -90,
                         x: -100,
                         opacity: 0.5,
                         ease: "power2.inOut"
                     }, 0)
-                    .call(() => setIndividualMode(), null, 0.2)
+                    .call(() => setIndividualMode(), null, 0.3)
                     .to(registrationForm, {
-                        duration: 0.4,
+                        duration: 0.6,
                         rotationY: 0,
                         x: 0,
                         opacity: 1,
                         ease: "power2.inOut"
-                    }, 0.2);
+                    }, 0.3);
                 }
             }
 

@@ -7,10 +7,9 @@ use App\Models\Caller;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -49,11 +48,11 @@ class CallerResource extends Resource
         ];
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
-                Section::make('بيانات المتصل')
+                Forms\Components\Section::make('بيانات المتصل')
                     ->description('المعلومات الأساسية للمتصل')
                     ->schema([
                         Forms\Components\TextInput::make('name')
@@ -80,7 +79,7 @@ class CallerResource extends Resource
                             ->disabled(),
                     ])->columns(2),
 
-                Section::make('الحالة')
+                Forms\Components\Section::make('الحالة')
                     ->schema([
                         Forms\Components\Toggle::make('is_winner')
                             ->label('فائز')

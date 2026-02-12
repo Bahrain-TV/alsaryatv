@@ -31,8 +31,25 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            background-repeat: no-repeat;
             font-family: 'Tajawal', sans-serif;
             overflow: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("{{ asset('images/seef-district-from-sea.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            z-index: -1;
         }
 
         .success-container {
@@ -447,7 +464,7 @@
                 <!-- Lottie animation -->
                 <div class="lottie-wrapper">
                     <lottie-player src="{{ asset('lottie/crecent-moon-ramadan.json') }}" background="transparent"
-                        speed="1.2" style="width: 180px; height: 180px;" loop autoplay>
+                        speed="0.5" style="width: 180px; height: 180px;" count="1" autoplay>
                     </lottie-player>
                 </div>
 

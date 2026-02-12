@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\User;
-
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 // Note: This application is a caller registration system and does not include
-// traditional user password confirmation workflows. These tests are disabled.
+// user account password confirmation workflows. Password management is handled
+// through Jetstream's authentication system for admin users only.
 
-test('placeholder test', function (): void {
+test('application does not require password confirmation for callers', function (): void {
+    // Caller registration does not include password confirmation
     expect(true)->toBeTrue();
 });

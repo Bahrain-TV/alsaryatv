@@ -5,151 +5,76 @@
     $todayRegistrations = \App\Models\Caller::whereDate('created_at', today())->count();
 @endphp
 
-<div style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border-radius: 20px; padding: 3rem; margin-bottom: 3rem; border: 2px solid rgba(251, 191, 36, 0.2);">
+<div class="bg-gradient-to-br from-amber-500/10 via-emerald-500/10 to-amber-500/10 dark:from-amber-500/5 dark:via-emerald-500/5 dark:to-amber-500/5 rounded-3xl p-8 md:p-12 mb-8 border-2 border-amber-500/20 dark:border-amber-500/30">
     <!-- Hero Section -->
-    <div style="text-align: center; margin-bottom: 2rem;">
-        <h1 style="font-size: 3rem; color: #fbbf24; margin-bottom: 1rem; font-weight: 900; text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl text-amber-500 dark:text-amber-400 mb-4 font-black drop-shadow-lg">
             🎯 لوحة التحكم - برنامج السارية
         </h1>
-        <p style="font-size: 1.25rem; color: #34d399; margin-bottom: 2rem;">
+        <p class="text-xl md:text-2xl text-emerald-500 dark:text-emerald-400 mb-8 font-semibold">
             إدارة المتصلين والفائزين بسهولة وأمان
         </p>
 
         <!-- Quick Stats -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-            <div style="background: rgba(15, 23, 42, 0.6); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 15px; padding: 1.5rem;">
-                <div style="font-size: 2.5rem; color: #fbbf24; font-weight: 900;">{{ $totalCallers }}</div>
-                <div style="color: #94a3b8; font-size: 0.9rem; margin-top: 0.5rem;">إجمالي المتصلين</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-slate-900/60 dark:bg-slate-800/80 border-2 border-amber-500/30 dark:border-amber-500/40 rounded-2xl p-6 backdrop-blur-sm">
+                <div class="text-4xl text-amber-500 dark:text-amber-400 font-black">{{ $totalCallers }}</div>
+                <div class="text-slate-400 dark:text-slate-300 text-sm mt-2">إجمالي المتصلين</div>
             </div>
-            <div style="background: rgba(15, 23, 42, 0.6); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 15px; padding: 1.5rem;">
-                <div style="font-size: 2.5rem; color: #34d399; font-weight: 900;">{{ $eligibleCallers }}</div>
-                <div style="color: #94a3b8; font-size: 0.9rem; margin-top: 0.5rem;">مؤهلين للفوز</div>
+            <div class="bg-slate-900/60 dark:bg-slate-800/80 border-2 border-emerald-500/30 dark:border-emerald-500/40 rounded-2xl p-6 backdrop-blur-sm">
+                <div class="text-4xl text-emerald-400 dark:text-emerald-300 font-black">{{ $eligibleCallers }}</div>
+                <div class="text-slate-400 dark:text-slate-300 text-sm mt-2">مؤهلين للفوز</div>
             </div>
-            <div style="background: rgba(15, 23, 42, 0.6); border: 2px solid rgba(34, 197, 94, 0.3); border-radius: 15px; padding: 1.5rem;">
-                <div style="font-size: 2.5rem; color: #22c55e; font-weight: 900;">{{ $totalWinners }}</div>
-                <div style="color: #94a3b8; font-size: 0.9rem; margin-top: 0.5rem;">الفائزون</div>
+            <div class="bg-slate-900/60 dark:bg-slate-800/80 border-2 border-green-500/30 dark:border-green-500/40 rounded-2xl p-6 backdrop-blur-sm">
+                <div class="text-4xl text-green-400 dark:text-green-300 font-black">{{ $totalWinners }}</div>
+                <div class="text-slate-400 dark:text-slate-300 text-sm mt-2">الفائزون</div>
             </div>
-            <div style="background: rgba(15, 23, 42, 0.6); border: 2px solid rgba(147, 51, 234, 0.3); border-radius: 15px; padding: 1.5rem;">
-                <div style="font-size: 2.5rem; color: #a855f7; font-weight: 900;">{{ $todayRegistrations }}</div>
-                <div style="color: #94a3b8; font-size: 0.9rem; margin-top: 0.5rem;">تسجيلات اليوم</div>
+            <div class="bg-slate-900/60 dark:bg-slate-800/80 border-2 border-purple-500/30 dark:border-purple-500/40 rounded-2xl p-6 backdrop-blur-sm">
+                <div class="text-4xl text-purple-400 dark:text-purple-300 font-black">{{ $todayRegistrations }}</div>
+                <div class="text-slate-400 dark:text-slate-300 text-sm mt-2">تسجيلات اليوم</div>
             </div>
         </div>
 
         <!-- HUGE RED WINNER SELECTION BUTTON -->
         @if ($eligibleCallers > 0)
             <button id="select-winner-btn"
-                    style="
-                        width: 100%;
-                        max-width: 600px;
-                        padding: 2rem;
-                        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-                        color: white;
-                        font-size: 2rem;
-                        font-weight: 900;
-                        border: 4px solid #991b1b;
-                        border-radius: 25px;
-                        cursor: pointer;
-                        box-shadow: 0 10px 40px rgba(220, 38, 38, 0.5), inset 0 -4px 0 rgba(0,0,0,0.3);
-                        transition: all 0.3s ease;
-                        transform: scale(1);
-                        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-                    "
-                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 15px 50px rgba(220, 38, 38, 0.7), inset 0 -4px 0 rgba(0,0,0,0.3)'"
-                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 40px rgba(220, 38, 38, 0.5), inset 0 -4px 0 rgba(0,0,0,0.3)'"
-                    onmousedown="this.style.transform='scale(0.98)'"
-                    onmouseup="this.style.transform='scale(1.05)'">
+                    class="w-full max-w-2xl mx-auto py-8 px-6 bg-gradient-to-br from-red-600 to-red-800 dark:from-red-500 dark:to-red-700 text-white text-3xl md:text-4xl font-black border-4 border-red-900 dark:border-red-600 rounded-3xl cursor-pointer shadow-2xl hover:shadow-red-500/50 dark:hover:shadow-red-400/50 transition-all duration-300 transform hover:scale-105 active:scale-98 drop-shadow-2xl">
                 🎡 اختر الفائز الآن!
             </button>
-            <p style="color: #fbbf24; margin-top: 1rem; font-size: 0.9rem;">
+            <p class="text-amber-500 dark:text-amber-400 mt-4 text-base md:text-lg text-center font-semibold">
                 ⚠️ يرجى الضغط بحذر - سيتم حظر الفائز فوراً من الظهور مرة أخرى
             </p>
         @else
-            <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 15px; padding: 2rem; color: #fca5a5;">
-                <p style="font-size: 1.25rem; margin: 0;">❌ لا يوجد متصلون مؤهلون للفوز حالياً</p>
+            <div class="bg-red-500/10 dark:bg-red-500/20 border-2 border-red-500/30 dark:border-red-500/40 rounded-2xl p-8 backdrop-blur-sm">
+                <p class="text-red-400 dark:text-red-300 text-xl md:text-2xl font-bold text-center">❌ لا يوجد متصلون مؤهلون للفوز حالياً</p>
             </div>
         @endif
     </div>
 </div>
 
 <!-- Winner Selection Modal (Hidden by default) -->
-<div id="winner-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-    <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 3px solid #fbbf24; border-radius: 30px; padding: 3rem; max-width: 600px; width: 90%; text-align: center; box-shadow: 0 25px 100px rgba(0,0,0,0.5);">
-        <h2 style="color: #fbbf24; font-size: 2rem; margin-bottom: 2rem; font-weight: 900;">🎯 الفائز الأسبوع هذا</h2>
+<div id="winner-modal" class="hidden fixed inset-0 bg-black/90 dark:bg-black/95 z-50 flex items-center justify-center p-4">
+    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 border-4 border-amber-500 dark:border-amber-400 rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center shadow-2xl">
+        <h2 class="text-amber-500 dark:text-amber-400 text-3xl md:text-4xl mb-8 font-black">🎯 الفائز الأسبوع هذا</h2>
 
         <!-- Spinning Names Animation Container -->
-        <div id="names-spin-container" style="
-            background: rgba(0,0,0,0.3);
-            border: 2px dashed rgba(251, 191, 36, 0.5);
-            border-radius: 20px;
-            padding: 3rem 2rem;
-            margin-bottom: 2rem;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        ">
-            <div id="spinning-text" style="
-                font-size: 3rem;
-                color: #34d399;
-                font-weight: 900;
-                text-align: center;
-                white-space: nowrap;
-                animation: spin 0.1s linear infinite;
-            ">
+        <div id="names-spin-container" class="bg-black/30 dark:bg-black/50 border-2 border-dashed border-amber-500/50 dark:border-amber-400/50 rounded-2xl p-12 mb-8 min-h-[200px] flex items-center justify-center relative overflow-hidden">
+            <div id="spinning-text" class="text-4xl md:text-5xl text-emerald-400 dark:text-emerald-300 font-black text-center whitespace-nowrap animate-spin-slow">
                 جاري الاختيار...
             </div>
         </div>
 
-        <div id="winner-result" style="display: none;">
-            <div id="winner-name" style="
-                font-size: 2.5rem;
-                color: #22c55e;
-                font-weight: 900;
-                margin-bottom: 1rem;
-                text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-            "></div>
-            <button id="confirm-winner-btn" style="
-                width: 100%;
-                padding: 1rem;
-                background: linear-gradient(135deg, #22c55e, #16a34a);
-                color: white;
-                font-size: 1.25rem;
-                font-weight: 700;
-                border: none;
-                border-radius: 15px;
-                cursor: pointer;
-                margin-bottom: 1rem;
-            ">
+        <div id="winner-result" class="hidden">
+            <div id="winner-name" class="text-4xl md:text-5xl text-green-400 dark:text-green-300 font-black mb-6 drop-shadow-lg"></div>
+            <button id="confirm-winner-btn" class="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 dark:from-green-400 dark:to-green-500 text-white text-xl font-bold border-none rounded-2xl cursor-pointer mb-4 hover:shadow-xl transition-all transform hover:scale-105 active:scale-95">
                 ✅ تأكيد الفائز
             </button>
-            <button id="close-modal-btn" style="
-                width: 100%;
-                padding: 1rem;
-                background: transparent;
-                color: #fbbf24;
-                font-size: 1rem;
-                font-weight: 700;
-                border: 2px solid #fbbf24;
-                border-radius: 15px;
-                cursor: pointer;
-            ">
+            <button id="close-modal-btn" class="w-full py-4 bg-transparent text-amber-500 dark:text-amber-400 text-lg font-bold border-2 border-amber-500 dark:border-amber-400 rounded-2xl cursor-pointer hover:bg-amber-500/10 dark:hover:bg-amber-400/10 transition-all">
                 ❌ إلغاء
             </button>
         </div>
 
-        <button id="start-spin-btn" style="
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0f172a;
-            font-size: 1.25rem;
-            font-weight: 700;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-        ">
+        <button id="start-spin-btn" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-400 dark:to-amber-500 text-slate-900 dark:text-slate-950 text-xl font-bold border-none rounded-2xl cursor-pointer hover:shadow-xl transition-all transform hover:scale-105 active:scale-95">
             🎡 ابدأ الدوران
         </button>
     </div>
@@ -185,6 +110,19 @@
     @keyframes spin {
         0% { transform: rotateY(0deg) rotateZ(0deg); }
         100% { transform: rotateY(360deg) rotateZ(360deg); }
+    }
+    
+    .animate-spin-slow {
+        animation: spin 0.1s linear infinite;
+    }
+    
+    /* Ensure modal visibility states */
+    #winner-modal.hidden {
+        display: none !important;
+    }
+    
+    #winner-modal:not(.hidden) {
+        display: flex !important;
     }
 </style>
 
@@ -224,14 +162,14 @@
             alert('عدد المتصلين غير كافٍ (نحتاج 20 على الأقل)');
             return;
         }
-        winnerModal.style.display = 'flex';
-        winnerResult.style.display = 'none';
-        startSpinBtn.style.display = 'block';
+        winnerModal.classList.remove('hidden');
+        winnerResult.classList.add('hidden');
+        startSpinBtn.classList.remove('hidden');
     });
 
     // Close modal
     closeModalBtn?.addEventListener('click', () => {
-        winnerModal.style.display = 'none';
+        winnerModal.classList.add('hidden');
         isSpinning = false;
     });
 
@@ -256,9 +194,9 @@
             clearInterval(spinInterval);
             selectedWinner = shuffled[Math.floor(Math.random() * 20)];
             winnerNameDisplay.textContent = selectedWinner.name;
-            spinningText.style.display = 'none';
-            winnerResult.style.display = 'block';
-            startSpinBtn.style.display = 'none';
+            spinningText.classList.add('hidden');
+            winnerResult.classList.remove('hidden');
+            startSpinBtn.classList.add('hidden');
             isSpinning = false;
 
             // Show confetti
@@ -282,7 +220,7 @@
 
             if (response.ok) {
                 alert('تم تحديد الفائز بنجاح وحظره من الظهور مرة أخرى!');
-                winnerModal.style.display = 'none';
+                winnerModal.classList.add('hidden');
                 location.reload();
             } else {
                 alert('حدث خطأ في حفظ البيانات');
