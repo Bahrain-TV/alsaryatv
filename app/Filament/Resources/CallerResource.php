@@ -404,7 +404,7 @@ class CallerResource extends Resource
                                 ->body('تم إزالة حالة الفوز من '.$records->count().' متصل')
                                 ->send();
                         })
-                        ->requiresConfirmation()˝
+                        ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
                 ])
                     ->icon('heroicon-o-ellipsis-horizontal')
