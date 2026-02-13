@@ -87,7 +87,7 @@ class AdminPanelNavigationTest extends DuskTestCase
             echo "✓ Dashboard is visible\n";
 
             // Navigate through each menu item and validate
-            foreach ($menuItems[0] as $index => $item) {
+            foreach ($menuItems[0] as $item) {
                 if (empty($item['href'])) {
                     continue;
                 }

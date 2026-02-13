@@ -26,8 +26,13 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $arabicNames = [
+            'سلمان الخليفة', 'أحمد الجودر', 'محمد الذوادي', 'ليلى المناعي', 'فاطمة بوجيري',
+            'علي الدوسري', 'نورة السبيعي', 'خالد المطيري', 'عبدالله الشمري', 'ريم الحربي',
+        ];
+
         return [
-            'name' => fake()->name(),
+            'name' => $this->faker->randomElement($arabicNames),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -36,7 +41,20 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'profile_photo_path' => null,
             'current_team_id' => null,
+            'is_admin' => false,
+            'role' => 'user',
         ];
+    }
+
+    /**
+     * Indicate that the user is an admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_admin' => true,
+            'role' => 'manager',
+        ]);
     }
 
     /**

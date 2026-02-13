@@ -1,0 +1,480 @@
+
+   PASS  Tests\Feature\Admin\AdminPanelTest
+  ✓ authenticated admin can access dashboard                             3.77s  
+  ✓ dashboard page title displayed                                       0.20s  
+  ✓ dashboard renders html                                               0.23s  
+  ✓ admin can create caller                                              0.25s  
+  ✓ admin dashboard loads without errors                                 0.25s  
+  ✓ sidebar navigation present                                           0.17s  
+  ✓ multiple admins can access dashboard                                 0.28s  
+  ✓ dashboard responds quickly                                           0.19s  
+
+   PASS  Tests\Feature\Admin\DashboardWidgetsTest
+  ✓ animated stats widget mounts                                         0.12s  
+  ✓ animated stats widget calculates totals                              0.15s  
+  ✓ quick actions widget returns actions                                 0.11s  
+  ✓ recent activity widget instantiates                                  0.28s  
+  ✓ winners history widget instantiates                                  0.87s  
+  ✓ dashboard page loads                                                 0.23s  
+  ✓ animated stats caches data                                           0.09s  
+  ✓ animated stats with zero callers                                     0.08s  
+  ✓ quick actions contain valid urls                                     0.13s  
+  ✓ dashboard contains valid html                                        0.20s  
+
+   PASS  Tests\Feature\AdminPanelTest
+  ✓ admin can access filament panel                                      0.18s  
+  ✓ guest cannot access admin panel                                      0.11s  
+
+   PASS  Tests\Feature\Auth\AuthenticationTest
+  ✓ login screen can be rendered                                         0.11s  
+  ✓ users can authenticate using the login screen                        1.43s  
+  ✓ users can not authenticate with invalid password                     0.35s  
+
+   PASS  Tests\Feature\Auth\EmailVerificationTest
+  ✓ application does not require email verification for callers          0.10s  
+
+   PASS  Tests\Feature\Auth\PasswordConfirmationTest
+  ✓ application does not require password confirmation for callers       9.09s  
+
+   PASS  Tests\Feature\Auth\PasswordResetTest
+  ✓ reset password link screen can be rendered                           2.43s  
+  ✓ reset password link can be requested                                 2.74s  
+  ✓ reset password screen can be rendered                                0.66s  
+  ✓ password can be reset with valid token                               5.67s  
+
+   PASS  Tests\Feature\Auth\RegistrationTest
+  ✓ splash screen can be rendered                                        0.19s  
+  ✓ home registration page can be rendered                               0.33s  
+  ✓ family registration page can be rendered                             0.26s  
+
+   FAIL  Tests\Feature\CallerModelTest
+  ⨯ winners scope returns only winners                                   0.31s  
+  ⨯ eligible scope excludes winners                                      0.47s  
+  ⨯ eligible scope excludes callers without cpr                          0.22s  
+  ⨯ get eligible callers static method                                   0.82s  
+  ✓ select random winner by cpr                                          0.33s  
+  ⨯ select random winner returns null when all are winners               0.13s  
+  ✓ increment hits increases hit count                                   0.23s  
+  ✓ increment hits updates last hit timestamp                            0.11s  
+  ✓ increment hits is atomic                                             0.18s  
+  ✓ caller fillable attributes                                           0.14s  
+  ✓ caller casts are applied                                             0.26s  
+  ✓ caller relationships                                                 0.52s  
+  ✓ eligible callers with various statuses                               0.10s  
+  ✓ callers can be marked as family                                      0.08s  
+  ✓ callers can be marked as individual                                  0.10s  
+  ✓ caller tracks registration time                                      0.11s  
+
+   PASS  Tests\Feature\CallerRegistrationTest
+  ✓ individual registration form can be submitted                        0.97s  
+  ✓ family registration form can be submitted                            0.17s  
+  ✓ existing caller can register again and increment hits                1.01s  
+  ✓ registration stores ip address                                       0.21s  
+  ✓ registration with invalid data fails validation                      0.37s  
+  ✓ registration type validation works                                   0.44s  
+  ✓ family registration requires family members count between 2 and 10   1.47s  
+  ✓ seeded callers are available in database                             0.27s  
+  ✓ seeded winners are properly marked                                   0.77s  
+
+   PASS  Tests\Feature\CprHashingServiceTest
+  ✓ hash cpr creates hash                                                1.70s  
+  ✓ verify cpr succeeds with correct cpr                                 2.11s  
+  ✓ verify cpr fails with incorrect cpr                                  3.67s  
+  ✓ mask cpr hides most digits                                           0.10s  
+  ✓ mask cpr preserves length                                            0.07s  
+  ✓ different hashes for same cpr                                        4.37s  
+  ✓ mask handles short cpr                                               0.11s  
+  ✓ hash is consistent for verification                                  7.28s  
+
+   PASS  Tests\Feature\FilamentDashboardFeatureTest
+  ✓ admin can access dashboard                                           4.67s  
+  ✓ dashboard contains quick actions widget                              3.63s  
+  ✓ dashboard contains stats overview                                    6.91s  
+  ✓ dashboard authenticated access only                                  4.74s  
+  ✓ dashboard has no missing widgets                                    10.13s  
+  ✓ dashboard loads with empty callers                                   2.54s  
+  ✓ dashboard widgets polling intervals are valid                        3.21s  
+  ✓ recent activity widget shows latest callers                          5.76s  
+  ✓ winners history widget shows only winners                            4.14s  
+  ✓ dashboard charts render without error                                2.60s  
+
+   FAIL  Tests\Feature\FormValidationTest
+  ⨯ store caller request validates required name                         0.34s  
+  ⨯ store caller request validates required cpr                          0.55s  
+  ⨯ store caller request validates required phone number                 0.08s  
+  ⨯ store caller request validates registration type                     0.10s  
+  ⨯ store caller request validates family members minimum                0.12s  
+  ⨯ store caller request validates family members maximum                0.13s  
+  ⨯ store caller request allows valid family registration                0.18s  
+  ⨯ store caller request allows valid individual registration            0.20s  
+  ⨯ store caller request validates name max length                       0.65s  
+  ⨯ store caller request validates cpr max length                        0.30s  
+  ⨯ store caller request validates phone max length                      0.11s  
+  ⨯ update caller request validates required fields                      0.09s  
+  ⨯ update caller request validates unique cpr                           0.13s  
+  ⨯ update caller request allows same cpr for same caller                0.09s  
+  ⨯ bilingual validation messages are available                          0.08s  
+
+   PASS  Tests\Feature\Settings\PasswordUpdateTest
+  ✓ application does not require password updates for callers            0.10s  
+
+   PASS  Tests\Feature\Settings\ProfileUpdateTest
+  ✓ application does not require profile updates for callers             0.08s  
+
+   PASS  Tests\Feature\VersionManagerTest
+  ✓ get version returns current version                                  0.07s  
+  ✓ get version info returns array                                       0.07s  
+  ✓ version is consistent                                                0.08s  
+  ✓ version has semantic versioning                                      0.06s  
+  ✓ version info contains name                                           0.07s  
+  ✓ version info contains timestamp                                      0.05s  
+  ✓ increment patch version                                              0.12s  
+  ✓ increment minor version                                              0.25s  
+  ✓ increment major version                                              0.22s  
+  ✓ version file exists                                                  0.18s  
+  ✓ version file contains valid json                                     0.45s  
+
+   PASS  Tests\Feature\VersionSyncCommandTest
+  ✓ version sync command exists                                          0.17s  
+  ✓ version sync fails without version file                              0.22s  
+  ✓ version sync fails without version json file                         0.48s  
+  ✓ version sync updates version json from version file                  0.18s  
+  ✓ version sync dry run does not modify files                           0.09s  
+  ✓ version sync detects when already synchronized                       0.11s  
+  ✓ version sync handles version without build number                    0.12s  
+  ✓ version sync fails with invalid version format                       0.20s  
+  ✓ version sync can update env files                                    0.25s  
+  ✓ version sync from version json to version file                       0.82s  
+  ✓ version sync preserves changelog entries                             0.11s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > winners scope returns only winner…   
+  Failed asserting that 6 matches expected 3.
+
+  at tests/Feature/CallerModelTest.php:27
+     23▕     public function test_winners_scope_returns_only_winners(): void
+     24▕     {
+     25▕         $winners = Caller::winners()->get();
+     26▕ 
+  ➜  27▕         $this->assertEquals(3, $winners->count());
+     28▕         $winners->each(fn ($winner) => $this->assertTrue($winner->is_winner));
+     29▕     }
+     30▕ 
+     31▕     public function test_eligible_scope_excludes_winners(): void
+
+  1   tests/Feature/CallerModelTest.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > eligible scope excludes winners      
+  Failed asserting that 1266 matches expected 5.
+
+  at tests/Feature/CallerModelTest.php:35
+     31▕     public function test_eligible_scope_excludes_winners(): void
+     32▕     {
+     33▕         $eligible = Caller::eligible()->get();
+     34▕ 
+  ➜  35▕         $this->assertEquals(5, $eligible->count());
+     36▕         $eligible->each(fn ($caller) => $this->assertFalse($caller->is_winner));
+     37▕     }
+     38▕ 
+     39▕     public function test_eligible_scope_excludes_callers_without_cpr(): void
+
+  1   tests/Feature/CallerModelTest.php:35
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > eligible scope ex…  QueryException   
+  SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: callers.cpr (Connection: sqlite, Database: database/alsaryatv.sqlite, SQL: insert into "callers" ("name", "phone", "cpr", "is_family", "is_winner", "ip_address", "hits", "last_hit", "status", "notes", "created_at", "updated_at") values (سارة حصة الخليفة, 32699225, ?, 1, 0, 211.62.253.141, 29, 2026-01-29 09:58:42, inactive, ?, 2026-02-03 04:44:30, 2026-02-13 12:08:44))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:584
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+    583▕ 
+  ➜ 584▕             return $statement->execute();
+    585▕         });
+    586▕     }
+    587▕ 
+    588▕     /**
+
+      [2m+16 vendor frames [22m
+  17  tests/Feature/CallerModelTest.php:41
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > get eligible callers static metho…   
+  Failed asserting that 1266 matches expected 5.
+
+  at tests/Feature/CallerModelTest.php:53
+     49▕     public function test_get_eligible_callers_static_method(): void
+     50▕     {
+     51▕         $eligible = Caller::getEligibleCallers()->get();
+     52▕ 
+  ➜  53▕         $this->assertEquals(5, $eligible->count());
+     54▕     }
+     55▕ 
+     56▕     public function test_select_random_winner_by_cpr(): void
+     57▕     {
+
+  1   tests/Feature/CallerModelTest.php:53
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > select random winner retur…  Error   
+  Non-static method Illuminate\Database\Eloquent\Model::update() cannot be called statically
+
+  at tests/Feature/CallerModelTest.php:69
+     65▕     }
+     66▕ 
+     67▕     public function test_select_random_winner_returns_null_when_all_are_winners(): void
+     68▕     {
+  ➜  69▕         Caller::update(['is_winner' => true]);
+     70▕ 
+     71▕         $winner = Caller::selectRandomWinnerByCpr();
+     72▕ 
+     73▕         $this->assertNull($winner);
+
+  1   tests/Feature/CallerModelTest.php:69
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:22
+     18▕             'phone_number' => '+97312345678',
+     19▕             'registration_type' => 'individual',
+     20▕         ]);
+     21▕ 
+  ➜  22▕         $response->assertSessionHasErrors('name');
+     23▕     }
+     24▕ 
+     25▕     public function test_store_caller_request_validates_required_cpr(): void
+     26▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:34
+     30▕             'phone_number' => '+97312345678',
+     31▕             'registration_type' => 'individual',
+     32▕         ]);
+     33▕ 
+  ➜  34▕         $response->assertSessionHasErrors('cpr');
+     35▕     }
+     36▕ 
+     37▕     public function test_store_caller_request_validates_required_phone_number(): void
+     38▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:46
+     42▕             'phone_number' => '',
+     43▕             'registration_type' => 'individual',
+     44▕         ]);
+     45▕ 
+  ➜  46▕         $response->assertSessionHasErrors('phone_number');
+     47▕     }
+     48▕ 
+     49▕     public function test_store_caller_request_validates_registration_type(): void
+     50▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:58
+     54▕             'phone_number' => '+97312345678',
+     55▕             'registration_type' => 'invalid',
+     56▕         ]);
+     57▕ 
+  ➜  58▕         $response->assertSessionHasErrors('registration_type');
+     59▕     }
+     60▕ 
+     61▕     public function test_store_caller_request_validates_family_members_minimum(): void
+     62▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:71
+     67▕             'registration_type' => 'family',
+     68▕             'family_members' => 1, // Too low, minimum is 2
+     69▕         ]);
+     70▕ 
+  ➜  71▕         $response->assertSessionHasErrors('family_members');
+     72▕     }
+     73▕ 
+     74▕     public function test_store_caller_request_validates_family_members_maximum(): void
+     75▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:84
+     80▕             'registration_type' => 'family',
+     81▕             'family_members' => 11, // Too high, maximum is 10
+     82▕         ]);
+     83▕ 
+  ➜  84▕         $response->assertSessionHasErrors('family_members');
+     85▕     }
+     86▕ 
+     87▕     public function test_store_caller_request_allows_valid_family_registration(): void
+     88▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request allows va…   
+  Expected response status code [201, 301, 302, 303, 307, 308] but received 419.
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:97
+     93▕             'registration_type' => 'family',
+     94▕             'family_members' => 5,
+     95▕         ]);
+     96▕ 
+  ➜  97▕         $response->assertRedirect(route('callers.success'));
+     98▕     }
+     99▕ 
+    100▕     public function test_store_caller_request_allows_valid_individual_registration(): void
+    101▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request allows va…   
+  Expected response status code [201, 301, 302, 303, 307, 308] but received 419.
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:109
+    105▕             'phone_number' => '+97312345678',
+    106▕             'registration_type' => 'individual',
+    107▕         ]);
+    108▕ 
+  ➜ 109▕         $response->assertRedirect(route('callers.success'));
+    110▕     }
+    111▕ 
+    112▕     public function test_store_caller_request_validates_name_max_length(): void
+    113▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:121
+    117▕             'phone_number' => '+97312345678',
+    118▕             'registration_type' => 'individual',
+    119▕         ]);
+    120▕ 
+  ➜ 121▕         $response->assertSessionHasErrors('name');
+    122▕     }
+    123▕ 
+    124▕     public function test_store_caller_request_validates_cpr_max_length(): void
+    125▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:133
+    129▕             'phone_number' => '+97312345678',
+    130▕             'registration_type' => 'individual',
+    131▕         ]);
+    132▕ 
+  ➜ 133▕         $response->assertSessionHasErrors('cpr');
+    134▕     }
+    135▕ 
+    136▕     public function test_store_caller_request_validates_phone_max_length(): void
+    137▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > store caller request validates…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:145
+    141▕             'phone_number' => str_repeat('1', 46), // Max is 45
+    142▕             'registration_type' => 'individual',
+    143▕         ]);
+    144▕ 
+  ➜ 145▕         $response->assertSessionHasErrors('phone_number');
+    146▕     }
+    147▕ 
+    148▕     public function test_update_caller_request_validates_required_fields(): void
+    149▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > update caller request validate…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:159
+    155▕                 'phone_number' => '+97312345678',
+    156▕                 'cpr' => '12345678901',
+    157▕             ]);
+    158▕ 
+  ➜ 159▕         $response->assertSessionHasErrors('name');
+    160▕     }
+    161▕ 
+    162▕     public function test_update_caller_request_validates_unique_cpr(): void
+    163▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > update caller request validate…   
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:174
+    170▕                 'phone_number' => '+97312345678',
+    171▕                 'cpr' => '12345678901', // Already taken by caller1
+    172▕             ]);
+    173▕ 
+  ➜ 174▕         $response->assertSessionHasErrors('cpr');
+    175▕     }
+    176▕ 
+    177▕     public function test_update_caller_request_allows_same_cpr_for_same_caller(): void
+    178▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > update caller request allows s…   
+  Expected response status code [201, 301, 302, 303, 307, 308] but received 419.
+Failed asserting that false is true.
+
+  at tests/Feature/FormValidationTest.php:188
+    184▕                 'phone_number' => '+97312345678',
+    185▕                 'cpr' => '12345678901', // Same CPR, same caller
+    186▕             ]);
+    187▕ 
+  ➜ 188▕         $response->assertRedirect(route('dashboard'));
+    189▕     }
+    190▕ 
+    191▕     public function test_bilingual_validation_messages_are_available(): void
+    192▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > biling…  BadMethodCallException   
+  Method Illuminate\Http\JsonResponse::getSession does not exist.
+
+  at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:115
+    111▕      */
+    112▕     public function __call($method, $parameters)
+    113▕     {
+    114▕         if (! static::hasMacro($method)) {
+  ➜ 115▕             throw new BadMethodCallException(sprintf(
+    116▕                 'Method %s::%s does not exist.', static::class, $method
+    117▕             ));
+    118▕         }
+    119▕
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/FormValidationTest.php:202
+
+
+  Tests:    20 failed, 94 passed (243 assertions)
+  Duration: 118.67s
+
