@@ -1,0 +1,1345 @@
+
+   FAIL  Tests\Feature\Admin\AdminPanelTest
+  ⨯ authenticated admin can access dashboard                            13.26s  
+  ⨯ dashboard page title displayed                                       1.03s  
+  ⨯ dashboard renders html                                               0.69s  
+  ⨯ admin can create caller                                              2.00s  
+  ⨯ admin dashboard loads without errors                                 0.52s  
+  ⨯ sidebar navigation present                                           1.61s  
+  ⨯ multiple admins can access dashboard                                 0.73s  
+  ✓ dashboard responds quickly                                           0.09s  
+
+   FAIL  Tests\Feature\Admin\DashboardWidgetsTest
+  ✓ animated stats widget mounts                                         0.15s  
+  ✓ animated stats widget calculates totals                              0.05s  
+  ✓ quick actions widget returns actions                                 0.15s  
+  ✓ recent activity widget instantiates                                  0.17s  
+  ✓ winners history widget instantiates                                  0.05s  
+  ⨯ dashboard page loads                                                 0.13s  
+  ✓ animated stats caches data                                           0.10s  
+  ✓ animated stats with zero callers                                     0.04s  
+  ✓ quick actions contain valid urls                                     0.04s  
+  ⨯ dashboard contains valid html                                        0.05s  
+
+   FAIL  Tests\Feature\AdminPanelTest
+  ⨯ admin can access filament panel                                      0.05s  
+  ✓ guest cannot access admin panel                                      0.09s  
+
+   PASS  Tests\Feature\Auth\AuthenticationTest
+  ✓ login screen can be rendered                                         0.08s  
+  ✓ users can authenticate using the login screen                        0.17s  
+  ✓ users can not authenticate with invalid password                     0.04s  
+
+   PASS  Tests\Feature\Auth\EmailVerificationTest
+  ✓ application does not require email verification for callers          0.09s  
+
+   PASS  Tests\Feature\Auth\PasswordConfirmationTest
+  ✓ application does not require password confirmation for callers       0.06s  
+
+   PASS  Tests\Feature\Auth\PasswordResetTest
+  ✓ reset password link screen can be rendered                           0.04s  
+  ✓ reset password link can be requested                                 0.32s  
+  ✓ reset password screen can be rendered                                0.39s  
+  ✓ password can be reset with valid token                               0.54s  
+
+   PASS  Tests\Feature\Auth\RegistrationTest
+  ✓ splash screen can be rendered                                        0.13s  
+  ✓ home registration page can be rendered                               0.06s  
+  ✓ family registration page can be rendered                             0.12s  
+
+   FAIL  Tests\Feature\CallerControllerTest
+  ✓ guests can view caller registration form                             0.09s  
+  ⨯ authenticated user can view callers list                             0.06s  
+  ✓ admin can edit caller                                                0.13s  
+  ⨯ admin can update caller                                              0.07s  
+  ✓ guest cannot edit caller                                             0.19s  
+  ✓ admin can delete caller                                              0.16s  
+  ✓ guest cannot delete caller                                           0.04s  
+  ⨯ admin can view winners                                               0.05s  
+  ⨯ admin can view families                                              0.03s  
+  ⨯ cpr existence can be checked                                         0.03s  
+  ⨯ non existent cpr returns false                                       0.05s  
+  ✓ admin can toggle winner status                                       0.07s  
+  ⨯ guest cannot toggle winner status                                    0.04s  
+  ✓ admin can select random winner                                       0.14s  
+  ✓ random winner fails when no eligible callers                         0.03s  
+  ✓ update caller validates input                                        0.06s  
+  ⨯ caller index is paginated                                            0.08s  
+
+   FAIL  Tests\Feature\CallerExportImportCommandTest
+  ✓ export callers command creates csv                                   0.10s  
+  ⨯ export callers command with specific filename                        0.06s  
+  ⨯ export and email command                                             0.14s  
+  ✓ dump callers csv command                                             0.07s  
+  ⨯ dump callers command                                                 0.08s  
+  ⨯ import callers command with csv                                      0.04s  
+  ⨯ import callers command requires file                                 0.04s  
+  ✓ persist data command exports data                                    0.04s  
+  ⨯ sync callers command                                                 0.28s  
+  ⨯ show statistics command                                              0.05s  
+  ✓ export creates valid csv structure                                   0.08s  
+
+   FAIL  Tests\Feature\CallerModelTest
+  ✓ winners scope returns only winners                                   0.08s  
+  ⨯ eligible scope excludes winners                                      0.16s  
+  ⨯ eligible scope excludes callers without cpr                          0.06s  
+  ⨯ get eligible callers static method                                   0.15s  
+  ✓ select random winner by cpr                                          0.06s  
+  ⨯ select random winner returns null when all are winners               0.10s  
+  ✓ increment hits increases hit count                                   0.04s  
+  ✓ increment hits updates last hit timestamp                            0.04s  
+  ✓ increment hits is atomic                                             0.06s  
+  ✓ caller fillable attributes                                           0.07s  
+  ✓ caller casts are applied                                             0.09s  
+  ✓ caller relationships                                                 0.07s  
+  ✓ eligible callers with various statuses                               0.06s  
+  ✓ callers can be marked as family                                      0.04s  
+  ✓ callers can be marked as individual                                  0.04s  
+  ✓ caller tracks registration time                                      0.13s  
+
+   FAIL  CallerRegistrationTest
+  ⨯ individual registration form can be submitted
+  ⨯ family registration form can be submitted
+  ⨯ existing caller can register again and increment hits
+  ⨯ registration stores ip address
+  ⨯ registration with invalid data fails validation
+  ⨯ registration type validation works
+  ⨯ family registration requires family members count between 2 and 10
+  ⨯ seeded callers are available in database
+  ⨯ seeded winners are properly marked
+
+   FAIL  Tests\Feature\CallerStatusTest
+  ⨯ admin can update caller status                                       0.10s  
+  ⨯ guest cannot update caller status                                    0.04s  
+  ⨯ invalid status is rejected                                           0.05s  
+  ⨯ admin can send approved caller to live                               0.06s  
+  ⨯ non approved caller cannot be sent to live                           0.10s  
+  ⨯ admin can toggle winner status                                       0.08s  
+  ⨯ status cannot be updated to empty value                              0.08s  
+  ⨯ caller not found returns 404                                         0.12s  
+
+   PASS  Tests\Feature\CprHashingServiceTest
+  ✓ hash cpr creates hash                                                0.06s  
+  ✓ verify cpr succeeds with correct cpr                                 0.08s  
+  ✓ verify cpr fails with incorrect cpr                                  0.10s  
+  ✓ mask cpr hides most digits                                           0.03s  
+  ✓ mask cpr preserves length                                            0.03s  
+  ✓ different hashes for same cpr                                        0.04s  
+  ✓ mask handles short cpr                                               0.05s  
+  ✓ hash is consistent for verification                                  0.06s  
+
+   FAIL  Tests\Feature\FormValidationTest
+  ✓ store caller request validates required name                         0.04s  
+  ✓ store caller request validates required cpr                          0.10s  
+  ✓ store caller request validates required phone number                 0.03s  
+  ✓ store caller request validates registration type                     0.05s  
+  ✓ store caller request validates family members minimum                0.05s  
+  ✓ store caller request validates family members maximum                0.03s  
+  ✓ store caller request allows valid family registration                0.05s  
+  ✓ store caller request allows valid individual registration            0.04s  
+  ✓ store caller request validates name max length                       0.06s  
+  ✓ store caller request validates cpr max length                        0.10s  
+  ✓ store caller request validates phone max length                      0.06s  
+  ✓ update caller request validates required fields                      0.13s  
+  ✓ update caller request validates unique cpr                           0.11s  
+  ⨯ update caller request allows same cpr for same caller                0.06s  
+  ⨯ bilingual validation messages are available                          0.07s  
+
+   FAIL  Tests\Feature\RateLimitingTest
+  ⨯ caller registration is rate limited by cpr
+  ⨯ caller registration is rate limited by ip
+  ⨯ rate limit cpr duration is 5 minutes
+  ⨯ rate limit ip duration is 1 hour
+  ⨯ different cprs have separate limits
+  ⨯ different ips have separate limits
+  ⨯ rate limit can be cleared
+
+   FAIL  Tests\Feature\SecurityServiceTest
+  ⨯ validate operation allows first attempt                              0.09s  
+  ⨯ validate operation respects rate limit                               0.05s  
+  ⨯ different operations have separate limits                            0.04s  
+  ✓ validate request with empty rules                                    0.05s  
+  ⨯ security service logs rate limit exceeded                            0.03s  
+  ⨯ different users have separate rate limits                            0.04s  
+
+   PASS  Tests\Feature\Settings\PasswordUpdateTest
+  ✓ application does not require password updates for callers            0.06s  
+
+   PASS  Tests\Feature\Settings\ProfileUpdateTest
+  ✓ application does not require profile updates for callers             0.14s  
+
+   PASS  Tests\Feature\VersionManagerTest
+  ✓ get version returns current version                                  0.04s  
+  ✓ get version info returns array                                       0.04s  
+  ✓ version is consistent                                                0.06s  
+  ✓ version has semantic versioning                                      0.03s  
+  ✓ version info contains name                                           0.03s  
+  ✓ version info contains timestamp                                      0.03s  
+  ✓ increment patch version                                              0.05s  
+  ✓ increment minor version                                              0.07s  
+  ✓ increment major version                                              0.04s  
+  ✓ version file exists                                                  0.09s  
+  ✓ version file contains valid json                                     0.13s  
+
+   PASS  Tests\Feature\VersionSyncCommandTest
+  ✓ version sync command exists                                          0.04s  
+  ✓ version sync fails without version file                              0.04s  
+  ✓ version sync fails without version json file                         0.05s  
+  ✓ version sync updates version json from version file                  0.05s  
+  ✓ version sync dry run does not modify files                           0.07s  
+  ✓ version sync detects when already synchronized                       0.04s  
+  ✓ version sync handles version without build number                    0.14s  
+  ✓ version sync fails with invalid version format                       0.05s  
+  ✓ version sync can update env files                                    0.05s  
+  ✓ version sync from version json to version file                       0.04s  
+  ✓ version sync preserves changelog entries                             0.05s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\AdminPanelTest > authenticated admin can acce…   
+  Failed asserting that 403 matches expected 200.
+
+  at tests/Feature/Admin/AdminPanelTest.php:29
+     25▕     public function test_authenticated_admin_can_access_dashboard(): void
+     26▕     {
+     27▕         $response = $this->actingAs($this->admin)->get('/admin');
+     28▕ 
+  ➜  29▕         $this->assertEquals(200, $response->status());
+     30▕     }
+     31▕ 
+     32▕     public function test_dashboard_page_title_displayed(): void
+     33▕     {
+
+  1   tests/Feature/Admin/AdminPanelTest.php:29
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\AdminPanelTest > dashboard page title display…   
+  Expected: {"message":""}
+
+  To contain: لوحة التحكم
+
+  at tests/Feature/Admin/AdminPanelTest.php:36
+     32▕     public function test_dashboard_page_title_displayed(): void
+     33▕     {
+     34▕         $response = $this->actingAs($this->admin)->get('/admin');
+     35▕ 
+  ➜  36▕         $this->assertStringContainsString('لوحة التحكم', $response->getContent());
+     37▕     }
+     38▕ 
+     39▕     public function test_dashboard_renders_html(): void
+     40▕     {
+
+  1   tests/Feature/Admin/AdminPanelTest.php:36
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\AdminPanelTest > dashboard renders html          
+  Failed asserting that 403 matches expected 200.
+
+  at tests/Feature/Admin/AdminPanelTest.php:43
+     39▕     public function test_dashboard_renders_html(): void
+     40▕     {
+     41▕         $response = $this->actingAs($this->admin)->get('/admin');
+     42▕ 
+  ➜  43▕         $this->assertEquals(200, $response->status());
+     44▕         $this->assertStringContainsString('<!DOCTYPE', $response->getContent());
+     45▕     }
+     46▕ 
+     47▕     public function test_admin_can_create_caller(): void
+
+  1   tests/Feature/Admin/AdminPanelTest.php:43
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\AdminPanelTest > admin can create caller         
+  Failed asserting that 403 matches expected 200.
+
+  at tests/Feature/Admin/AdminPanelTest.php:51
+     47▕     public function test_admin_can_create_caller(): void
+     48▕     {
+     49▕         $response = $this->actingAs($this->admin)->get('/admin/callers/create');
+     50▕ 
+  ➜  51▕         $this->assertEquals(200, $response->status());
+     52▕     }
+     53▕ 
+     54▕     public function test_admin_dashboard_loads_without_errors(): void
+     55▕     {
+
+  1   tests/Feature/Admin/AdminPanelTest.php:51
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\AdminPanelTest > admin dashboard loads withou…   
+  Failed asserting that false is true.
+
+  at tests/Feature/Admin/AdminPanelTest.php:58
+     54▕     public function test_admin_dashboard_loads_without_errors(): void
+     55▕     {
+     56▕         $response = $this->actingAs($this->admin)->get('/admin');
+     57▕ 
+  ➜  58▕         $this->assertTrue($response->status() === 200);
+     59▕     }
+     60▕ 
+     61▕     public function test_sidebar_navigation_present(): void
+     62▕     {
+
+  1   tests/Feature/Admin/AdminPanelTest.php:58
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\AdminPanelTest > sidebar navigation present      
+  Failed asserting that 14 is greater than 100.
+
+  at tests/Feature/Admin/AdminPanelTest.php:67
+     63▕         $response = $this->actingAs($this->admin)->get('/admin');
+     64▕ 
+     65▕         $content = $response->getContent();
+     66▕         $this->assertNotEmpty($content);
+  ➜  67▕         $this->assertGreaterThan(100, strlen($content));
+     68▕     }
+     69▕ 
+     70▕     public function test_multiple_admins_can_access_dashboard(): void
+     71▕     {
+
+  1   tests/Feature/Admin/AdminPanelTest.php:67
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\AdminPanelTest > multiple admins can access d…   
+  Failed asserting that 403 matches expected 200.
+
+  at tests/Feature/Admin/AdminPanelTest.php:77
+     73▕ 
+     74▕         $response1 = $this->actingAs($this->admin)->get('/admin');
+     75▕         $response2 = $this->actingAs($admin2)->get('/admin');
+     76▕ 
+  ➜  77▕         $this->assertEquals(200, $response1->status());
+     78▕         $this->assertEquals(200, $response2->status());
+     79▕     }
+     80▕ 
+     81▕     public function test_dashboard_responds_quickly(): void
+
+  1   tests/Feature/Admin/AdminPanelTest.php:77
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\DashboardWidgetsTest > dashboard page loads      
+  Failed asserting that 403 matches expected 200.
+
+  at tests/Feature/Admin/DashboardWidgetsTest.php:81
+     77▕     public function test_dashboard_page_loads(): void
+     78▕     {
+     79▕         $response = $this->actingAs($this->admin)->get('/admin');
+     80▕ 
+  ➜  81▕         $this->assertEquals(200, $response->status());
+     82▕     }
+     83▕ 
+     84▕     public function test_animated_stats_caches_data(): void
+     85▕     {
+
+  1   tests/Feature/Admin/DashboardWidgetsTest.php:81
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\Admin\DashboardWidgetsTest > dashboard contains val…   
+  Expected: {"message":""}
+
+  To contain: <!DOCTYPE
+
+  at tests/Feature/Admin/DashboardWidgetsTest.php:120
+    116▕     public function test_dashboard_contains_valid_html(): void
+    117▕     {
+    118▕         $response = $this->actingAs($this->admin)->get('/admin');
+    119▕ 
+  ➜ 120▕         $this->assertStringContainsString('<!DOCTYPE', $response->getContent());
+    121▕     }
+    122▕ }
+    123▕
+
+  1   tests/Feature/Admin/DashboardWidgetsTest.php:120
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\AdminPanelTest > admin can access filament panel       
+  Failed asserting that 403 is equal to 200 or is equal to 302.
+
+  at tests/Feature/AdminPanelTest.php:20
+     16▕ 
+     17▕         $response = $this->actingAs($user)->get('/admin');
+     18▕ 
+     19▕         // Filament panel returns 200 when authenticated, or redirects on insufficient permissions
+  ➜  20▕         $this->assertThat(
+     21▕             $response->getStatusCode(),
+     22▕             $this->logicalOr(
+     23▕                 $this->equalTo(200),
+     24▕                 $this->equalTo(302)
+
+  1   tests/Feature/AdminPanelTest.php:20
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerControllerTest > authenticated user can view…    
+  Expected response status code [200] but received 405.
+Failed asserting that 405 is identical to 200.
+
+  at tests/Feature/CallerControllerTest.php:40
+     36▕         Caller::factory()->count(5)->create();
+     37▕ 
+     38▕         $response = $this->actingAs($this->admin)->get('/callers');
+     39▕ 
+  ➜  40▕         $response->assertStatus(200);
+     41▕         $response->assertViewHas('callers');
+     42▕     }
+     43▕ 
+     44▕     public function test_admin_can_edit_caller(): void
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerControllerTest > admin can update caller         
+  Failed asserting that two strings are equal.
+
+The following errors occurred during the last request:
+
+The caller type field is required.
+
+  -'http://localhost:8122/dashboard'
+  +'http://localhost:8122'
+  
+
+  at tests/Feature/CallerControllerTest.php:62
+     58▕             'is_winner' => true,
+     59▕             'notes' => 'Test notes',
+     60▕         ]);
+     61▕ 
+  ➜  62▕         $response->assertRedirect(route('dashboard'));
+     63▕         $this->assertEquals('Updated Name', $this->caller->fresh()->name);
+     64▕     }
+     65▕ 
+     66▕     public function test_guest_cannot_edit_caller(): void
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerControllerTest > admin can view winners          
+  Expected response status code [200] but received 405.
+Failed asserting that 405 is identical to 200.
+
+  at tests/Feature/CallerControllerTest.php:98
+     94▕         Caller::factory()->count(2)->create(['is_winner' => false]);
+     95▕ 
+     96▕         $response = $this->actingAs($this->admin)->get('/callers/winners');
+     97▕ 
+  ➜  98▕         $response->assertStatus(200);
+     99▕         $response->assertViewHas('winners');
+    100▕     }
+    101▕ 
+    102▕     public function test_admin_can_view_families(): void
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerControllerTest > admin can view families         
+  Expected response status code [200] but received 405.
+Failed asserting that 405 is identical to 200.
+
+  at tests/Feature/CallerControllerTest.php:108
+    104▕         Caller::factory()->count(5)->create(['is_family' => true]);
+    105▕ 
+    106▕         $response = $this->actingAs($this->admin)->get('/callers/families');
+    107▕ 
+  ➜ 108▕         $response->assertStatus(200);
+    109▕         $response->assertViewHas('families');
+    110▕     }
+    111▕ 
+    112▕     public function test_cpr_existence_can_be_checked(): void
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerControllerTest > cpr existence can be checked    
+  Unable to find JSON: 
+
+[{
+    "exists": true
+}]
+
+within response JSON:
+
+[{
+    "message": "The route api/callers/check-cpr could not be found."
+}].
+
+
+Failed asserting that an array has the subset Array &0 [
+    'exists' => true,
+].
+   array (
+     'message' => 'The route api/callers/check-cpr could not be found.',
+  -  'exists' => true,
+   )
+  
+
+  at tests/Feature/CallerControllerTest.php:118
+    114▕         $response = $this->post('/api/callers/check-cpr', [
+    115▕             'cpr' => $this->caller->cpr,
+    116▕         ]);
+    117▕ 
+  ➜ 118▕         $response->assertJson(['exists' => true]);
+    119▕     }
+    120▕ 
+    121▕     public function test_non_existent_cpr_returns_false(): void
+    122▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerControllerTest > non existent cpr returns fal…   
+  Unable to find JSON: 
+
+[{
+    "exists": false
+}]
+
+within response JSON:
+
+[{
+    "message": "The route api/callers/check-cpr could not be found."
+}].
+
+
+Failed asserting that an array has the subset Array &0 [
+    'exists' => false,
+].
+   array (
+     'message' => 'The route api/callers/check-cpr could not be found.',
+  -  'exists' => false,
+   )
+  
+
+  at tests/Feature/CallerControllerTest.php:127
+    123▕         $response = $this->post('/api/callers/check-cpr', [
+    124▕             'cpr' => 'nonexistent',
+    125▕         ]);
+    126▕ 
+  ➜ 127▕         $response->assertJson(['exists' => false]);
+    128▕     }
+    129▕ 
+    130▕     public function test_admin_can_toggle_winner_status(): void
+    131▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerControllerTest > guest cannot toggle winner s…   
+  Expected response status code [401] but received 302.
+Failed asserting that 302 is identical to 401.
+
+  at tests/Feature/CallerControllerTest.php:145
+    141▕     public function test_guest_cannot_toggle_winner_status(): void
+    142▕     {
+    143▕         $response = $this->post("/callers/{$this->caller->id}/toggle-winner");
+    144▕ 
+  ➜ 145▕         $response->assertStatus(401);
+    146▕     }
+    147▕ 
+    148▕     public function test_admin_can_select_random_winner(): void
+    149▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerControllerTest > caller…  AssertionFailedError   
+  The response is not a view.
+
+  at tests/Feature/CallerControllerTest.php:188
+    184▕         Caller::factory()->count(30)->create();
+    185▕ 
+    186▕         $response = $this->actingAs($this->admin)->get('/callers');
+    187▕ 
+  ➜ 188▕         $response->assertViewHas('callers');
+    189▕     }
+    190▕ }
+    191▕
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerExportImportCommandTe…  InvalidOptionException   
+  The "--filename" option does not exist.
+
+  at vendor/symfony/console/Input/ArrayInput.php:154
+    150▕     private function addLongOption(string $name, mixed $value): void
+    151▕     {
+    152▕         if (!$this->definition->hasOption($name)) {
+    153▕             if (!$this->definition->hasNegation($name)) {
+  ➜ 154▕                 throw new InvalidOptionException(\sprintf('The "--%s" option does not exist.', $name));
+    155▕             }
+    156▕ 
+    157▕             $optionName = $this->definition->negationToName($name);
+    158▕             $this->options[$optionName] = false;
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerExportImportCommandTest.php:40
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerExportImportCommand…  CommandNotFoundException   
+  The command "callers:export-and-email" does not exist.
+
+  at vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+    158▕     {
+    159▕         [$command, $input] = $this->parseCommand($command, $parameters);
+    160▕ 
+    161▕         if (! $this->has($command)) {
+  ➜ 162▕             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
+    163▕         }
+    164▕ 
+    165▕         return $this->run(
+    166▕             $input, $this->lastOutput = $outputBuffer ?: new BufferedOutput
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/CallerExportImportCommandTest.php:49
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerExportImportCommand…  CommandNotFoundException   
+  The command "callers:dump" does not exist.
+
+  at vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+    158▕     {
+    159▕         [$command, $input] = $this->parseCommand($command, $parameters);
+    160▕ 
+    161▕         if (! $this->has($command)) {
+  ➜ 162▕             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
+    163▕         }
+    164▕ 
+    165▕         return $this->run(
+    166▕             $input, $this->lastOutput = $outputBuffer ?: new BufferedOutput
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/CallerExportImportCommandTest.php:67
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerExportImportCommand…  CommandNotFoundException   
+  The command "callers:import" does not exist.
+
+  at vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+    158▕     {
+    159▕         [$command, $input] = $this->parseCommand($command, $parameters);
+    160▕ 
+    161▕         if (! $this->has($command)) {
+  ➜ 162▕             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
+    163▕         }
+    164▕ 
+    165▕         return $this->run(
+    166▕             $input, $this->lastOutput = $outputBuffer ?: new BufferedOutput
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/CallerExportImportCommandTest.php:80
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerExportImportCommand…  CommandNotFoundException   
+  The command "callers:import" does not exist.
+
+  at vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+    158▕     {
+    159▕         [$command, $input] = $this->parseCommand($command, $parameters);
+    160▕ 
+    161▕         if (! $this->has($command)) {
+  ➜ 162▕             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
+    163▕         }
+    164▕ 
+    165▕         return $this->run(
+    166▕             $input, $this->lastOutput = $outputBuffer ?: new BufferedOutput
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/CallerExportImportCommandTest.php:89
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerExportImportCommandTest > sync callers comman…   
+  Expected status code 0 but received 1.
+Failed asserting that 1 matches expected 0.
+
+  at tests/Feature/CallerExportImportCommandTest.php:104
+    100▕ 
+    101▕     public function test_sync_callers_command(): void
+    102▕     {
+    103▕         $this->artisan('callers:sync')
+  ➜ 104▕             ->assertExitCode(0);
+    105▕ 
+    106▕         // Sync should complete
+    107▕         $this->assertTrue(true);
+    108▕     }
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerExportImportCommand…  CommandNotFoundException   
+  The command "callers:stats" does not exist.
+
+  at vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+    158▕     {
+    159▕         [$command, $input] = $this->parseCommand($command, $parameters);
+    160▕ 
+    161▕         if (! $this->has($command)) {
+  ➜ 162▕             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
+    163▕         }
+    164▕ 
+    165▕         return $this->run(
+    166▕             $input, $this->lastOutput = $outputBuffer ?: new BufferedOutput
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/CallerExportImportCommandTest.php:113
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > eligible scope excludes winners      
+  Failed asserting that 7 matches expected 5.
+
+  at tests/Feature/CallerModelTest.php:35
+     31▕     public function test_eligible_scope_excludes_winners(): void
+     32▕     {
+     33▕         $eligible = Caller::eligible()->get();
+     34▕ 
+  ➜  35▕         $this->assertEquals(5, $eligible->count());
+     36▕         $eligible->each(fn ($caller) => $this->assertFalse($caller->is_winner));
+     37▕     }
+     38▕ 
+     39▕     public function test_eligible_scope_excludes_callers_without_cpr(): void
+
+  1   tests/Feature/CallerModelTest.php:35
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > eligible scope ex…  QueryException   
+  SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: callers.cpr (Connection: sqlite, Database: :memory:, SQL: insert into "callers" ("name", "phone", "cpr", "is_family", "is_winner", "ip_address", "hits", "last_hit", "status", "notes", "created_at", "updated_at") values (محمد نورة البوديري, 31161670, ?, 0, 0, 173.138.97.6, 141, 2026-01-24 07:56:13, blocked, يطلب دائماً التحية للمذيع, 2026-02-04 19:26:58, 2026-02-13 11:07:31))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:584
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+    583▕ 
+  ➜ 584▕             return $statement->execute();
+    585▕         });
+    586▕     }
+    587▕ 
+    588▕     /**
+
+      [2m+16 vendor frames [22m
+  17  tests/Feature/CallerModelTest.php:41
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > get eligible callers static metho…   
+  Failed asserting that 7 matches expected 5.
+
+  at tests/Feature/CallerModelTest.php:53
+     49▕     public function test_get_eligible_callers_static_method(): void
+     50▕     {
+     51▕         $eligible = Caller::getEligibleCallers()->get();
+     52▕ 
+  ➜  53▕         $this->assertEquals(5, $eligible->count());
+     54▕     }
+     55▕ 
+     56▕     public function test_select_random_winner_by_cpr(): void
+     57▕     {
+
+  1   tests/Feature/CallerModelTest.php:53
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerModelTest > select random winner retur…  Error   
+  Non-static method Illuminate\Database\Eloquent\Model::update() cannot be called statically
+
+  at tests/Feature/CallerModelTest.php:69
+     65▕     }
+     66▕ 
+     67▕     public function test_select_random_winner_returns_null_when_all_are_winners(): void
+     68▕     {
+  ➜  69▕         Caller::update(['is_winner' => true]);
+     70▕ 
+     71▕         $winner = Caller::selectRandomWinnerByCpr();
+     72▕ 
+     73▕         $this->assertNull($winner);
+
+  1   tests/Feature/CallerModelTest.php:69
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > individual registration…   QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > family registration form…  QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > existing caller can regi…  QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > registration stores ip a…  QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > registration with invali…  QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > registration type valida…  QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > family registration requ…  QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > seeded callers are avail…  QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  CallerRegistrationTest > seeded winners are prope…  QueryException   
+  SQLSTATE[HY000]: General error: 1 no such table: sqlite_sequence (Connection: sqlite, Database: :memory:, SQL: delete from sqlite_sequence where name = callers)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:578
+    574▕             if ($this->pretending()) {
+    575▕                 return true;
+    576▕             }
+    577▕ 
+  ➜ 578▕             $statement = $this->getPdo()->prepare($query);
+    579▕ 
+    580▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    581▕ 
+    582▕             $this->recordsHaveBeenModified();
+
+      [2m+10 vendor frames [22m
+  11  tests/Feature/CallerRegistrationTest.php:12
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerStatusTest > admin can u…  ValidationException   
+  Status must be one of: PENDING, REJECTED, APPROVED
+
+  at vendor/laravel/framework/src/Illuminate/Foundation/Http/FormRequest.php:168
+    164▕     protected function failedValidation(Validator $validator)
+    165▕     {
+    166▕         $exception = $validator->getException();
+    167▕ 
+  ➜ 168▕         throw (new $exception($validator))
+    169▕             ->errorBag($this->errorBag)
+    170▕             ->redirectTo($this->getRedirectUrl());
+    171▕     }
+    172▕
+
+      [2m+51 vendor frames [22m
+  52  tests/Feature/CallerStatusTest.php:29
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerStatusTest > guest cannot update caller statu…   
+  Expected response status code [401] but received 302.
+Failed asserting that 302 is identical to 401.
+
+The following errors occurred during the last request:
+
+Status must be one of: PENDING, REJECTED, APPROVED
+
+  at tests/Feature/CallerStatusTest.php:43
+     39▕         $response = $this->post("/api/callers/{$this->caller->id}/status", [
+     40▕             'status' => 'approved',
+     41▕         ]);
+     42▕ 
+  ➜  43▕         $response->assertStatus(401);
+     44▕     }
+     45▕ 
+     46▕     public function test_invalid_status_is_rejected(): void
+     47▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerStatusTest > invalid status is rejected          
+  Expected response status code [422] but received 302.
+Failed asserting that 302 is identical to 422.
+
+The following errors occurred during the last request:
+
+Status must be one of: PENDING, REJECTED, APPROVED
+
+  at tests/Feature/CallerStatusTest.php:53
+     49▕             ->post("/api/callers/{$this->caller->id}/status", [
+     50▕                 'status' => 'invalid-status',
+     51▕             ]);
+     52▕ 
+  ➜  53▕         $response->assertStatus(422);
+     54▕         $this->assertEquals('pending', $this->caller->fresh()->status);
+     55▕     }
+     56▕ 
+     57▕     public function test_admin_can_send_approved_caller_to_live(): void
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerStatusTest > admin can send approved caller t…   
+  Unable to find JSON: 
+
+[{
+    "success": true
+}]
+
+within response JSON:
+
+[{
+    "message": "The route api/callers/1/send-to-live could not be found."
+}].
+
+
+Failed asserting that an array has the subset Array &0 [
+    'success' => true,
+].
+   array (
+     'message' => 'The route api/callers/1/send-to-live could not be found.',
+  -  'success' => true,
+   )
+  
+
+  at tests/Feature/CallerStatusTest.php:64
+     60▕ 
+     61▕         $response = $this->actingAs($this->admin)
+     62▕             ->post("/api/callers/{$this->caller->id}/send-to-live");
+     63▕ 
+  ➜  64▕         $response->assertJson(['success' => true]);
+     65▕     }
+     66▕ 
+     67▕     public function test_non_approved_caller_cannot_be_sent_to_live(): void
+     68▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerStatusTest > non approved caller cannot be se…   
+  Expected response status code [422] but received 404.
+Failed asserting that 404 is identical to 422.
+
+  at tests/Feature/CallerStatusTest.php:74
+     70▕ 
+     71▕         $response = $this->actingAs($this->admin)
+     72▕             ->post("/api/callers/{$this->caller->id}/send-to-live");
+     73▕ 
+  ➜  74▕         $response->assertStatus(422);
+     75▕         $response->assertJson(['success' => false]);
+     76▕     }
+     77▕ 
+     78▕     public function test_admin_can_toggle_winner_status(): void
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerStatusTest > admin can toggle winner status      
+  Unable to find JSON: 
+
+[{
+    "success": true
+}]
+
+within response JSON:
+
+[{
+    "success": false,
+    "message": "Cannot unmark a winner"
+}].
+
+
+Failed asserting that an array has the subset Array &0 [
+    'success' => true,
+].
+   array (
+  -  'success' => true,
+  +  'success' => false,
+     'message' => 'Cannot unmark a winner',
+   )
+  
+
+  at tests/Feature/CallerStatusTest.php:92
+     88▕         // Toggle back
+     89▕         $response = $this->actingAs($this->admin)
+     90▕             ->post("/api/callers/{$this->caller->id}/toggle-winner");
+     91▕ 
+  ➜  92▕         $response->assertJson(['success' => true]);
+     93▕         $this->assertFalse($this->caller->fresh()->is_winner);
+     94▕     }
+     95▕ 
+     96▕     public function test_status_cannot_be_updated_to_empty_value(): void
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerStatusTest > status cannot be updated to empt…   
+  Expected response status code [422] but received 302.
+Failed asserting that 302 is identical to 422.
+
+The following errors occurred during the last request:
+
+Status is required
+
+  at tests/Feature/CallerStatusTest.php:103
+     99▕             ->post("/api/callers/{$this->caller->id}/status", [
+    100▕                 'status' => '',
+    101▕             ]);
+    102▕ 
+  ➜ 103▕         $response->assertStatus(422);
+    104▕     }
+    105▕ 
+    106▕     public function test_caller_not_found_returns_404(): void
+    107▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CallerStatusTest > caller not found returns 404        
+  Expected response status code [404] but received 302.
+Failed asserting that 302 is identical to 404.
+
+The following errors occurred during the last request:
+
+Status must be one of: PENDING, REJECTED, APPROVED
+
+  at tests/Feature/CallerStatusTest.php:113
+    109▕             ->post('/api/callers/99999/status', [
+    110▕                 'status' => 'approved',
+    111▕             ]);
+    112▕ 
+  ➜ 113▕         $response->assertStatus(404);
+    114▕     }
+    115▕ }
+    116▕
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > update caller request allows s…   
+  Failed asserting that two strings are equal.
+
+The following errors occurred during the last request:
+
+The caller type field is required.
+
+  -'http://localhost:8122/dashboard'
+  +'http://localhost:8122'
+  
+
+  at tests/Feature/FormValidationTest.php:188
+    184▕                 'phone_number' => '+97312345678',
+    185▕                 'cpr' => '12345678901', // Same CPR, same caller
+    186▕             ]);
+    187▕ 
+  ➜ 188▕         $response->assertRedirect(route('dashboard'));
+    189▕     }
+    190▕ 
+    191▕     public function test_bilingual_validation_messages_are_available(): void
+    192▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\FormValidationTest > biling…  BadMethodCallException   
+  Method Illuminate\Session\Store::errors does not exist.
+
+  at vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:115
+    111▕      */
+    112▕     public function __call($method, $parameters)
+    113▕     {
+    114▕         if (! static::hasMacro($method)) {
+  ➜ 115▕             throw new BadMethodCallException(sprintf(
+    116▕                 'Method %s::%s does not exist.', static::class, $method
+    117▕             ));
+    118▕         }
+    119▕
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/FormValidationTest.php:202
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\RateLimitingTest > caller regis…  ArgumentCountError   
+  Too few arguments to function Illuminate\Cache\RateLimiter::clear(), 0 passed in /Users/aldoyh/Sites/RAMADAN/alsaryatv/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 363 and exactly 1 expected
+
+  at vendor/laravel/framework/src/Illuminate/Cache/RateLimiter.php:256
+    252▕      *
+    253▕      * @param  string  $key
+    254▕      * @return void
+    255▕      */
+  ➜ 256▕     public function clear($key)
+    257▕     {
+    258▕         $key = $this->cleanRateLimiterKey($key);
+    259▕ 
+    260▕         $this->resetAttempts($key);
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/RateLimitingTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\RateLimitingTest > caller regis…  ArgumentCountError   
+  Too few arguments to function Illuminate\Cache\RateLimiter::clear(), 0 passed in /Users/aldoyh/Sites/RAMADAN/alsaryatv/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 363 and exactly 1 expected
+
+  at vendor/laravel/framework/src/Illuminate/Cache/RateLimiter.php:256
+    252▕      *
+    253▕      * @param  string  $key
+    254▕      * @return void
+    255▕      */
+  ➜ 256▕     public function clear($key)
+    257▕     {
+    258▕         $key = $this->cleanRateLimiterKey($key);
+    259▕ 
+    260▕         $this->resetAttempts($key);
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/RateLimitingTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\RateLimitingTest > rate limit c…  ArgumentCountError   
+  Too few arguments to function Illuminate\Cache\RateLimiter::clear(), 0 passed in /Users/aldoyh/Sites/RAMADAN/alsaryatv/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 363 and exactly 1 expected
+
+  at vendor/laravel/framework/src/Illuminate/Cache/RateLimiter.php:256
+    252▕      *
+    253▕      * @param  string  $key
+    254▕      * @return void
+    255▕      */
+  ➜ 256▕     public function clear($key)
+    257▕     {
+    258▕         $key = $this->cleanRateLimiterKey($key);
+    259▕ 
+    260▕         $this->resetAttempts($key);
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/RateLimitingTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\RateLimitingTest > rate limit i…  ArgumentCountError   
+  Too few arguments to function Illuminate\Cache\RateLimiter::clear(), 0 passed in /Users/aldoyh/Sites/RAMADAN/alsaryatv/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 363 and exactly 1 expected
+
+  at vendor/laravel/framework/src/Illuminate/Cache/RateLimiter.php:256
+    252▕      *
+    253▕      * @param  string  $key
+    254▕      * @return void
+    255▕      */
+  ➜ 256▕     public function clear($key)
+    257▕     {
+    258▕         $key = $this->cleanRateLimiterKey($key);
+    259▕ 
+    260▕         $this->resetAttempts($key);
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/RateLimitingTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\RateLimitingTest > different cp…  ArgumentCountError   
+  Too few arguments to function Illuminate\Cache\RateLimiter::clear(), 0 passed in /Users/aldoyh/Sites/RAMADAN/alsaryatv/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 363 and exactly 1 expected
+
+  at vendor/laravel/framework/src/Illuminate/Cache/RateLimiter.php:256
+    252▕      *
+    253▕      * @param  string  $key
+    254▕      * @return void
+    255▕      */
+  ➜ 256▕     public function clear($key)
+    257▕     {
+    258▕         $key = $this->cleanRateLimiterKey($key);
+    259▕ 
+    260▕         $this->resetAttempts($key);
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/RateLimitingTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\RateLimitingTest > different ip…  ArgumentCountError   
+  Too few arguments to function Illuminate\Cache\RateLimiter::clear(), 0 passed in /Users/aldoyh/Sites/RAMADAN/alsaryatv/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 363 and exactly 1 expected
+
+  at vendor/laravel/framework/src/Illuminate/Cache/RateLimiter.php:256
+    252▕      *
+    253▕      * @param  string  $key
+    254▕      * @return void
+    255▕      */
+  ➜ 256▕     public function clear($key)
+    257▕     {
+    258▕         $key = $this->cleanRateLimiterKey($key);
+    259▕ 
+    260▕         $this->resetAttempts($key);
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/RateLimitingTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\RateLimitingTest > rate limit c…  ArgumentCountError   
+  Too few arguments to function Illuminate\Cache\RateLimiter::clear(), 0 passed in /Users/aldoyh/Sites/RAMADAN/alsaryatv/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 363 and exactly 1 expected
+
+  at vendor/laravel/framework/src/Illuminate/Cache/RateLimiter.php:256
+    252▕      *
+    253▕      * @param  string  $key
+    254▕      * @return void
+    255▕      */
+  ➜ 256▕     public function clear($key)
+    257▕     {
+    258▕         $key = $this->cleanRateLimiterKey($key);
+    259▕ 
+    260▕         $this->resetAttempts($key);
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/RateLimitingTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SecurityServiceTest > validate oper…  LogicException   
+  Please make sure the PHP Redis extension is installed and enabled.
+
+  at vendor/laravel/framework/src/Illuminate/Redis/Connectors/PhpRedisConnector.php:82
+     78▕     protected function createClient(array $config)
+     79▕     {
+     80▕         return tap(new Redis, function ($client) use ($config) {
+     81▕             if ($client instanceof RedisFacade) {
+  ➜  82▕                 throw new LogicException(
+     83▕                     extension_loaded('redis')
+     84▕                         ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
+     85▕                         : 'Please make sure the PHP Redis extension is installed and enabled.'
+     86▕                 );
+
+      [2m+11 vendor frames [22m
+  12  app/Services/SecurityService.php:16
+  13  tests/Feature/SecurityServiceTest.php:32
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SecurityServiceTest > validate oper…  LogicException   
+  Please make sure the PHP Redis extension is installed and enabled.
+
+  at vendor/laravel/framework/src/Illuminate/Redis/Connectors/PhpRedisConnector.php:82
+     78▕     protected function createClient(array $config)
+     79▕     {
+     80▕         return tap(new Redis, function ($client) use ($config) {
+     81▕             if ($client instanceof RedisFacade) {
+  ➜  82▕                 throw new LogicException(
+     83▕                     extension_loaded('redis')
+     84▕                         ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
+     85▕                         : 'Please make sure the PHP Redis extension is installed and enabled.'
+     86▕                 );
+
+      [2m+11 vendor frames [22m
+  12  app/Services/SecurityService.php:16
+  13  tests/Feature/SecurityServiceTest.php:43
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SecurityServiceTest > different ope…  LogicException   
+  Please make sure the PHP Redis extension is installed and enabled.
+
+  at vendor/laravel/framework/src/Illuminate/Redis/Connectors/PhpRedisConnector.php:82
+     78▕     protected function createClient(array $config)
+     79▕     {
+     80▕         return tap(new Redis, function ($client) use ($config) {
+     81▕             if ($client instanceof RedisFacade) {
+  ➜  82▕                 throw new LogicException(
+     83▕                     extension_loaded('redis')
+     84▕                         ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
+     85▕                         : 'Please make sure the PHP Redis extension is installed and enabled.'
+     86▕                 );
+
+      [2m+11 vendor frames [22m
+  12  app/Services/SecurityService.php:16
+  13  tests/Feature/SecurityServiceTest.php:54
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SecurityServiceTest > security serv…  LogicException   
+  Please make sure the PHP Redis extension is installed and enabled.
+
+  at vendor/laravel/framework/src/Illuminate/Redis/Connectors/PhpRedisConnector.php:82
+     78▕     protected function createClient(array $config)
+     79▕     {
+     80▕         return tap(new Redis, function ($client) use ($config) {
+     81▕             if ($client instanceof RedisFacade) {
+  ➜  82▕                 throw new LogicException(
+     83▕                     extension_loaded('redis')
+     84▕                         ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
+     85▕                         : 'Please make sure the PHP Redis extension is installed and enabled.'
+     86▕                 );
+
+      [2m+11 vendor frames [22m
+  12  app/Services/SecurityService.php:16
+  13  tests/Feature/SecurityServiceTest.php:80
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SecurityServiceTest > different use…  LogicException   
+  Please make sure the PHP Redis extension is installed and enabled.
+
+  at vendor/laravel/framework/src/Illuminate/Redis/Connectors/PhpRedisConnector.php:82
+     78▕     protected function createClient(array $config)
+     79▕     {
+     80▕         return tap(new Redis, function ($client) use ($config) {
+     81▕             if ($client instanceof RedisFacade) {
+  ➜  82▕                 throw new LogicException(
+     83▕                     extension_loaded('redis')
+     84▕                         ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
+     85▕                         : 'Please make sure the PHP Redis extension is installed and enabled.'
+     86▕                 );
+
+      [2m+11 vendor frames [22m
+  12  app/Services/SecurityService.php:16
+  13  tests/Feature/SecurityServiceTest.php:94
+
+
+  Tests:    60 failed, 93 passed (231 assertions)
+  Duration: 34.14s
+

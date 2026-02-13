@@ -1,9 +1,14 @@
 <?php
 
+namespace Tests\Feature;
+
 use App\Models\Caller;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CallerRegistrationTest extends TestCase
+{
+    use RefreshDatabase;
 {
     protected function setUp(): void
     {

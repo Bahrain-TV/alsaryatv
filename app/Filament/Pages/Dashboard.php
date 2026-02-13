@@ -24,30 +24,23 @@ class Dashboard extends BaseDashboard
     {
         return [
             // ==================== QUICK ACTIONS ====================
-            // Quick Access Actions - First Row
             QuickActionsWidget::class,
 
             // ==================== OVERVIEW SECTION ====================
-            // Main Stats - Second Row
             AnimatedStatsOverviewWidget::class,
 
-            // ==================== PARTICIPATION SECTION ====================
-            // Participation Metrics - Third Row
-            ParticipationRateWidget::class,
-
-            // ==================== TRENDS & ANALYTICS SECTION ====================
-            // Charts Row - Third Row
+            // ==================== TRENDS & ANALYTICS ====================
             RegistrationTrendsChart::class,
 
-            // Charts - Fourth Row (Side by Side)
+            // ==================== CHARTS (Side by Side) ====================
             PeakHoursChart::class,
             StatusDistributionChart::class,
 
-            // ==================== ACTIVITY & HISTORY SECTION ====================
-            // Activity Tables - Fifth Row (Side by Side)
-            RecentActivityWidget::class,
+            // ==================== PARTICIPATION METRICS ====================
+            ParticipationRateWidget::class,
 
-            // Winners History - Sixth Row (Full Width)
+            // ==================== ACTIVITY & WINNERS ====================
+            RecentActivityWidget::class,
             WinnersHistoryWidget::class,
         ];
     }
