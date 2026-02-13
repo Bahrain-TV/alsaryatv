@@ -25,6 +25,8 @@ yarn-error.log
 .*mcp*
 /screenshots
 screenshot.png
+# Admin Scripts (local only)
+publish.sh
 # Deployment & Admin Scripts (local only)
 publish.sh
 deploy.sh

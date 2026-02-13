@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-    $obsOverlayUrl = url('/dashboard/obs-overlay');
+    $obsOverlayUrl = url('/obs-overlay');
 @endphp
 
 <div class="py-8" x-data="callerDashboard()">
@@ -73,7 +73,7 @@
                             <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
                                 <span>{{ __('Livewire updates every 2 seconds.') }}</span>
                                 <span class="hidden sm:inline">•</span>
-                                <span>{{ __('Overlay is authenticated like the dashboard.') }}</span>
+                                <span>{{ __('Overlay is publicly accessible — no login required.') }}</span>
                             </div>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                         <ul class="mt-3 space-y-2 text-xs text-gray-600 dark:text-gray-300 list-disc ps-4">
                             <li>{{ __('Confirm registrations appear here before going live on air.') }}</li>
                             <li>{{ __('Use the Random Winner tool only after verifying caller eligibility.') }}</li>
-                            <li>{{ __('Keep this dashboard open to maintain session access for the OBS overlay.') }}</li>
+                            <li>{{ __('The OBS overlay works independently — no dashboard session needed.') }}</li>
                             <li>{{ __('If the overlay stops updating, refresh the OBS browser source.') }}</li>
                         </ul>
                     </div>

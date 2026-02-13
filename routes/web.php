@@ -29,6 +29,9 @@ Route::get('/', fn () => view('welcome', $getRamadanContext()))->name('home');
 Route::get('/welcome', fn () => view('welcome', $getRamadanContext()))->name('welcome');
 Route::get('/family', fn () => view('welcome', $getRamadanContext()))->name('family.registration');
 
+// Public OBS overlay — accessible without authentication for OBS Browser Source
+Route::get('/obs-overlay', fn () => view('obs.overlay'))->name('obs.overlay');
+
 // Protected routes
 Route::middleware([
     'auth:sanctum',
@@ -36,7 +39,6 @@ Route::middleware([
     'verified',
 ])->group(function (): void {
     Route::get('/dashboard', [CallerController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/obs-overlay', fn () => view('obs.overlay'))->name('obs.overlay');
     Route::get('/winners', [CallerController::class, 'winners'])->name('winners');
     Route::get('/families', [CallerController::class, 'families'])->name('families');
 
