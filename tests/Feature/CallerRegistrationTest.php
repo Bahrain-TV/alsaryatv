@@ -9,7 +9,7 @@ use Tests\TestCase;
 class CallerRegistrationTest extends TestCase
 {
     use RefreshDatabase;
-{
+
     protected function setUp(): void
     {
         parent::setUp();
