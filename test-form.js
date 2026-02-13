@@ -1,6 +1,5 @@
 import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 
 async function test() {
   const browser = await chromium.launch();
