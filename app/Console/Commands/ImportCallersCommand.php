@@ -753,7 +753,13 @@ class ImportCallersCommand extends Command
                 }
             } catch (\Exception $e) {
                 // Check if this is a duplicate CPR error
-                if ($e->getCode() == 23000 && strpos($e->getMessage(), 'callers_cpr_unique') !== false) {
+                $isDuplicateCpr = $e->getCode() == 23000 && (
+                    strpos($e->getMessage(), 'callers_cpr_unique') !== false ||
+                    strpos($e->getMessage(), 'callers.cpr') !== false ||
+                    strpos($e->getMessage(), 'UNIQUE constraint failed: callers.cpr') !== false
+                );
+
+                if ($isDuplicateCpr) {
                     // Get the CPR that's duplicated
                     $cpr = $data['cpr'] ?? null;
                     if ($cpr) {
@@ -819,7 +825,11 @@ class ImportCallersCommand extends Command
                             $this->error('Fallback insert failed: '.$fallbackException->getMessage());
                             throw $fallbackException;
                         }
-                    } elseif ($e->getCode() == 23000 && strpos($e->getMessage(), 'callers_cpr_unique') !== false) {
+                    } elseif ($e->getCode() == 23000 && (
+                        strpos($e->getMessage(), 'callers_cpr_unique') !== false ||
+                        strpos($e->getMessage(), 'callers.cpr') !== false ||
+                        strpos($e->getMessage(), 'UNIQUE constraint failed: callers.cpr') !== false
+                    )) {
                         // Check if this is a duplicate CPR error
                         $cpr = $record['cpr'] ?? null;
                         if ($cpr) {

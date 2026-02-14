@@ -31,14 +31,153 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.js"></script>
 
+    <!-- Additional styles for flip cards and particles -->
+    <style>
+        body {
+            background-color: #050507;
+            overflow-x: hidden;
+        }
+
+        /* Typography Gradients */
+        .gold-text {
+            background: linear-gradient(to bottom, #fff5e1 0%, #e8b960 40%, #b8860b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0px 2px 10px rgba(232, 185, 96, 0.2);
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 17, 23, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-gradient-border {
+            background: linear-gradient(#1A1E26, #1A1E26) padding-box,
+                        linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.02)) border-box;
+            border: 1px solid transparent;
+        }
+
+        /* Pattern */
+        .pattern-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C59D5F' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* 3D Transform Utilities */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .face-front { transform: rotateY(0deg); }
+        .face-back { transform: rotateY(180deg); }
+
+        /* Background layers */
+        .background-layers {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .deep-night {
+            background: radial-gradient(circle at 50% 0%, #2D1A1A 0%, #050507 70%);
+        }
+
+        .spinning-circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid;
+            pointer-events: none;
+        }
+
+        .circle-1 {
+            top: -20%;
+            left: -10%;
+            width: 800px;
+            height: 800px;
+            border-color: rgba(255, 255, 255, 0.05);
+            opacity: 0.2;
+            animation: spin-slow 60s linear infinite;
+        }
+
+        .circle-2 {
+            top: 10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            border-color: rgba(197, 157, 95, 0.1);
+            opacity: 0.2;
+            animation: spin-slow 60s linear infinite reverse;
+        }
+
+        .pattern-overlay-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+
+        .gradient-overlay {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(to bottom, rgba(218, 41, 28, 0.1) 0%, transparent 100%);
+            filter: blur(60px);
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Animation classes */
+        .gsap-entry, .gsap-card, .gsap-item {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+    </style>
+
     @vite([
         'resources/css/app.css',
         'resources/js/app.js',
     ])
-
 </head>
 
 <body dir="rtl">
+    <!-- Background Layers -->
+    <div class="background-layers">
+        <div class="background-layer deep-night"></div>
+        <div class="background-layer">
+            <div class="spinning-circle circle-1"></div>
+        </div>
+        <div class="background-layer">
+            <div class="spinning-circle circle-2"></div>
+        </div>
+        <div class="background-layer pattern-overlay-bg"></div>
+        <div class="background-layer gradient-overlay"></div>
+    </div>
+
     <!-- ==================== PRELOADER ==================== -->
     <div class="preloader" id="preloader">
         <div class="preloader-stars" id="preloaderStars"></div>
@@ -56,7 +195,11 @@
                 </div>
                 <div class="preloader-ring"></div>
                 <div class="preloader-ring-2"></div>
-                <img src="{{ asset('images/bahrain-tv-sm.png') }}" alt="Bahrain TV" class="preloader-logo" />
+                @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
+                    <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="AlSarya TV" class="preloader-logo" />
+                @else
+                    <img src="{{ asset('images/bahrain-tv-sm.png') }}" alt="Bahrain TV" class="preloader-logo" />
+                @endif
             </div>
             <div class="preloader-text">جاري التحميل</div>
         </div>
@@ -74,153 +217,359 @@
         </lottie-player>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-container">
+    <!-- Main Content Wrapper -->
+    <div id="main-content" class="relative z-10 container mx-auto px-4 py-8 min-h-screen flex flex-col justify-center items-center">
         <!-- Logo -->
         <div class="logo-section">
-            {{-- <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" /> --}}
-        </div>
-
-        <!-- Downtime Card -->
-        <div class="downtime-card">
-            <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
-            
-            <h1 class="main-title">برنامج السارية</h1>
-            <p class="subtitle">على شاشة تلفزيون البحرين</p>
-
-            @if(config('alsarya.registration.enabled', false) || auth()->check())
-                {{-- Registration is enabled - show registration form --}}
-                <div class="open-message bg-gradient-to-r from-brand-maroon/20 to-brand-cream/20 border-2 border-brand-maroon/40 rounded-2xl p-6 mb-8 backdrop-blur-sm">
-                    <h3 class="text-brand-cream text-2xl font-bold mb-2">🌙 رمضان كريم!</h3>
-                    <p class="text-white/80 text-lg">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
-                </div>
-
-                {{-- Registration Form for Logged-in Users --}}
-                <div class="registration-form bg-dark-card border border-brand-cream/20 rounded-2xl p-8 mb-8 opacity-100 backdrop-blur-md">
-                    {{-- Registration Type Toggle --}}
-                    <div class="flex gap-4 mb-6 justify-center">
-                        <button type="button" id="individual-toggle"
-                                class="flex-1 py-3 px-4 bg-brand-gradient text-white font-bold border-2 border-brand-cream rounded-xl cursor-pointer transition-all duration-300 text-base hover:shadow-lg hover:shadow-brand-maroon/50 opacity-100">
-                            👤 تسجيل فردي
-                        </button>
-                        <button type="button" id="family-toggle"
-                                class="flex-1 py-3 px-4 bg-transparent text-brand-cream font-bold border-2 border-brand-cream rounded-xl cursor-pointer transition-all duration-300 text-base hover:bg-brand-cream/10 opacity-100">
-                            👨‍👩‍👧‍👦 تسجيل عائلي
-                        </button>
-                    </div>
-
-                    <form method="POST" action="{{ route('callers.store') }}" dir="rtl" style="display: flex; flex-direction: column; gap: 1rem;">
-                        @csrf
-
-                        {{-- Hidden field to track registration type --}}
-                        <input type="hidden" id="registration_type" name="registration_type" value="individual">
-
-                        {{-- Name --}}
-                        <div>
-                            <label for="name" class="block text-brand-cream mb-2 font-semibold">الاسم الكامل</label>
-                            <input type="text" id="name" name="name" required value="{{ old('name') }}"
-                                   class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base placeholder-white/50 focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100"
-                                   placeholder="أدخل اسمك الكامل">
-                            @error('name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- CPR --}}
-                        <div>
-                            <label for="cpr" class="block text-brand-cream mb-2 font-semibold">رقم الهوية (CPR)</label>
-                            <input type="text" id="cpr" name="cpr" required value="{{ old('cpr') }}" pattern="\d*"
-                                   class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base placeholder-white/50 focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100"
-                                   placeholder="أدخل رقم الهوية">
-                            @error('cpr') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Phone --}}
-                        <div>
-                            <label for="phone_number" class="block text-brand-cream mb-2 font-semibold">رقم الهاتف</label>
-                            <input type="tel" id="phone_number" name="phone_number" required value="{{ old('phone_number') }}"
-                                   class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base placeholder-white/50 focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100"
-                                   placeholder="أدخل رقم الهاتف">
-                            @error('phone_number') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        {{-- Family Fields (Hidden by default) --}}
-                        <div id="family-fields" class="hidden">
-                            {{-- Family Name --}}
-                            <div>
-                                <label for="family_name" class="block text-brand-cream mb-2 font-semibold">اسم العائلة</label>
-                                <input type="text" id="family_name" name="family_name" value="{{ old('family_name') }}"
-                                       class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base placeholder-white/50 focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100"
-                                       placeholder="أدخل اسم العائلة (اختياري)">
-                                @error('family_name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
-                            </div>
-
-                            {{-- Number of Family Members --}}
-                            <div>
-                                <label for="family_members" class="block text-brand-cream mb-2 font-semibold">عدد أفراد العائلة</label>
-                                <input type="number" id="family_members" name="family_members" min="2" max="10" value="{{ old('family_members', 2) }}"
-                                       class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100">
-                                @error('family_members') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        {{-- Submit Button --}}
-                        <button type="submit"
-                                class="w-full py-4 bg-brand-gradient text-white font-bold text-lg rounded-xl cursor-pointer mt-2 transition-all duration-300 hover:shadow-lg hover:shadow-brand-maroon/50 hover:scale-105 active:scale-95 opacity-100">
-                            🎯 سجّل الآن
-                        </button>
-                    </form>
-                </div>
-
-                {{-- Current Ramadan Info --}}
-                <div class="ramadan-info bg-gradient-to-r from-brand-maroon/20 to-brand-cream/20 border-2 border-brand-cream/40 rounded-2xl p-6 backdrop-blur-sm text-center">
-                    <h4 class="text-brand-cream text-2xl font-bold mb-3">🌙 أهلاً بكم في شهر رمضان المبارك</h4>
-                    <div class="text-brand-cream text-lg font-semibold mb-2">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
-                    <div class="text-brand-light-cream text-xl font-bold">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
-                </div>
+            @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
+                <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
             @else
-                {{-- Guests see the countdown timer --}}
-                <!-- Registration Closed -->
-                <div class="closed-message">
-                    <h3>⏸️ التسجيل مغلق حالياً</h3>
-                    <p>سيتم فتح التسجيل مع بداية شهر رمضان المبارك</p>
-                </div>
-
-                <!-- Countdown -->
-                <div class="countdown-section">
-                    <div class="countdown-label">
-                        العد التنازلي لشهر رمضان المبارك
-                    </div>
-                    <div id="flipdown" class="flipdown flipdown__theme-dark"></div>
-                </div>
-
-                <!-- Ramadan Date Info -->
-                <div class="ramadan-info">
-                    <h4>🌙 أول أيام شهر رمضان المبارك</h4>
-                    <div class="date">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
-                    <div class="hijri">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
-                </div>
+                <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
             @endif
         </div>
 
-        <!-- Footer -->
-        <div class="footer-section">
-            <p>© {{ date('Y') }} <a href="https://live.bh" target="_blank">تلفزيون البحرين</a> | جميع الحقوق محفوظة</p>
-
-            <div class="footer-meta">
-                <span class="visitors-count">
-                    👁️ عدد الزوار: {{ number_format($totalHits ?? 0) }}
-                </span>
-                <span class="separator">|</span>
-                <span class="version-tag" title="إصدار التطبيق">v{{ $appVersion ?? '1.0.0' }}</span>
-                <span class="separator">|</span>
-                <a href="{{ route('login') }}" class="login-link">تسجيل الدخول</a>
+        <!-- Header Section (Animates as one block) -->
+        <header class="gsap-entry text-center mb-8 relative w-full max-w-lg">
+            <div class="inline-block mb-3 px-4 py-1 rounded-full border border-gold-500/20 bg-gold-900/10 backdrop-blur-sm">
+                <h3 class="text-gold-300 text-sm tracking-widest font-medium">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</h3>
             </div>
-        </div>
+
+            <h1 class="text-5xl md:text-6xl font-black mb-2 tracking-tight gold-text drop-shadow-2xl leading-tight pb-2">
+                برنامج السارية
+            </h1>
+            <div class="flex items-center justify-center gap-3 opacity-90">
+                <div class="h-[1px] w-12 bg-gradient-to-l from-transparent to-gold-500/50"></div>
+                <p class="text-gray-300 text-base md:text-lg font-light tracking-wide">على شاشة تلفزيون البحرين</p>
+                <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-gold-500/50"></div>
+            </div>
+        </header>
+
+        <!-- Main Glass Card Container (Animates in separately) -->
+        <main class="w-full max-w-lg relative group">
+            <!-- Glow effect -->
+            <div class="absolute -inset-1 bg-gradient-to-r from-bahrain-red to-gold-700 rounded-[2.2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+
+            <div class="gsap-card glass-panel rounded-[2rem] p-1 relative overflow-hidden">
+                <div class="bg-[#0B0D12]/80 rounded-[1.8rem] p-6 md:p-8 relative">
+                    @if(config('alsarya.registration.enabled', false) || auth()->check())
+                        {{-- Registration is enabled - show registration form --}}
+                        <div class="gsap-item relative overflow-hidden rounded-2xl mb-8 border border-white/5">
+                            <div class="absolute inset-0 bg-gradient-to-r from-bahrain-dark to-[#4a0808] opacity-80"></div>
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-gold-500/20 rounded-full blur-2xl"></div>
+
+                            <div class="relative p-5 text-center">
+                                <h2 class="text-2xl font-bold text-white mb-1 flex items-center justify-center gap-3">
+                                    <span class="gold-text text-3xl drop-shadow-lg">☪</span>
+                                    <span class="bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-300">رمضان كريم!</span>
+                                </h2>
+                                <p class="text-white/70 text-sm font-light">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
+                            </div>
+                        </div>
+
+                        {{-- Registration Form for Logged-in Users --}}
+                        <div class="gsap-item">
+                            {{-- Registration Type Toggle --}}
+                            <div class="flex bg-black/40 p-1.5 rounded-2xl mb-8 border border-white/5 relative">
+                                <!-- Start at Left (roughly 4px) to align with "Individual" (Left in RTL layout) -->
+                                <div id="tab-bg" class="w-1/2 h-full absolute top-0 bottom-0 rounded-xl bg-gradient-to-br from-bahrain-red to-bahrain-dark border border-white/10 shadow-lg left-[4px]">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl"></div>
+                                </div>
+
+                                <!-- Family (Visually Right in RTL) -->
+                                <button onclick="switchTab('family')" id="tab-family" class="flex-1 relative z-10 py-3 text-sm font-bold text-gray-400 flex justify-center items-center gap-2 transition-colors duration-300">
+                                    <i data-lucide="users" class="w-4 h-4"></i>
+                                    <span>تسجيل عائلي</span>
+                                </button>
+
+                                <!-- Individual (Visually Left in RTL) -->
+                                <button onclick="switchTab('individual')" id="tab-individual" class="flex-1 relative z-10 py-3 text-sm font-bold text-white flex justify-center items-center gap-2 transition-colors duration-300">
+                                    <i data-lucide="user" class="w-4 h-4"></i>
+                                    <span>تسجيل فردي</span>
+                                </button>
+                            </div>
+
+                            <form method="POST" action="{{ route('callers.store') }}" dir="rtl">
+                                @csrf
+
+                                {{-- Hidden field to track registration type --}}
+                                <input type="hidden" id="registration_type" name="registration_type" value="individual">
+
+                                {{-- Name --}}
+                                <div class="gsap-item flip-scene perspective-1000 h-[86px] mb-5">
+                                    <div class="flip-card w-full h-full relative transform-style-3d" id="field-1">
+                                        <!-- Front -->
+                                        <div class="face-front absolute inset-0 backface-hidden">
+                                            <div class="space-y-2">
+                                                <label for="name" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">الاسم الكامل</label>
+                                                <input type="text" id="name" name="name" required value="{{ old('name') }}"
+                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all duration-300 bg-[#151820]"
+                                                       placeholder="أدخل اسمك الكامل">
+                                                @error('name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+                                        <!-- Back -->
+                                        <div class="face-back absolute inset-0 backface-hidden">
+                                            <div class="space-y-2">
+                                                <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">اسم رب العائلة</label>
+                                                <input type="text" id="family_name" name="family_name" value="{{ old('family_name') }}"
+                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-bahrain-red/50 transition-all duration-300 bg-[#1A1515]"
+                                                       placeholder="أدخل اسم العائلة">
+                                                @error('family_name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- CPR --}}
+                                <div class="gsap-item flip-scene perspective-1000 h-[86px] mb-5">
+                                    <div class="flip-card w-full h-full relative transform-style-3d" id="field-2">
+                                        <!-- Front -->
+                                        <div class="face-front absolute inset-0 backface-hidden">
+                                            <div class="space-y-2">
+                                                <label for="cpr" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">رقم الهوية (CPR)</label>
+                                                <input type="text" id="cpr" name="cpr" required value="{{ old('cpr') }}" pattern="\d*"
+                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all duration-300 bg-[#151820]"
+                                                       placeholder="أدخل رقم الهوية">
+                                                @error('cpr') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+                                        <!-- Back -->
+                                        <div class="face-back absolute inset-0 backface-hidden">
+                                            <div class="space-y-2">
+                                                <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">رقم الهوية (CPR) لرب العائلة</label>
+                                                <input type="text" id="responsible_cpr" name="responsible_cpr" value="{{ old('responsible_cpr') }}" pattern="\d*"
+                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-bahrain-red/50 transition-all duration-300 bg-[#1A1515]"
+                                                       placeholder="أدخل رقم الهوية">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Phone --}}
+                                <div class="gsap-item flip-scene perspective-1000 h-[86px] mb-5">
+                                    <div class="flip-card w-full h-full relative transform-style-3d" id="field-3">
+                                        <!-- Front -->
+                                        <div class="face-front absolute inset-0 backface-hidden">
+                                            <div class="space-y-2">
+                                                <label for="phone_number" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">رقم الهاتف</label>
+                                                <input type="tel" id="phone_number" name="phone_number" required value="{{ old('phone_number') }}"
+                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all duration-300 bg-[#151820]"
+                                                       placeholder="أدخل رقم الهاتف">
+                                                @error('phone_number') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+                                        <!-- Back -->
+                                        <div class="face-back absolute inset-0 backface-hidden">
+                                            <div class="space-y-2">
+                                                <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">رقم هاتف التواصل لرب العائلة</label>
+                                                <input type="tel" id="contact_phone" name="contact_phone" value="{{ old('contact_phone') }}"
+                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-bahrain-red/50 transition-all duration-300 bg-[#1A1515]"
+                                                       placeholder="أدخل رقم للتواصل">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Family Fields (Hidden by default) --}}
+                                <div id="family-fields" class="hidden">
+                                    {{-- Number of Family Members --}}
+                                    <div class="gsap-item">
+                                        <label for="family_members" class="block text-brand-cream mb-2 font-semibold">عدد أفراد العائلة</label>
+                                        <input type="number" id="family_members" name="family_members" min="2" max="10" value="{{ old('family_members', 2) }}"
+                                               class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100">
+                                        @error('family_members') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                {{-- Submit Button --}}
+                                <div class="gsap-item flip-scene perspective-1000 h-[60px] mt-4">
+                                    <div class="flip-card w-full h-full relative transform-style-3d" id="btn-flip">
+                                        <!-- Front Button -->
+                                        <div class="face-front absolute inset-0 backface-hidden">
+                                            <button type="submit" class="w-full h-full group relative overflow-hidden rounded-xl bg-gradient-to-b from-bahrain-red to-[#800000] p-[1px] shadow-xl shadow-red-900/40 transition-all hover:scale-[1.01] active:scale-[0.99]">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                                <div class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine left-0"></div>
+                                                <div class="relative w-full h-full flex items-center justify-center gap-2">
+                                                    <span class="text-lg font-bold text-white tracking-wide drop-shadow-md">سجّل الآن</span>
+                                                    <i data-lucide="target" class="w-5 h-5 text-gold-300"></i>
+                                                </div>
+                                            </button>
+                                        </div>
+                                        <!-- Back Button -->
+                                        <div class="face-back absolute inset-0 backface-hidden">
+                                            <button type="submit" class="w-full h-full group relative overflow-hidden rounded-xl bg-gradient-to-b from-gold-500 to-gold-700 p-[1px] shadow-xl shadow-gold-900/40 transition-all hover:scale-[1.01] active:scale-[0.99]">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                                <div class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine left-0"></div>
+                                                <div class="relative w-full h-full flex items-center justify-center gap-2">
+                                                    <span class="text-lg font-bold text-white tracking-wide drop-shadow-md">سجّل الآن</span>
+                                                    <i data-lucide="users" class="w-5 h-5 text-white"></i>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        {{-- Current Ramadan Info --}}
+                        <div class="gsap-item mt-6 mx-4 p-[1px] rounded-2xl bg-gradient-to-r from-transparent via-green-800/50 to-transparent">
+                            <div class="bg-black/40 backdrop-blur-md rounded-2xl p-4 text-center border border-green-500/10 relative overflow-hidden">
+                                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-green-500/50 to-transparent"></div>
+
+                                <h4 class="text-green-400 font-bold mb-2 flex items-center justify-center gap-2 text-sm md:text-base">
+                                    <i data-lucide="moon" class="w-4 h-4 fill-green-400/20"></i>
+                                    <span>أهلاً بكم في شهر رمضان المبارك</span>
+                                </h4>
+                                <div class="flex justify-center items-center gap-4 text-xs md:text-sm text-gray-400 font-mono">
+                                    <span>{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</span>
+                                    <span class="w-1 h-1 rounded-full bg-gray-600"></span>
+                                    <span>{{ $ramadanDate ?? '18 فبراير 2026' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        {{-- Guests see the countdown timer --}}
+                        <!-- Registration Closed -->
+                        <div class="closed-message">
+                            <h3>⏸️ التسجيل مغلق حالياً</h3>
+                            <p>سيتم فتح التسجيل مع بداية شهر رمضان المبارك</p>
+                        </div>
+
+                        <!-- Countdown -->
+                        <div class="countdown-section">
+                            <div class="countdown-label">
+                                العد التنازلي لشهر رمضان المبارك
+                            </div>
+                            <div id="flipdown" class="flipdown flipdown__theme-dark"></div>
+                        </div>
+
+                        <!-- Ramadan Date Info -->
+                        <div class="ramadan-info">
+                            <h4>🌙 أول أيام شهر رمضان المبارك</h4>
+                            <div class="date">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
+                            <div class="hijri">{{ $ramadanHijri ?? '1 Ramadan 1447 هـ' }}</div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="gsap-item mt-12 text-center relative z-10 pb-6">
+            <p class="text-gray-500 text-[10px] mb-2 tracking-widest uppercase">© {{ date('Y') }} Bahrain Television | All Rights Reserved</p>
+
+            <div class="inline-flex items-center gap-3 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-mono text-gray-400">
+                <div class="flex items-center gap-1.5">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <span>{{ number_format($totalHits ?? 0) }} Live</span>
+                </div>
+                <div class="w-[1px] h-3 bg-gray-600"></div>
+                <span class="text-gold-500">v{{ $appVersion ?? '1.0.0' }}</span>
+            </div>
+        </footer>
     </div>
 
     <!-- Lottie Player Library -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
     <script>
+        lucide.createIcons();
+
+        // Animation Sequence
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline();
+
+            // 1. Initial State Set (Crucial for preventing FOUC)
+            // We set opacity: 0 HERE via JS so if JS fails, content remains visible (fallback)
+            gsap.set(".gsap-entry, .gsap-card, .gsap-item", {
+                opacity: 0,
+                y: 30
+            });
+            gsap.set(".flip-card", { rotationY: 0 }); // Enforce 3D state
+
+            // 2. Animate Header First
+            tl.to(".gsap-entry", {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+
+            // 3. Animate Main Card Container
+            tl.to(".gsap-card", {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power2.out"
+            }, "-=0.5");
+
+            // 4. Stagger Inner Items (Banner, Tabs, Inputs, Button, Footer)
+            // This creates the "stacking up" effect you wanted
+            tl.to(".gsap-item", {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.15, // Nice delay between each box
+                ease: "power2.out"
+            }, "-=0.4");
+        });
+
+        // Tab Logic (Preserved)
+        let currentTab = 'individual';
+
+        function switchTab(tab) {
+            if (currentTab === tab) return;
+            currentTab = tab;
+
+            const bg = document.getElementById('tab-bg');
+            const tabInd = document.getElementById('tab-individual');
+            const tabFam = document.getElementById('tab-family');
+
+            if (tab === 'family') {
+                gsap.to(bg, {
+                    left: "98%",
+                    xPercent: -100,
+                    duration: 0.6,
+                    ease: "power3.inOut"
+                });
+
+                tabFam.className = "flex-1 relative z-10 py-3 text-sm font-bold text-white flex justify-center items-center gap-2 transition-colors duration-300";
+                tabInd.className = "flex-1 relative z-10 py-3 text-sm font-bold text-gray-400 flex justify-center items-center gap-2 transition-colors duration-300";
+
+                gsap.to(".flip-card", {
+                    rotationY: 180,
+                    duration: 0.9,
+                    stagger: 0.08,
+                    ease: "back.out(1.2)"
+                });
+
+            } else {
+                gsap.to(bg, {
+                    left: "4px",
+                    xPercent: 0,
+                    duration: 0.6,
+                    ease: "power3.inOut"
+                });
+
+                tabFam.className = "flex-1 relative z-10 py-3 text-sm font-bold text-gray-400 flex justify-center items-center gap-2 transition-colors duration-300";
+                tabInd.className = "flex-1 relative z-10 py-3 text-sm font-bold text-white flex justify-center items-center gap-2 transition-colors duration-300";
+
+                gsap.to(".flip-card", {
+                    rotationY: 0,
+                    duration: 0.9,
+                    stagger: 0.08,
+                    ease: "back.out(1.2)"
+                });
+            }
+        }
+
         // ==================== REGISTRATION TYPE TOGGLE WITH SPINNING ANIMATION ====================
         function setupRegistrationToggle() {
             const individualToggle = document.getElementById('individual-toggle');

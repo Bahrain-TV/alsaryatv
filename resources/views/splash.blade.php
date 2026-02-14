@@ -474,12 +474,20 @@
                 <!-- Front face -->
                 <div class="logo-face front">
                     <div class="logo-glow front"></div>
-                    <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="logo-image front-image" title="Al-Sarya TV Show">
+                    @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
+                        <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="برنامج السارية" class="logo-image front-image" title="Al-Sarya TV Show">
+                    @else
+                        <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="logo-image front-image" title="Al-Sarya TV Show">
+                    @endif
                 </div>
                 <!-- Back face -->
                 <div class="logo-face back">
                     <div class="logo-glow back"></div>
-                    <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="logo-image back-image" title="Al-Sarya TV Show">
+                    @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
+                        <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="برنامج السارية" class="logo-image back-image" title="Al-Sarya TV Show">
+                    @else
+                        <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="logo-image back-image" title="Al-Sarya TV Show">
+                    @endif
                 </div>
             </div>
         </div>
