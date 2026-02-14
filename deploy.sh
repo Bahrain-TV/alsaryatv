@@ -22,6 +22,11 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No colour
 
+# ── Logging Setup ────────────────────────────────────────────────────────────
+LOG_FILE=$(mktemp)
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+
 # ── Helpers ──────────────────────────────────────────────────────────────────
 info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
 success() { echo -e "${GREEN}[OK]${NC}    $*"; }
@@ -53,6 +58,52 @@ for arg in "$@"; do
     esac
 done
 
+# ── Discord Notification ─────────────────────────────────────────────────────
+DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+
+send_notification() {
+    local exit_code=$1
+    if [[ -z "$DISCORD_WEBHOOK" ]]; then
+        return
+    fi
+    
+    # Use PHP to construct safe JSON payload
+    php -r "
+        \$log = file_get_contents('$LOG_FILE');
+        // Strip ANSI codes for cleaner Discord display
+        \$log = preg_replace('/\\x1b\[[0-9;]*m/', '', \$log);
+        // Limit to last 1500 chars to fit in embed
+        if (strlen(\$log) > 1500) {
+            \$log = '...' . substr(\$log, -1500);
+        }
+        
+        \$status = $exit_code === 0 ? 'Success' : 'Failed';
+        \$color = $exit_code === 0 ? 5763719 : 15548997; // Green or Red
+        
+        \$json = json_encode([
+            'username' => 'Deployment Bot',
+            'embeds' => [[
+                'title' => \"Deployment \$status\",
+                'description' => \"\`\`\`\\n\" . \$log . \"\\n\`\`\`\",
+                'color' => \$color,
+                'timestamp' => date('c')
+            ]]
+        ]);
+        file_put_contents('discord_payload.json', \$json);
+    "
+
+    if [[ -f discord_payload.json ]]; then
+        curl -s -H "Content-Type: application/json" -d @discord_payload.json "$DISCORD_WEBHOOK" >/dev/null || true
+        rm discord_payload.json
+    fi
+    rm -f "$LOG_FILE"
+    rm -f resources/views/errors/temp_503.blade.php
+}
+
+trap 'send_notification $?' EXIT
+
+
+
 # ── Pre-flight checks ───────────────────────────────────────────────────────
 APP_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$APP_DIR"
@@ -71,7 +122,26 @@ fi
 
 # ── Step 1: Maintenance mode ────────────────────────────────────────────────
 info "Enabling maintenance mode..."
-run php artisan down --retry=30 --refresh=15 || true
+
+# Generate temporary maintenance view with random message
+php -r "
+    \$messages = [
+        \"نعمل حالياً على تحسين تجربة المشاهدة. سنعود قريباً.<br>We're currently enhancing your viewing experience. Back shortly.\",
+        \"صيانة دورية لخدمتكم بشكل أفضل. شكراً لتفهمكم.<br>Routine maintenance to serve you better. Thanks for your patience.\",
+        \"نقوم بتحديث النظام بميزات جديدة. انتظرونا!<br>Updating the system with new features. Stay tuned!\",
+        \"تحسينات سريعة للأداء. سنكون متاحين خلال دقائق.<br>Quick performance improvements. We'll be back in minutes.\",
+        \"مجرد وقت مستقطع قصير للصيانة. شكراً لانتظاركم.<br>Just a short timeout for maintenance. Thanks for waiting.\"
+    ];
+    \$message = \$messages[array_rand(\$messages)];
+    
+    \$content = file_get_contents('resources/views/errors/503.blade.php');
+    \$content = str_replace('{{{MAINTENANCE_MESSAGE}}}', \$message, \$content);
+    file_put_contents('resources/views/errors/temp_503.blade.php', \$content);
+"
+
+# Use the temporary view for maintenance mode (pre-rendered)
+run php artisan down --retry=60 --refresh=15 --render="errors::temp_503" || true
+
 
 # ── Step 2: Pull latest code (if in a git repo) ─────────────────────────────
 if [[ -d .git ]]; then
@@ -189,10 +259,7 @@ echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  Deployment complete!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
-info "Migration status:"
-if [[ "$DRY_RUN" == "false" ]]; then
-    php artisan migrate:status
-fi
+
 echo ""
 [[ "$SEED" == "true" ]] && info "Seeders executed: UserSeeder, CallerSeeder"
 [[ "$FRESH" == "true" ]] && warn "Database was freshly rebuilt (all previous data dropped)."

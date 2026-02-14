@@ -64,3 +64,4 @@ Homestead.json
 auth.json
 
 *.log
+resources/views/errors/temp_503.blade.php
