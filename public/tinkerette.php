@@ -36,6 +36,40 @@ $blockedCommands = [
 $maxExecutionTime = 30;
 
 // ---------------------------------------------------------------------------
+// Resolve paths
+// ---------------------------------------------------------------------------
+
+$publicDir  = __DIR__;
+$basePath   = dirname($publicDir);          // project root
+$artisanBin = $basePath . '/artisan';
+
+// ---------------------------------------------------------------------------
+// Production kill-switch — Tinkerette must never run in production
+// ---------------------------------------------------------------------------
+
+$appEnv = 'production'; // default to the safest assumption
+
+// Read APP_ENV from .env without bootstrapping Laravel
+$envFile = $basePath . '/.env';
+if (file_exists($envFile)) {
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        if (str_starts_with(trim($line), '#')) continue;
+        if (preg_match('/^APP_ENV\s*=\s*(.+)$/', trim($line), $m)) {
+            $appEnv = trim($m[1], " \t\n\r\0\x0B\"'");
+            break;
+        }
+    }
+}
+
+// Also honour the real environment variable (set by the web server / container)
+$appEnv = getenv('APP_ENV') ?: $appEnv;
+
+if ($appEnv === 'production') {
+    http_response_code(403);
+    exit('Tinkerette is disabled in production.');
+}
+
+// ---------------------------------------------------------------------------
 // Security gate
 // ---------------------------------------------------------------------------
 
@@ -45,14 +79,6 @@ if (!empty($allowedIps) && !in_array($clientIp, $allowedIps, true)) {
     http_response_code(403);
     exit('Forbidden');
 }
-
-// ---------------------------------------------------------------------------
-// Resolve paths
-// ---------------------------------------------------------------------------
-
-$publicDir  = __DIR__;
-$basePath   = dirname($publicDir);          // project root
-$artisanBin = $basePath . '/artisan';
 
 if (!file_exists($artisanBin)) {
     http_response_code(500);
