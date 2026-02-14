@@ -45,6 +45,7 @@ class Caller extends Model
     public function scopeEligible(Builder $query): Builder
     {
         return $query->where('is_winner', false)
+            ->where('status', 'active')
             ->whereNotNull('cpr')
             ->where('cpr', '!=', '');
     }
