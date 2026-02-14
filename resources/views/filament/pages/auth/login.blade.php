@@ -1,15 +1,7 @@
 <x-filament-panels::page.simple>
     <x-slot name="card">
         <div class="w-full flex justify-center mb-4">
-            @if (filled($logo = filament()->getLogoUrl()))
-                <img src="{{ $logo }}" alt="{{ config('app.name') }}" class="h-16">
-            @else
-                <div class="bg-primary-500 h-16 w-16 rounded-full flex items-center justify-center">
-                    <span class="text-white text-2xl font-bold">
-                        {{ strtoupper(substr(config('app.name'), 0, 1)) }}
-                    </span>
-                </div>
-            @endif
+            <img src="{{ asset('images/alsarya-logo.png') }}" alt="{{ config('app.name', 'السارية') }}" class="h-16 w-auto" />
         </div>
 
         <h2 class="text-center text-2xl font-bold tracking-tight text-gray-950">
