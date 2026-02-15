@@ -261,24 +261,50 @@ fi
 if [[ -d .git ]]; then
     info "Pulling latest changes from git..."
 
-    # Try fast-forward only first (safest)
-    if run git pull --ff-only 2>/dev/null; then
-        success "Pulled latest changes (fast-forward)"
+    # First, fetch to see what's available
+    run git fetch origin || warn "git fetch failed"
+
+    # Get current branch
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+    
+    if [[ "$CURRENT_BRANCH" == "unknown" ]]; then
+        warn "Could not determine current branch — skipping git pull"
     else
-        warn "Fast-forward failed — local and remote branches have diverged"
-
-        # Fetch remote to see current state
-        run git fetch origin || warn "git fetch failed"
-
-        # Get current branch
-        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-
-        # Reset to remote HEAD (deployment should use what's on GitHub/remote)
-        info "Resetting to remote/$CURRENT_BRANCH..."
-        if run git reset --hard origin/"$CURRENT_BRANCH" 2>/dev/null; then
-            success "Reset to remote branch (local commits discarded if any)"
+        # Check if we can fast-forward
+        LOCAL=$(git rev-parse HEAD 2>/dev/null || echo "")
+        REMOTE=$(git rev-parse origin/"$CURRENT_BRANCH" 2>/dev/null || echo "")
+        
+        if [[ -z "$LOCAL" || -z "$REMOTE" ]]; then
+            warn "Could not determine commit hashes — skipping git pull"
+        elif [[ "$LOCAL" == "$REMOTE" ]]; then
+            success "Already up to date with origin/$CURRENT_BRANCH"
         else
-            warn "Could not reset to remote — continuing with local state"
+            # Check if we can fast-forward
+            BASE=$(git merge-base HEAD origin/"$CURRENT_BRANCH" 2>/dev/null || echo "")
+            
+            if [[ "$BASE" == "$LOCAL" ]]; then
+                # Can fast-forward
+                info "Fast-forwarding to origin/$CURRENT_BRANCH..."
+                if run git merge --ff-only origin/"$CURRENT_BRANCH"; then
+                    success "Fast-forwarded to latest changes"
+                else
+                    error "Fast-forward merge failed"
+                    exit 1
+                fi
+            else
+                # Cannot fast-forward - local and remote have diverged
+                warn "Local and remote branches have diverged"
+                warn "Local commits will be discarded in favor of remote"
+                
+                # Reset to remote HEAD (deployment should use what's on GitHub/remote)
+                info "Resetting to origin/$CURRENT_BRANCH..."
+                if run git reset --hard origin/"$CURRENT_BRANCH"; then
+                    success "Reset to remote branch (local commits discarded)"
+                else
+                    error "Could not reset to remote branch"
+                    exit 1
+                fi
+            fi
         fi
     fi
 fi
