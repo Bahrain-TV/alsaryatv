@@ -10,41 +10,63 @@
 
 /* Modern OKLCH Color System */
 :root {
-    /* Base colors - Light mode */
-    --background: oklch(0.98 0 0);
-    --foreground: oklch(0.1 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.1 0 0);
+    /* Base colors - Light mode - Beautiful Ramadan theme */
+    --background: linear-gradient(135deg,
+        oklch(0.99 0.02 85) 0%,
+        oklch(0.98 0.03 75) 25%,
+        oklch(0.97 0.04 65) 50%,
+        oklch(0.96 0.03 55) 75%,
+        oklch(0.98 0.02 45) 100%);
+    --foreground: oklch(0.15 0.02 25);
+    --card: oklch(1 0 0 / 0.95);
+    --card-foreground: oklch(0.15 0.02 25);
 
-    /* Primary colors - Gold/Amber theme */
-    --primary: oklch(0.6 0.2 70.0804);
+    /* Primary colors - Elegant Gold theme for light mode */
+    --primary: oklch(0.65 0.18 70.0804);
     --primary-foreground: oklch(1 0 0);
-    --primary-gold: oklch(0.6 0.2 70.0804);
+    --primary-gold: oklch(0.65 0.18 70.0804);
 
-    /* Accent colors - Emerald theme */
-    --accent: oklch(0.7 0.15 155.0);
+    /* Accent colors - Soft Emerald theme */
+    --accent: oklch(0.75 0.12 155.0);
     --accent-foreground: oklch(0.1 0 0);
-    --primary-emerald: oklch(0.7 0.15 155.0);
+    --primary-emerald: oklch(0.75 0.12 155.0);
 
-    /* Semantic colors */
-    --muted: oklch(0.95 0 0);
-    --muted-foreground: oklch(0.4 0 0);
-    --border: oklch(0.9 0 0);
-    --input: oklch(0.9 0 0);
-    --ring: oklch(0.6 0.2 70.0804);
+    /* Semantic colors - Light mode friendly */
+    --muted: oklch(0.96 0.01 80);
+    --muted-foreground: oklch(0.45 0.01 30);
+    --border: oklch(0.92 0.005 70);
+    --input: oklch(0.95 0.005 75);
+    --ring: oklch(0.65 0.18 70.0804);
 
-    /* Legacy support */
-    --bg-dark: oklch(0.95 0 0);
-    --bg-card: oklch(1 0 0);
-    --text-primary: oklch(0.1 0 0);
-    --text-secondary: oklch(0.4 0 0);
+    /* Legacy support - Light mode optimized */
+    --bg-dark: oklch(0.94 0.01 85);
+    --bg-card: oklch(1 0 0 / 0.98);
+    --text-primary: oklch(0.15 0.02 25);
+    --text-secondary: oklch(0.45 0.01 30);
 
-    /* Shadows */
-    --shadow-color: oklch(0 0 0 / 0.05);
-    --shadow-sm: 0px 2px 4px var(--shadow-color);
-    --shadow-md: 0px 4px 8px var(--shadow-color);
-    --shadow-lg: 0px 8px 16px var(--shadow-color);
-    --shadow-xl: 0px 12px 24px var(--shadow-color);
+    /* Enhanced Shadows for Light Mode */
+    --shadow-color: oklch(0.15 0.02 25 / 0.08);
+    --shadow-sm: 0px 2px 8px var(--shadow-color);
+    --shadow-md: 0px 4px 16px var(--shadow-color);
+    --shadow-lg: 0px 8px 32px var(--shadow-color);
+    --shadow-xl: 0px 16px 48px var(--shadow-color);
+    --shadow-glow: 0px 0px 20px oklch(0.65 0.18 70.0804 / 0.3);
+
+    /* Light mode specific gradients */
+    --gradient-primary: linear-gradient(135deg,
+        oklch(0.65 0.18 70.0804) 0%,
+        oklch(0.7 0.15 75.0804) 50%,
+        oklch(0.65 0.18 70.0804) 100%);
+    --gradient-accent: linear-gradient(135deg,
+        oklch(0.75 0.12 155.0) 0%,
+        oklch(0.8 0.1 160.0) 50%,
+        oklch(0.75 0.12 155.0) 100%);
+    --gradient-background: linear-gradient(135deg,
+        oklch(0.99 0.02 85) 0%,
+        oklch(0.98 0.03 75) 25%,
+        oklch(0.97 0.04 65) 50%,
+        oklch(0.96 0.03 55) 75%,
+        oklch(0.98 0.02 45) 100%);
 
     /* Spacing scale */
     --spacing-xs: 0.25rem;
@@ -107,13 +129,10 @@ html.dark {
 
 body {
     font-family: var(--font-sans);
-    background: linear-gradient(135deg,
-        oklch(0.95 0 0 / 0.95) 0%,
-        oklch(0.92 0 0 / 0.90) 50%,
-        oklch(0.96 0 0 / 0.95) 100%);
-    background-size: cover;
-    background-position: center;
+    background: var(--gradient-background);
+    background-size: 400% 400%;
     background-attachment: fixed;
+    background-position: center;
     background-repeat: no-repeat;
     min-height: 100vh;
     min-height: 100dvh;
@@ -126,6 +145,37 @@ body {
     color: var(--foreground);
     padding: clamp(0.5rem, 2vw, 1rem);
     padding: max(env(safe-area-inset-top), 0.5rem) max(env(safe-area-inset-right), 0.5rem) max(env(safe-area-inset-bottom), 0.5rem) max(env(safe-area-inset-left), 0.5rem);
+    animation: gentle-float 20s ease-in-out infinite;
+}
+
+/* Light mode specific animations */
+@keyframes gentle-float {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes soft-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px oklch(0.65 0.18 70.0804 / 0.1),
+                    0 0 40px oklch(0.65 0.18 70.0804 / 0.05);
+    }
+    50% {
+        box-shadow: 0 0 30px oklch(0.65 0.18 70.0804 / 0.15),
+                    0 0 60px oklch(0.65 0.18 70.0804 / 0.08);
+    }
 }
 
 /* Dark mode body styles */

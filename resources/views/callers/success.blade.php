@@ -33,10 +33,13 @@
             background-attachment: fixed;
             background-repeat: no-repeat;
             font-family: 'Tajawal', sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
+            min-height: 100vh;
+            padding: 0;
         }
-        
+
         body::before {
             content: '';
             position: fixed;
@@ -54,27 +57,31 @@
 
         .success-container {
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 24px;
+            padding: clamp(16px, 4vw, 32px);
             background: linear-gradient(135deg, rgba(9, 12, 18, 0.9) 0%, rgba(16, 24, 40, 0.85) 100%);
+            padding-top: max(env(safe-area-inset-top), 16px);
+            padding-bottom: max(env(safe-area-inset-bottom), 16px);
         }
 
         .success-card {
             background: rgba(10, 12, 20, 0.7);
             backdrop-filter: blur(15px);
             border: 2px solid rgba(251, 191, 36, 0.35);
-            border-radius: 24px;
+            border-radius: clamp(16px, 4vw, 24px);
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
                         0 0 50px rgba(251, 191, 36, 0.2),
                         inset 0 1px 1px rgba(255, 255, 255, 0.08);
             animation: slideIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-            max-width: 450px;
             width: 100%;
-            padding: 40px 28px;
+            max-width: min(450px, 95vw);
+            padding: clamp(24px, 6vw, 40px) clamp(20px, 5vw, 28px);
             position: relative;
             overflow: hidden;
+            margin-top: clamp(20px, 8vh, 60px);
         }
 
         .success-card::before {
@@ -157,50 +164,53 @@
         }
 
         h2 {
-            font-size: clamp(1.875rem, 5vw, 2.5rem);
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
             font-weight: 800;
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: clamp(16px, 4vw, 24px);
             background: linear-gradient(135deg, #ffffff 0%, #fde68a 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.5px;
+            line-height: 1.2;
         }
 
         .subtitle {
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 2.8vw, 1rem);
             text-align: center;
             color: #cbd5e1;
-            margin-bottom: 32px;
+            margin-bottom: clamp(24px, 6vw, 32px);
             line-height: 1.6;
         }
 
         .beyon-section {
             background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(16, 185, 129, 0.12) 100%);
             border: 1px solid rgba(251, 191, 36, 0.3);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 32px;
+            border-radius: clamp(12px, 3vw, 16px);
+            padding: clamp(16px, 4vw, 24px);
+            margin-bottom: clamp(24px, 6vw, 32px);
             text-align: center;
         }
 
         .beyon-section p {
             color: #e2e8f0;
-            margin-bottom: 16px;
-            font-size: 0.95rem;
+            margin-bottom: clamp(8px, 2vw, 16px);
+            font-size: clamp(0.9rem, 2.5vw, 0.95rem);
+            line-height: 1.5;
         }
 
         .beyon-section .app-name {
             color: #fbbf24;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 3vw, 1.1rem);
         }
 
         .app-store-link {
             display: inline-block;
             transition: all 0.3s ease;
             transform: scale(1);
+            margin-top: clamp(8px, 2vw, 12px);
         }
 
         .app-store-link:hover {
@@ -208,28 +218,29 @@
         }
 
         .app-store-link img {
-            width: 240px;
+            width: clamp(180px, 25vw, 240px);
             height: auto;
-            border-radius: 8px;
+            border-radius: clamp(6px, 1.5vw, 8px);
+            max-width: 100%;
         }
 
         .stats-container {
             background: rgba(251, 191, 36, 0.08);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
+            border-radius: clamp(8px, 2vw, 12px);
+            padding: clamp(16px, 4vw, 24px);
+            margin-bottom: clamp(16px, 4vw, 24px);
             border: 1px solid rgba(251, 191, 36, 0.2);
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: #94a3b8;
-            margin-bottom: 12px;
             text-align: center;
         }
 
+        .stat-label {
+            font-size: clamp(0.8rem, 2.5vw, 0.875rem);
+            color: #94a3b8;
+            margin-bottom: clamp(8px, 2.5vw, 12px);
+        }
+
         .stat-value {
-            font-size: 3rem;
+            font-size: clamp(2rem, 8vw, 3rem);
             font-weight: 900;
             text-align: center;
             background: linear-gradient(135deg, #fbbf24 0%, #34d399 100%);
@@ -238,56 +249,58 @@
             background-clip: text;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum";
-            margin-bottom: 8px;
+            margin-bottom: clamp(4px, 1.5vw, 8px);
+            line-height: 1;
         }
 
         .stat-total {
-            font-size: 0.875rem;
+            font-size: clamp(0.75rem, 2.5vw, 0.875rem);
             color: #cbd5e1;
             text-align: center;
+            line-height: 1.4;
         }
 
         .warning-box {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(234, 88, 12, 0.15) 100%);
             border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 32px;
+            border-radius: clamp(8px, 2vw, 12px);
+            padding: clamp(12px, 3vw, 16px);
+            margin-bottom: clamp(24px, 6vw, 32px);
             text-align: center;
         }
 
         .warning-box .label {
             color: #fca5a5;
             font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 4px;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            margin-bottom: clamp(2px, 1vw, 4px);
         }
 
         .warning-box .text {
             color: #fecaca;
-            font-size: 0.875rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.875rem);
             line-height: 1.5;
         }
 
         .countdown-section {
-            margin-top: 32px;
+            margin-top: clamp(24px, 6vw, 32px);
             text-align: center;
         }
 
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: clamp(6px, 2vw, 8px);
             background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: clamp(3px, 1vw, 4px);
             overflow: hidden;
-            margin-bottom: 24px;
+            margin-bottom: clamp(16px, 4vw, 24px);
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .progress-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, #fbbf24 0%, #34d399 60%, #0ea5e9 100%);
-            border-radius: 4px;
+            border-radius: clamp(3px, 1vw, 4px);
             transition: width 0.1s linear;
             box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
         }
@@ -296,38 +309,47 @@
             display: flex;
             align-items: baseline;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 24px;
+            gap: clamp(4px, 1.5vw, 8px);
+            margin-bottom: clamp(16px, 4vw, 24px);
+            flex-wrap: wrap;
         }
 
         .countdown-number {
-            font-size: 2.5rem;
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
             font-weight: 900;
             color: #fbbf24;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum";
-            min-width: 90px;
+            min-width: clamp(60px, 15vw, 90px);
         }
 
         .countdown-label {
-            font-size: 1rem;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
             color: #cbd5e1;
         }
 
         .action-button {
             display: inline-block;
-            padding: 14px 32px;
+            padding: clamp(12px, 3vw, 14px) clamp(24px, 6vw, 32px);
             background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
             color: #0f172a;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: clamp(10px, 2.5vw, 12px);
+            font-size: clamp(14px, 3.5vw, 16px);
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(251, 191, 36, 0.35);
             text-decoration: none;
             font-family: 'Tajawal', sans-serif;
+            text-align: center;
+            min-height: 44px; /* Touch-friendly minimum */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
         }
 
         .action-button:hover {
@@ -339,15 +361,33 @@
             transform: translateY(0);
         }
 
-        /* Rate limit countdown mode */
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .action-button {
+                padding: 16px 32px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .action-button:hover {
+                transform: none;
+            }
+
+            .app-store-link {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
         .rate-limit-container {
             text-align: center;
         }
 
         .rate-limit-icon {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 24px;
+            width: clamp(80px, 20vw, 100px);
+            height: clamp(80px, 20vw, 100px);
+            margin: 0 auto clamp(16px, 4vw, 24px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -358,39 +398,35 @@
         }
 
         .rate-limit-icon svg {
-            width: 60%;
-            height: 60%;
+            width: clamp(50%, 15vw, 60%);
+            height: clamp(50%, 15vw, 60%);
             color: #fca5a5;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
         }
 
         .rate-limit-message {
             color: #e2e8f0;
-            margin-bottom: 12px;
-            font-size: 1.1rem;
+            margin-bottom: clamp(8px, 2vw, 12px);
+            font-size: clamp(1rem, 3vw, 1.1rem);
         }
 
         .rate-limit-submessage {
             color: #cbd5e1;
-            font-size: 0.95rem;
-            margin-bottom: 32px;
+            font-size: clamp(0.9rem, 2.5vw, 0.95rem);
+            margin-bottom: clamp(24px, 6vw, 32px);
             line-height: 1.5;
         }
 
         .timer-circle {
-            width: 140px;
-            height: 140px;
-            margin: 0 auto 24px;
+            width: clamp(100px, 25vw, 140px);
+            height: clamp(100px, 25vw, 140px);
+            margin: 0 auto clamp(16px, 4vw, 24px);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
             background: conic-gradient(#fbbf24, #f97316, #34d399);
-            padding: 4px;
+            padding: clamp(3px, 1vw, 4px);
             position: relative;
             animation: rotate 3s linear infinite;
         }
@@ -398,12 +434,12 @@
         .timer-circle::after {
             content: '';
             position: absolute;
-            width: calc(100% - 8px);
-            height: calc(100% - 8px);
+            width: calc(100% - clamp(6px, 2vw, 8px));
+            height: calc(100% - clamp(6px, 2vw, 8px));
             border-radius: 50%;
             background: rgba(15, 23, 42, 0.95);
-            top: 4px;
-            left: 4px;
+            top: clamp(3px, 1vw, 4px);
+            left: clamp(3px, 1vw, 4px);
         }
 
         .timer-content {
@@ -416,7 +452,7 @@
         }
 
         .timer-value {
-            font-size: 2.5rem;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
             font-weight: 900;
             color: #fbbf24;
             font-variant-numeric: tabular-nums;
@@ -424,10 +460,10 @@
         }
 
         .timer-label {
-            font-size: 0.75rem;
+            font-size: clamp(0.6rem, 2vw, 0.75rem);
             color: #cbd5e1;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: clamp(0.5px, 1.5vw, 1px);
         }
 
         @keyframes rotate {
@@ -435,21 +471,247 @@
             to { transform: rotate(360deg); }
         }
 
-        @media (max-width: 640px) {
+        /* Enhanced Responsive Design */
+        @media (max-width: 480px) {
+            .success-container {
+                padding: 12px;
+                align-items: flex-start;
+            }
+
             .success-card {
-                padding: 32px 20px;
+                margin-top: 20px;
+                padding: 20px 16px;
+                border-radius: 16px;
+                max-width: 100%;
+            }
+
+            .lottie-wrapper lottie-player {
+                width: 120px !important;
+                height: 120px !important;
+            }
+
+            .check-mark {
+                width: 60px;
+                height: 60px;
             }
 
             h2 {
-                font-size: 1.75rem;
+                font-size: 1.5rem;
+                margin-bottom: 16px;
             }
 
-            .stat-value {
-                font-size: 2.5rem;
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 24px;
+            }
+
+            .beyon-section {
+                padding: 16px;
+                margin-bottom: 24px;
             }
 
             .app-store-link img {
-                width: 200px;
+                width: 180px;
+            }
+
+            .stats-container {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .warning-box {
+                padding: 12px;
+                margin-bottom: 24px;
+            }
+
+            .countdown-section {
+                margin-top: 24px;
+            }
+
+            .timer-circle {
+                width: 100px;
+                height: 100px;
+            }
+
+            .timer-value {
+                font-size: 1.8rem;
+            }
+
+            .rate-limit-icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .rate-limit-icon svg {
+                width: 50%;
+                height: 50%;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .success-card {
+                max-width: 500px;
+                padding: 32px 24px;
+            }
+
+            .lottie-wrapper lottie-player {
+                width: 150px !important;
+                height: 150px !important;
+            }
+
+            .check-mark {
+                width: 70px;
+                height: 70px;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .app-store-link img {
+                width: 220px;
+            }
+
+            .stat-value {
+                font-size: 2.8rem;
+            }
+
+            .timer-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .timer-value {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .success-card {
+                max-width: 550px;
+                padding: 36px 32px;
+            }
+
+            .lottie-wrapper lottie-player {
+                width: 160px !important;
+                height: 160px !important;
+            }
+
+            .check-mark {
+                width: 75px;
+                height: 75px;
+            }
+
+            h2 {
+                font-size: 2.2rem;
+            }
+
+            .app-store-link img {
+                width: 240px;
+            }
+
+            .stat-value {
+                font-size: 3.2rem;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .success-card {
+                max-width: 450px;
+            }
+
+            .lottie-wrapper lottie-player {
+                width: 180px !important;
+                height: 180px !important;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .success-container {
+                align-items: center;
+                padding: 16px;
+            }
+
+            .success-card {
+                margin-top: 0;
+                max-height: calc(100vh - 32px);
+                overflow-y: auto;
+            }
+
+            .lottie-wrapper lottie-player {
+                width: 100px !important;
+                height: 100px !important;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+                margin-bottom: 12px;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 16px;
+            }
+
+            .beyon-section {
+                padding: 12px;
+                margin-bottom: 16px;
+            }
+
+            .stats-container {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .warning-box {
+                padding: 10px;
+                margin-bottom: 16px;
+            }
+
+            .countdown-section {
+                margin-top: 16px;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .success-card {
+                border-width: 1px;
+            }
+
+            .app-store-link img {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .success-card {
+                animation: none;
+            }
+
+            .check-mark {
+                animation: none;
+            }
+
+            .timer-circle {
+                animation: none;
+            }
+
+            .rate-limit-icon {
+                animation: none;
+            }
+
+            * {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
             }
         }
     </style>
@@ -464,7 +726,7 @@
                 <!-- Lottie animation -->
                 <div class="lottie-wrapper">
                     <lottie-player src="{{ asset('lottie/crecent-moon-ramadan.json') }}" background="transparent"
-                        speed="0.5" style="width: 180px; height: 180px;" count="1" autoplay>
+                        speed="0.5" style="width: clamp(120px, 20vw, 180px); height: clamp(120px, 20vw, 180px);" count="1" autoplay>
                     </lottie-player>
                 </div>
 

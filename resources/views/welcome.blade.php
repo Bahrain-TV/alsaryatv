@@ -33,41 +33,65 @@
 
     <!-- Additional styles for flip cards and particles -->
     <style>
-        body {
-            background-color: #050507;
-            overflow-x: hidden;
+        /* Light mode body override */
+        body:not(.dark-mode) {
+            background: linear-gradient(135deg,
+                oklch(0.99 0.02 85) 0%,
+                oklch(0.98 0.03 75) 25%,
+                oklch(0.97 0.04 65) 50%,
+                oklch(0.96 0.03 55) 75%,
+                oklch(0.98 0.02 45) 100%);
+            animation: gentle-float 20s ease-in-out infinite;
         }
 
-        /* Typography Gradients */
+        @keyframes gentle-float {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Enhanced Typography Gradients for Light Mode */
         .gold-text {
-            background: linear-gradient(to bottom, #fff5e1 0%, #e8b960 40%, #b8860b 100%);
+            background: linear-gradient(135deg,
+                oklch(0.65 0.18 70.0804) 0%,
+                oklch(0.7 0.15 75.0804) 30%,
+                oklch(0.75 0.12 80.0804) 60%,
+                oklch(0.65 0.18 70.0804) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0px 2px 10px rgba(232, 185, 96, 0.2);
+            text-shadow: 0px 2px 15px oklch(0.65 0.18 70.0804 / 0.2);
+            filter: drop-shadow(0 0 10px oklch(0.65 0.18 70.0804 / 0.1));
         }
 
-        /* Glassmorphism */
+        /* Beautiful Glassmorphism for Light Mode */
         .glass-panel {
-            background: rgba(15, 17, 23, 0.65);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+                0 1px 0 rgba(255, 255, 255, 0.1) inset;
         }
 
         .input-gradient-border {
-            background: linear-gradient(#1A1E26, #1A1E26) padding-box,
-                        linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.02)) border-box;
-            border: 1px solid transparent;
+            background: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)) padding-box,
+                        linear-gradient(135deg,
+                            oklch(0.65 0.18 70.0804 / 0.3),
+                            oklch(0.75 0.12 155.0 / 0.2),
+                            oklch(0.65 0.18 70.0804 / 0.3)) border-box;
+            border: 2px solid transparent;
+            border-radius: 12px;
         }
 
-        /* Pattern */
+        /* Elegant Pattern for Light Mode */
         .pattern-overlay {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C59D5F' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C59D5F' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.6;
         }
 
-        /* 3D Transform Utilities */
+        /* Enhanced 3D Transform Utilities */
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden {
@@ -77,7 +101,7 @@
         .face-front { transform: rotateY(0deg); }
         .face-back { transform: rotateY(180deg); }
 
-        /* Background layers */
+        /* Beautiful Background layers for Light Mode */
         .background-layers {
             position: fixed;
             top: 0;
@@ -95,8 +119,68 @@
             height: 100%;
         }
 
-        .deep-night {
-            background: radial-gradient(circle at 50% 0%, #2D1A1A 0%, #050507 70%);
+        .light-mode-bg {
+            background:
+                radial-gradient(circle at 20% 80%, oklch(0.75 0.12 155.0 / 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, oklch(0.65 0.18 70.0804 / 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, oklch(0.7 0.15 75.0804 / 0.06) 0%, transparent 50%);
+        }
+
+        /* Enhanced button styles for light mode */
+        .btn-primary {
+            background: linear-gradient(135deg,
+                oklch(0.65 0.18 70.0804) 0%,
+                oklch(0.7 0.15 75.0804) 50%,
+                oklch(0.65 0.18 70.0804) 100%);
+            border: none;
+            color: white;
+            box-shadow:
+                0 4px 15px oklch(0.65 0.18 70.0804 / 0.3),
+                0 2px 8px oklch(0.65 0.18 70.0804 / 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 25px oklch(0.65 0.18 70.0804 / 0.4),
+                0 4px 15px oklch(0.65 0.18 70.0804 / 0.3);
+        }
+
+        /* Enhanced form styling */
+        .form-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: oklch(0.65 0.18 70.0804);
+            box-shadow: 0 0 0 3px oklch(0.65 0.18 70.0804 / 0.1);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Ramadan crescent moon effect */
+        .moon-glow {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle,
+                oklch(0.9 0.05 70) 0%,
+                oklch(0.8 0.08 75) 30%,
+                transparent 70%);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: moon-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes moon-pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
         }
 
         .spinning-circle {
@@ -167,13 +251,21 @@
 <body dir="rtl">
     <!-- Background Layers -->
     <div class="background-layers">
-        <div class="background-layer deep-night"></div>
+        <!-- Light Mode Beautiful Background -->
+        <div class="background-layer light-mode-bg"></div>
+
+        <!-- Ramadan Moon Glow Effect -->
+        <div class="moon-glow"></div>
+
+        <!-- Animated Elements -->
         <div class="background-layer">
             <div class="spinning-circle circle-1"></div>
         </div>
         <div class="background-layer">
             <div class="spinning-circle circle-2"></div>
         </div>
+
+        <!-- Pattern and Gradient Overlays -->
         <div class="background-layer pattern-overlay-bg"></div>
         <div class="background-layer gradient-overlay"></div>
     </div>
@@ -220,7 +312,7 @@
     <!-- Main Content Wrapper -->
     <div id="main-content" class="relative z-10 container mx-auto px-4 py-8 min-h-screen flex flex-col justify-center items-center">
         <!-- Theme Toggle Button -->
-        <button id="theme-toggle" class="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-black/20 backdrop-blur-md border border-white/10 hover:bg-black/30 transition-all duration-300 flex items-center justify-center group" onclick="window.ThemeManager?.toggleTheme()" title="تبديل السمة">
+        <button id="theme-toggle" class="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-black/10 hover:bg-white/30 dark:bg-black/20 dark:border-white/10 dark:hover:bg-black/30 transition-all duration-300 flex items-center justify-center group shadow-lg" onclick="window.ThemeManager?.toggleTheme()" title="تبديل السمة">
             <svg id="theme-icon-sun" class="w-6 h-6 text-yellow-400 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
             </svg>
@@ -311,7 +403,7 @@
                                             <div class="space-y-2">
                                                 <label for="name" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">الاسم الكامل</label>
                                                 <input type="text" id="name" name="name" required value="{{ old('name') }}"
-                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all duration-300 bg-[#151820]"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل اسمك الكامل">
                                                 @error('name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                                             </div>
@@ -321,7 +413,7 @@
                                             <div class="space-y-2">
                                                 <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">اسم رب العائلة</label>
                                                 <input type="text" id="family_name" name="family_name" value="{{ old('family_name') }}"
-                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-bahrain-red/50 transition-all duration-300 bg-[#1A1515]"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل اسم العائلة">
                                                 @error('family_name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                                             </div>
@@ -337,7 +429,7 @@
                                             <div class="space-y-2">
                                                 <label for="cpr" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">رقم الهوية (CPR)</label>
                                                 <input type="text" id="cpr" name="cpr" required value="{{ old('cpr') }}" pattern="\d*"
-                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all duration-300 bg-[#151820]"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل رقم الهوية">
                                                 @error('cpr') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                                             </div>
@@ -347,7 +439,7 @@
                                             <div class="space-y-2">
                                                 <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">رقم الهوية (CPR) لرب العائلة</label>
                                                 <input type="text" id="responsible_cpr" name="responsible_cpr" value="{{ old('responsible_cpr') }}" pattern="\d*"
-                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-bahrain-red/50 transition-all duration-300 bg-[#1A1515]"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل رقم الهوية">
                                             </div>
                                         </div>
@@ -362,7 +454,7 @@
                                             <div class="space-y-2">
                                                 <label for="phone_number" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">رقم الهاتف</label>
                                                 <input type="tel" id="phone_number" name="phone_number" required value="{{ old('phone_number') }}"
-                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-gold-500/50 transition-all duration-300 bg-[#151820]"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل رقم الهاتف">
                                                 @error('phone_number') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                                             </div>
@@ -372,7 +464,7 @@
                                             <div class="space-y-2">
                                                 <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">رقم هاتف التواصل لرب العائلة</label>
                                                 <input type="tel" id="contact_phone" name="contact_phone" value="{{ old('contact_phone') }}"
-                                                       class="w-full input-gradient-border text-white placeholder-gray-600 rounded-xl py-4 px-4 text-right focus:outline-none focus:ring-1 focus:ring-bahrain-red/50 transition-all duration-300 bg-[#1A1515]"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل رقم للتواصل">
                                             </div>
                                         </div>
@@ -395,20 +487,20 @@
                                     <div class="flip-card w-full h-full relative transform-style-3d" id="btn-flip">
                                         <!-- Front Button -->
                                         <div class="face-front absolute inset-0 backface-hidden">
-                                            <button type="submit" class="w-full h-full group relative overflow-hidden rounded-xl bg-gradient-to-b from-bahrain-red to-[#800000] p-[1px] shadow-xl shadow-red-900/40 transition-all hover:scale-[1.01] active:scale-[0.99]">
-                                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                                                <div class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine left-0"></div>
+                                            <button type="submit" class="w-full h-full btn-primary group relative overflow-hidden rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99]">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                                                <div class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-30 group-hover:animate-shine left-0"></div>
                                                 <div class="relative w-full h-full flex items-center justify-center gap-2">
                                                     <span class="text-lg font-bold text-white tracking-wide drop-shadow-md">سجّل الآن</span>
-                                                    <i data-lucide="target" class="w-5 h-5 text-gold-300"></i>
+                                                    <i data-lucide="target" class="w-5 h-5 text-white"></i>
                                                 </div>
                                             </button>
                                         </div>
                                         <!-- Back Button -->
                                         <div class="face-back absolute inset-0 backface-hidden">
-                                            <button type="submit" class="w-full h-full group relative overflow-hidden rounded-xl bg-gradient-to-b from-gold-500 to-gold-700 p-[1px] shadow-xl shadow-gold-900/40 transition-all hover:scale-[1.01] active:scale-[0.99]">
-                                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                                                <div class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine left-0"></div>
+                                            <button type="submit" class="w-full h-full btn-primary group relative overflow-hidden rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99]">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                                                <div class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-30 group-hover:animate-shine left-0"></div>
                                                 <div class="relative w-full h-full flex items-center justify-center gap-2">
                                                     <span class="text-lg font-bold text-white tracking-wide drop-shadow-md">سجّل الآن</span>
                                                     <i data-lucide="users" class="w-5 h-5 text-white"></i>
