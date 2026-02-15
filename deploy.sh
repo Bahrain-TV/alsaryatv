@@ -10,6 +10,7 @@
 #   ./deploy.sh --fresh      # Drop all tables, re-migrate and seed
 #   ./deploy.sh --seed       # Run seeders after migration
 #   ./deploy.sh --no-build   # Skip npm build step
+#   ./deploy.sh --force      # Force all steps even if no changes
 #   ./deploy.sh --dry-run    # Print steps without executing
 ###############################################################################
 
@@ -49,6 +50,7 @@ run() {
 FRESH=false
 SEED=false
 NO_BUILD=false
+FORCE=false
 DRY_RUN=false
 WEBHOOK_TRIGGER="${WEBHOOK_TRIGGER:-false}"
 
@@ -58,6 +60,7 @@ for arg in "$@"; do
         --fresh)    FRESH=true; SEED=true ;;
         --seed)     SEED=true ;;
         --no-build) NO_BUILD=true ;;
+        --force)    FORCE=true ;;
         --dry-run)  DRY_RUN=true ;;
         *)          warn "Unknown flag: $arg" ;;
     esac
@@ -165,6 +168,26 @@ fi
 if [[ ! -f .env ]]; then
     error ".env file not found. Copy .env.example and configure it first."
     exit 1
+fi
+
+# ── Step 0: Initial Change Detection (Drastic Loop Prevention) ──────────────
+PREV_DEPLOY_FILE="storage/framework/last_successful_deploy"
+INITIAL_GIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
+
+# If this is a webhook trigger, compare with last success BEFORE pulling or doing anything
+if [[ "$WEBHOOK_TRIGGER" == "true" && -f "$PREV_DEPLOY_FILE" && "$FORCE" == "false" ]]; then
+    LAST_SUCCESSFUL_HASH=$(cut -d'|' -f1 "$PREV_DEPLOY_FILE")
+    if [[ "$INITIAL_GIT_HASH" == "$LAST_SUCCESSFUL_HASH" ]]; then
+        # We check remote without pulling to see if we actually need to pull
+        info "Webhook triggered, checking remote for actual changes..."
+        git fetch origin >/dev/null 2>&1 || true
+        REMOTE_HASH=$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main") 2>/dev/null || echo "")
+        
+        if [[ "$INITIAL_GIT_HASH" == "$REMOTE_HASH" ]]; then
+            success "No remote changes detected. System is already at hash $REMOTE_HASH. Terminating to avoid loop."
+            exit 0
+        fi
+    fi
 fi
 
 # ── Ensure APP_KEY is set ───────────────────────────────────────────────────
@@ -275,85 +298,145 @@ fi
 
 # ── Step 2: Pull latest code (if in a git repo) ─────────────────────────────
 if [[ -d .git ]]; then
-    info "Pulling latest changes from git..."
+    info "Current Hash: $INITIAL_GIT_HASH. Pulling latest changes..."
 
     # Try fast-forward only first (safest)
     if run git pull --ff-only 2>/dev/null; then
-        success "Pulled latest changes (fast-forward)"
+        success "Git pull completed."
     else
         warn "Fast-forward failed — local and remote branches have diverged"
-
-        # Fetch remote to see current state
         run git fetch origin || warn "git fetch failed"
-
-        # Get current branch
         CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-
-        # Reset to remote HEAD (deployment should use what's on GitHub/remote)
         info "Resetting to remote/$CURRENT_BRANCH..."
-        if run git reset --hard origin/"$CURRENT_BRANCH" 2>/dev/null; then
-            success "Reset to remote branch (local commits discarded if any)"
-        else
-            warn "Could not reset to remote — continuing with local state"
+        run git reset --hard origin/"$CURRENT_BRANCH" 2>/dev/null || warn "Reset failed"
+    fi
+
+    # Post-pull check: If nothing changed and not forced, STOP HERE
+    POST_PULL_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
+    if [[ -f "$PREV_DEPLOY_FILE" && "$FORCE" == "false" && "$FRESH" == "false" ]]; then
+        LAST_SUCCESSFUL_HASH=$(cut -d'|' -f1 "$PREV_DEPLOY_FILE")
+        if [[ "$POST_PULL_HASH" == "$LAST_SUCCESSFUL_HASH" ]]; then
+            success "System is already at the last successfully deployed hash ($POST_PULL_HASH)."
+            success "No new changes to process. Terminating deployment to protect resources."
+            exit 0
+        fi
+    fi
+fi
+
+# ── Step 2.5: Change Detection ──────────────────────────────────────────────
+info "Detecting specific changes for optimized build..."
+CURRENT_GIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
+CURRENT_VERSION=$(cat VERSION 2>/dev/null || echo "no-version")
+
+if [[ -f "$PREV_DEPLOY_FILE" ]]; then
+    IFS='|' read -r LAST_HASH LAST_VERSION < "$PREV_DEPLOY_FILE"
+else
+    LAST_HASH=""
+fi
+
+# Re-evaluate change status based on the potentially updated POST_PULL_HASH
+COMPOSER_CHANGED=true
+FRONTEND_CHANGED=true
+MIGRATIONS_CHANGED=true
+
+if [[ "$FORCE" == "true" || "$FRESH" == "true" ]]; then
+    info "Force deployment requested — skipping optimizations."
+elif [[ -z "$LAST_HASH" || "$LAST_HASH" == "no-git" ]]; then
+    info "No previous deployment record found."
+else
+    # Detect what actually changed
+    CHANGES=$(git diff --name-only "$LAST_HASH" "$POST_PULL_HASH" 2>/dev/null || echo "ALL")
+    
+    if [[ "$CHANGES" == "ALL" ]]; then
+        info "Assuming everything changed."
+    else
+        # Composer check
+        if ! echo "$CHANGES" | grep -qE "^(composer\.json|composer\.lock)$"; then
+            COMPOSER_CHANGED=false
+            info "No Composer changes."
+        fi
+        
+        # Frontend check
+        if ! echo "$CHANGES" | grep -qE "^(package\.json|pnpm-lock\.yaml|package-lock\.json|vite\.config\.js|tailwind\.config\.js|postcss\.config\.js|resources/|public/)"; then
+            FRONTEND_CHANGED=false
+            info "No Frontend changes."
+        fi
+        
+        # Migrations check
+        if ! echo "$CHANGES" | grep -q "^database/migrations/"; then
+            MIGRATIONS_CHANGED=false
+            info "No migration changes."
         fi
     fi
 fi
 
 # ── Step 3: Install PHP dependencies ────────────────────────────────────────
-info "Installing Composer dependencies..."
-if [[ "${APP_ENV:-production}" == "production" ]]; then
-    run composer install --no-dev --optimize-autoloader --no-interaction
+if [[ "$COMPOSER_CHANGED" == "true" ]]; then
+    info "Installing Composer dependencies..."
+    if [[ "${APP_ENV:-production}" == "production" ]]; then
+        run composer install --no-dev --optimize-autoloader --no-interaction
+    else
+        run composer install --no-interaction
+    fi
+    success "Composer dependencies installed."
 else
-    run composer install --no-interaction
+    info "Skipping Composer installation (no changes detected)."
 fi
-success "Composer dependencies installed."
 
 # ── Step 4: Install & build frontend assets ─────────────────────────────────
 if [[ "$NO_BUILD" == "false" ]]; then
-    info "Installing Node dependencies..."
-    if command -v pnpm &>/dev/null; then
-        run pnpm install --frozen-lockfile
-    elif command -v npm &>/dev/null; then
-        run npm ci
-    else
-        warn "Neither pnpm nor npm found — skipping frontend build."
-        NO_BUILD=true
-    fi
-
-    if [[ "$NO_BUILD" == "false" ]]; then
-        info "Building frontend assets..."
+    if [[ "$FRONTEND_CHANGED" == "true" ]]; then
+        info "Installing Node dependencies..."
         if command -v pnpm &>/dev/null; then
-            run pnpm build
+            run pnpm install --frozen-lockfile
+        elif command -v npm &>/dev/null; then
+            run npm ci
         else
-            run npm run build
+            warn "Neither pnpm nor npm found — skipping frontend build."
+            NO_BUILD=true
         fi
-        success "Frontend assets built."
+
+        if [[ "$NO_BUILD" == "false" ]]; then
+            info "Building frontend assets..."
+            if command -v pnpm &>/dev/null; then
+                run pnpm build
+            else
+                run npm run build
+            fi
+            success "Frontend assets built."
+        fi
+    else
+        info "Skipping Frontend build (no changes detected)."
     fi
 else
-    info "Skipping frontend build (--no-build)."
+    info "Skipping frontend build (--no-build or skipped due to changes)."
 fi
 
 # ── Step 5: Database migrations ─────────────────────────────────────────────
-info "Running database migrations..."
+if [[ "$MIGRATIONS_CHANGED" == "true" || "$FRESH" == "true" ]]; then
+    info "Running database migrations..."
 
-if [[ "$FRESH" == "true" ]]; then
-    warn "Running migrate:fresh — this will DROP all tables!"
-    run php artisan migrate:fresh --force --seed
-    success "Fresh migration completed with seeding."
-else
-    run php artisan migrate --force
-    success "Migrations applied."
-
-    # ── Step 5b: Seed (if requested) ─────────────────────────────────────────
-    if [[ "$SEED" == "true" ]]; then
-        info "Running database seeders..."
-        info "  → UserSeeder: Creates/updates admin users"
-        info "  → CallerSeeder: Imports from CSV (only if table is empty)"
-        run php artisan db:seed --force
-        success "Database seeding completed."
-        warn "Note: CallerSeeder imports from database/seeders/data/callers_seed.csv"
-        warn "      and only runs when callers table is completely empty."
+    if [[ "$FRESH" == "true" ]]; then
+        warn "Running migrate:fresh — this will DROP all tables!"
+        run php artisan migrate:fresh --force --seed
+        success "Fresh migration completed with seeding."
+    else
+        run php artisan migrate --force
+        success "Migrations applied."
     fi
+else
+    info "Skipping database migrations (no changes detected)."
+fi
+
+# Always check seeding if requested
+if [[ "$SEED" == "true" && "$FRESH" == "false" ]]; then
+    info "Running database seeders..."
+    info "  → UserSeeder: Creates/updates admin users"
+    info "  → CallerSeeder: Imports from CSV (only if table is empty)"
+    run php artisan db:seed --force
+    success "Database seeding completed."
+    warn "Note: CallerSeeder imports from database/seeders/data/callers_seed.csv"
+    warn "      and only runs when callers table is completely empty."
 fi
 
 # ── Step 6: Verify migration status ─────────────────────────────────────────
@@ -409,6 +492,13 @@ if [[ "$(id -u)" -eq 0 ]]; then
     success "Ownership set to alsar4210:alsar4210."
 else
     warn "Skipping ownership fix (requires root)."
+fi
+
+# ── Step 11c: Update deployment record ───────────────────────────────────────
+if [[ "$DRY_RUN" == "false" ]]; then
+    # PREV_DEPLOY_FILE, CURRENT_GIT_HASH, CURRENT_VERSION are defined in Step 2.5
+    echo "${CURRENT_GIT_HASH}|${CURRENT_VERSION}" > "$PREV_DEPLOY_FILE"
+    info "Deployment record updated: ${CURRENT_VERSION} (${CURRENT_GIT_HASH})"
 fi
 
 # ── Step 12: Disable maintenance mode ────────────────────────────────────────
