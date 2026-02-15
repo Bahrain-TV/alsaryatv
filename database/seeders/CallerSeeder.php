@@ -14,11 +14,16 @@ class CallerSeeder extends Seeder
      */
     public function run()
     {
-        // Clear existing callers
-        Caller::truncate();
+        if (Caller::count() > 0) {
+            return;
+        }
 
-        // Seed fixed counts to avoid accumulating generated data.
-        Caller::factory()->count(410)->create([
+        if (app()->environment('production')) {
+            return;
+        }
+
+        // Keep local/dev seed small when database is empty.
+        Caller::factory()->count(10)->create([
             'is_family' => false,
         ]);
 

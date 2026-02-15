@@ -105,8 +105,37 @@ trap 'send_notification $?' EXIT
 
 
 # ── Pre-flight checks ───────────────────────────────────────────────────────
-APP_DIR="$(cd "$(dirname "$0")" && pwd)"
-cd "$APP_DIR"
+resolve_app_dir() {
+    local script_source=""
+    if [[ -n "${BASH_SOURCE[0]:-}" && -f "${BASH_SOURCE[0]}" ]]; then
+        script_source="${BASH_SOURCE[0]}"
+    elif [[ -n "${0:-}" && -f "${0:-}" ]]; then
+        script_source="$0"
+    fi
+
+    if [[ -n "$script_source" ]]; then
+        (cd "$(dirname "$script_source")" && pwd)
+        return 0
+    fi
+
+    if [[ -n "${APP_DIR:-}" && -d "${APP_DIR:-}" ]]; then
+        printf '%s\n' "$APP_DIR"
+        return 0
+    fi
+
+    if [[ -d "/home/alsarya.tv/public_html" ]]; then
+        printf '%s\n' "/home/alsarya.tv/public_html"
+        return 0
+    fi
+
+    pwd
+}
+
+APP_DIR="$(resolve_app_dir)"
+cd "$APP_DIR" || {
+    error "Failed to change directory to $APP_DIR"
+    exit 1
+}
 
 info "Deploying from $APP_DIR"
 
@@ -247,6 +276,15 @@ fi
 info "Restarting queue workers..."
 run php artisan queue:restart || true
 success "Queue restart signal sent."
+
+# ── Step 11b: Ensure ownership ───────────────────────────────────────────────
+if [[ "$(id -u)" -eq 0 ]]; then
+    info "Ensuring ownership for $APP_DIR..."
+    run chown -R alsar4210:alsar4210 "$APP_DIR"
+    success "Ownership set to alsar4210:alsar4210."
+else
+    warn "Skipping ownership fix (requires root)."
+fi
 
 # ── Step 12: Disable maintenance mode ────────────────────────────────────────
 info "Disabling maintenance mode..."
