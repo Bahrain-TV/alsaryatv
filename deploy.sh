@@ -13,6 +13,10 @@
 #   ./deploy.sh --dry-run    # Print steps without executing
 ###############################################################################
 
+# Configuration
+APP_USER="alsar4210"
+SUDO_PREFIX="sudo -u $APP_USER"
+
 set -euo pipefail
 
 # ── Colours ──────────────────────────────────────────────────────────────────
@@ -23,11 +27,8 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No colour
 
 # ── Logging Setup ────────────────────────────────────────────────────────────
-LOG_FILE=$(mktemp)
-# Store original file descriptors to restore later
-exec 3>&1 4>&2
-exec > >(tee -a "$LOG_FILE") 2>&1
-TEE_PID=$!
+# Disabled logging to prevent tee process issues
+# LOG_FILE=$(mktemp)
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -77,37 +78,28 @@ send_notification() {
         color=15548997
     fi
 
-    # Restore original file descriptors and close tee process
-    exec 1>&3 2>&4
-    exec 3>&- 4>&-
-
+    # Logging disabled - no cleanup needed
+    # exec 1>&3 2>&4  # Disabled since we're not using file descriptor redirection
+    # exec 3>&- 4>&-
     # Wait for tee to finish writing
-    if [[ -n "${TEE_PID:-}" ]]; then
-        wait "$TEE_PID" 2>/dev/null || true
-    fi
-    sleep 0.5  # Brief delay to ensure file is written
+    # if [[ -n "${TEE_PID:-}" ]]; then
+    #     wait "$TEE_PID" 2>/dev/null || true
+    # fi
+    # sleep 0.5  # Brief delay to ensure file is written
 
     if [[ "$NOTIFY_ENABLED" != "true" ]]; then
-        rm -f "$LOG_FILE"
+        # rm -f "$LOG_FILE"  # Logging disabled
         rm -f resources/views/errors/temp_503.blade.php 2>/dev/null || true
         return
     fi
 
-    # Use PHP to construct safe JSON payload
+    # Use PHP to construct safe JSON payload (without log content since logging is disabled)
     php -r "
-        \$log = file_get_contents('$LOG_FILE');
-        // Strip ANSI codes for cleaner Discord display
-        \$log = preg_replace('/\\x1b\[[0-9;]*m/', '', \$log);
-        // Limit to last 1500 chars to fit in embed
-        if (strlen(\$log) > 1500) {
-            \$log = '...' . substr(\$log, -1500);
-        }
-
         \$json = json_encode([
             'username' => 'Deployment Bot',
             'embeds' => [[
                 'title' => \"Deployment $status\",
-                'description' => \"\`\`\`\\n\" . \$log . \"\\n\`\`\`\",
+                'description' => 'Deployment completed. Logging disabled.',
                 'color' => $color,
                 'timestamp' => date('c')
             ]]
@@ -123,10 +115,10 @@ send_notification() {
     fi
 
     if [[ -n "$NTFY_URL" ]]; then
-        tail -n 30 "$LOG_FILE" 2>/dev/null | curl -s --max-time 10 -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null 2>&1 || true
+        echo "Deployment $status - Logging disabled" | curl -s --max-time 10 -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null 2>&1 || true
     fi
 
-    rm -f "$LOG_FILE"
+    # rm -f "$LOG_FILE"  # Logging disabled
     rm -f resources/views/errors/temp_503.blade.php 2>/dev/null || true
 }
 
@@ -177,16 +169,27 @@ fi
 
 # ── Ensure APP_KEY is set ───────────────────────────────────────────────────
 info "Checking application encryption key..."
-APP_KEY_VALUE=$(grep '^APP_KEY=' .env 2>/dev/null | cut -d'=' -f2- | sed 's/^"//' | sed 's/"$//' || echo "")
-if [[ -z "$APP_KEY_VALUE" ]]; then
-    warn "APP_KEY not found or empty in .env file. Generating new key..."
-    # Ensure .env file is writable
-    if [[ ! -w .env ]]; then
-        warn ".env file is not writable. Attempting to fix permissions..."
-        chmod 644 .env || warn "Could not make .env writable"
+APP_KEY_EXISTS=false
+set +e  # Temporarily disable exit on error for key checking
+if [[ -f .env ]]; then
+    APP_KEY_LINE=$(grep '^APP_KEY=' .env 2>/dev/null | head -1 || echo "")
+    if [[ -n "$APP_KEY_LINE" ]]; then
+        APP_KEY_VALUE=$(echo "$APP_KEY_LINE" | cut -d'=' -f2- | sed 's/^"//' | sed 's/"$//')
+        if [[ -n "$APP_KEY_VALUE" ]]; then
+            APP_KEY_EXISTS=true
+        fi
     fi
-    run php artisan key:generate
-    success "Application encryption key generated."
+fi
+set -e  # Re-enable exit on error
+
+if [[ "$APP_KEY_EXISTS" == "false" ]]; then
+    warn "APP_KEY not found or empty in .env file. Generating new key..."
+    if run php artisan key:generate; then
+        success "Application encryption key generated."
+    else
+        error "Failed to generate APP_KEY. Please set APP_KEY manually in .env file."
+        exit 1
+    fi
 else
     success "Application encryption key is set."
 fi
@@ -246,20 +249,13 @@ TIMEOUT_PID=$!
 trap "kill $TIMEOUT_PID 2>/dev/null || true; rm -f '$LOCK_FILE' '$INSTALL_FLAG'; send_notification \$?" EXIT
 
 # ── Cleanup zombie processes ────────────────────────────────────────────────
-info "Checking for zombie tee processes..."
-# Kill stale tee processes from previous deployments, but exclude this deployment's
-# Check each tee process's command line to exclude our current log file
-pgrep -f "tee -a /tmp/tmp\." 2>/dev/null | while read pid; do
-    # Check if this tee process is for a different log file (not ours)
-    if ! cat /proc/$pid/cmdline 2>/dev/null | grep -q "$LOG_FILE"; then
-        kill -9 "$pid" 2>/dev/null || true
-    fi
-done
+# Logging disabled - skip zombie process check
+# info "Checking for zombie tee processes..."
 
 # ── Load notification settings from .env ─────────────────────────────────────
-DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
-NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
-NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || true)
+NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || true)
+NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || true)
 
 # ── Log deployment trigger source ───────────────────────────────────────────
 if [[ "$WEBHOOK_TRIGGER" == "true" ]]; then
