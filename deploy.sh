@@ -61,6 +61,8 @@ done
 # ── Notifications ────────────────────────────────────────────────────────────
 DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
 NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+NOTIFY_ENABLED="true"
 
 send_notification() {
     local exit_code=$1
@@ -69,6 +71,12 @@ send_notification() {
     if [[ "$exit_code" -ne 0 ]]; then
         status="Failed"
         color=15548997
+    fi
+
+    if [[ "$NOTIFY_ENABLED" != "true" ]]; then
+        rm -f "$LOG_FILE"
+        rm -f resources/views/errors/temp_503.blade.php
+        return
     fi
     
     # Use PHP to construct safe JSON payload
@@ -93,7 +101,7 @@ send_notification() {
         file_put_contents('discord_payload.json', \$json);
     "
 
-    if [[ -f discord_payload.json && -n "$DISCORD_WEBHOOK" ]]; then
+    if [[ -f discord_payload.json && "$NOTIFY_DISCORD" = "true" && -n "$DISCORD_WEBHOOK" ]]; then
         curl -s -H "Content-Type: application/json" -d @discord_payload.json "$DISCORD_WEBHOOK" >/dev/null || true
         rm discord_payload.json
     else
@@ -162,6 +170,7 @@ if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     # Use the downtime template with a 40-second refresh window
     run php artisan down --retry=60 --refresh=40 --render="down" || true
 else
+    NOTIFY_ENABLED="false"
     info "Skipping maintenance mode (handled by publish.sh)."
 fi
 
