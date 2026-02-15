@@ -1,9 +1,15 @@
 <?php
 
 use App\Http\Controllers\CallerStatusController;
+use App\Http\Controllers\DeploymentWebhookController;
 use App\Http\Controllers\VersionCheckController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// GitHub deployment webhook (rate-limited)
+Route::post('/deploy-webhook', [DeploymentWebhookController::class, 'handle'])
+    ->middleware(['throttle:10,60'])
+    ->withoutMiddleware(['api']);
 
 // API routes with proper middleware
 Route::middleware('api')->group(function (): void {

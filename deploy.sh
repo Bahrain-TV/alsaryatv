@@ -49,6 +49,7 @@ FRESH=false
 SEED=false
 NO_BUILD=false
 DRY_RUN=false
+WEBHOOK_TRIGGER="${WEBHOOK_TRIGGER:-false}"
 
 # ── Parse flags ──────────────────────────────────────────────────────────────
 for arg in "$@"; do
@@ -237,6 +238,11 @@ DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- |
 NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
 NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
 
+# ── Log deployment trigger source ───────────────────────────────────────────
+if [[ "$WEBHOOK_TRIGGER" == "true" ]]; then
+    info "Deployment triggered by GitHub webhook"
+fi
+
 # ── Step 1: Maintenance mode ────────────────────────────────────────────────
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Enabling maintenance mode..."
@@ -251,10 +257,27 @@ fi
 # ── Step 2: Pull latest code (if in a git repo) ─────────────────────────────
 if [[ -d .git ]]; then
     info "Pulling latest changes from git..."
-    if [[ -z "$(git config --get pull.ff 2>/dev/null || true)" ]]; then
-        git config pull.ff only
+
+    # Try fast-forward only first (safest)
+    if run git pull --ff-only 2>/dev/null; then
+        success "Pulled latest changes (fast-forward)"
+    else
+        warn "Fast-forward failed — local and remote branches have diverged"
+
+        # Fetch remote to see current state
+        run git fetch origin || warn "git fetch failed"
+
+        # Get current branch
+        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+
+        # Reset to remote HEAD (deployment should use what's on GitHub/remote)
+        info "Resetting to remote/$CURRENT_BRANCH..."
+        if run git reset --hard origin/"$CURRENT_BRANCH" 2>/dev/null; then
+            success "Reset to remote branch (local commits discarded if any)"
+        else
+            warn "Could not reset to remote — continuing with local state"
+        fi
     fi
-    run git pull --ff-only || warn "git pull failed — continuing with local state"
 fi
 
 # ── Step 3: Install PHP dependencies ────────────────────────────────────────

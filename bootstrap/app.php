@@ -16,6 +16,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);
+
+        // Exempt webhook and static assets from maintenance mode
+        $middleware->preventRequestsDuringMaintenance(except: [
+            '/api/deploy-webhook',
+            '/build/*',
+            '/images/*',
+            '/lottie/*',
+            '/css/*',
+            '/js/*',
+            '/fonts/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
