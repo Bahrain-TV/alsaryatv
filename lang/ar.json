@@ -1,4 +1,11 @@
 {
+  "Live dashboard feed": "البث المباشر للوحة",
+  "Updated": "آخر تحديث",
+  "Total callers": "إجمالي المتصلين",
+  "Total winners": "إجمالي الفائزين",
+  "Today callers": "متصلين اليوم",
+  "Total hits": "إجمالي المشاركات",
+  "Win ratio": "نسبة الفوز",
   "Callers Dashboard": "لوحة تحكم المتصلين",
   "Manage callers, winners, and family registrations.": "إدارة المتصلين والفائزين وتسجيلات العائلات.",
   "Add Caller": "إضافة متصل",

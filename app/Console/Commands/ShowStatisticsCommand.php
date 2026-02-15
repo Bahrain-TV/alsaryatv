@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ShowStatisticsCommand extends Command
 {
-    // Update command signature to include email options
-    protected $signature = 'app:show:stats {--from=} {--to=} {--email=} {--skip-email-prompt}';
+    // Update command signature to include email and OBS overlay options
+    protected $signature = 'app:show:stats {--from=} {--to=} {--email=} {--skip-email-prompt} {--overlay : Refresh the OBS overlay layer after generating statistics}';
 
-    protected $description = 'Show statistical report about registered callers';
+    protected $description = 'Show statistical report about registered callers on OBS and save it as a markdown file. Optionally send the report by email.';
 
     protected $dateFilter = '';
 
@@ -89,7 +89,30 @@ class ShowStatisticsCommand extends Command
         // Handle email sending based on command options
         $this->handleEmailSending($filename, $markdown);
 
+        // Handle OBS overlay refresh if requested
+        if ($this->option('overlay')) {
+            $this->triggerOverlayRefresh();
+        }
+
         return $filename;
+    }
+
+    /**
+     * Trigger the OBS overlay to refresh by clearing cache and logging
+     */
+    protected function triggerOverlayRefresh(): void
+    {
+        try {
+            // Clear stats cache to force refresh on next poll
+            cache()->forget('obs-overlay-stats');
+
+            // Set a flag to indicate stats were updated
+            cache()->put('stats-updated-at', now()->toIso8601String(), now()->addMinutes(5));
+
+            $this->info('OBS overlay refresh triggered successfully.');
+        } catch (\Exception $e) {
+            $this->warn('Could not trigger OBS overlay refresh: '.$e->getMessage());
+        }
     }
 
     /**
