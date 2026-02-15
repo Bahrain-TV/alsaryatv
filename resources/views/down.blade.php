@@ -3,8 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="{{ $refresh ?? session('seconds', 40) }}">
-    <title>لحظات وسنعود...</title>
+    <title>صيانة مجدولة - برنامج السارية</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -229,28 +228,28 @@
                 <div class="down-brand">
                     <lottie-player src="{{ asset('lottie/crecent-moon-ramadan.json') }}" background="transparent" speed=".1" style="width: 140px; height: 140px;" loop autoplay></lottie-player>
                     <div>
-                        <div class="status-pill">جاري التحديث</div>
-                        <h1 class="down-title">لحظات وراجعين لكم</h1>
-                        <p class="down-subtitle">نجهز لكم تجربة أهدى وأسرع قبل الرجوع للبث.</p>
+                        <div class="status-pill">صيانة مجدولة</div>
+                        <h1 class="down-title">نجهز لكم تجربة أفضل</h1>
+                        <p class="down-subtitle">نعمل حاليًا على تطوير وتحسين النظام لخدمتكم بشكل أفضل.</p>
                     </div>
                 </div>
                 <div class="countdown-card">
-                    <div class="countdown-value"><span id="countdown">{{ $refresh ?? session('seconds', 40) }}</span>ث</div>
-                    <div class="countdown-label">وقت تقريبي للرجوع</div>
+                    <div class="countdown-value"><span id="countdown">⏳</span></div>
+                    <div class="countdown-label">سنعود قريبًا</div>
                     <div class="progress-bar">
-                        <div class="progress-bar-fill" id="progress"></div>
+                        <div class="progress-bar-fill" id="progress" style="width: 60%;"></div>
                     </div>
                 </div>
             </div>
 
             <div class="down-grid">
                 <div class="fun-message" id="funMessage">
-                    <span class="emoji-bounce">😅</span> السموحة، ضيعنا واير الچارچ واللي عندي منعوي.
+                    <span class="emoji-bounce">⚙️</span> نعمل على تحديثات دورية لضمان أفضل أداء للنظام.
                 </div>
                 <div class="countdown-card">
-                    <div class="countdown-label">عدد الزيارات أثناء التحديث</div>
+                    <div class="countdown-label">شكرًا لزيارتكم</div>
                     <div class="countdown-value count-number" id="hits-counter"></div>
-                    <a href="/" class="text-sm" style="color: var(--cool);">موقع برنامج السارية</a>
+                    <a href="/" class="text-sm" style="color: var(--cool);">برنامج السارية - تلفزيون البحرين</a>
                 </div>
             </div>
         </div>
@@ -259,11 +258,11 @@
     {{-- @include('sponsors') --}}
 
     <script>
-        // Funny maintenance messages
+        // Professional maintenance messages
         const funMessages = [
-            { text: 'سيرفر داون ...', emoji: '😅' },
-            { text: 'شكلنا يبيلنا دكه.. فيكم شده؟', emoji: '🔧' },
-            { text: 'شباب تره خلص التانكي.. أحد يعرف رقم ماي بيلر؟', emoji: '💧' },
+            { text: 'نعمل على تحسين الأداء والاستقرار لخدمتكم بشكل أفضل.', emoji: '⚙️' },
+            { text: 'جاري تطبيق التحديثات الأمنية والتقنية المجدولة.', emoji: '🔒' },
+            { text: 'نقدر صبركم ونتطلع لخدمتكم قريبًا بتجربة محسّنة.', emoji: '🌟' },
         ];
 
         function setFunMessageOnce() {
@@ -278,7 +277,6 @@
             const hits = {{ session('hits', 1) }};
             const hitsCounter = document.getElementById('hits-counter');
             const progressBar = document.getElementById('progress');
-            const countdownEl = document.getElementById('countdown');
 
             // Animate counter from 0 to actual hits
             let currentCount = 0;
@@ -296,26 +294,27 @@
                 hitsCounter.textContent = Math.floor(currentCount).toLocaleString('ar-SA');
             }, interval);
 
-            // Countdown and progress bar
-            const totalSeconds = {{ $refresh ?? session('seconds', 40) }};
-            let secondsLeft = totalSeconds;
+            // Animate progress bar (aesthetic only)
             if (progressBar) {
-                progressBar.style.width = '100%';
+                let progress = 0;
+                setInterval(() => {
+                    progress = (progress + 1) % 100;
+                    progressBar.style.width = `${progress}%`;
+                }, 200);
             }
 
-            const countdownInterval = setInterval(() => {
-                secondsLeft -= 1;
-                countdownEl.textContent = secondsLeft;
-                if (progressBar) {
-                    const pct = Math.max(0, (secondsLeft / totalSeconds) * 100);
-                    progressBar.style.width = `${pct}%`;
-                }
-
-                if (secondsLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.reload(); // Retry the page after refresh window
-                }
-            }, 1000);
+            // Check if site is back online every 30 seconds (no auto-reload spam)
+            setInterval(() => {
+                fetch('/', { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok && response.status === 200) {
+                            window.location.reload();
+                        }
+                    })
+                    .catch(() => {
+                        // Still in maintenance, do nothing
+                    });
+            }, 30000); // Check every 30 seconds
         });
     </script>
 </body>

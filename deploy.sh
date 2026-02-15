@@ -24,7 +24,10 @@ NC='\033[0m' # No colour
 
 # ── Logging Setup ────────────────────────────────────────────────────────────
 LOG_FILE=$(mktemp)
+# Store original file descriptors to restore later
+exec 3>&1 4>&2
 exec > >(tee -a "$LOG_FILE") 2>&1
+TEE_PID=$!
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -58,10 +61,10 @@ for arg in "$@"; do
     esac
 done
 
-# ── Notifications ────────────────────────────────────────────────────────────
-DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
-NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
-NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+# ── Notifications (defined early for send_notification function) ────────────
+DISCORD_WEBHOOK=""
+NTFY_URL=""
+NOTIFY_DISCORD=""
 NOTIFY_ENABLED="true"
 
 send_notification() {
@@ -73,12 +76,22 @@ send_notification() {
         color=15548997
     fi
 
+    # Restore original file descriptors and close tee process
+    exec 1>&3 2>&4
+    exec 3>&- 4>&-
+
+    # Wait for tee to finish writing
+    if [[ -n "${TEE_PID:-}" ]]; then
+        wait "$TEE_PID" 2>/dev/null || true
+    fi
+    sleep 0.5  # Brief delay to ensure file is written
+
     if [[ "$NOTIFY_ENABLED" != "true" ]]; then
         rm -f "$LOG_FILE"
-        rm -f resources/views/errors/temp_503.blade.php
+        rm -f resources/views/errors/temp_503.blade.php 2>/dev/null || true
         return
     fi
-    
+
     # Use PHP to construct safe JSON payload
     php -r "
         \$log = file_get_contents('$LOG_FILE');
@@ -88,7 +101,7 @@ send_notification() {
         if (strlen(\$log) > 1500) {
             \$log = '...' . substr(\$log, -1500);
         }
-        
+
         \$json = json_encode([
             'username' => 'Deployment Bot',
             'embeds' => [[
@@ -99,25 +112,22 @@ send_notification() {
             ]]
         ]);
         file_put_contents('discord_payload.json', \$json);
-    "
+    " 2>/dev/null || true
 
     if [[ -f discord_payload.json && "$NOTIFY_DISCORD" = "true" && -n "$DISCORD_WEBHOOK" ]]; then
-        curl -s -H "Content-Type: application/json" -d @discord_payload.json "$DISCORD_WEBHOOK" >/dev/null || true
-        rm discord_payload.json
+        curl -s --max-time 10 -H "Content-Type: application/json" -d @discord_payload.json "$DISCORD_WEBHOOK" >/dev/null 2>&1 || true
+        rm -f discord_payload.json
     else
         rm -f discord_payload.json
     fi
 
     if [[ -n "$NTFY_URL" ]]; then
-        tail -n 30 "$LOG_FILE" | curl -s -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null || true
+        tail -n 30 "$LOG_FILE" 2>/dev/null | curl -s --max-time 10 -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null 2>&1 || true
     fi
+
     rm -f "$LOG_FILE"
-    rm -f resources/views/errors/temp_503.blade.php
+    rm -f resources/views/errors/temp_503.blade.php 2>/dev/null || true
 }
-
-trap 'send_notification $?' EXIT
-
-
 
 # ── Pre-flight checks ───────────────────────────────────────────────────────
 resolve_app_dir() {
@@ -164,11 +174,74 @@ if [[ ! -f .env ]]; then
     exit 1
 fi
 
+# Ensure storage/framework directory exists for installation flag
+mkdir -p storage/framework
+
+# ── Lock mechanism (prevent concurrent runs) ────────────────────────────────
+LOCK_FILE="/tmp/deploy.lock"
+INSTALL_FLAG="storage/framework/deployment.lock"
+
+# Check system-level lock
+if [[ -f "$LOCK_FILE" ]]; then
+    LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
+    if [[ -n "$LOCK_PID" ]] && kill -0 "$LOCK_PID" 2>/dev/null; then
+        error "Deploy script already running (PID: $LOCK_PID). Exiting."
+        exit 1
+    else
+        warn "Stale system lock file found. Removing..."
+        rm -f "$LOCK_FILE"
+    fi
+fi
+
+# Check application-level installation flag
+if [[ -f "$INSTALL_FLAG" ]]; then
+    FLAG_DATA=$(cat "$INSTALL_FLAG" 2>/dev/null || echo "")
+    FLAG_PID=$(echo "$FLAG_DATA" | cut -d'|' -f1)
+    FLAG_TIME=$(echo "$FLAG_DATA" | cut -d'|' -f2)
+    FLAG_AGE=$(($(date +%s) - FLAG_TIME))
+
+    if [[ -n "$FLAG_PID" ]] && kill -0 "$FLAG_PID" 2>/dev/null; then
+        error "Installation already in progress (PID: $FLAG_PID, started $FLAG_AGE seconds ago)."
+        error "If this is a stuck deployment, manually remove: $APP_DIR/$INSTALL_FLAG"
+        exit 1
+    else
+        warn "Stale installation flag found (PID: $FLAG_PID, age: ${FLAG_AGE}s). Removing..."
+        rm -f "$INSTALL_FLAG"
+    fi
+fi
+
+# Create both locks
+info "Creating deployment locks..."
+echo $$ > "$LOCK_FILE"
+echo "$$|$(date +%s)|$(date '+%Y-%m-%d %H:%M:%S')" > "$INSTALL_FLAG"
+trap 'rm -f "$LOCK_FILE" "$INSTALL_FLAG"; send_notification $?' EXIT
+
+# ── Timeout mechanism (prevent infinite runs) ───────────────────────────────
+TIMEOUT=600  # 10 minutes max runtime
+(
+    sleep "$TIMEOUT"
+    if kill -0 $$ 2>/dev/null; then
+        error "Deploy script exceeded $TIMEOUT second timeout. Killing..."
+        kill -9 $$
+    fi
+) &
+TIMEOUT_PID=$!
+trap "kill $TIMEOUT_PID 2>/dev/null || true; rm -f '$LOCK_FILE' '$INSTALL_FLAG'; send_notification \$?" EXIT
+
+# ── Cleanup zombie processes ────────────────────────────────────────────────
+info "Checking for zombie tee processes..."
+pkill -f "tee -a /tmp/tmp\." 2>/dev/null || true
+
+# ── Load notification settings from .env ─────────────────────────────────────
+DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+
 # ── Step 1: Maintenance mode ────────────────────────────────────────────────
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Enabling maintenance mode..."
-    # Use the downtime template with a 40-second refresh window
-    run php artisan down --retry=60 --refresh=40 --render="down" || true
+    # Use the downtime template WITHOUT auto-refresh to prevent client-side loops
+    run php artisan down --retry=60 --render="down" || true
 else
     NOTIFY_ENABLED="false"
     info "Skipping maintenance mode (handled by publish.sh)."
@@ -232,8 +305,12 @@ else
     # ── Step 5b: Seed (if requested) ─────────────────────────────────────────
     if [[ "$SEED" == "true" ]]; then
         info "Running database seeders..."
+        info "  → UserSeeder: Creates/updates admin users"
+        info "  → CallerSeeder: Imports from CSV (only if table is empty)"
         run php artisan db:seed --force
-        success "Database seeded (UserSeeder + CallerSeeder)."
+        success "Database seeding completed."
+        warn "Note: CallerSeeder imports from database/seeders/data/callers_seed.csv"
+        warn "      and only runs when callers table is completely empty."
     fi
 fi
 
