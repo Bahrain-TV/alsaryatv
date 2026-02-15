@@ -231,7 +231,10 @@ trap "kill $TIMEOUT_PID 2>/dev/null || true; rm -f '$LOCK_FILE' '$INSTALL_FLAG';
 
 # ── Cleanup zombie processes ────────────────────────────────────────────────
 info "Checking for zombie tee processes..."
-pkill -f "tee -a /tmp/tmp\." 2>/dev/null || true
+# Kill stale tee processes from previous deployments, but exclude current shell
+# Get our own PID and filter it out to avoid killing our own tee process
+CURRENT_PID=$$
+pgrep -f "tee -a /tmp/tmp\." 2>/dev/null | grep -v "^${CURRENT_PID}$" | xargs -r kill -9 2>/dev/null || true
 
 # ── Load notification settings from .env ─────────────────────────────────────
 DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
