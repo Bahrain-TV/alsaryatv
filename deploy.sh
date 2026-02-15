@@ -150,10 +150,13 @@ if [[ ! -f .env ]]; then
 fi
 
 # ── Step 1: Maintenance mode ────────────────────────────────────────────────
-info "Enabling maintenance mode..."
-
-# Use the downtime template with a 40-second refresh window
-run php artisan down --retry=60 --refresh=40 --render="down" || true
+if [[ -z "${PUBLISH_VERSION:-}" ]]; then
+    info "Enabling maintenance mode..."
+    # Use the downtime template with a 40-second refresh window
+    run php artisan down --retry=60 --refresh=40 --render="down" || true
+else
+    info "Skipping maintenance mode (handled by publish.sh)."
+fi
 
 
 # ── Step 2: Pull latest code (if in a git repo) ─────────────────────────────
@@ -271,9 +274,13 @@ else
 fi
 
 # ── Step 12: Disable maintenance mode ────────────────────────────────────────
-info "Disabling maintenance mode..."
-run php artisan up
-success "Application is live."
+if [[ -z "${PUBLISH_VERSION:-}" ]]; then
+    info "Disabling maintenance mode..."
+    run php artisan up
+    success "Application is live."
+else
+    info "Skipping maintenance mode restore (handled by publish.sh)."
+fi
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 echo ""

@@ -8,8 +8,8 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    <link href="https://fonts.bunny.net/css?family=tajawal:400,500,600,bold&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=changa:400,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=tajawal:400,500,700&display=swap" rel="stylesheet" />
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,20 +19,132 @@
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <style>
+        :root {
+            --bg: #0c0f14;
+            --panel: rgba(12, 15, 20, 0.82);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --ink: #f8fafc;
+            --muted: rgba(248, 250, 252, 0.7);
+            --accent: #ffb703;
+            --accent-2: #fb8500;
+            --cool: #8ecae6;
+        }
+
         body {
-            background-image: url("{{ asset('images/bahrain-bay.jpg') }}");
+            background-color: var(--bg);
+            background-image:
+                linear-gradient(120deg, rgba(12, 15, 20, 0.88), rgba(12, 15, 20, 0.65)),
+                radial-gradient(circle at 20% 20%, rgba(251, 133, 0, 0.18), transparent 45%),
+                radial-gradient(circle at 80% 10%, rgba(142, 202, 230, 0.16), transparent 40%),
+                url("{{ asset('images/bahrain-bay.jpg') }}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             font-family: 'Tajawal', sans-serif;
+            color: var(--ink);
         }
 
-        .success-card {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.5s ease-in-out;
+        .down-shell {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 48px 20px;
+        }
+
+        .down-card {
+            width: min(920px, 100%);
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+            padding: clamp(24px, 4vw, 48px);
+            display: grid;
+            gap: 24px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .down-head {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .down-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1 1 280px;
+        }
+
+        .down-title {
+            font-family: 'Changa', sans-serif;
+            font-size: clamp(1.6rem, 3vw, 2.4rem);
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.2px;
+        }
+
+        .down-subtitle {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .status-pill {
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255, 183, 3, 0.12);
+            border: 1px solid rgba(255, 183, 3, 0.35);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .down-grid {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        .countdown-card {
+            border-radius: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: grid;
+            gap: 12px;
+        }
+
+        .countdown-value {
+            font-family: 'Changa', sans-serif;
+            font-size: clamp(2.4rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .countdown-label {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: 999px;
+            transition: width 0.4s linear;
+            width: 0%;
         }
 
         @keyframes fadeIn {
@@ -63,13 +175,14 @@
         }
 
         .fun-message {
-            min-height: 80px;
+            min-height: 72px;
             display: flex;
             align-items: center;
             justify-content: center;
             animation: slideIn 0.6s ease-in-out;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             line-height: 1.6;
+            text-align: center;
         }
 
         @keyframes slideIn {
@@ -110,29 +223,36 @@
     </style>
 </head>
 <body class="antialiased">
-    <div class="flex items-center justify-center px-4 py-12" id="app">
-        <div class="success-card max-w-md w-full p-8 text-white">
-            <div class="flex justify-center mb-4">
-                <lottie-player src="{{ asset('lottie/crecent-moon-ramadan.json') }}" background="transparent" speed=".1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
-            </div>
-            <h1 class="text-2xl font-bold text-center mb-4 fun-message" id="funMessage">
-                <span class="emoji-bounce">😅</span> السموحة، ضيعنا واير الچارچ واللي عندي منعوي.
-            </h1>
-            {{-- <p class="text-center mb-4">قاعدين نسحب على الأسماء ... دعواتكم 🤩</p> --}}
-            {{-- <div class="progress-bar mb-4">
-                <div class="progress-bar-fill" id="progress"></div>
-            </div> --}}
-            <div class="mt-6 text-center">
-                <a href="/" class="text-indigo-400 hover:text-indigo-300 text-sm">
-                    موقع برنامج السارية</a>
-            </div>
-            <div class="mt-6 text-center">
-                <p class="text-sm">عدد الزيارات: <span id="hits-counter" class="count-number text-orange-300"></span></p>
-                <p class="text-sm">شكثر وقت باقي؟: <span id="countdown" class="text-orange-300">
-                    {{ $refresh ?? session('seconds', 40) }}
-                    </span> ثواني</p>
+    <div class="down-shell" id="app">
+        <div class="down-card">
+            <div class="down-head">
+                <div class="down-brand">
+                    <lottie-player src="{{ asset('lottie/crecent-moon-ramadan.json') }}" background="transparent" speed=".1" style="width: 140px; height: 140px;" loop autoplay></lottie-player>
+                    <div>
+                        <div class="status-pill">جاري التحديث</div>
+                        <h1 class="down-title">لحظات وراجعين لكم</h1>
+                        <p class="down-subtitle">نجهز لكم تجربة أهدى وأسرع قبل الرجوع للبث.</p>
+                    </div>
+                </div>
+                <div class="countdown-card">
+                    <div class="countdown-value"><span id="countdown">{{ $refresh ?? session('seconds', 40) }}</span>ث</div>
+                    <div class="countdown-label">وقت تقريبي للرجوع</div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" id="progress"></div>
+                    </div>
+                </div>
             </div>
 
+            <div class="down-grid">
+                <div class="fun-message" id="funMessage">
+                    <span class="emoji-bounce">😅</span> السموحة، ضيعنا واير الچارچ واللي عندي منعوي.
+                </div>
+                <div class="countdown-card">
+                    <div class="countdown-label">عدد الزيارات أثناء التحديث</div>
+                    <div class="countdown-value count-number" id="hits-counter"></div>
+                    <a href="/" class="text-sm" style="color: var(--cool);">موقع برنامج السارية</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -177,12 +297,8 @@
             }, interval);
 
             // Countdown and progress bar
-            if (progressBar) {
-                progressBar.style.width = '0%';
-            }
-
-            // Start countdown
-            let secondsLeft = {{ $refresh ?? session('seconds', 40) }};
+            const totalSeconds = {{ $refresh ?? session('seconds', 40) }};
+            let secondsLeft = totalSeconds;
             if (progressBar) {
                 progressBar.style.width = '100%';
             }
@@ -190,6 +306,10 @@
             const countdownInterval = setInterval(() => {
                 secondsLeft -= 1;
                 countdownEl.textContent = secondsLeft;
+                if (progressBar) {
+                    const pct = Math.max(0, (secondsLeft / totalSeconds) * 100);
+                    progressBar.style.width = `${pct}%`;
+                }
 
                 if (secondsLeft <= 0) {
                     clearInterval(countdownInterval);
