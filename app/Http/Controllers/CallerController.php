@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCallerRequest;
 use App\Http\Requests\UpdateCallerRequest;
 use App\Models\Caller;
 use App\Providers\HitsCounter;
+use App\Services\NtfyNotifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,6 +58,10 @@ class CallerController extends Controller
                 'status' => 'active',
             ]
         );
+
+        if ($caller->wasRecentlyCreated) {
+            app(NtfyNotifier::class)->notifyRegistration($caller);
+        }
 
         $caller->incrementHits();
 
@@ -148,6 +153,7 @@ class CallerController extends Controller
         }
 
         $caller->update(['is_winner' => true]);
+        app(NtfyNotifier::class)->notifyWinner($caller);
 
         return response()->json([
             'success' => true,

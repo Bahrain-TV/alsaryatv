@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'ntfy' => [
+        'url' => env('NTFY_URL'),
+    ],
+
 ];

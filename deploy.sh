@@ -58,13 +58,17 @@ for arg in "$@"; do
     esac
 done
 
-# ── Discord Notification ─────────────────────────────────────────────────────
+# ── Notifications ────────────────────────────────────────────────────────────
 DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
+NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
 
 send_notification() {
     local exit_code=$1
-    if [[ -z "$DISCORD_WEBHOOK" ]]; then
-        return
+    local status="Success"
+    local color=5763719
+    if [[ "$exit_code" -ne 0 ]]; then
+        status="Failed"
+        color=15548997
     fi
     
     # Use PHP to construct safe JSON payload
@@ -77,24 +81,27 @@ send_notification() {
             \$log = '...' . substr(\$log, -1500);
         }
         
-        \$status = $exit_code === 0 ? 'Success' : 'Failed';
-        \$color = $exit_code === 0 ? 5763719 : 15548997; // Green or Red
-        
         \$json = json_encode([
             'username' => 'Deployment Bot',
             'embeds' => [[
-                'title' => \"Deployment \$status\",
+                'title' => \"Deployment $status\",
                 'description' => \"\`\`\`\\n\" . \$log . \"\\n\`\`\`\",
-                'color' => \$color,
+                'color' => $color,
                 'timestamp' => date('c')
             ]]
         ]);
         file_put_contents('discord_payload.json', \$json);
     "
 
-    if [[ -f discord_payload.json ]]; then
+    if [[ -f discord_payload.json && -n "$DISCORD_WEBHOOK" ]]; then
         curl -s -H "Content-Type: application/json" -d @discord_payload.json "$DISCORD_WEBHOOK" >/dev/null || true
         rm discord_payload.json
+    else
+        rm -f discord_payload.json
+    fi
+
+    if [[ -n "$NTFY_URL" ]]; then
+        tail -n 30 "$LOG_FILE" | curl -s -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null || true
     fi
     rm -f "$LOG_FILE"
     rm -f resources/views/errors/temp_503.blade.php
@@ -162,6 +169,9 @@ fi
 # ── Step 2: Pull latest code (if in a git repo) ─────────────────────────────
 if [[ -d .git ]]; then
     info "Pulling latest changes from git..."
+    if [[ -z "$(git config --get pull.ff 2>/dev/null || true)" ]]; then
+        git config pull.ff only
+    fi
     run git pull --ff-only || warn "git pull failed — continuing with local state"
 fi
 
