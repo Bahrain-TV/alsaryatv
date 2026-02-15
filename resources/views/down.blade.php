@@ -113,7 +113,7 @@
     <div class="flex items-center justify-center px-4 py-12" id="app">
         <div class="success-card max-w-md w-full p-8 text-white">
             <div class="flex justify-center mb-4">
-                <lottie-player src="lottie/crecent-moon-ramadan.json" background="transparent" speed=".1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
+                <lottie-player src="{{ asset('lottie/crecent-moon-ramadan.json') }}" background="transparent" speed=".1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
             </div>
             <h1 class="text-2xl font-bold text-center mb-4 fun-message" id="funMessage">
                 <span class="emoji-bounce">😅</span> السموحة، ضيعنا واير الچارچ واللي عندي منعوي.
@@ -177,11 +177,15 @@
             }, interval);
 
             // Countdown and progress bar
-            progressBar.style.width = '0%';
+            if (progressBar) {
+                progressBar.style.width = '0%';
+            }
 
             // Start countdown
             let secondsLeft = {{ $refresh ?? session('seconds', 40) }};
-            progressBar.style.width = '100%';
+            if (progressBar) {
+                progressBar.style.width = '100%';
+            }
 
             const countdownInterval = setInterval(() => {
                 secondsLeft -= 1;

@@ -152,24 +152,8 @@ fi
 # ── Step 1: Maintenance mode ────────────────────────────────────────────────
 info "Enabling maintenance mode..."
 
-# Generate temporary maintenance view with random message
-php -r "
-    \$messages = [
-        \"نعمل حالياً على تحسين تجربة المشاهدة. سنعود قريباً.<br>We're currently enhancing your viewing experience. Back shortly.\",
-        \"صيانة دورية لخدمتكم بشكل أفضل. شكراً لتفهمكم.<br>Routine maintenance to serve you better. Thanks for your patience.\",
-        \"نقوم بتحديث النظام بميزات جديدة. انتظرونا!<br>Updating the system with new features. Stay tuned!\",
-        \"تحسينات سريعة للأداء. سنكون متاحين خلال دقائق.<br>Quick performance improvements. We'll be back in minutes.\",
-        \"مجرد وقت مستقطع قصير للصيانة. شكراً لانتظاركم.<br>Just a short timeout for maintenance. Thanks for waiting.\"
-    ];
-    \$message = \$messages[array_rand(\$messages)];
-    
-    \$content = file_get_contents('resources/views/errors/503.blade.php');
-    \$content = str_replace('{{{MAINTENANCE_MESSAGE}}}', \$message, \$content);
-    file_put_contents('resources/views/errors/temp_503.blade.php', \$content);
-"
-
-# Use the temporary view for maintenance mode (pre-rendered)
-run php artisan down --retry=60 --refresh=15 --render="errors::temp_503" || true
+# Use the downtime template with a 40-second refresh window
+run php artisan down --retry=60 --refresh=40 --render="down" || true
 
 
 # ── Step 2: Pull latest code (if in a git repo) ─────────────────────────────
