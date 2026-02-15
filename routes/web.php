@@ -31,6 +31,7 @@ Route::get('/family', fn () => view('welcome', $getRamadanContext()))->name('fam
 
 // Public OBS overlay — accessible without authentication for OBS Browser Source
 Route::get('/obs-overlay', fn () => view('obs.overlay'))->name('obs.overlay');
+Route::get('/obs', fn () => view('obs.overlay'))->name('obs.overlay.short');
 
 // Protected routes
 Route::middleware([

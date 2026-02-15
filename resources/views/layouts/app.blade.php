@@ -21,11 +21,17 @@
 
         <script>
             (function () {
-                const storedTheme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const theme = storedTheme || (prefersDark ? 'dark' : 'light');
-                document.documentElement.classList.toggle('dark', theme === 'dark');
-                document.documentElement.dataset.theme = theme;
+                // Initialize theme management
+                if (window.ThemeManager) {
+                    window.ThemeManager.init();
+                } else {
+                    // Fallback theme detection
+                    const storedTheme = localStorage.getItem('theme');
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+                    document.documentElement.classList.toggle('dark', theme === 'dark');
+                    document.documentElement.dataset.theme = theme;
+                }
             })();
         </script>
 

@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-    $obsOverlayUrl = url('/obs-overlay');
+    $obsOverlayUrl = url('/obs');
 @endphp
 
 <div class="py-8" x-data="callerDashboard()">

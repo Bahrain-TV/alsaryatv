@@ -5,11 +5,12 @@ import './bootstrap';
 import 'alpinejs';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import { TextPlugin } from 'gsap/TextPlugin';
 import { initMasterTimeline, initGlitchEffect } from './animations';
 import { TornadoEffect } from './tornado-effect';
 
 // Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
 // Make GSAP available globally for inline scripts in blade templates
 window.gsap = gsap;
@@ -17,8 +18,115 @@ window.gsap = gsap;
 // Make TornadoEffect available globally
 window.TornadoEffect = TornadoEffect;
 
+// Theme detection and management
+window.ThemeManager = {
+    init() {
+        this.detectAndApplyTheme();
+        this.setupThemeListeners();
+        // Initialize toggle button state
+        this.updateToggleButton(document.documentElement.dataset.theme);
+    },
+
+    detectAndApplyTheme() {
+        const storedTheme = localStorage.getItem('theme');
+        const autoTheme = this.getAutoTheme();
+        const theme = storedTheme || autoTheme;
+
+        this.applyTheme(theme);
+        localStorage.setItem('theme', theme);
+    },
+
+    getAutoTheme() {
+        // First check browser preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+        if (prefersDark) return 'dark';
+        if (prefersLight) return 'light';
+
+        // Fallback to time-based detection
+        return this.getTimeBasedTheme();
+    },
+
+    getTimeBasedTheme() {
+        const now = new Date();
+        const hour = now.getHours();
+
+        // Dark mode: 6 PM to 6 AM
+        // Light mode: 6 AM to 6 PM
+        return (hour >= 18 || hour < 6) ? 'dark' : 'light';
+    },
+
+    applyTheme(theme) {
+        const html = document.documentElement;
+        html.classList.toggle('dark', theme === 'dark');
+        html.dataset.theme = theme;
+
+        // Update meta theme-color for mobile browsers
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+            metaThemeColor.content = theme === 'dark' ? '#0f172a' : '#ffffff';
+        }
+
+        // Update theme toggle button
+        this.updateToggleButton(theme);
+    },
+
+    setupThemeListeners() {
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                this.applyTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        // Periodic check for time-based theme (every 5 minutes)
+        setInterval(() => {
+            if (!localStorage.getItem('theme')) {
+                const newTheme = this.getAutoTheme();
+                const currentTheme = document.documentElement.dataset.theme;
+
+                if (newTheme !== currentTheme) {
+                    this.applyTheme(newTheme);
+                }
+            }
+        }, 5 * 60 * 1000); // 5 minutes
+    },
+
+    setTheme(theme) {
+        localStorage.setItem('theme', theme);
+        this.applyTheme(theme);
+    },
+
+    toggleTheme() {
+        const currentTheme = document.documentElement.dataset.theme;
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+    },
+
+    updateToggleButton(theme) {
+        const sunIcon = document.getElementById('theme-icon-sun');
+        const moonIcon = document.getElementById('theme-icon-moon');
+
+        if (sunIcon && moonIcon) {
+            if (theme === 'dark') {
+                sunIcon.style.opacity = '0';
+                moonIcon.style.opacity = '1';
+            } else {
+                sunIcon.style.opacity = '1';
+                moonIcon.style.opacity = '0';
+            }
+        }
+    }
+};
+
 // DOM Ready handler
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize theme management
+    if (window.ThemeManager) {
+        window.ThemeManager.init();
+    }
+
     // Check if animations module is loaded
     if (typeof initMasterTimeline === 'function') {
         // Initialize master timeline

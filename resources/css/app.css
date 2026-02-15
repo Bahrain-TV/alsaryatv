@@ -10,7 +10,63 @@
 
 /* Modern OKLCH Color System */
 :root {
-    /* Base colors */
+    /* Base colors - Light mode */
+    --background: oklch(0.98 0 0);
+    --foreground: oklch(0.1 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.1 0 0);
+
+    /* Primary colors - Gold/Amber theme */
+    --primary: oklch(0.6 0.2 70.0804);
+    --primary-foreground: oklch(1 0 0);
+    --primary-gold: oklch(0.6 0.2 70.0804);
+
+    /* Accent colors - Emerald theme */
+    --accent: oklch(0.7 0.15 155.0);
+    --accent-foreground: oklch(0.1 0 0);
+    --primary-emerald: oklch(0.7 0.15 155.0);
+
+    /* Semantic colors */
+    --muted: oklch(0.95 0 0);
+    --muted-foreground: oklch(0.4 0 0);
+    --border: oklch(0.9 0 0);
+    --input: oklch(0.9 0 0);
+    --ring: oklch(0.6 0.2 70.0804);
+
+    /* Legacy support */
+    --bg-dark: oklch(0.95 0 0);
+    --bg-card: oklch(1 0 0);
+    --text-primary: oklch(0.1 0 0);
+    --text-secondary: oklch(0.4 0 0);
+
+    /* Shadows */
+    --shadow-color: oklch(0 0 0 / 0.05);
+    --shadow-sm: 0px 2px 4px var(--shadow-color);
+    --shadow-md: 0px 4px 8px var(--shadow-color);
+    --shadow-lg: 0px 8px 16px var(--shadow-color);
+    --shadow-xl: 0px 12px 24px var(--shadow-color);
+
+    /* Spacing scale */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    /* Border radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+
+    /* Font family */
+    --font-sans: 'Tajawal', sans-serif;
+}
+
+/* Dark mode overrides */
+html.dark {
+    /* Base colors - Dark mode */
     --background: oklch(0.2046 0 0);
     --foreground: oklch(0.9219 0 0);
     --card: oklch(0.2686 0 0);
@@ -41,27 +97,6 @@
 
     /* Shadows */
     --shadow-color: oklch(0 0 0 / 0.1);
-    --shadow-sm: 0px 2px 4px var(--shadow-color);
-    --shadow-md: 0px 4px 8px var(--shadow-color);
-    --shadow-lg: 0px 8px 16px var(--shadow-color);
-    --shadow-xl: 0px 12px 24px var(--shadow-color);
-
-    /* Spacing scale */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 3rem;
-
-    /* Border radius */
-    --radius-sm: 0.5rem;
-    --radius-md: 0.75rem;
-    --radius-lg: 1rem;
-    --radius-xl: 1.5rem;
-
-    /* Font family */
-    --font-sans: 'Tajawal', sans-serif;
 }
 
 * {
@@ -73,10 +108,9 @@
 body {
     font-family: var(--font-sans);
     background: linear-gradient(135deg,
-        oklch(0.15 0 0 / 0.95) 0%,
-        oklch(0.18 0 0 / 0.90) 50%,
-        oklch(0.16 0 0 / 0.95) 100%),
-    url('/images/alsarya-bg-2026-by-gemini-compressed.jpeg');
+        oklch(0.95 0 0 / 0.95) 0%,
+        oklch(0.92 0 0 / 0.90) 50%,
+        oklch(0.96 0 0 / 0.95) 100%);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -92,6 +126,15 @@ body {
     color: var(--foreground);
     padding: clamp(0.5rem, 2vw, 1rem);
     padding: max(env(safe-area-inset-top), 0.5rem) max(env(safe-area-inset-right), 0.5rem) max(env(safe-area-inset-bottom), 0.5rem) max(env(safe-area-inset-left), 0.5rem);
+}
+
+/* Dark mode body styles */
+html.dark body {
+    background: linear-gradient(135deg,
+        oklch(0.15 0 0 / 0.95) 0%,
+        oklch(0.18 0 0 / 0.90) 50%,
+        oklch(0.16 0 0 / 0.95) 100%),
+    url('/images/alsarya-bg-2026-by-gemini-compressed.jpeg');
 }
 
 body.jetstream-app {
