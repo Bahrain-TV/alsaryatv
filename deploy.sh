@@ -175,6 +175,22 @@ if [[ ! -f .env ]]; then
     exit 1
 fi
 
+# ── Ensure APP_KEY is set ───────────────────────────────────────────────────
+info "Checking application encryption key..."
+APP_KEY_VALUE=$(grep '^APP_KEY=' .env 2>/dev/null | cut -d'=' -f2- | sed 's/^"//' | sed 's/"$//' || echo "")
+if [[ -z "$APP_KEY_VALUE" ]]; then
+    warn "APP_KEY not found or empty in .env file. Generating new key..."
+    # Ensure .env file is writable
+    if [[ ! -w .env ]]; then
+        warn ".env file is not writable. Attempting to fix permissions..."
+        chmod 644 .env || warn "Could not make .env writable"
+    fi
+    run php artisan key:generate
+    success "Application encryption key generated."
+else
+    success "Application encryption key is set."
+fi
+
 # Ensure storage/framework directory exists for installation flag
 mkdir -p storage/framework
 
@@ -231,10 +247,14 @@ trap "kill $TIMEOUT_PID 2>/dev/null || true; rm -f '$LOCK_FILE' '$INSTALL_FLAG';
 
 # ── Cleanup zombie processes ────────────────────────────────────────────────
 info "Checking for zombie tee processes..."
-# Kill stale tee processes from previous deployments, but exclude current shell
-# Get our own PID and filter it out to avoid killing our own tee process
-CURRENT_PID=$$
-pgrep -f "tee -a /tmp/tmp\." 2>/dev/null | grep -v "^${CURRENT_PID}$" | xargs -r kill -9 2>/dev/null || true
+# Kill stale tee processes from previous deployments, but exclude this deployment's
+# Check each tee process's command line to exclude our current log file
+pgrep -f "tee -a /tmp/tmp\." 2>/dev/null | while read pid; do
+    # Check if this tee process is for a different log file (not ours)
+    if ! cat /proc/$pid/cmdline 2>/dev/null | grep -q "$LOG_FILE"; then
+        kill -9 "$pid" 2>/dev/null || true
+    fi
+done
 
 # ── Load notification settings from .env ─────────────────────────────────────
 DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"'"'" || true)
