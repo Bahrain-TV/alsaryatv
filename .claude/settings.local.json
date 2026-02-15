@@ -24,7 +24,8 @@
       "mcp__playwright__browser_console_messages",
       "Bash(./publish.sh)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(./publish.sh:*)"
     ]
   }
 }

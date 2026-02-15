@@ -3,21 +3,24 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="صيانة مجدولة - برنامج السارية من تلفزيون البحرين">
     <title>صيانة مجدولة - برنامج السارية</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=changa:400,600,700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.bunny.net/css?family=tajawal:400,500,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=changa:400,600,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=tajawal:400,500,700&display=swap" rel="stylesheet">
 
-    <!-- Styles / Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- Include Lottie Player library -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <!-- External Libraries (Fallback CDN) -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" async></script>
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --bg: #0c0f14;
             --panel: rgba(12, 15, 20, 0.82);
@@ -27,6 +30,12 @@
             --accent: #ffb703;
             --accent-2: #fb8500;
             --cool: #8ecae6;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
         }
 
         body {
@@ -34,20 +43,39 @@
             background-image:
                 linear-gradient(120deg, rgba(12, 15, 20, 0.88), rgba(12, 15, 20, 0.65)),
                 radial-gradient(circle at 20% 20%, rgba(251, 133, 0, 0.18), transparent 45%),
-                radial-gradient(circle at 80% 10%, rgba(142, 202, 230, 0.16), transparent 40%),
-                url("{{ asset('images/bahrain-bay.jpg') }}");
+                radial-gradient(circle at 80% 10%, rgba(142, 202, 230, 0.16), transparent 40%);
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            font-family: 'Tajawal', sans-serif;
+            font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: var(--ink);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Fallback background image */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("{{ asset('images/bahrain-bay.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: -1;
+            opacity: 0.3;
         }
 
         .down-shell {
             min-height: 100vh;
             display: grid;
             place-items: center;
-            padding: 48px 20px;
+            padding: clamp(24px, 5vw, 48px);
+            position: relative;
+            z-index: 1;
         }
 
         .down-card {
@@ -56,84 +84,104 @@
             border: 1px solid var(--panel-border);
             border-radius: 28px;
             backdrop-filter: blur(14px);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             padding: clamp(24px, 4vw, 48px);
             display: grid;
-            gap: 24px;
+            gap: clamp(20px, 3vw, 32px);
             animation: fadeIn 0.6s ease-out;
         }
 
         .down-head {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: clamp(16px, 3vw, 32px);
             flex-wrap: wrap;
         }
 
         .down-brand {
             display: flex;
             align-items: center;
-            gap: 16px;
-            flex: 1 1 280px;
+            gap: clamp(12px, 2vw, 20px);
+            flex: 1 1 260px;
+            min-width: 0;
+        }
+
+        .lottie-wrapper {
+            flex-shrink: 0;
+            width: clamp(100px, 15vw, 140px);
+            height: clamp(100px, 15vw, 140px);
+        }
+
+        .lottie-wrapper lottie-player {
+            width: 100%;
+            height: 100%;
+        }
+
+        .down-text {
+            flex: 1;
+            min-width: 0;
         }
 
         .down-title {
             font-family: 'Changa', sans-serif;
             font-size: clamp(1.6rem, 3vw, 2.4rem);
             font-weight: 700;
-            margin: 0;
-            letter-spacing: 0.2px;
+            margin: 12px 0 8px 0;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
         }
 
         .down-subtitle {
-            margin: 8px 0 0;
             color: var(--muted);
-            font-size: 1rem;
+            font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+            margin: 0;
         }
 
         .status-pill {
-            padding: 8px 16px;
+            display: inline-block;
+            padding: 8px 14px;
             border-radius: 999px;
             background: rgba(255, 183, 3, 0.12);
             border: 1px solid rgba(255, 183, 3, 0.35);
             color: var(--accent);
             font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .down-grid {
-            display: grid;
-            gap: 24px;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            font-size: 0.85rem;
+            white-space: nowrap;
         }
 
         .countdown-card {
             border-radius: 20px;
-            padding: 20px;
+            padding: clamp(16px, 2vw, 24px);
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
             display: grid;
             gap: 12px;
+            text-align: center;
+            min-width: 200px;
         }
 
         .countdown-value {
             font-family: 'Changa', sans-serif;
-            font-size: clamp(2.4rem, 5vw, 3.5rem);
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
             font-weight: 700;
             color: var(--accent);
             line-height: 1;
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
         }
 
         .countdown-label {
             color: var(--muted);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background-color: rgba(255, 255, 255, 0.12);
-            border-radius: 999px;
+            border-radius: 3px;
             overflow: hidden;
             position: relative;
         }
@@ -141,148 +189,222 @@
         .progress-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--accent), var(--accent-2));
-            border-radius: 999px;
-            transition: width 0.4s linear;
+            border-radius: 3px;
+            transition: width 0.4s ease-out;
             width: 0%;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4F46E5, #9333EA);
-            border-radius: 3px;
-            transition: width 3s linear;
-            width: 0%;
-        }
-
-        .count-number {
-            font-feature-settings: "tnum";
-            font-variant-numeric: tabular-nums;
+        .down-grid {
+            display: grid;
+            gap: clamp(16px, 2vw, 24px);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
 
         .fun-message {
-            min-height: 72px;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: slideIn 0.6s ease-in-out;
-            font-size: 1.25rem;
+            padding: 16px;
+            animation: slideIn 0.6s ease-out;
+            font-size: clamp(1rem, 1.8vw, 1.25rem);
             line-height: 1.6;
             text-align: center;
-        }
-
-        @keyframes slideIn {
-            0% {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideOut {
-            0% {
-                opacity: 1;
-                transform: translateX(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-        }
-
-        .message-exit {
-            animation: slideOut 0.4s ease-in-out forwards;
+            color: var(--muted);
         }
 
         .emoji-bounce {
             display: inline-block;
+            margin-left: 8px;
             animation: bounce 0.8s ease-in-out infinite;
+            font-size: 1.3em;
+        }
+
+        .hits-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-link {
+            color: var(--cool);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--accent);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .down-head {
+                flex-direction: column;
+            }
+
+            .down-brand {
+                flex: 1 1 100%;
+            }
+
+            .countdown-card {
+                min-width: 100%;
+            }
+
+            .fun-message {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* High contrast support */
+        @media (prefers-contrast: more) {
+            .down-card {
+                border-color: rgba(255, 255, 255, 0.3);
+                background: rgba(12, 15, 20, 0.95);
+            }
+
+            .status-pill {
+                border-color: rgba(255, 183, 3, 0.7);
+            }
         }
     </style>
 </head>
 <body class="antialiased">
     <div class="down-shell" id="app">
         <div class="down-card">
+            <!-- Header Section -->
             <div class="down-head">
                 <div class="down-brand">
-                    <lottie-player src="{{ asset('lottie/crecent-moon-ramadan.json') }}" background="transparent" speed=".1" style="width: 140px; height: 140px;" loop autoplay></lottie-player>
-                    <div>
+                    <div class="lottie-wrapper">
+                        <lottie-player
+                            src="{{ asset('lottie/crecent-moon-ramadan.json') }}"
+                            background="transparent"
+                            speed="0.1"
+                            loop
+                            autoplay
+                            aria-hidden="true">
+                        </lottie-player>
+                    </div>
+                    <div class="down-text">
                         <div class="status-pill">صيانة مجدولة</div>
                         <h1 class="down-title">نجهز لكم تجربة أفضل</h1>
                         <p class="down-subtitle">نعمل حاليًا على تطوير وتحسين النظام لخدمتكم بشكل أفضل.</p>
                     </div>
                 </div>
-                <div class="countdown-card">
-                    <div class="countdown-value"><span id="countdown">⏳</span></div>
+
+                <!-- Status Card -->
+                <div class="countdown-card" aria-label="حالة الخادم">
+                    <div class="countdown-value" id="countdown" aria-live="polite">⏳</div>
                     <div class="countdown-label">سنعود قريبًا</div>
-                    <div class="progress-bar">
-                        <div class="progress-bar-fill" id="progress" style="width: 60%;"></div>
+                    <div class="progress-bar" aria-hidden="true">
+                        <div class="progress-bar-fill" id="progress"></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Content Grid -->
             <div class="down-grid">
-                <div class="fun-message" id="funMessage">
-                    <span class="emoji-bounce">⚙️</span> نعمل على تحديثات دورية لضمان أفضل أداء للنظام.
+                <!-- Message -->
+                <div class="fun-message" id="funMessage" aria-live="polite" aria-atomic="true">
+                    <span class="emoji-bounce">⚙️</span>
+                    <span>نعمل على تحديثات دورية لضمان أفضل أداء للنظام.</span>
                 </div>
+
+                <!-- Hits Counter -->
                 <div class="countdown-card">
                     <div class="countdown-label">شكرًا لزيارتكم</div>
-                    <div class="countdown-value count-number" id="hits-counter"></div>
-                    <a href="/" class="text-sm" style="color: var(--cool);">برنامج السارية - تلفزيون البحرين</a>
+                    <div class="hits-display">
+                        <div class="countdown-value count-number" id="hits-counter" aria-live="polite">0</div>
+                    </div>
+                    <a href="/" class="footer-link">برنامج السارية - تلفزيون البحرين</a>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- @include('sponsors') --}}
-
     <script>
-        // Professional maintenance messages
-        const funMessages = [
-            { text: 'نعمل على تحسين الأداء والاستقرار لخدمتكم بشكل أفضل.', emoji: '⚙️' },
-            { text: 'جاري تطبيق التحديثات الأمنية والتقنية المجدولة.', emoji: '🔒' },
-            { text: 'نقدر صبركم ونتطلع لخدمتكم قريبًا بتجربة محسّنة.', emoji: '🌟' },
-        ];
+        'use strict';
 
-        function setFunMessageOnce() {
+        // Configuration
+        const CONFIG = {
+            hitCountDuration: 1500,
+            hitCountInterval: 30,
+            siteCheckInterval: 30000, // 30 seconds
+            messages: [
+                { text: 'نعمل على تحسين الأداء والاستقرار لخدمتكم بشكل أفضل.', emoji: '⚙️' },
+                { text: 'جاري تطبيق التحديثات الأمنية والتقنية المجدولة.', emoji: '🔒' },
+                { text: 'نقدر صبركم ونتطلع لخدمتكم قريبًا بتجربة محسّنة.', emoji: '🌟' },
+            ]
+        };
+
+        /**
+         * Set a random maintenance message on page load
+         */
+        function setRandomMessage() {
             const messageEl = document.getElementById('funMessage');
-            const message = funMessages[Math.floor(Math.random() * funMessages.length)];
-            messageEl.innerHTML = `<span class="emoji-bounce">${message.emoji}</span> ${message.text}`;
+            if (!messageEl) return;
+
+            const message = CONFIG.messages[
+                Math.floor(Math.random() * CONFIG.messages.length)
+            ];
+
+            messageEl.innerHTML = `
+                <span class="emoji-bounce">${message.emoji}</span>
+                <span>${message.text}</span>
+            `;
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            setFunMessageOnce();
-            // Get the actual hits from session
-            const hits = {{ session('hits', 1) }};
+        /**
+         * Animate hit counter with smooth increment
+         */
+        function animateHitCounter(hits) {
             const hitsCounter = document.getElementById('hits-counter');
-            const progressBar = document.getElementById('progress');
+            if (!hitsCounter) return;
 
-            // Animate counter from 0 to actual hits
             let currentCount = 0;
-            const duration = 1500; // 1.5 seconds
-            const interval = 30; // Update every 30ms
-            const steps = duration / interval;
+            const steps = CONFIG.hitCountDuration / CONFIG.hitCountInterval;
             const increment = hits / steps;
 
             const counterInterval = setInterval(() => {
@@ -292,30 +414,78 @@
                     clearInterval(counterInterval);
                 }
                 hitsCounter.textContent = Math.floor(currentCount).toLocaleString('ar-SA');
-            }, interval);
+            }, CONFIG.hitCountInterval);
+        }
 
-            // Animate progress bar (aesthetic only)
-            if (progressBar) {
-                let progress = 0;
-                setInterval(() => {
-                    progress = (progress + 1) % 100;
-                    progressBar.style.width = `${progress}%`;
-                }, 200);
-            }
+        /**
+         * Animate progress bar aesthetic effect
+         */
+        function animateProgressBar() {
+            const progressBar = document.getElementById('progress');
+            if (!progressBar) return;
 
-            // Check if site is back online every 30 seconds (no auto-reload spam)
+            let progress = 0;
             setInterval(() => {
-                fetch('/', { method: 'HEAD' })
+                progress = (progress + 1) % 100;
+                progressBar.style.width = `${progress}%`;
+            }, 200);
+        }
+
+        /**
+         * Poll for site availability and reload when live
+         */
+        function pollSiteAvailability() {
+            setInterval(() => {
+                fetch('/', {
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                })
                     .then(response => {
-                        if (response.ok && response.status === 200) {
+                        if (response.ok || response.status === 200) {
                             window.location.reload();
                         }
                     })
                     .catch(() => {
-                        // Still in maintenance, do nothing
+                        // Still in maintenance, silently continue
                     });
-            }, 30000); // Check every 30 seconds
+            }, CONFIG.siteCheckInterval);
+        }
+
+        /**
+         * Initialize when DOM is ready
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                setRandomMessage();
+
+                // Get hits from session (default to 1)
+                const hits = {{ session('hits', 1) }};
+                animateHitCounter(hits);
+                animateProgressBar();
+
+                // Start polling for site availability
+                pollSiteAvailability();
+            } catch (error) {
+                console.error('Error initializing maintenance page:', error);
+            }
         });
+
+        // Fallback if DOMContentLoaded already fired (rare edge case)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setRandomMessage();
+                const hits = {{ session('hits', 1) }};
+                animateHitCounter(hits);
+                animateProgressBar();
+                pollSiteAvailability();
+            });
+        } else {
+            setRandomMessage();
+            const hits = {{ session('hits', 1) }};
+            animateHitCounter(hits);
+            animateProgressBar();
+            pollSiteAvailability();
+        }
     </script>
 </body>
 </html>
