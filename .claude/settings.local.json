@@ -25,7 +25,8 @@
       "Bash(./publish.sh)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(./publish.sh:*)"
+      "Bash(./publish.sh:*)",
+      "Bash(ssh -i ~/.ssh/id_oct24 -o ConnectTimeout=30 -o ServerAliveInterval=10 -o ServerAliveCountMax=5 root@h6.doy.tech:*)"
     ]
   }
 }
