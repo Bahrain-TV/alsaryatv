@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ###############################################################################
-# deploy.sh — AlSarya TV Show Registration System (FIXED VERSION)
+# deploy.sh — AlSarya TV Show Registration System
 #
 # Production deployment script. Handles dependency installation, asset
 # compilation, database migrations, seeding, and Laravel cache optimisation.
@@ -19,8 +19,8 @@
 APP_USER="alsar4210"
 SUDO_PREFIX="sudo -u $APP_USER"
 
-# Start with basic error handling, we'll enable -u later after variable init
-set -eo pipefail
+# Enable strict mode AFTER we have a chance to initialize critical variables
+set -eo pipefail  # Don't use -u yet, will enable after init
 
 # ── Colours ──────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -29,6 +29,11 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No colour
 
+# ── Logging Setup ────────────────────────────────────────────────────────────
+# Disabled logging to prevent tee process issues
+# LOG_FILE=$(mktemp)
+
+
 # ── Helpers ──────────────────────────────────────────────────────────────────
 info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
 success() { echo -e "${GREEN}[OK]${NC}    $*"; }
@@ -36,10 +41,11 @@ warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
 error()   { echo -e "${RED}[ERROR]${NC} $*"; }
 
 run() {
-    if [[ "${DRY_RUN:-false}" == "true" ]]; then
+    if [[ "$DRY_RUN" == "true" ]]; then
         echo -e "${YELLOW}[DRY-RUN]${NC} $*"
         return 0
     else
+        # Execute the command arguments directly for better error handling
         "$@" || {
             local exit_code=$?
             error "Command failed with exit code $exit_code: $*"
@@ -48,7 +54,7 @@ run() {
     fi
 }
 
-# ── Initialize critical variables BEFORE enabling -u ──────────────────────────
+# ── Defaults ─────────────────────────────────────────────────────────────────
 FRESH=false
 SEED=false
 NO_BUILD=false
@@ -60,12 +66,8 @@ TIMEOUT_PID=""
 MAINTENANCE_WAS_ENABLED=false
 LOCK_FILE="/tmp/deploy.lock"
 INSTALL_FLAG="storage/framework/deployment.lock"
-NOTIFY_ENABLED="true"
-DISCORD_WEBHOOK=""
-NTFY_URL=""
-NOTIFY_DISCORD=""
 
-# NOW enable strict mode for undefined variables
+# NOW enable full strict mode
 set -u
 
 # ── Parse flags ──────────────────────────────────────────────────────────────
@@ -81,7 +83,12 @@ for arg in "$@"; do
     esac
 done
 
-# ── Notifications ────────────────────────────────────────────────────────────
+# ── Notifications (defined early for send_notification function) ────────────
+DISCORD_WEBHOOK=""
+NTFY_URL=""
+NOTIFY_DISCORD=""
+NOTIFY_ENABLED="true"
+
 send_notification() {
     local exit_code=$1
     local status="Success"
@@ -91,17 +98,28 @@ send_notification() {
         color=15548997
     fi
 
+    # Logging disabled - no cleanup needed
+    # exec 1>&3 2>&4  # Disabled since we're not using file descriptor redirection
+    # exec 3>&- 4>&-
+    # Wait for tee to finish writing
+    # if [[ -n "${TEE_PID:-}" ]]; then
+    #     wait "$TEE_PID" 2>/dev/null || true
+    # fi
+    # sleep 0.5  # Brief delay to ensure file is written
+
     if [[ "$NOTIFY_ENABLED" != "true" ]]; then
+        # rm -f "$LOG_FILE"  # Logging disabled
         rm -f resources/views/errors/temp_503.blade.php 2>/dev/null || true
         return
     fi
 
+    # Use PHP to construct safe JSON payload (without log content since logging is disabled)
     php -r "
         \$json = json_encode([
             'username' => 'Deployment Bot',
             'embeds' => [[
                 'title' => \"Deployment $status\",
-                'description' => 'Deployment completed.',
+                'description' => 'Deployment completed. Logging disabled.',
                 'color' => $color,
                 'timestamp' => date('c')
             ]]
@@ -117,13 +135,14 @@ send_notification() {
     fi
 
     if [[ -n "$NTFY_URL" ]]; then
-        echo "Deployment $status" | curl -s --max-time 10 -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null 2>&1 || true
+        echo "Deployment $status - Logging disabled" | curl -s --max-time 10 -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null 2>&1 || true
     fi
 
+    # rm -f "$LOG_FILE"  # Logging disabled
     rm -f resources/views/errors/temp_503.blade.php 2>/dev/null || true
 }
 
-# ── Pre-flight checks ────────────────────────────────────────────────────────
+# ── Pre-flight checks ───────────────────────────────────────────────────────
 resolve_app_dir() {
     local script_source=""
     if [[ -n "${BASH_SOURCE[0]:-}" && -f "${BASH_SOURCE[0]}" ]]; then
@@ -133,7 +152,7 @@ resolve_app_dir() {
     fi
 
     if [[ -n "$script_source" ]]; then
-        (cd "$(dirname "$script_source")" && pwd) || pwd
+        (cd "$(dirname "$script_source")" && pwd)
         return 0
     fi
 
@@ -148,24 +167,6 @@ resolve_app_dir() {
     fi
 
     pwd
-    return 0
-}
-
-# ── Validate required commands ───────────────────────────────────────────────
-validate_required_commands() {
-    local missing_commands=()
-    
-    for cmd in php composer git; do
-        if ! command -v "$cmd" &>/dev/null; then
-            missing_commands+=("$cmd")
-        fi
-    done
-    
-    if [[ ${#missing_commands[@]} -gt 0 ]]; then
-        error "Missing required commands: ${missing_commands[*]}"
-        error "Please install the missing dependencies and try again."
-        exit 1
-    fi
 }
 
 APP_DIR="$(resolve_app_dir)"
@@ -186,18 +187,37 @@ if [[ ! -f .env ]]; then
     exit 1
 fi
 
+# ── Validate required commands ───────────────────────────────────────────────
+validate_required_commands() {
+    local missing_commands=()
+    
+    for cmd in php composer git; do
+        if ! command -v "$cmd" &>/dev/null; then
+            missing_commands+=("$cmd")
+        fi
+    done
+    
+    if [[ ${#missing_commands[@]} -gt 0 ]]; then
+        error "Missing required commands: ${missing_commands[*]}"
+        error "Please install the missing dependencies and try again."
+        exit 1
+    fi
+}
+
 validate_required_commands
 
-# ── Step 0: Initial Change Detection ─────────────────────────────────────────
+# ── Step 0: Initial Change Detection (Drastic Loop Prevention) ──────────────
 PREV_DEPLOY_FILE="storage/framework/last_successful_deploy"
 INITIAL_GIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
 
+# If this is a webhook trigger, compare with last success BEFORE pulling or doing anything
 if [[ "$WEBHOOK_TRIGGER" == "true" && -f "$PREV_DEPLOY_FILE" && "$FORCE" == "false" ]]; then
-    LAST_SUCCESSFUL_HASH=$(cut -d'|' -f1 "$PREV_DEPLOY_FILE" 2>/dev/null || echo "")
+    LAST_SUCCESSFUL_HASH=$(cut -d'|' -f1 "$PREV_DEPLOY_FILE")
     if [[ "$INITIAL_GIT_HASH" == "$LAST_SUCCESSFUL_HASH" ]]; then
+        # We check remote without pulling to see if we actually need to pull
         info "Webhook triggered, checking remote for actual changes..."
         git fetch origin >/dev/null 2>&1 || true
-        REMOTE_HASH=$(git rev-parse origin/main 2>/dev/null || echo "")
+        REMOTE_HASH=$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main") 2>/dev/null || echo "")
         
         if [[ "$INITIAL_GIT_HASH" == "$REMOTE_HASH" ]]; then
             success "No remote changes detected. System is already at hash $REMOTE_HASH. Terminating to avoid loop."
@@ -231,10 +251,11 @@ else
     success "Application encryption key is set."
 fi
 
-# Ensure storage/framework directory exists
+# Ensure storage/framework directory exists for installation flag
 mkdir -p storage/framework
 
-# ── Lock mechanism ───────────────────────────────────────────────────────────
+# ── Lock mechanism (prevent concurrent runs) ────────────────────────────────
+# Check system-level lock
 if [[ -f "$LOCK_FILE" ]]; then
     LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
     if [[ -n "$LOCK_PID" ]] && kill -0 "$LOCK_PID" 2>/dev/null; then
@@ -246,11 +267,15 @@ if [[ -f "$LOCK_FILE" ]]; then
     fi
 fi
 
+# Check application-level installation flag
 if [[ -f "$INSTALL_FLAG" ]]; then
     FLAG_DATA=$(cat "$INSTALL_FLAG" 2>/dev/null || echo "")
     FLAG_PID=$(echo "$FLAG_DATA" | cut -d'|' -f1 || echo "")
     FLAG_TIME=$(echo "$FLAG_DATA" | cut -d'|' -f2 || echo "0")
     FLAG_AGE=$(($(date +%s) - FLAG_TIME))
+    if [[ "$FLAG_AGE" -lt 0 ]]; then
+        FLAG_AGE=0  # Handle case where system clock was adjusted
+    fi
 
     if [[ -n "$FLAG_PID" ]] && kill -0 "$FLAG_PID" 2>/dev/null; then
         error "Installation already in progress (PID: $FLAG_PID, started $FLAG_AGE seconds ago)."
@@ -267,7 +292,7 @@ info "Creating deployment locks..."
 echo $$ > "$LOCK_FILE"
 echo "$$|$(date +%s)|$(date '+%Y-%m-%d %H:%M:%S')" > "$INSTALL_FLAG"
 
-# ── Cleanup and error handler ────────────────────────────────────────────────
+# ── Unified cleanup and error handler ─────────────────────────────────────────
 cleanup_and_exit() {
     local exit_code=$?
     
@@ -280,7 +305,7 @@ cleanup_and_exit() {
     # Remove locks
     rm -f "$LOCK_FILE" "$INSTALL_FLAG"
 
-    # CRITICAL: Restore site if maintenance mode was enabled and something failed
+    # CRITICAL: Restore site if we put it in maintenance mode and something failed
     if [[ "$MAINTENANCE_WAS_ENABLED" == "true" && "$exit_code" -ne 0 ]]; then
         error "Deploy failed (exit code: $exit_code)! Restoring site to LIVE status..."
         if php artisan up 2>/dev/null; then
@@ -294,10 +319,10 @@ cleanup_and_exit() {
     send_notification "$exit_code"
 }
 
-# Single unified trap
+# Single unified trap - handles both normal exit and errors
 trap cleanup_and_exit EXIT
 
-# ── Timeout mechanism ────────────────────────────────────────────────────────
+# ── Timeout mechanism (prevent infinite runs) ───────────────────────────────
 TIMEOUT=600  # 10 minutes max runtime
 (
     sleep "$TIMEOUT"
@@ -308,17 +333,21 @@ TIMEOUT=600  # 10 minutes max runtime
 ) &
 TIMEOUT_PID=$!
 
-# ── Load notification settings ───────────────────────────────────────────────
-DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || echo "")
-NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || echo "")
-NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || echo "")
+# ── Cleanup zombie processes ────────────────────────────────────────────────
+# Logging disabled - skip zombie process check
+# info "Checking for zombie tee processes..."
 
-# ── Log deployment trigger source ────────────────────────────────────────────
+# ── Load notification settings from .env ─────────────────────────────────────
+DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || true)
+NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || true)
+NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || true)
+
+# ── Log deployment trigger source ───────────────────────────────────────────
 if [[ "$WEBHOOK_TRIGGER" == "true" ]]; then
     info "Deployment triggered by GitHub webhook"
 fi
 
-# ── Step 1: Maintenance mode ─────────────────────────────────────────────────
+# ── Step 1: Maintenance mode ────────────────────────────────────────────────
 if [[ -f "storage/framework/down" ]]; then
     if [[ -n "${PUBLISH_VERSION:-}" ]] || [[ "$IGNORE_MAINTENANCE" == "true" ]]; then
         info "Maintenance mode is active (continuing due to active flag or publisher)."
@@ -331,6 +360,7 @@ fi
 
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Enabling maintenance mode..."
+    # Use the downtime template WITHOUT auto-refresh to prevent client-side loops
     run php artisan down --retry=60 --render="down" || true
     MAINTENANCE_WAS_ENABLED=true
 else
@@ -339,19 +369,24 @@ else
     MAINTENANCE_WAS_ENABLED=false
 fi
 
-# ── Step 2: Pull latest code ────────────────────────────────────────────────
+
+# ── Step 2: Pull latest code (if in a git repo) ─────────────────────────────
 if [[ -d .git ]]; then
     info "Current Hash: $INITIAL_GIT_HASH. Pulling latest changes..."
 
+    # Always fetch and reset to ensure exact match with remote
+    # This avoids "diverged" warnings and ensures a clean state
     run git fetch origin
     CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
     
+    # Resetting hard ensures local changes (like previous build artifacts) don't conflict
     run git reset --hard origin/"$CURRENT_BRANCH"
     success "Codebase synced with remote/$CURRENT_BRANCH."
 
+    # Post-pull check: If nothing changed and not forced, STOP HERE
     POST_PULL_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
     if [[ -f "$PREV_DEPLOY_FILE" && "$FORCE" == "false" && "$FRESH" == "false" ]]; then
-        LAST_SUCCESSFUL_HASH=$(cut -d'|' -f1 "$PREV_DEPLOY_FILE" 2>/dev/null || echo "")
+        LAST_SUCCESSFUL_HASH=$(cut -d'|' -f1 "$PREV_DEPLOY_FILE")
         if [[ "$POST_PULL_HASH" == "$LAST_SUCCESSFUL_HASH" ]]; then
             success "System is already at the last successfully deployed hash ($POST_PULL_HASH)."
             success "No new changes to process. Terminating deployment to protect resources."
@@ -366,11 +401,12 @@ CURRENT_GIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
 CURRENT_VERSION=$(cat VERSION 2>/dev/null || echo "no-version")
 
 if [[ -f "$PREV_DEPLOY_FILE" ]]; then
-    IFS='|' read -r LAST_HASH LAST_VERSION < "$PREV_DEPLOY_FILE" || LAST_HASH=""
+    IFS='|' read -r LAST_HASH LAST_VERSION < "$PREV_DEPLOY_FILE"
 else
     LAST_HASH=""
 fi
 
+# Re-evaluate change status based on the potentially updated POST_PULL_HASH
 COMPOSER_CHANGED=true
 FRONTEND_CHANGED=true
 MIGRATIONS_CHANGED=true
@@ -380,22 +416,28 @@ if [[ "$FORCE" == "true" || "$FRESH" == "true" ]]; then
 elif [[ -z "$LAST_HASH" || "$LAST_HASH" == "no-git" ]]; then
     info "No previous deployment record found."
 else
-    CHANGES=$(git diff --name-only "$LAST_HASH" "${POST_PULL_HASH:-$CURRENT_GIT_HASH}" 2>/dev/null || echo "ALL")
+    # Detect what actually changed
+    CHANGES=$(git diff --name-only "$LAST_HASH" "$POST_PULL_HASH" 2>/dev/null || echo "ALL")
     
-    if [[ "$CHANGES" != "ALL" ]]; then
+    if [[ "$CHANGES" == "ALL" ]]; then
+        info "Assuming everything changed."
+    else
+        # Composer check
         if ! echo "$CHANGES" | grep -qE "^(composer\.json|composer\.lock)$"; then
             COMPOSER_CHANGED=false
-            info "No Composer changes detected."
+            info "No Composer changes."
         fi
         
-        if ! echo "$CHANGES" | grep -qE "(package\.json|pnpm-lock\.yaml|package-lock\.json|vite\.config\.js|resources/|public/)"; then
+        # Frontend check
+        if ! echo "$CHANGES" | grep -qE "^(package\.json|pnpm-lock\.yaml|package-lock\.json|vite\.config\.js|tailwind\.config\.js|postcss\.config\.js|resources/|public/)"; then
             FRONTEND_CHANGED=false
-            info "No Frontend changes detected."
+            info "No Frontend changes."
         fi
         
+        # Migrations check
         if ! echo "$CHANGES" | grep -q "^database/migrations/"; then
             MIGRATIONS_CHANGED=false
-            info "No migration changes detected."
+            info "No migration changes."
         fi
     fi
 fi
@@ -413,7 +455,7 @@ else
     info "Skipping Composer installation (no changes detected)."
 fi
 
-# ── Step 4: Install & build frontend assets ────────────────────────────────
+# ── Step 4: Install & build frontend assets ─────────────────────────────────
 if [[ "$NO_BUILD" == "false" ]]; then
     if [[ "$FRONTEND_CHANGED" == "true" ]]; then
         info "Installing Node dependencies..."
@@ -439,7 +481,7 @@ if [[ "$NO_BUILD" == "false" ]]; then
         info "Skipping Frontend build (no changes detected)."
     fi
 else
-    info "Skipping frontend build (--no-build flag set)."
+    info "Skipping frontend build (--no-build or skipped due to changes)."
 fi
 
 # ── Step 5: Database migrations ─────────────────────────────────────────────
@@ -517,10 +559,21 @@ info "Restarting queue workers..."
 run php artisan queue:restart || true
 success "Queue restart signal sent."
 
+# ── Step 11b: Ensure ownership ───────────────────────────────────────────────
+# DISABLED: Recursive chown breaks web server permissions (HTTP 403 errors)
+# All operations above already run as the correct user via SUDO_PREFIX
+# if [[ "$(id -u)" -eq 0 ]]; then
+#     info "Ensuring ownership for $APP_DIR..."
+#     run chown -R alsar4210:alsar4210 "$APP_DIR"
+#     success "Ownership set to alsar4210:alsar4210."
+# else
+#     warn "Skipping ownership fix (requires root)."
+# fi
 info "Skipping recursive ownership change (prevents HTTP 403 errors)"
 
 # ── Step 11c: Update deployment record ───────────────────────────────────────
 if [[ "$DRY_RUN" == "false" ]]; then
+    # PREV_DEPLOY_FILE, CURRENT_GIT_HASH, CURRENT_VERSION are defined in Step 2.5
     echo "${CURRENT_GIT_HASH}|${CURRENT_VERSION}" > "$PREV_DEPLOY_FILE"
     info "Deployment record updated: ${CURRENT_VERSION} (${CURRENT_GIT_HASH})"
 fi
@@ -536,7 +589,10 @@ check_production_health() {
 
     info "Running production health checks..."
 
+    # Check individual registration route
     local individual_status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$app_url" 2>/dev/null || echo "000")
+
+    # Check family registration route
     local family_status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$app_url/family" 2>/dev/null || echo "000")
 
     if [[ "$individual_status" == "200" || "$individual_status" == "302" ]]; then
@@ -557,6 +613,7 @@ check_production_health() {
     return 0
 }
 
+# Detect if running from local machine (via publish.sh or direct SSH)
 IS_LOCAL_EXECUTION=false
 if [[ -n "${PUBLISH_VERSION:-}" ]] || [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_TTY:-}" ]]; then
     IS_LOCAL_EXECUTION=true
@@ -568,8 +625,9 @@ if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Disabling maintenance mode..."
     run php artisan up
     success "Application is live."
-    MAINTENANCE_WAS_ENABLED=false
+    MAINTENANCE_WAS_ENABLED=false  # Site is now up, don't restore in trap
 
+    # Run health check if executed remotely from local machine
     if [[ "$IS_LOCAL_EXECUTION" == "true" && "$DRY_RUN" == "false" ]]; then
         echo ""
         if ! check_production_health; then
@@ -589,6 +647,7 @@ echo -e "${GREEN}  Deployment complete!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
 
+echo ""
 [[ "$SEED" == "true" ]] && info "Seeders executed: UserSeeder, CallerSeeder"
 [[ "$FRESH" == "true" ]] && warn "Database was freshly rebuilt (all previous data dropped)."
 echo ""

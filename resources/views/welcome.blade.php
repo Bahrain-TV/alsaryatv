@@ -345,7 +345,7 @@
             </div>
         </header>
 
-        @if(!config('alsarya.registration.enabled', false) && !auth()->check())
+        @if(!auth()->check())
             {{-- Countdown Timer - Outside the panel for full width --}}
             <div class="gsap-entry w-full max-w-2xl mb-8">
                 <!-- Countdown Section -->
@@ -947,7 +947,7 @@
 
             // Ramadan 1447 starts on configured date at midnight (Bahrain time)
             // Using Bahrain timezone (UTC+3)
-            const ramadanStartISO = '{{ $ramadanStartISO ?? "2026-02-28" }}';
+            const ramadanStartISO = '{{ $ramadanStartISO ?? "2026-02-18" }}';
             const ramadanDate = new Date(ramadanStartISO + 'T00:00:00+03:00');
             const ramadanTimestamp = Math.floor(ramadanDate.getTime() / 1000);
 
