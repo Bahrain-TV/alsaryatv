@@ -309,6 +309,15 @@ if [[ "$WEBHOOK_TRIGGER" == "true" ]]; then
 fi
 
 # ── Step 1: Maintenance mode ────────────────────────────────────────────────
+if [[ -f "storage/framework/down" ]]; then
+    if [[ -n "${PUBLISH_VERSION:-}" ]]; then
+        info "Maintenance mode is active (handled by publisher)."
+    else
+        error "Website is currently in maintenance mode. Aborting deployment to prevent conflicts."
+        exit 1
+    fi
+fi
+
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Enabling maintenance mode..."
     # Use the downtime template WITHOUT auto-refresh to prevent client-side loops
