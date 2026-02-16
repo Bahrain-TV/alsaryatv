@@ -32,7 +32,7 @@
     }
 
     .threejs-canvas {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
@@ -75,25 +75,28 @@
     }
 </style>
 
-<div wire:poll.2s="refreshStats" class="obs-overlay-wrap">
-    <div class="obs-overlay-float">
-        <div class="obs-overlay-panel rounded-2xl border border-white/10 bg-black/70 p-6 shadow-lg backdrop-blur">
-            <canvas class="threejs-canvas" id="obs-overlay-canvas"></canvas>
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-                <span class="obs-overlay-pulse inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
-                <p
-                    class="text-sm font-semibold text-white"
-                    data-obs-text
-                    data-obs-en="{{ __('Live dashboard feed', [], 'en') }}"
-                    data-obs-ar="{{ __('Live dashboard feed', [], 'ar') }}"
-                    dir="auto"
-                >
-                    {{ __('Live dashboard feed', [], 'en') }}
-                </p>
+<div wire:poll.2s="refreshStats">
+    <!-- Ramadan-themed Three.js Background Canvas -->
+    <canvas class="threejs-canvas" id="obs-ramadan-canvas"></canvas>
+
+    <div class="obs-overlay-wrap">
+        <div class="obs-overlay-float">
+            <div class="obs-overlay-panel rounded-2xl border border-white/10 bg-black/70 p-6 shadow-lg backdrop-blur">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="obs-overlay-pulse inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                    <p
+                        class="text-sm font-semibold text-white"
+                        data-obs-text
+                        data-obs-en="{{ __('Live dashboard feed', [], 'en') }}"
+                        data-obs-ar="{{ __('Live dashboard feed', [], 'ar') }}"
+                        dir="auto"
+                    >
+                        {{ __('Live dashboard feed', [], 'en') }}
+                    </p>
+                </div>
+                <span class="text-xs text-white/70">{{ __('Updated') }} {{ $lastUpdatedAt }}</span>
             </div>
-            <span class="text-xs text-white/70">{{ __('Updated') }} {{ $lastUpdatedAt }}</span>
-        </div>
 
         <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-xl bg-white/5 p-4">
@@ -158,584 +161,544 @@
             </div>
         </div>
 
-        <div class="mt-4 text-xs text-white/70">
-            <span
-                data-obs-text
-                data-obs-en="{{ __('Win ratio', [], 'en') }}"
-                data-obs-ar="{{ __('Win ratio', [], 'ar') }}"
-                dir="auto"
-            >
-                {{ __('Win ratio', [], 'en') }}
-            </span>
-            :
-            <span
-                data-obs-text
-                data-obs-value="true"
-                data-obs-en="{{ $winRatio }}%"
-                dir="auto"
-            >
-                {{ $winRatio }}%
-            </span>
+        <div class="mt-4 flex justify-between items-center text-xs text-white/70">
+            <div>
+                <span
+                    data-obs-text
+                    data-obs-en="{{ __('Win ratio', [], 'en') }}"
+                    data-obs-ar="{{ __('Win ratio', [], 'ar') }}"
+                    dir="auto"
+                >
+                    {{ __('Win ratio', [], 'en') }}
+                </span>
+                :
+                <span
+                    data-obs-text
+                    data-obs-value="true"
+                    data-obs-en="{{ $winRatio }}%"
+                    dir="auto"
+                >
+                    {{ $winRatio }}%
+                </span>
+            </div>
+            <div class="text-white/50 font-mono">
+                v{{ config('alsarya.version', '1.0.0') }}
+            </div>
         </div>
         </div>
+    </div>
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const overlayPanel = document.querySelector('.obs-overlay-panel');
-        const canvas = document.getElementById('obs-overlay-canvas');
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('obs-ramadan-canvas');
+    if (!canvas || !window.THREE) return;
 
-        if (!overlayPanel || !canvas || !window.THREE) {
-            return;
-        }
+    // ============================
+    // RAMADAN-THEMED THREE.JS SCENE
+    // ============================
 
-        // Three.js setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        alpha: true,
+        antialias: true
+    });
 
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-        renderer.setClearColor(0x000000, 0);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0);
+    camera.position.set(0, 0, 15);
 
-        camera.position.z = 5;
+    // Color Palette - Ramadan Theme
+    const COLORS = {
+        gold: 0xC59D5F,
+        deepRed: 0xA81C2E,
+        emerald: 0x10B981,
+        darkBlue: 0x1E3A8A,
+        lightGold: 0xF5DEB3,
+        white: 0xFFFFFF
+    };
 
-        // Create meaningful animated elements for each stat
-        const elements = [];
+    // ============================
+    // RAMADAN LANTERN (FANOOS) - 3D Model
+    // ============================
+    function createLantern(scale = 1) {
+        const lantern = new THREE.Group();
 
-        // 1. Total Callers - Group of people (spheres with simple features)
-        const peopleGroup = new THREE.Group();
-        const peopleCount = 7;
-
-        for (let i = 0; i < peopleCount; i++) {
-            // Body (cylinder)
-            const bodyGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.3, 8);
-            const bodyMaterial = new THREE.MeshBasicMaterial({
-                color: 0xff6b6b,
-                transparent: true,
-                opacity: 0.4
-            });
-            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-
-            // Head (sphere)
-            const headGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-            const headMaterial = new THREE.MeshBasicMaterial({
-                color: 0xffa726,
-                transparent: true,
-                opacity: 0.5
-            });
-            const head = new THREE.Mesh(headGeometry, headMaterial);
-            head.position.y = 0.25;
-
-            // Combine into person
-            const person = new THREE.Group();
-            person.add(body);
-            person.add(head);
-
-            // Position in a semi-circle
-            const angle = (i / (peopleCount - 1)) * Math.PI * 0.8 - Math.PI * 0.4;
-            const radius = 0.8;
-            person.position.set(
-                Math.cos(angle) * radius,
-                Math.sin(angle) * 0.3,
-                -1
-            );
-            person.rotation.z = angle + Math.PI / 2;
-
-            peopleGroup.add(person);
-        }
-
-        peopleGroup.position.set(-1.5, 0.5, 0);
-        scene.add(peopleGroup);
-        elements.push({
-            object: peopleGroup,
-            type: 'people',
-            initialPosition: peopleGroup.position.clone(),
-            floatOffset: 0
+        // Top dome
+        const domeGeometry = new THREE.SphereGeometry(0.4 * scale, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+        const domeMaterial = new THREE.MeshBasicMaterial({
+            color: COLORS.gold,
+            transparent: true,
+            opacity: 0.6,
+            wireframe: false
         });
+        const dome = new THREE.Mesh(domeGeometry, domeMaterial);
+        dome.position.y = 0.8 * scale;
+        lantern.add(dome);
 
-        // 2. Today Callers - Clock/watch shape
-        const clockGroup = new THREE.Group();
+        // Body (hexagonal prism)
+        const bodyShape = new THREE.Shape();
+        const sides = 6;
+        const radius = 0.5 * scale;
+        for (let i = 0; i < sides; i++) {
+            const angle = (i / sides) * Math.PI * 2;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            if (i === 0) bodyShape.moveTo(x, y);
+            else bodyShape.lineTo(x, y);
+        }
+        bodyShape.closePath();
 
-        // Clock face (circle)
-        const clockFaceGeometry = new THREE.CircleGeometry(0.25, 16);
-        const clockFaceMaterial = new THREE.MeshBasicMaterial({
-            color: 0x4ecdc4,
+        const extrudeSettings = { depth: 1.2 * scale, bevelEnabled: false };
+        const bodyGeometry = new THREE.ExtrudeGeometry(bodyShape, extrudeSettings);
+        const bodyMaterial = new THREE.MeshBasicMaterial({
+            color: COLORS.lightGold,
             transparent: true,
             opacity: 0.3,
             side: THREE.DoubleSide
         });
-        const clockFace = new THREE.Mesh(clockFaceGeometry, clockFaceMaterial);
-        clockGroup.add(clockFace);
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.rotation.x = Math.PI / 2;
+        body.position.y = 0;
+        lantern.add(body);
 
-        // Hour markers
-        for (let i = 0; i < 12; i++) {
-            const angle = (i / 12) * Math.PI * 2;
-            const markerGeometry = new THREE.BoxGeometry(0.02, 0.08, 0.01);
-            const markerMaterial = new THREE.MeshBasicMaterial({
-                color: 0x4ecdc4,
+        // Lantern glow (inner light)
+        const glowGeometry = new THREE.SphereGeometry(0.3 * scale, 16, 16);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: COLORS.gold,
+            transparent: true,
+            opacity: 0.8
+        });
+        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+        glow.position.y = 0.5 * scale;
+        lantern.add(glow);
+
+        // Light rays (lines emanating from lantern)
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const rayGeometry = new THREE.BufferGeometry();
+            const rayVertices = new Float32Array([
+                0, 0.5 * scale, 0,
+                Math.cos(angle) * 2 * scale, 0.5 * scale + Math.sin(angle) * 0.5, Math.sin(angle) * 2 * scale
+            ]);
+            rayGeometry.setAttribute('position', new THREE.BufferAttribute(rayVertices, 3));
+            const rayMaterial = new THREE.LineBasicMaterial({
+                color: COLORS.gold,
                 transparent: true,
-                opacity: 0.6
+                opacity: 0.2
             });
-            const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-            marker.position.set(
-                Math.sin(angle) * 0.2,
-                Math.cos(angle) * 0.2,
-                0.01
-            );
-            marker.rotation.z = angle;
-            clockGroup.add(marker);
+            const ray = new THREE.Line(rayGeometry, rayMaterial);
+            lantern.add(ray);
         }
 
-        // Clock hands
-        const hourHandGeometry = new THREE.BoxGeometry(0.02, 0.15, 0.01);
-        const minuteHandGeometry = new THREE.BoxGeometry(0.015, 0.2, 0.01);
-        const secondHandGeometry = new THREE.BoxGeometry(0.01, 0.22, 0.01);
+        // Bottom ring
+        const ringGeometry = new THREE.TorusGeometry(0.3 * scale, 0.05 * scale, 8, 16);
+        const ringMaterial = new THREE.MeshBasicMaterial({ color: COLORS.deepRed, transparent: true, opacity: 0.7 });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.position.y = -0.7 * scale;
+        lantern.add(ring);
 
-        const hourHand = new THREE.Mesh(hourHandGeometry, new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.8
-        }));
-        const minuteHand = new THREE.Mesh(minuteHandGeometry, new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.8
-        }));
-        const secondHand = new THREE.Mesh(secondHandGeometry, new THREE.MeshBasicMaterial({
-            color: 0xff4444,
-            transparent: true,
-            opacity: 0.9
-        }));
+        return lantern;
+    }
 
-        clockGroup.add(hourHand);
-        clockGroup.add(minuteHand);
-        clockGroup.add(secondHand);
+    // Create multiple floating lanterns
+    const lanterns = [];
+    for (let i = 0; i < 5; i++) {
+        const lantern = createLantern(0.8 + Math.random() * 0.4);
+        lantern.position.set(
+            (Math.random() - 0.5) * 30,
+            (Math.random() - 0.5) * 20,
+            (Math.random() - 0.5) * 15
+        );
+        lantern.userData = {
+            floatSpeed: 0.3 + Math.random() * 0.3,
+            floatOffset: Math.random() * Math.PI * 2,
+            rotationSpeed: 0.001 + Math.random() * 0.002
+        };
+        scene.add(lantern);
+        lanterns.push(lantern);
+    }
 
-        clockGroup.position.set(-0.5, 0.5, 0);
-        scene.add(clockGroup);
-        elements.push({
-            object: clockGroup,
-            type: 'clock',
-            initialPosition: clockGroup.position.clone(),
-            floatOffset: Math.PI / 3
-        });
+    // ============================
+    // CRESCENT MOON - 3D Model
+    // ============================
+    function createCrescent() {
+        const crescent = new THREE.Group();
 
-        // 3. Total Hits - Target/bullseye with rings
-        const targetGroup = new THREE.Group();
-
-        // Multiple concentric rings
-        const ringColors = [0xf9ca24, 0xff6b6b, 0x4ecdc4, 0x45b7d1];
-        const ringRadii = [0.25, 0.18, 0.12, 0.06];
-
-        for (let i = 0; i < ringRadii.length; i++) {
-            const ringGeometry = new THREE.RingGeometry(
-                ringRadii[i] - 0.02,
-                ringRadii[i],
-                16
-            );
-            const ringMaterial = new THREE.MeshBasicMaterial({
-                color: ringColors[i],
-                transparent: true,
-                opacity: 0.4 + (i * 0.1),
-                side: THREE.DoubleSide
-            });
-            const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-            ring.position.z = i * 0.02;
-            targetGroup.add(ring);
-        }
-
-        // Center dot
-        const centerGeometry = new THREE.CircleGeometry(0.04, 8);
-        const centerMaterial = new THREE.MeshBasicMaterial({
-            color: 0xff0000,
-            transparent: true,
-            opacity: 0.8
-        });
-        const center = new THREE.Mesh(centerGeometry, centerMaterial);
-        center.position.z = 0.1;
-        targetGroup.add(center);
-
-        targetGroup.position.set(0.5, 0.5, 0);
-        scene.add(targetGroup);
-        elements.push({
-            object: targetGroup,
-            type: 'target',
-            initialPosition: targetGroup.position.clone(),
-            floatOffset: Math.PI * 2 / 3
-        });
-
-        // 4. Win Ratio - Trophy/cup shape
-        const trophyGroup = new THREE.Group();
-
-        // Cup base (cylinder)
-        const cupBaseGeometry = new THREE.CylinderGeometry(0.12, 0.15, 0.1, 8);
-        const cupBaseMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffd700,
-            transparent: true,
-            opacity: 0.5
-        });
-        const cupBase = new THREE.Mesh(cupBaseGeometry, cupBaseMaterial);
-        trophyGroup.add(cupBase);
-
-        // Cup body (tapered cylinder)
-        const cupBodyGeometry = new THREE.CylinderGeometry(0.15, 0.12, 0.2, 8);
-        const cupBodyMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffd700,
-            transparent: true,
-            opacity: 0.4
-        });
-        const cupBody = new THREE.Mesh(cupBodyGeometry, cupBodyMaterial);
-        cupBody.position.y = 0.15;
-        trophyGroup.add(cupBody);
-
-        // Cup handles (tori)
-        const handleGeometry = new THREE.TorusGeometry(0.08, 0.02, 8, 16, Math.PI);
-        const handleMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffd700,
-            transparent: true,
-            opacity: 0.6
-        });
-
-        const leftHandle = new THREE.Mesh(handleGeometry, handleMaterial);
-        leftHandle.position.set(-0.15, 0.15, 0);
-        leftHandle.rotation.z = Math.PI / 2;
-        trophyGroup.add(leftHandle);
-
-        const rightHandle = new THREE.Mesh(handleGeometry, handleMaterial);
-        rightHandle.position.set(0.15, 0.15, 0);
-        rightHandle.rotation.z = -Math.PI / 2;
-        trophyGroup.add(rightHandle);
-
-        // Trophy base (larger cylinder)
-        const trophyBaseGeometry = new THREE.CylinderGeometry(0.2, 0.18, 0.08, 8);
-        const trophyBaseMaterial = new THREE.MeshBasicMaterial({
-            color: 0x8B4513,
-            transparent: true,
-            opacity: 0.5
-        });
-        const trophyBase = new THREE.Mesh(trophyBaseGeometry, trophyBaseMaterial);
-        trophyBase.position.y = -0.09;
-        trophyGroup.add(trophyBase);
-
-        trophyGroup.position.set(1.5, 0.5, 0);
-        scene.add(trophyGroup);
-        elements.push({
-            object: trophyGroup,
-            type: 'trophy',
-            initialPosition: trophyGroup.position.clone(),
-            floatOffset: Math.PI
-        });
-
-        // Enhanced particle system
-        const particleGeometry = new THREE.BufferGeometry();
-        const particleCount = 100;
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
-
-        for (let i = 0; i < particleCount; i++) {
-            positions[i * 3] = (Math.random() - 0.5) * 12;
-            positions[i * 3 + 1] = (Math.random() - 0.5) * 8;
-            positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
-
-            // Color particles based on position
-            const hue = (positions[i * 3] + 6) / 12;
-            const color = new THREE.Color().setHSL(hue, 0.7, 0.6);
-            colors[i * 3] = color.r;
-            colors[i * 3 + 1] = color.g;
-            colors[i * 3 + 2] = color.b;
-        }
-
-        particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-        const particleMaterial = new THREE.PointsMaterial({
-            size: 0.03,
-            transparent: true,
-            opacity: 0.4,
-            vertexColors: true,
-            blending: THREE.AdditiveBlending
-        });
-
-        const particles = new THREE.Points(particleGeometry, particleMaterial);
-        scene.add(particles);
-        elements.push({ object: particles, type: 'particles' });
-
-        // Pulsing ring for live indicator
-        const ringGeometry = new THREE.RingGeometry(0.08, 0.12, 16);
-        const ringMaterial = new THREE.MeshBasicMaterial({
-            color: 0x00ff88,
+        // Outer circle
+        const outerGeometry = new THREE.CircleGeometry(1.5, 32);
+        const outerMaterial = new THREE.MeshBasicMaterial({
+            color: COLORS.gold,
             transparent: true,
             opacity: 0.8,
             side: THREE.DoubleSide
         });
-        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-        ring.position.set(-2.2, 1.2, 0);
-        scene.add(ring);
-        elements.push({ object: ring, type: 'ring', initialScale: ring.scale.clone() });
+        const outer = new THREE.Mesh(outerGeometry, outerMaterial);
+        crescent.add(outer);
 
-        // Entrance animation
-        const entranceAnimation = () => {
-            const tl = gsap.timeline();
+        // Inner circle (cutout) - positioned to create crescent shape
+        const innerGeometry = new THREE.CircleGeometry(1.3, 32);
+        const innerMaterial = new THREE.MeshBasicMaterial({
+            color: 0x000000,
+            transparent: true,
+            opacity: 1,
+            side: THREE.DoubleSide
+        });
+        const inner = new THREE.Mesh(innerGeometry, innerMaterial);
+        inner.position.x = 0.7;
+        crescent.add(inner);
 
-            // Animate particles entrance
-            tl.fromTo(particles.position, { y: -8 }, { y: 0, duration: 2, ease: "power2.out" });
+        // Glow effect around crescent
+        const glowGeometry = new THREE.CircleGeometry(1.8, 32);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: COLORS.lightGold,
+            transparent: true,
+            opacity: 0.2,
+            side: THREE.DoubleSide
+        });
+        const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+        glowMesh.position.z = -0.1;
+        crescent.add(glowMesh);
 
-            // Animate people group
-            tl.fromTo(peopleGroup.position,
-                { z: -3, y: peopleGroup.position.y - 1 },
-                { z: 0, y: peopleGroup.position.y, duration: 1.2, ease: "back.out(1.7)" },
-                "-=1.5"
-            );
+        return crescent;
+    }
 
-            // Animate clock
-            tl.fromTo(clockGroup.position,
-                { z: -3, x: clockGroup.position.x - 1 },
-                { z: 0, x: clockGroup.position.x, duration: 1, ease: "power2.out" },
-                "-=1.2"
-            );
+    const crescent = createCrescent();
+    crescent.position.set(-12, 8, -5);
+    scene.add(crescent);
 
-            // Animate target
-            tl.fromTo(targetGroup.position,
-                { z: -3, x: targetGroup.position.x + 1 },
-                { z: 0, x: targetGroup.position.x, duration: 1, ease: "power2.out" },
-                "-=1"
-            );
+    // ============================
+    // STARS - Particle System with Twinkling
+    // ============================
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 200;
+    const starPositions = new Float32Array(starCount * 3);
+    const starColors = new Float32Array(starCount * 3);
+    const starSizes = new Float32Array(starCount);
 
-            // Animate trophy
-            tl.fromTo(trophyGroup.position,
-                { z: -3, y: trophyGroup.position.y + 1 },
-                { z: 0, y: trophyGroup.position.y, duration: 1.2, ease: "back.out(1.7)" },
-                "-=0.8"
-            );
+    for (let i = 0; i < starCount; i++) {
+        starPositions[i * 3] = (Math.random() - 0.5) * 50;
+        starPositions[i * 3 + 1] = (Math.random() - 0.5) * 30;
+        starPositions[i * 3 + 2] = (Math.random() - 0.5) * 30;
 
-            // Animate ring
-            tl.fromTo(ring.position,
-                { x: -3 },
-                { x: -2.2, duration: 1, ease: "power2.out" },
-                "-=1.5"
-            );
+        // Random star colors (gold and white mix)
+        const color = Math.random() > 0.5 ? new THREE.Color(COLORS.gold) : new THREE.Color(COLORS.white);
+        starColors[i * 3] = color.r;
+        starColors[i * 3 + 1] = color.g;
+        starColors[i * 3 + 2] = color.b;
 
-            return tl;
-        };
+        starSizes[i] = Math.random() * 2 + 1;
+    }
 
-        // Looping animations
-        const animate = () => {
-            requestAnimationFrame(animate);
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+    starGeometry.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
 
-            const time = Date.now() * 0.001;
-
-            // Animate particles with flowing motion
-            const particlePositions = particles.geometry.attributes.position.array;
-            for (let i = 0; i < particleCount; i++) {
-                const i3 = i * 3;
-                particlePositions[i3 + 1] += Math.sin(time * 0.5 + i * 0.1) * 0.002;
-                if (particlePositions[i3 + 1] > 4) particlePositions[i3 + 1] = -4;
-            }
-            particles.geometry.attributes.position.needsUpdate = true;
-            particles.rotation.y += 0.001;
-
-            // Animate people group - subtle bobbing
-            peopleGroup.children.forEach((person, index) => {
-                person.position.y = Math.sin(time * 1.5 + index * 0.5) * 0.05;
-                person.rotation.z += 0.002;
-            });
-            peopleGroup.position.y = 0.5 + Math.sin(time * 0.8) * 0.03;
-
-            // Animate clock - moving hands
-            const now = new Date();
-            const seconds = now.getSeconds();
-            const minutes = now.getMinutes();
-            const hours = now.getHours() % 12;
-
-            hourHand.rotation.z = -(hours * Math.PI / 6 + minutes * Math.PI / 360) + Math.PI / 2;
-            minuteHand.rotation.z = -(minutes * Math.PI / 30 + seconds * Math.PI / 1800) + Math.PI / 2;
-            secondHand.rotation.z = -(seconds * Math.PI / 30) + Math.PI / 2;
-
-            clockGroup.rotation.z = Math.sin(time * 0.3) * 0.05;
-            clockGroup.position.y = 0.5 + Math.sin(time * 0.5 + Math.PI / 3) * 0.04;
-
-            // Animate target - rotating rings
-            targetGroup.children.forEach((ring, index) => {
-                if (ring.geometry.type === 'RingGeometry') {
-                    ring.rotation.z += 0.005 * (index + 1);
-                }
-            });
-            targetGroup.position.y = 0.5 + Math.sin(time * 0.7 + Math.PI * 2 / 3) * 0.04;
-
-            // Animate trophy - gentle rotation and shine
-            trophyGroup.rotation.y += 0.003;
-            trophyGroup.position.y = 0.5 + Math.sin(time * 0.6 + Math.PI) * 0.03;
-
-            // Animate pulsing ring
-            const pulseScale = 1 + Math.sin(time * 4) * 0.15;
-            ring.scale.setScalar(pulseScale);
-            ring.rotation.z += 0.02;
-
-            renderer.render(scene, camera);
-        };
-
-        // Handle canvas resize
-        const resizeCanvas = () => {
-            const rect = canvas.getBoundingClientRect();
-            camera.aspect = rect.width / rect.height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(rect.width, rect.height);
-        };
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Start animations
-        entranceAnimation();
-        animate();
-
-        // GSAP text animations (existing functionality)
-        if (!window.gsap || !gsap.plugins || !gsap.plugins.text) {
-            return;
-        }
-
-        const cycleSeconds = 30;
-        const transitionSeconds = 0.6;
-        const arabicHoldSeconds = 6;
-        const englishHoldSeconds = Math.max(
-            1,
-            cycleSeconds - (transitionSeconds * 2 + arabicHoldSeconds)
-        );
-        const introDelaySeconds = 1;
-        const introCountSeconds = 1.6;
-        const introLabelSeconds = 0.45;
-        const introLabelStagger = 0.08;
-        const introValueStagger = 0.12;
-
-        const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-        const toArabicDigits = (value) =>
-            value.replace(/\d/g, (digit) => arabicDigits[Number(digit)]);
-
-        const formatNumber = (value, decimals) => {
-            return new Intl.NumberFormat('en-US', {
-                minimumFractionDigits: decimals,
-                maximumFractionDigits: decimals
-            }).format(value);
-        };
-
-        const collectTargets = () => {
-            const targets = Array.from(overlayPanel.querySelectorAll('[data-obs-text]'));
-            targets.forEach((element) => {
-                const english = element.getAttribute('data-obs-en')?.trim() ||
-                    element.textContent.trim();
-                element.setAttribute('data-obs-en', english);
-
-                if (element.dataset.obsValue === 'true') {
-                    element.setAttribute('data-obs-ar', toArabicDigits(english));
-                }
-            });
-            return targets;
-        };
-
-        const getLabelTargets = () => Array.from(
-            overlayPanel.querySelectorAll('[data-obs-text]:not([data-obs-value="true"])')
-        );
-
-        const getValueTargets = () => Array.from(
-            overlayPanel.querySelectorAll('[data-obs-text][data-obs-value="true"]')
-        );
-
-        const animateLocale = (locale) => {
-            const targets = collectTargets();
-            targets.forEach((element) => {
-                const targetText = locale === 'ar'
-                    ? element.getAttribute('data-obs-ar')
-                    : element.getAttribute('data-obs-en');
-                if (!targetText) {
-                    return;
-                }
-
-                gsap.to(element, {
-                    text: { value: targetText, delimiter: '' },
-                    duration: transitionSeconds,
-                    ease: 'power2.inOut',
-                    overwrite: 'auto'
-                });
-            });
-        };
-
-        const setIntroBlankState = () => {
-            getLabelTargets().forEach((element) => {
-                gsap.set(element, { text: '' });
-            });
-
-            getValueTargets().forEach((element) => {
-                const targetText = element.getAttribute('data-obs-ar')?.trim() ||
-                    element.textContent.trim();
-                const zeroText = targetText.includes('%') ? '0%' : '0';
-                gsap.set(element, { text: zeroText });
-            });
-        };
-
-        const buildLabelIntro = () => {
-            const targets = getLabelTargets();
-            const tl = gsap.timeline();
-
-            targets.forEach((element, index) => {
-                const targetText = element.getAttribute('data-obs-ar') || '';
-                tl.to(element, {
-                    text: { value: targetText, delimiter: '' },
-                    duration: introLabelSeconds,
-                    ease: 'power2.out',
-                    overwrite: 'auto'
-                }, index * introLabelStagger);
-            });
-
-            return tl;
-        };
-
-        const buildValueIntro = () => {
-            const targets = getValueTargets();
-            const tl = gsap.timeline();
-
-            targets.forEach((element, index) => {
-                const targetText = element.getAttribute('data-obs-ar')?.trim() ||
-                    element.textContent.trim();
-                const cleanTarget = targetText.replace(/,/g, '');
-                const decimals = cleanTarget.includes('.')
-                    ? cleanTarget.split('.')[1].replace(/\D/g, '').length
-                    : 0;
-                const hasPercent = cleanTarget.includes('%');
-                const numericTarget = Number(cleanTarget.replace(/[^0-9.]/g, '')) || 0;
-
-                const state = { value: 0 };
-                tl.to(state, {
-                    value: numericTarget,
-                    duration: introCountSeconds,
-                    ease: 'power2.out',
-                    onUpdate: () => {
-                        const formatted = formatNumber(state.value, decimals);
-                        const nextText = hasPercent ? `${formatted}%` : formatted;
-                        gsap.set(element, { text: nextText });
-                    }
-                }, index * introValueStagger);
-            });
-
-            return tl;
-        };
-
-        if (window.obsOverlayTimeline) {
-            window.obsOverlayTimeline.kill();
-        }
-
-        const timeline = gsap.timeline({ repeat: -1 });
-        timeline.add(() => setIntroBlankState());
-        timeline.to({}, { duration: introDelaySeconds });
-        timeline.add(buildLabelIntro());
-        timeline.add(buildValueIntro(), '>-0.05');
-        timeline.to({}, { duration: arabicHoldSeconds });
-        timeline.add(() => animateLocale('en'));
-        timeline.to({}, { duration: englishHoldSeconds });
-        timeline.add(() => animateLocale('ar'));
-        timeline.to({}, { duration: transitionSeconds });
-
-        window.obsOverlayTimeline = timeline;
+    const starMaterial = new THREE.PointsMaterial({
+        size: 0.15,
+        transparent: true,
+        opacity: 0.8,
+        vertexColors: true,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true
     });
+
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    // ============================
+    // ISLAMIC GEOMETRIC PATTERNS - Rotating Mandala
+    // ============================
+    function createMandala() {
+        const mandala = new THREE.Group();
+        const segments = 8;
+        const radius = 3;
+
+        for (let i = 0; i < segments; i++) {
+            const angle = (i / segments) * Math.PI * 2;
+
+            // Petal shape
+            const petalShape = new THREE.Shape();
+            petalShape.moveTo(0, 0);
+            petalShape.quadraticCurveTo(0.5, 0.8, 1, 0);
+            petalShape.quadraticCurveTo(0.5, -0.2, 0, 0);
+
+            const petalGeometry = new THREE.ShapeGeometry(petalShape);
+            const petalMaterial = new THREE.MeshBasicMaterial({
+                color: i % 2 === 0 ? COLORS.emerald : COLORS.deepRed,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+            petal.rotation.z = angle;
+            petal.position.x = Math.cos(angle) * radius;
+            petal.position.y = Math.sin(angle) * radius;
+            mandala.add(petal);
+
+            // Inner ring patterns
+            const ringGeometry = new THREE.RingGeometry(radius - 0.5, radius - 0.3, 32);
+            const ringMaterial = new THREE.MeshBasicMaterial({
+                color: COLORS.gold,
+                transparent: true,
+                opacity: 0.2,
+                side: THREE.DoubleSide
+            });
+            const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
+            mandala.add(ringMesh);
+        }
+
+        return mandala;
+    }
+
+    const mandala = createMandala();
+    mandala.position.set(12, -6, -10);
+    scene.add(mandala);
+
+    // ============================
+    // ANIMATED PARTICLES - Golden Dust
+    // ============================
+    const dustGeometry = new THREE.BufferGeometry();
+    const dustCount = 300;
+    const dustPositions = new Float32Array(dustCount * 3);
+
+    for (let i = 0; i < dustCount; i++) {
+        dustPositions[i * 3] = (Math.random() - 0.5) * 40;
+        dustPositions[i * 3 + 1] = (Math.random() - 0.5) * 25;
+        dustPositions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+    }
+
+    dustGeometry.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+
+    const dustMaterial = new THREE.PointsMaterial({
+        size: 0.08,
+        color: COLORS.lightGold,
+        transparent: true,
+        opacity: 0.6,
+        blending: THREE.AdditiveBlending
+    });
+
+    const dust = new THREE.Points(dustGeometry, dustMaterial);
+    scene.add(dust);
+
+    // ============================
+    // ANIMATION LOOP
+    // ============================
+    let time = 0;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.01;
+
+        // Animate lanterns - floating and rotating
+        lanterns.forEach((lantern, index) => {
+            lantern.position.y += Math.sin(time * lantern.userData.floatSpeed + lantern.userData.floatOffset) * 0.01;
+            lantern.rotation.y += lantern.userData.rotationSpeed;
+
+            // Glow pulsing
+            const glow = lantern.children.find(child => child.geometry?.type === 'SphereGeometry');
+            if (glow) {
+                glow.material.opacity = 0.6 + Math.sin(time * 2 + index) * 0.2;
+            }
+        });
+
+        // Animate crescent - gentle rotation
+        crescent.rotation.z += 0.002;
+        crescent.children[2].material.opacity = 0.15 + Math.sin(time * 0.5) * 0.1; // Glow pulse
+
+        // Animate stars - twinkling effect
+        const starSizesAttr = stars.geometry.attributes.size;
+        for (let i = 0; i < starCount; i++) {
+            starSizesAttr.array[i] = (Math.sin(time * 2 + i * 0.1) + 1) * 0.5 + 0.5;
+        }
+        starSizesAttr.needsUpdate = true;
+        stars.rotation.y += 0.0005;
+
+        // Animate mandala - rotating patterns
+        mandala.rotation.z += 0.003;
+        mandala.children.forEach((child, i) => {
+            if (child.geometry?.type === 'ShapeGeometry') {
+                child.rotation.z += 0.001 * (i % 2 === 0 ? 1 : -1);
+            }
+        });
+
+        // Animate golden dust - slow drift
+        const dustPos = dust.geometry.attributes.position.array;
+        for (let i = 0; i < dustCount; i++) {
+            dustPos[i * 3 + 1] += Math.sin(time * 0.5 + i * 0.05) * 0.02;
+            if (dustPos[i * 3 + 1] > 12) dustPos[i * 3 + 1] = -12;
+        }
+        dust.geometry.attributes.position.needsUpdate = true;
+        dust.rotation.y += 0.001;
+
+        // Subtle camera movement for depth
+        camera.position.x = Math.sin(time * 0.1) * 0.5;
+        camera.position.y = Math.cos(time * 0.15) * 0.3;
+        camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Start animation
+    animate();
+
+    // GSAP text animations (existing functionality preserved)
+    const overlayPanel = document.querySelector('.obs-overlay-panel');
+    if (!overlayPanel || !window.gsap || !gsap.plugins || !gsap.plugins.text) {
+        return;
+    }
+
+    const cycleSeconds = 30;
+    const transitionSeconds = 0.6;
+    const arabicHoldSeconds = 6;
+    const englishHoldSeconds = Math.max(
+        1,
+        cycleSeconds - (transitionSeconds * 2 + arabicHoldSeconds)
+    );
+    const introDelaySeconds = 1;
+    const introCountSeconds = 1.6;
+    const introLabelSeconds = 0.45;
+    const introLabelStagger = 0.08;
+    const introValueStagger = 0.12;
+
+    const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    const toArabicDigits = (value) =>
+        value.replace(/\d/g, (digit) => arabicDigits[Number(digit)]);
+
+    const formatNumber = (value, decimals) => {
+        return new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        }).format(value);
+    };
+
+    const collectTargets = () => {
+        const targets = Array.from(overlayPanel.querySelectorAll('[data-obs-text]'));
+        targets.forEach((element) => {
+            const english = element.getAttribute('data-obs-en')?.trim() ||
+                element.textContent.trim();
+            element.setAttribute('data-obs-en', english);
+
+            if (element.dataset.obsValue === 'true') {
+                element.setAttribute('data-obs-ar', toArabicDigits(english));
+            }
+        });
+        return targets;
+    };
+
+    const getLabelTargets = () => Array.from(
+        overlayPanel.querySelectorAll('[data-obs-text]:not([data-obs-value="true"])')
+    );
+
+    const getValueTargets = () => Array.from(
+        overlayPanel.querySelectorAll('[data-obs-text][data-obs-value="true"]')
+    );
+
+    const animateLocale = (locale) => {
+        const targets = collectTargets();
+        targets.forEach((element) => {
+            const targetText = locale === 'ar'
+                ? element.getAttribute('data-obs-ar')
+                : element.getAttribute('data-obs-en');
+            if (!targetText) {
+                return;
+            }
+
+            gsap.to(element, {
+                text: { value: targetText, delimiter: '' },
+                duration: transitionSeconds,
+                ease: 'power2.inOut',
+                overwrite: 'auto'
+            });
+        });
+    };
+
+    const setIntroBlankState = () => {
+        getLabelTargets().forEach((element) => {
+            gsap.set(element, { text: '' });
+        });
+
+        getValueTargets().forEach((element) => {
+            const targetText = element.getAttribute('data-obs-ar')?.trim() ||
+                element.textContent.trim();
+            const zeroText = targetText.includes('%') ? '0%' : '0';
+            gsap.set(element, { text: zeroText });
+        });
+    };
+
+    const buildLabelIntro = () => {
+        const targets = getLabelTargets();
+        const tl = gsap.timeline();
+
+        targets.forEach((element, index) => {
+            const targetText = element.getAttribute('data-obs-ar') || '';
+            tl.to(element, {
+                text: { value: targetText, delimiter: '' },
+                duration: introLabelSeconds,
+                ease: 'power2.out',
+                overwrite: 'auto'
+            }, index * introLabelStagger);
+        });
+
+        return tl;
+    };
+
+    const buildValueIntro = () => {
+        const targets = getValueTargets();
+        const tl = gsap.timeline();
+
+        targets.forEach((element, index) => {
+            const targetText = element.getAttribute('data-obs-ar')?.trim() ||
+                element.textContent.trim();
+            const cleanTarget = targetText.replace(/,/g, '');
+            const decimals = cleanTarget.includes('.')
+                ? cleanTarget.split('.')[1].replace(/\D/g, '').length
+                : 0;
+            const hasPercent = cleanTarget.includes('%');
+            const numericTarget = Number(cleanTarget.replace(/[^0-9.]/g, '')) || 0;
+
+            const state = { value: 0 };
+            tl.to(state, {
+                value: numericTarget,
+                duration: introCountSeconds,
+                ease: 'power2.out',
+                onUpdate: () => {
+                    const formatted = formatNumber(state.value, decimals);
+                    const nextText = hasPercent ? `${formatted}%` : formatted;
+                    gsap.set(element, { text: nextText });
+                }
+            }, index * introValueStagger);
+        });
+
+        return tl;
+    };
+
+    if (window.obsOverlayTimeline) {
+        window.obsOverlayTimeline.kill();
+    }
+
+    const timeline = gsap.timeline({ repeat: -1 });
+    timeline.add(() => setIntroBlankState());
+    timeline.to({}, { duration: introDelaySeconds });
+    timeline.add(buildLabelIntro());
+    timeline.add(buildValueIntro(), '>-0.05');
+    timeline.to({}, { duration: arabicHoldSeconds });
+    timeline.add(() => animateLocale('en'));
+    timeline.to({}, { duration: englishHoldSeconds });
+    timeline.add(() => animateLocale('ar'));
+    timeline.to({}, { duration: transitionSeconds });
+
+    window.obsOverlayTimeline = timeline;
+});
 </script>

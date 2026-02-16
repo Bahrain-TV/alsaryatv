@@ -11,6 +11,7 @@
 #   ./deploy.sh --seed       # Run seeders after migration
 #   ./deploy.sh --no-build   # Skip npm build step
 #   ./deploy.sh --force      # Force all steps even if no changes
+#   ./deploy.sh --up         # Force deploy even if maintenance mode is active
 #   ./deploy.sh --dry-run    # Print steps without executing
 ###############################################################################
 
@@ -52,6 +53,7 @@ SEED=false
 NO_BUILD=false
 FORCE=false
 DRY_RUN=false
+IGNORE_MAINTENANCE=false
 WEBHOOK_TRIGGER="${WEBHOOK_TRIGGER:-false}"
 
 # ── Parse flags ──────────────────────────────────────────────────────────────
@@ -62,6 +64,7 @@ for arg in "$@"; do
         --no-build) NO_BUILD=true ;;
         --force)    FORCE=true ;;
         --dry-run)  DRY_RUN=true ;;
+        --up)       IGNORE_MAINTENANCE=true ;;
         *)          warn "Unknown flag: $arg" ;;
     esac
 done
@@ -310,10 +313,11 @@ fi
 
 # ── Step 1: Maintenance mode ────────────────────────────────────────────────
 if [[ -f "storage/framework/down" ]]; then
-    if [[ -n "${PUBLISH_VERSION:-}" ]]; then
-        info "Maintenance mode is active (handled by publisher)."
+    if [[ -n "${PUBLISH_VERSION:-}" ]] || [[ "$IGNORE_MAINTENANCE" == "true" ]]; then
+        info "Maintenance mode is active (continuing due to active flag or publisher)."
     else
         error "Website is currently in maintenance mode. Aborting deployment to prevent conflicts."
+        error "To override and deploy anyway, use: ./deploy.sh --up"
         exit 1
     fi
 fi
@@ -334,16 +338,14 @@ fi
 if [[ -d .git ]]; then
     info "Current Hash: $INITIAL_GIT_HASH. Pulling latest changes..."
 
-    # Try fast-forward only first (safest)
-    if run git pull --ff-only 2>/dev/null; then
-        success "Git pull completed."
-    else
-        warn "Fast-forward failed — local and remote branches have diverged"
-        run git fetch origin || warn "git fetch failed"
-        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-        info "Resetting to remote/$CURRENT_BRANCH..."
-        run git reset --hard origin/"$CURRENT_BRANCH" 2>/dev/null || warn "Reset failed"
-    fi
+    # Always fetch and reset to ensure exact match with remote
+    # This avoids "diverged" warnings and ensures a clean state
+    run git fetch origin
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+    
+    # Resetting hard ensures local changes (like previous build artifacts) don't conflict
+    run git reset --hard origin/"$CURRENT_BRANCH"
+    success "Codebase synced with remote/$CURRENT_BRANCH."
 
     # Post-pull check: If nothing changed and not forced, STOP HERE
     POST_PULL_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")

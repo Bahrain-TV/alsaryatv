@@ -235,5 +235,5 @@ return [
         Illuminate\Foundation\Bootstrap\BootProviders::class,
     ],
 
-    'version' => env('APP_VERSION', '1.0.0'),
+    'version' => file_exists(base_path('VERSION')) ? trim(file_get_contents(base_path('VERSION'))) : env('APP_VERSION', '1.0.0'),
 ];

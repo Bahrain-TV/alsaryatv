@@ -19,9 +19,17 @@
             @endif
 
             <!-- Right: Links and copyright -->
-            <div class="flex gap-3 justify-center sm:justify-end items-center">
+            <div class="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-end items-center">
                 <a href="{{ route('privacy') }}" class="text-indigo-300 hover:text-indigo-100 transition-colors">
                     سياسة الخصوصية
+                </a>
+                <span class="text-gray-500">•</span>
+                <a href="{{ route('terms') }}" class="text-indigo-300 hover:text-indigo-100 transition-colors">
+                    شروط الاستخدام
+                </a>
+                <span class="text-gray-500">•</span>
+                <a href="{{ route('policy') }}" class="text-indigo-300 hover:text-indigo-100 transition-colors">
+                    الشروط والأحكام
                 </a>
                 <span class="text-gray-500">•</span>
                 <span class="opacity-90">تلفزيون البحرين © {{ date('Y') }}</span>

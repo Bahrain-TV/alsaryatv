@@ -345,6 +345,32 @@
             </div>
         </header>
 
+        @if(!config('alsarya.registration.enabled', false) && !auth()->check())
+            {{-- Countdown Timer - Outside the panel for full width --}}
+            <div class="gsap-entry w-full max-w-2xl mb-8">
+                <!-- Countdown Section -->
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+                        <span class="text-4xl">🌙</span>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-b from-gold-300 to-gold-500">العد التنازلي لشهر رمضان المبارك</span>
+                    </h3>
+                </div>
+
+                <!-- FlipDown Countdown -->
+                <div id="flipdown" class="flipdown flipdown__theme-dark mx-auto" style="margin-bottom: 2rem;"></div>
+
+                <!-- Ramadan Date Info -->
+                <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-green-900/40 to-emerald-900/40 backdrop-blur-md border border-green-500/20">
+                    <h4 class="text-green-400 font-bold mb-3 flex items-center justify-center gap-2 text-lg">
+                        <span class="text-2xl">☪</span>
+                        <span>أول أيام شهر رمضان المبارك</span>
+                    </h4>
+                    <div class="text-xl text-white font-semibold mb-2">{{ $ramadanDate ?? '18 فبراير 2026' }}</div>
+                    <div class="text-sm text-gray-300">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
+                </div>
+            </div>
+        @endif
+
         <!-- Main Glass Card Container (Animates in separately) -->
         <main class="w-full max-w-lg relative group">
             <!-- Glow effect -->
@@ -529,35 +555,33 @@
                             </div>
                         </div>
                     @else
-                        {{-- Guests see the countdown timer --}}
-                        <!-- Registration Closed -->
-                        <div class="closed-message">
-                            <h3>⏸️ التسجيل مغلق حالياً</h3>
-                            <p>سيتم فتح التسجيل مع بداية شهر رمضان المبارك</p>
-                        </div>
-
-                        <!-- Countdown -->
-                        <div class="countdown-section">
-                            <div class="countdown-label">
-                                العد التنازلي لشهر رمضان المبارك
+                        {{-- Registration is closed - Simple "Coming Soon" message --}}
+                        <div class="text-center py-12">
+                            <div class="mb-6">
+                                <span class="text-6xl md:text-7xl">🌙</span>
                             </div>
-                            <div id="flipdown" class="flipdown flipdown__theme-dark"></div>
-                        </div>
-
-                        <!-- Ramadan Date Info -->
-                        <div class="ramadan-info">
-                            <h4>🌙 أول أيام شهر رمضان المبارك</h4>
-                            <div class="date">{{ $ramadanDate ?? '28 فبراير 2026' }}</div>
-                            <div class="hijri">{{ $ramadanHijri ?? '1 Ramadan 1447 هـ' }}</div>
+                            <h2 class="text-4xl md:text-5xl font-black mb-4 gold-text">
+                                قريباً
+                            </h2>
+                            <p class="text-gray-300 text-lg md:text-xl font-light">
+                                سيتم فتح التسجيل مع بداية شهر رمضان المبارك
+                            </p>
                         </div>
                     @endif
                 </div>
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="gsap-item mt-12 text-center relative z-10 pb-6">
             <p class="text-gray-500 text-[10px] mb-2 tracking-widest uppercase">© {{ date('Y') }} Bahrain Television | All Rights Reserved</p>
+
+            <div class="flex justify-center flex-wrap gap-x-4 gap-y-2 mb-3 text-[10px] font-bold text-gray-400">
+                <a href="{{ route('privacy') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Privacy Policy</a>
+                <span class="text-gray-700 hidden sm:inline">/</span>
+                <a href="{{ route('terms') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Terms of Use</a>
+                <span class="text-gray-700 hidden sm:inline">/</span>
+                <a href="{{ route('policy') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Terms & Conditions</a>
+            </div>
 
             <div class="inline-flex items-center gap-3 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-mono text-gray-400">
                 <div class="flex items-center gap-1.5">
@@ -937,14 +961,21 @@
                 });
 
                 flipdown.start().ifEnded(() => {
-                    // When countdown ends, show Ramadan message
-                    const title = document.querySelector('.closed-message h3');
-                    const desc = document.querySelector('.closed-message p');
-                    const label = document.querySelector('.countdown-title');
+                    // When countdown ends, update the message
+                    const countdownTitle = document.querySelector('.gsap-entry h3');
+                    const dateInfo = document.querySelector('.gsap-entry .text-center.p-6');
 
-                    if (title) title.innerHTML = '🌙 رمضان كريم!';
-                    if (desc) desc.textContent = 'أهلاً بكم في شهر رمضان المبارك - سيتم فتح التسجيل قريباً';
-                    if (label) label.innerHTML = '🎉 حل شهر رمضان المبارك!';
+                    if (countdownTitle) {
+                        countdownTitle.innerHTML = '<span class="text-4xl">🎉</span><span class="bg-clip-text text-transparent bg-gradient-to-b from-gold-300 to-gold-500">رمضان كريم!</span>';
+                    }
+
+                    if (dateInfo) {
+                        dateInfo.innerHTML = '<h4 class="text-green-400 font-bold text-xl">أهلاً بكم في شهر رمضان المبارك</h4><p class="text-white mt-2">سيتم فتح التسجيل قريباً</p>';
+                    }
+
+                    // Hide the flipdown
+                    flipdownEl.style.opacity = '0';
+                    flipdownEl.style.transition = 'opacity 1s';
                 });
             } catch (error) {
                 console.error('FlipDown initialization error:', error);

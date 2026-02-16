@@ -20,10 +20,11 @@ return [
     |
     | Configure the Ramadan start date and related settings.
     | The date should be in YYYY-MM-DD format.
+    | First day of Ramadan 1447 AH = February 18, 2026
     |
     */
     'ramadan' => [
-        'start_date' => env('RAMADAN_START_DATE', '2026-02-28'),
+        'start_date' => env('RAMADAN_START_DATE', '2026-02-18'),
         'hijri_date' => env('RAMADAN_HIJRI_DATE', '1 رمضان 1447 هـ'),
         'timezone' => env('RAMADAN_TIMEZONE', 'Asia/Bahrain'),
     ],
@@ -32,9 +33,12 @@ return [
     |--------------------------------------------------------------------------
     | Registration Settings
     |--------------------------------------------------------------------------
+    |
+    | Registration opens on the first day of Ramadan
+    |
     */
     'registration' => [
-        'open_date' => env('REGISTRATION_OPEN_DATE', '2026-03-01'),
+        'open_date' => env('REGISTRATION_OPEN_DATE', '2026-02-18'),
         'enabled' => env('REGISTRATION_ENABLED', false),
     ],
 

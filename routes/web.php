@@ -52,6 +52,14 @@ Route::get('/privacy', fn () => view('privacy', [
     'policy' => Markdown::parse(file_get_contents(resource_path('markdown/privacy.md'))),
 ]))->name('privacy');
 
+Route::get('/policy', fn () => view('policy', [
+    'policy' => Markdown::parse(file_get_contents(resource_path('markdown/policy.md'))),
+]))->name('policy');
+
+Route::get('/terms', fn () => view('terms', [
+    'terms' => Markdown::parse(file_get_contents(resource_path('markdown/terms.md'))),
+]))->name('terms');
+
 Route::post('/locale/{locale}', function (string $locale) {
     $supported = ['ar', 'en'];
 
