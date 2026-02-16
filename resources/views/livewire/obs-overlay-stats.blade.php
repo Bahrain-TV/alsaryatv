@@ -32,13 +32,15 @@
     }
 
     .threejs-canvas {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         pointer-events: none;
-        z-index: -1;
+        z-index: 0;
+        border-radius: 1rem;
+        opacity: 0.4;
     }
 
     @keyframes obsOverlayEnter {
@@ -76,12 +78,14 @@
 </style>
 
 <div wire:poll.2s="refreshStats">
-    <!-- Ramadan-themed Three.js Background Canvas -->
-    <canvas class="threejs-canvas" id="obs-ramadan-canvas"></canvas>
-
     <div class="obs-overlay-wrap">
         <div class="obs-overlay-float">
             <div class="obs-overlay-panel rounded-2xl border border-white/10 bg-black/70 p-6 shadow-lg backdrop-blur">
+                <!-- Ramadan-themed Three.js Background Canvas (INSIDE PANEL) -->
+                <canvas class="threejs-canvas" id="obs-ramadan-canvas"></canvas>
+
+                <!-- Content wrapper with higher z-index -->
+                <div style="position: relative; z-index: 1;">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <span class="obs-overlay-pulse inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
@@ -110,7 +114,7 @@
                     {{ __('Total callers', [], 'en') }}
                 </p>
                 <p
-                    class="mt-2 text-2xl font-semibold text-white"
+                    class="mt-2 text-4xl font-bold text-white"
                     data-obs-text
                     data-obs-value="true"
                     data-obs-en="{{ number_format($totalCallers) }}"
@@ -130,7 +134,7 @@
                     {{ __('Today callers', [], 'en') }}
                 </p>
                 <p
-                    class="mt-2 text-2xl font-semibold text-white"
+                    class="mt-2 text-4xl font-bold text-white"
                     data-obs-text
                     data-obs-value="true"
                     data-obs-en="{{ number_format($todayCallers) }}"
@@ -150,7 +154,7 @@
                     {{ __('Total hits', [], 'en') }}
                 </p>
                 <p
-                    class="mt-2 text-2xl font-semibold text-white"
+                    class="mt-2 text-4xl font-bold text-white"
                     data-obs-text
                     data-obs-value="true"
                     data-obs-en="{{ number_format($totalHits) }}"
@@ -185,8 +189,9 @@
                 v{{ config('alsarya.version', '1.0.0') }}
             </div>
         </div>
+                </div>
         </div>
-    </div>
+        </div>
     </div>
 </div>
 
@@ -201,16 +206,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    // Get canvas dimensions from parent panel
+    const panelRect = canvas.parentElement.getBoundingClientRect();
+    const camera = new THREE.PerspectiveCamera(60, panelRect.width / panelRect.height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({
         canvas: canvas,
         alpha: true,
         antialias: true
     });
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(panelRect.width, panelRect.height);
     renderer.setClearColor(0x000000, 0);
-    camera.position.set(0, 0, 15);
+    camera.position.set(0, 0, 8);
 
     // Color Palette - Ramadan Theme
     const COLORS = {
@@ -545,9 +553,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle window resize
     window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
+        const panelRect = canvas.parentElement.getBoundingClientRect();
+        camera.aspect = panelRect.width / panelRect.height;
         camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(panelRect.width, panelRect.height);
     });
 
     // Start animation
