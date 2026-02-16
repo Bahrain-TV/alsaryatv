@@ -75,12 +75,13 @@ class ObsOverlayVideoResource extends Resource
                 Tables\Columns\TextColumn::make('file_size')
                     ->formatStateUsing(fn($state) => self::formatBytes($state))
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'ready',
-                        'warning' => 'archived',
-                        'danger' => 'deleted',
-                    ])
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'ready' => 'success',
+                        'archived' => 'warning',
+                        'deleted' => 'danger',
+                    })
                     ->sortable(),
             ])
             ->defaultSort('recorded_at', 'desc')
@@ -91,15 +92,6 @@ class ObsOverlayVideoResource extends Resource
                         'archived' => 'Archived',
                         'deleted' => 'Deleted',
                     ]),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 
@@ -113,9 +105,9 @@ class ObsOverlayVideoResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListObsOverlayVideos::class,
-            'create' => Pages\CreateObsOverlayVideo::class,
-            'edit' => Pages\EditObsOverlayVideo::class,
+            'index' => Pages\ListObsOverlayVideos::route('/'),
+            'create' => Pages\CreateObsOverlayVideo::route('/create'),
+            'edit' => Pages\EditObsOverlayVideo::route('/{record}/edit'),
         ];
     }
 
