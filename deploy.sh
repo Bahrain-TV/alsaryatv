@@ -259,6 +259,29 @@ echo $$ > "$LOCK_FILE"
 echo "$$|$(date +%s)|$(date '+%Y-%m-%d %H:%M:%S')" > "$INSTALL_FLAG"
 trap 'rm -f "$LOCK_FILE" "$INSTALL_FLAG"; send_notification $?' EXIT
 
+# ── Error handler (ensure site comes back up on failure) ────────────────────
+MAINTENANCE_WAS_ENABLED=false
+
+cleanup_and_exit() {
+    local exit_code=$?
+
+    # Kill timeout process
+    kill $TIMEOUT_PID 2>/dev/null || true
+
+    # Remove locks
+    rm -f "$LOCK_FILE" "$INSTALL_FLAG"
+
+    # CRITICAL: Restore site if we put it in maintenance mode and something failed
+    if [[ "$MAINTENANCE_WAS_ENABLED" == "true" && "$exit_code" -ne 0 ]]; then
+        error "Deploy failed! Restoring site to LIVE status..."
+        php artisan up 2>/dev/null || true
+        error "Site restored. Check errors above."
+    fi
+
+    # Send notification
+    send_notification $exit_code
+}
+
 # ── Timeout mechanism (prevent infinite runs) ───────────────────────────────
 TIMEOUT=600  # 10 minutes max runtime
 (
@@ -269,7 +292,7 @@ TIMEOUT=600  # 10 minutes max runtime
     fi
 ) &
 TIMEOUT_PID=$!
-trap "kill $TIMEOUT_PID 2>/dev/null || true; rm -f '$LOCK_FILE' '$INSTALL_FLAG'; send_notification \$?" EXIT
+trap cleanup_and_exit EXIT
 
 # ── Cleanup zombie processes ────────────────────────────────────────────────
 # Logging disabled - skip zombie process check
@@ -290,9 +313,11 @@ if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Enabling maintenance mode..."
     # Use the downtime template WITHOUT auto-refresh to prevent client-side loops
     run php artisan down --retry=60 --render="down" || true
+    MAINTENANCE_WAS_ENABLED=true
 else
     NOTIFY_ENABLED="false"
     info "Skipping maintenance mode (handled by publish.sh)."
+    MAINTENANCE_WAS_ENABLED=false
 fi
 
 
@@ -486,13 +511,16 @@ run php artisan queue:restart || true
 success "Queue restart signal sent."
 
 # ── Step 11b: Ensure ownership ───────────────────────────────────────────────
-if [[ "$(id -u)" -eq 0 ]]; then
-    info "Ensuring ownership for $APP_DIR..."
-    run chown -R alsar4210:alsar4210 "$APP_DIR"
-    success "Ownership set to alsar4210:alsar4210."
-else
-    warn "Skipping ownership fix (requires root)."
-fi
+# DISABLED: Recursive chown breaks web server permissions (HTTP 403 errors)
+# All operations above already run as the correct user via SUDO_PREFIX
+# if [[ "$(id -u)" -eq 0 ]]; then
+#     info "Ensuring ownership for $APP_DIR..."
+#     run chown -R alsar4210:alsar4210 "$APP_DIR"
+#     success "Ownership set to alsar4210:alsar4210."
+# else
+#     warn "Skipping ownership fix (requires root)."
+# fi
+info "Skipping recursive ownership change (prevents HTTP 403 errors)"
 
 # ── Step 11c: Update deployment record ───────────────────────────────────────
 if [[ "$DRY_RUN" == "false" ]]; then
@@ -501,11 +529,64 @@ if [[ "$DRY_RUN" == "false" ]]; then
     info "Deployment record updated: ${CURRENT_VERSION} (${CURRENT_GIT_HASH})"
 fi
 
-# ── Step 12: Disable maintenance mode ────────────────────────────────────────
+# ── Step 12: Health check ────────────────────────────────────────────────────
+check_production_health() {
+    local app_url=$(grep "^APP_URL=" .env 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'" || echo "")
+
+    if [[ -z "$app_url" ]]; then
+        warn "APP_URL not found in .env - skipping health check"
+        return 0
+    fi
+
+    info "Running production health checks..."
+
+    # Check individual registration route
+    local individual_status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$app_url" 2>/dev/null || echo "000")
+
+    # Check family registration route
+    local family_status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$app_url/family" 2>/dev/null || echo "000")
+
+    if [[ "$individual_status" == "200" || "$individual_status" == "302" ]]; then
+        success "✓ Individual registration route: HTTP $individual_status"
+    else
+        error "✗ Individual registration route: HTTP $individual_status (expected 200/302)"
+        return 1
+    fi
+
+    if [[ "$family_status" == "200" || "$family_status" == "302" ]]; then
+        success "✓ Family registration route: HTTP $family_status"
+    else
+        error "✗ Family registration route: HTTP $family_status (expected 200/302)"
+        return 1
+    fi
+
+    success "All production routes are healthy!"
+    return 0
+}
+
+# Detect if running from local machine (via publish.sh or direct SSH)
+IS_LOCAL_EXECUTION=false
+if [[ -n "${PUBLISH_VERSION:-}" ]] || [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_TTY:-}" ]]; then
+    IS_LOCAL_EXECUTION=true
+    info "Detected remote execution (called from local machine)"
+fi
+
+# ── Step 13: Disable maintenance mode ────────────────────────────────────────
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Disabling maintenance mode..."
     run php artisan up
     success "Application is live."
+    MAINTENANCE_WAS_ENABLED=false  # Site is now up, don't restore in trap
+
+    # Run health check if executed remotely from local machine
+    if [[ "$IS_LOCAL_EXECUTION" == "true" && "$DRY_RUN" == "false" ]]; then
+        echo ""
+        if ! check_production_health; then
+            error "Health check failed! Site is live but routes may not be working correctly."
+            error "Please investigate immediately."
+            exit 1
+        fi
+    fi
 else
     info "Skipping maintenance mode restore (handled by publish.sh)."
 fi
