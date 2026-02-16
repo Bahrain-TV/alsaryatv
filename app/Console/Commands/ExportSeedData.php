@@ -35,15 +35,16 @@ class ExportSeedData extends Command
         $seedPath = database_path('seeders/data/callers_seed.csv');
 
         // Check if file exists and force not set
-        if (File::exists($seedPath) && !$force) {
+        if (File::exists($seedPath) && ! $force) {
             $this->error("Seed file already exists at: {$seedPath}");
-            $this->warn("Use --force to overwrite existing file");
+            $this->warn('Use --force to overwrite existing file');
+
             return 1;
         }
 
         // Ensure directory exists
         $dir = dirname($seedPath);
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
             $this->info("Created directory: {$dir}");
         }
@@ -55,19 +56,20 @@ class ExportSeedData extends Command
             $query->limit($limit);
             $this->info("Exporting up to {$limit} callers...");
         } else {
-            $this->info("Exporting all callers...");
+            $this->info('Exporting all callers...');
         }
 
         $callers = $query->get();
 
         if ($callers->isEmpty()) {
-            $this->warn("No callers found in database");
+            $this->warn('No callers found in database');
 
             // Create empty CSV with headers
             $csv = "Name,Phone,CPR,Status,Is Winner,Hits,Last Hit,Created At,Updated At\n";
             File::put($seedPath, $csv);
 
             $this->info("Created empty seed CSV: {$seedPath}");
+
             return 0;
         }
 
@@ -84,7 +86,7 @@ class ExportSeedData extends Command
             'Hits',
             'Last Hit',
             'Created At',
-            'Updated At'
+            'Updated At',
         ]);
 
         // Write data
@@ -107,7 +109,7 @@ class ExportSeedData extends Command
         fclose($file);
 
         $this->info("✅ Exported {$exported} callers to: {$seedPath}");
-        $this->comment("📝 This file will be used by CallerSeeder when database is empty");
+        $this->comment('📝 This file will be used by CallerSeeder when database is empty');
 
         return 0;
     }

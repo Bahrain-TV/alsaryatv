@@ -15,22 +15,22 @@ class FilamentDashboardTest extends DuskTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create test user
         User::factory()->create([
             'email' => 'admin@test.com',
             'password' => bcrypt('password'),
         ]);
-        
+
         // Create test data
         Caller::factory()
             ->count(20)
             ->create(['status' => 'active']);
-        
+
         Caller::factory()
             ->count(5)
             ->create(['status' => 'inactive']);
-        
+
         Caller::factory()
             ->count(2)
             ->create(['is_winner' => true, 'status' => 'active']);

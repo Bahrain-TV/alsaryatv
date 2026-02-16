@@ -9,18 +9,18 @@ class GitHubWebhookVerifier
     /**
      * Verify GitHub webhook signature using HMAC-SHA256
      *
-     * @param string $payload Raw request body
-     * @param string $signature X-Hub-Signature-256 header value (sha256=...)
-     * @param string $secret Webhook secret from GitHub
-     * @return bool
+     * @param  string  $payload  Raw request body
+     * @param  string  $signature  X-Hub-Signature-256 header value (sha256=...)
+     * @param  string  $secret  Webhook secret from GitHub
      */
     public function verify(string $payload, string $signature, string $secret): bool
     {
         // Expected format: sha256=<hex-digest>
-        if (!str_starts_with($signature, 'sha256=')) {
+        if (! str_starts_with($signature, 'sha256=')) {
             Log::warning('Invalid GitHub signature format', [
                 'signature_header' => substr($signature, 0, 20),
             ]);
+
             return false;
         }
 
@@ -33,10 +33,10 @@ class GitHubWebhookVerifier
         // Use constant-time comparison to prevent timing attacks
         $isValid = hash_equals($expectedSignature, $computedSignature);
 
-        if (!$isValid) {
+        if (! $isValid) {
             Log::warning('GitHub webhook signature mismatch', [
-                'expected' => substr($expectedSignature, 0, 16) . '...',
-                'computed' => substr($computedSignature, 0, 16) . '...',
+                'expected' => substr($expectedSignature, 0, 16).'...',
+                'computed' => substr($computedSignature, 0, 16).'...',
             ]);
         }
 
@@ -46,22 +46,21 @@ class GitHubWebhookVerifier
     /**
      * Check if webhook should be processed based on branch
      *
-     * @param string $branch Branch name from payload
-     * @param string $allowedBranches Comma-separated list of allowed branches
-     * @return bool
+     * @param  string  $branch  Branch name from payload
+     * @param  string  $allowedBranches  Comma-separated list of allowed branches
      */
     public function isBranchAllowed(string $branch, string $allowedBranches): bool
     {
         $branches = array_map('trim', explode(',', $allowedBranches));
+
         return in_array($branch, $branches, true);
     }
 
     /**
      * Check if request IP is in allowed GitHub IP ranges
      *
-     * @param string $ip Client IP address
-     * @param string|null $allowedIps Comma-separated CIDR ranges or IPs
-     * @return bool
+     * @param  string  $ip  Client IP address
+     * @param  string|null  $allowedIps  Comma-separated CIDR ranges or IPs
      */
     public function isIpAllowed(string $ip, ?string $allowedIps = null): bool
     {
@@ -88,14 +87,13 @@ class GitHubWebhookVerifier
     /**
      * Check if IP is in CIDR range
      *
-     * @param string $ip IP address
-     * @param string $range CIDR range or single IP
-     * @return bool
+     * @param  string  $ip  IP address
+     * @param  string  $range  CIDR range or single IP
      */
     private function ipInRange(string $ip, string $range): bool
     {
         // Single IP address
-        if (!str_contains($range, '/')) {
+        if (! str_contains($range, '/')) {
             return $ip === $range;
         }
 
@@ -119,15 +117,14 @@ class GitHubWebhookVerifier
     /**
      * Extract branch name from webhook payload
      *
-     * @param array $payload Decoded JSON payload
-     * @return string|null
+     * @param  array  $payload  Decoded JSON payload
      */
     public function extractBranch(array $payload): ?string
     {
         // Webhook payload should have "ref" like "refs/heads/main"
         $ref = $payload['ref'] ?? null;
 
-        if (!$ref || !str_starts_with($ref, 'refs/heads/')) {
+        if (! $ref || ! str_starts_with($ref, 'refs/heads/')) {
             return null;
         }
 

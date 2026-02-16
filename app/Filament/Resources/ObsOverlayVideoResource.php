@@ -39,7 +39,7 @@ class ObsOverlayVideoResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('file_size')
                             ->disabled()
-                            ->formatStateUsing(fn($state) => self::formatBytes($state)),
+                            ->formatStateUsing(fn ($state) => self::formatBytes($state)),
                         Forms\Components\TextInput::make('mime_type')
                             ->disabled(),
                         Forms\Components\DateTimePicker::make('recorded_at')
@@ -73,7 +73,7 @@ class ObsOverlayVideoResource extends Resource
                     ->copyable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('file_size')
-                    ->formatStateUsing(fn($state) => self::formatBytes($state))
+                    ->formatStateUsing(fn ($state) => self::formatBytes($state))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -119,6 +119,6 @@ class ObsOverlayVideoResource extends Resource
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 }

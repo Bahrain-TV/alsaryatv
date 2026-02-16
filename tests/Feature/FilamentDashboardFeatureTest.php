@@ -62,7 +62,7 @@ class FilamentDashboardFeatureTest extends TestCase
     {
         // Unauthenticated redirects to login page
         $response = $this->get('/admin');
-        
+
         // Should redirect to login
         $this->assertTrue($response->status() === 302 || $response->status() === 401);
     }

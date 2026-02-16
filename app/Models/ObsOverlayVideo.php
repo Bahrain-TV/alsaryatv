@@ -29,7 +29,7 @@ class ObsOverlayVideo extends Model
      */
     public function getPublicUrl(): string
     {
-        return url('storage/' . $this->path);
+        return url('storage/'.$this->path);
     }
 
     /**
@@ -37,7 +37,7 @@ class ObsOverlayVideo extends Model
      */
     public function getFullPath(): string
     {
-        return storage_path('app/public/' . $this->path);
+        return storage_path('app/public/'.$this->path);
     }
 
     /**

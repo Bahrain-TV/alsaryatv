@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Caller;
-use App\Services\CprHashingService;
 use App\Providers\HitsCounter;
+use App\Services\CprHashingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
@@ -16,7 +16,7 @@ class MainFunctionalityTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Clear all callers before each test
         Caller::truncate();
     }
@@ -27,14 +27,14 @@ class MainFunctionalityTest extends TestCase
         $response = $this->get('/');
         $response->assertStatus(200);
         $response->assertSee('سجّل الآن'); // Check for registration button
-        
+
         // Get CSRF token from the response
-        $dom = new \DOMDocument();
+        $dom = new \DOMDocument;
         libxml_use_internal_errors(true);
         $dom->loadHTML($response->getContent());
         $xpath = new \DOMXPath($dom);
         $csrfTokenNodes = $xpath->query("//meta[@name='csrf-token']");
-        
+
         if ($csrfTokenNodes->length > 0) {
             $csrfToken = $csrfTokenNodes->item(0)->getAttribute('content');
         } else {
@@ -57,7 +57,7 @@ class MainFunctionalityTest extends TestCase
 
         // Verify caller was created in the database
         $this->assertTrue(Caller::where('cpr', '12345678901')->exists());
-        
+
         $caller = Caller::where('cpr', '12345678901')->first();
         $this->assertEquals('محمد أحمد', $caller->name);
         $this->assertEquals('+97366123456', $caller->phone);
@@ -118,7 +118,7 @@ class MainFunctionalityTest extends TestCase
 
     public function test_cpr_hashing_and_verification(): void
     {
-        $service = new CprHashingService();
+        $service = new CprHashingService;
         $cpr = '12345678901';
 
         // Test hashing
@@ -137,7 +137,7 @@ class MainFunctionalityTest extends TestCase
 
     public function test_cpr_masking(): void
     {
-        $service = new CprHashingService();
+        $service = new CprHashingService;
         $cpr = '12345678901';
         $masked = $service->maskCpr($cpr);
 
@@ -239,7 +239,7 @@ class MainFunctionalityTest extends TestCase
 
         // Only the 3 eligible callers should be returned
         $this->assertEquals(3, $eligible->count());
-        
+
         foreach ($eligible as $caller) {
             $this->assertFalse($caller->is_winner);
             $this->assertEquals('active', $caller->status);

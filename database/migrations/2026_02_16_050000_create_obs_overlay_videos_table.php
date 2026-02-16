@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('status')->default('ready'); // ready, archived, deleted
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->index('recorded_at');
             $table->index('status');
         });

@@ -39,9 +39,9 @@ $maxExecutionTime = 30;
 // Resolve paths
 // ---------------------------------------------------------------------------
 
-$publicDir  = __DIR__;
-$basePath   = dirname($publicDir);          // project root
-$artisanBin = $basePath . '/artisan';
+$publicDir = __DIR__;
+$basePath = dirname($publicDir);          // project root
+$artisanBin = $basePath.'/artisan';
 
 // ---------------------------------------------------------------------------
 // Production kill-switch — Tinkerette must never run in production
@@ -50,10 +50,12 @@ $artisanBin = $basePath . '/artisan';
 $appEnv = 'production'; // default to the safest assumption
 
 // Read APP_ENV from .env without bootstrapping Laravel
-$envFile = $basePath . '/.env';
+$envFile = $basePath.'/.env';
 if (file_exists($envFile)) {
     foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (str_starts_with(trim($line), '#')) continue;
+        if (str_starts_with(trim($line), '#')) {
+            continue;
+        }
         if (preg_match('/^APP_ENV\s*=\s*(.+)$/', trim($line), $m)) {
             $appEnv = trim($m[1], " \t\n\r\0\x0B\"'");
             break;
@@ -75,14 +77,14 @@ if ($appEnv === 'production') {
 
 $clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
-if (!empty($allowedIps) && !in_array($clientIp, $allowedIps, true)) {
+if (! empty($allowedIps) && ! in_array($clientIp, $allowedIps, true)) {
     http_response_code(403);
     exit('Forbidden');
 }
 
-if (!file_exists($artisanBin)) {
+if (! file_exists($artisanBin)) {
     http_response_code(500);
-    exit('artisan not found at: ' . htmlspecialchars($artisanBin));
+    exit('artisan not found at: '.htmlspecialchars($artisanBin));
 }
 
 $phpBin = PHP_BINARY ?: 'php';
@@ -94,16 +96,16 @@ $phpBin = PHP_BINARY ?: 'php';
 $command = trim($_GET['cmd'] ?? '');
 
 // Sanitise: only allow alphanumeric, colons, dashes, underscores, spaces, equals, quotes, dots, commas, slashes
-if ($command !== '' && !preg_match('/^[a-zA-Z0-9:_\-\s=\'".,\/]+$/', $command)) {
+if ($command !== '' && ! preg_match('/^[a-zA-Z0-9:_\-\s=\'".,\/]+$/', $command)) {
     http_response_code(400);
     exit('Invalid command characters.');
 }
 
 // Block dangerous commands
 foreach ($blockedCommands as $blocked) {
-    if ($command === $blocked || str_starts_with($command, $blocked . ' ')) {
+    if ($command === $blocked || str_starts_with($command, $blocked.' ')) {
         http_response_code(403);
-        exit('Command blocked: ' . htmlspecialchars($blocked));
+        exit('Command blocked: '.htmlspecialchars($blocked));
     }
 }
 
@@ -122,8 +124,8 @@ $fullCmd = sprintf(
 
 set_time_limit($maxExecutionTime);
 
-$output    = '';
-$exitCode  = 0;
+$output = '';
+$exitCode = 0;
 exec($fullCmd, $lines, $exitCode);
 $output = implode("\n", $lines);
 
@@ -190,12 +192,13 @@ function ansiToHtml(string $text): string
             }
             // Try direct mapping
             if (isset($colorMap[$code])) {
-                return '<span style="color:' . $colorMap[$code] . '">';
+                return '<span style="color:'.$colorMap[$code].'">';
             }
             // Handle 38;5;N (256-color foreground)
             if (preg_match('/38;5;(\d+)/', $code, $m256)) {
                 $c = ansi256ToHex((int) $m256[1]);
-                return '<span style="color:' . $c . '">';
+
+                return '<span style="color:'.$c.'">';
             }
             // Bold
             if ($code === '1') {
@@ -223,14 +226,22 @@ function ansiToHtml(string $text): string
             $color = null;
             $bold = false;
             foreach ($parts as $p) {
-                if ($p === '1') $bold = true;
-                if (isset($singleMap[$p])) $color = $singleMap[$p];
+                if ($p === '1') {
+                    $bold = true;
+                }
+                if (isset($singleMap[$p])) {
+                    $color = $singleMap[$p];
+                }
             }
             if ($color) {
-                $style = 'color:' . $color;
-                if ($bold) $style .= ';font-weight:bold';
-                return '<span style="' . $style . '">';
+                $style = 'color:'.$color;
+                if ($bold) {
+                    $style .= ';font-weight:bold';
+                }
+
+                return '<span style="'.$style.'">';
             }
+
             return '<span>';
         },
         $text
@@ -249,18 +260,24 @@ function ansi256ToHex(int $n): string
 {
     // Standard 16 colors
     $base16 = [
-        '#000000','#800000','#008000','#808000','#000080','#800080','#008080','#c0c0c0',
-        '#808080','#ff0000','#00ff00','#ffff00','#0000ff','#ff00ff','#00ffff','#ffffff',
+        '#000000', '#800000', '#008000', '#808000', '#000080', '#800080', '#008080', '#c0c0c0',
+        '#808080', '#ff0000', '#00ff00', '#ffff00', '#0000ff', '#ff00ff', '#00ffff', '#ffffff',
     ];
-    if ($n < 16) return $base16[$n];
+    if ($n < 16) {
+        return $base16[$n];
+    }
     if ($n >= 232) {
         $v = 8 + ($n - 232) * 10;
+
         return sprintf('#%02x%02x%02x', $v, $v, $v);
     }
     $n -= 16;
-    $b = $n % 6; $n = (int)($n / 6);
-    $g = $n % 6; $r = (int)($n / 6);
-    $f = fn($v) => $v === 0 ? 0 : 55 + $v * 40;
+    $b = $n % 6;
+    $n = (int) ($n / 6);
+    $g = $n % 6;
+    $r = (int) ($n / 6);
+    $f = fn ($v) => $v === 0 ? 0 : 55 + $v * 40;
+
     return sprintf('#%02x%02x%02x', $f($r), $f($g), $f($b));
 }
 
@@ -277,19 +294,20 @@ function linkifyListOutput(string $html, array $blockedCommands): string
     return preg_replace_callback(
         '/^([ ]{2,})(<span[^>]*>)?([a-z][a-z0-9]*(?::[a-z0-9\-]+)*)(<\/span>)?([ ]{2,}.*)$/m',
         function ($m) use ($blockedCommands) {
-            $indent  = $m[1];
-            $spanOpen  = $m[2] ?? '';
-            $cmd     = $m[3];
+            $indent = $m[1];
+            $spanOpen = $m[2] ?? '';
+            $cmd = $m[3];
             $spanClose = $m[4] ?? '';
-            $rest    = $m[5];
+            $rest = $m[5];
 
             if (in_array($cmd, $blockedCommands, true)) {
-                return $indent . $spanOpen . $cmd . $spanClose . $rest;
+                return $indent.$spanOpen.$cmd.$spanClose.$rest;
             }
 
-            $url  = '?cmd=' . urlencode($cmd);
-            $link = '<a href="' . $url . '" class="cmd-link">' . $cmd . '</a>';
-            return $indent . $link . $rest;
+            $url = '?cmd='.urlencode($cmd);
+            $link = '<a href="'.$url.'" class="cmd-link">'.$cmd.'</a>';
+
+            return $indent.$link.$rest;
         },
         $html
     );
@@ -307,8 +325,9 @@ function linkifyGenericOutput(string $html, array $blockedCommands): string
             if (in_array($cmd, $blockedCommands, true)) {
                 return $cmd;
             }
-            $url = '?cmd=' . urlencode($cmd);
-            return '<a href="' . $url . '" class="cmd-link">' . $cmd . '</a>';
+            $url = '?cmd='.urlencode($cmd);
+
+            return '<a href="'.$url.'" class="cmd-link">'.$cmd.'</a>';
         },
         $html
     );
@@ -319,8 +338,8 @@ function linkifyGenericOutput(string $html, array $blockedCommands): string
 // ---------------------------------------------------------------------------
 
 $renderedOutput = renderOutput($output, $command, $blockedCommands);
-$pageTitle      = $command !== '' ? "artisan $command" : 'artisan list';
-$escapedCmd     = htmlspecialchars($command, ENT_QUOTES, 'UTF-8');
+$pageTitle = $command !== '' ? "artisan $command" : 'artisan list';
+$escapedCmd = htmlspecialchars($command, ENT_QUOTES, 'UTF-8');
 
 ?>
 <!DOCTYPE html>
@@ -600,24 +619,24 @@ $escapedCmd     = htmlspecialchars($command, ENT_QUOTES, 'UTF-8');
         <!-- Breadcrumb -->
         <div class="breadcrumb">
             <a href="?">artisan</a>
-            <?php if ($command !== ''): ?>
+            <?php if ($command !== '') { ?>
                 <span class="sep">&rsaquo;</span>
                 <?php
                 // Build breadcrumb segments for namespaced commands like make:model
                 $parts = explode(':', $command);
                 $accumulated = '';
                 $last = count($parts) - 1;
-                foreach ($parts as $i => $part):
-                    $accumulated .= ($i > 0 ? ':' : '') . $part;
-                    if ($i === $last): ?>
+                foreach ($parts as $i => $part) {
+                    $accumulated .= ($i > 0 ? ':' : '').$part;
+                    if ($i === $last) { ?>
                         <span class="current"><?= htmlspecialchars($part) ?></span>
-                    <?php else: ?>
-                        <a href="?cmd=<?= urlencode('list ' . $accumulated) ?>"><?= htmlspecialchars($part) ?></a>
+                    <?php } else { ?>
+                        <a href="?cmd=<?= urlencode('list '.$accumulated) ?>"><?= htmlspecialchars($part) ?></a>
                         <span class="sep">&rsaquo;</span>
-                    <?php endif;
-                endforeach;
+                    <?php }
+                    }
                 ?>
-            <?php endif; ?>
+            <?php } ?>
         </div>
 
         <!-- Output -->

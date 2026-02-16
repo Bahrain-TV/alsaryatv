@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Caller;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CallerSeeder extends Seeder
@@ -19,19 +18,20 @@ class CallerSeeder extends Seeder
         // Skip if database already has data
         if (Caller::count() > 0) {
             $this->command->info('Callers table already has data. Skipping seed.');
+
             return;
         }
 
         // Import from CSV file
         $csvPath = database_path('seeders/data/callers_seed.csv');
 
-        if (!file_exists($csvPath)) {
+        if (! file_exists($csvPath)) {
             $this->command->warn("Seed CSV not found at: {$csvPath}");
             $this->command->info('Creating empty CSV file for future use.');
 
             // Ensure directory exists
             $dir = dirname($csvPath);
-            if (!is_dir($dir)) {
+            if (! is_dir($dir)) {
                 mkdir($dir, 0755, true);
             }
 
@@ -48,6 +48,7 @@ class CallerSeeder extends Seeder
 
         if (empty($csvData)) {
             $this->command->info('CSV file is empty. No callers to import.');
+
             return;
         }
 
@@ -71,18 +72,18 @@ class CallerSeeder extends Seeder
                     'status' => $data['Status'] ?? 'active',
                     'is_winner' => filter_var($data['Is Winner'] ?? 0, FILTER_VALIDATE_BOOLEAN),
                     'hits' => (int) ($data['Hits'] ?? 0),
-                    'last_hit' => !empty($data['Last Hit']) ? $data['Last Hit'] : null,
-                    'created_at' => !empty($data['Created At']) ? $data['Created At'] : now(),
-                    'updated_at' => !empty($data['Updated At']) ? $data['Updated At'] : now(),
+                    'last_hit' => ! empty($data['Last Hit']) ? $data['Last Hit'] : null,
+                    'created_at' => ! empty($data['Created At']) ? $data['Created At'] : now(),
+                    'updated_at' => ! empty($data['Updated At']) ? $data['Updated At'] : now(),
                 ]);
 
                 $imported++;
             } catch (\Exception $e) {
                 $this->command->error("Failed to import caller: {$data['Name']} - {$e->getMessage()}");
                 $skipped++;
-                Log::error("CallerSeeder import error", [
+                Log::error('CallerSeeder import error', [
                     'data' => $data,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

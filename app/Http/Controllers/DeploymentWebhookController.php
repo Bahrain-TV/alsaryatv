@@ -10,15 +10,10 @@ use Illuminate\Support\Facades\Log;
 
 class DeploymentWebhookController extends Controller
 {
-    public function __construct(private GitHubWebhookVerifier $verifier)
-    {
-    }
+    public function __construct(private GitHubWebhookVerifier $verifier) {}
 
     /**
      * Handle incoming GitHub webhook payload
-     *
-     * @param Request $request
-     * @return Response
      */
     public function handle(Request $request): Response
     {
@@ -39,18 +34,20 @@ class DeploymentWebhookController extends Controller
         ]);
 
         // Verify webhook secret
-        if (!$this->verifier->verify($payload, $signature, $webhookSecret)) {
+        if (! $this->verifier->verify($payload, $signature, $webhookSecret)) {
             Log::warning('GitHub webhook signature verification failed');
+
             return response()->json([
                 'error' => 'Signature verification failed',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
         // Verify request IP (if configured)
-        if (!$this->verifier->isIpAllowed($request->ip(), $allowedIps)) {
+        if (! $this->verifier->isIpAllowed($request->ip(), $allowedIps)) {
             Log::warning('GitHub webhook from unauthorized IP', [
                 'ip' => $request->ip(),
             ]);
+
             return response()->json([
                 'error' => 'Unauthorized IP address',
             ], Response::HTTP_FORBIDDEN);
@@ -69,18 +66,20 @@ class DeploymentWebhookController extends Controller
         // Extract branch from payload
         $branch = $this->verifier->extractBranch($data);
 
-        if (!$branch) {
+        if (! $branch) {
             Log::warning('GitHub webhook: could not extract branch from payload');
+
             return response()->json([
                 'error' => 'Could not determine branch from webhook payload',
             ], Response::HTTP_BAD_REQUEST);
         }
 
         // Check if branch is allowed
-        if (!$this->verifier->isBranchAllowed($branch, $allowedBranches)) {
+        if (! $this->verifier->isBranchAllowed($branch, $allowedBranches)) {
             Log::info('GitHub webhook: branch not in allowed list', [
                 'branch' => $branch,
             ]);
+
             return response()->json([
                 'message' => "Branch '$branch' not configured for auto-deployment",
             ], Response::HTTP_OK);
@@ -91,6 +90,7 @@ class DeploymentWebhookController extends Controller
             Log::warning('GitHub webhook received while deployment already running', [
                 'branch' => $branch,
             ]);
+
             return response()->json([
                 'error' => 'Deployment already in progress',
             ], Response::HTTP_CONFLICT);
@@ -102,14 +102,12 @@ class DeploymentWebhookController extends Controller
 
     /**
      * Check if deployment is already running
-     *
-     * @return bool
      */
     private function isDeploymentRunning(): bool
     {
         $lockFile = '/tmp/deploy.lock';
 
-        if (!file_exists($lockFile)) {
+        if (! file_exists($lockFile)) {
             return false;
         }
 
@@ -129,9 +127,6 @@ class DeploymentWebhookController extends Controller
 
     /**
      * Trigger deployment via Artisan command
-     *
-     * @param string $branch
-     * @return Response
      */
     private function triggerDeployment(string $branch): Response
     {

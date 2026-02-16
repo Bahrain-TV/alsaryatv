@@ -23,19 +23,19 @@ class CallerModelTest extends TestCase
         // 3 Winners (Active)
         Caller::factory()->count(3)->create([
             'is_winner' => true,
-            'status' => 'active'
+            'status' => 'active',
         ]);
-        
+
         // 5 Non-Winners (Active)
         Caller::factory()->count(5)->create([
             'is_winner' => false,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $winners = Caller::winners()->get();
 
         $this->assertEquals(3, $winners->count());
-        $winners->each(fn ($winner) => $this->assertTrue((bool)$winner->is_winner));
+        $winners->each(fn ($winner) => $this->assertTrue((bool) $winner->is_winner));
     }
 
     public function test_eligible_scope_logic(): void
@@ -44,30 +44,28 @@ class CallerModelTest extends TestCase
         Caller::factory()->create([
             'is_winner' => false,
             'status' => 'active',
-            'cpr' => '123456789'
+            'cpr' => '123456789',
         ]);
 
         // 2. Inactive Caller (Should be excluded)
         Caller::factory()->create([
             'is_winner' => false,
             'status' => 'inactive',
-            'cpr' => '987654321'
+            'cpr' => '987654321',
         ]);
 
         // 3. Winner (Should be excluded)
         Caller::factory()->create([
             'is_winner' => true,
             'status' => 'active',
-            'cpr' => '1122334455'
+            'cpr' => '1122334455',
         ]);
 
-
-        
         // 5. Empty CPR (Should be excluded)
         Caller::factory()->create([
             'is_winner' => false,
             'status' => 'active',
-            'cpr' => ''
+            'cpr' => '',
         ]);
 
         $eligible = Caller::eligible()->get();
@@ -82,17 +80,17 @@ class CallerModelTest extends TestCase
         Caller::factory()->create([
             'is_winner' => false,
             'status' => 'active',
-            'cpr' => '123456789'
+            'cpr' => '123456789',
         ]);
 
         $winner = Caller::selectRandomWinnerByCpr();
 
         $this->assertNotNull($winner);
-        $this->assertTrue((bool)$winner->is_winner); // Should be marked winner now
+        $this->assertTrue((bool) $winner->is_winner); // Should be marked winner now
         $this->assertEquals('123456789', $winner->cpr);
-        
+
         // Verify persists in DB
-        $this->assertTrue((bool)$winner->fresh()->is_winner);
+        $this->assertTrue((bool) $winner->fresh()->is_winner);
     }
 
     public function test_select_random_winner_returns_null_when_no_eligible_callers(): void

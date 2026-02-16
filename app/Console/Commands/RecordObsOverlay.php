@@ -3,10 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\ObsOverlayVideo;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Process;
-use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 
 class RecordObsOverlay extends Command
 {
@@ -34,13 +33,13 @@ class RecordObsOverlay extends Command
 
         // Generate filename with timestamp
         $now = Carbon::now();
-        $filename = 'obs-overlay-' . $now->format('Y-m-d-H-i-s') . '.mov';
+        $filename = 'obs-overlay-'.$now->format('Y-m-d-H-i-s').'.mov';
         $directory = 'obs-overlays';
-        $relPath = $directory . '/' . $filename;
-        $fullPath = storage_path('app/public/' . $relPath);
+        $relPath = $directory.'/'.$filename;
+        $fullPath = storage_path('app/public/'.$relPath);
 
         // Ensure directory exists
-        if (!is_dir(dirname($fullPath))) {
+        if (! is_dir(dirname($fullPath))) {
             mkdir(dirname($fullPath), 0755, true);
         }
 
@@ -63,12 +62,14 @@ class RecordObsOverlay extends Command
             if ($result->failed()) {
                 $this->error('❌ Recording failed');
                 $this->error($result->errorOutput());
+
                 return self::FAILURE;
             }
 
             // Check if file exists and get size
-            if (!file_exists($fullPath)) {
+            if (! file_exists($fullPath)) {
                 $this->error('❌ Output file not created');
+
                 return self::FAILURE;
             }
 
@@ -88,7 +89,7 @@ class RecordObsOverlay extends Command
 
             $this->info('');
             $this->info('✅ Recording completed successfully!');
-            $this->info("📊 File size: " . $this->formatBytes($fileSize));
+            $this->info('📊 File size: '.$this->formatBytes($fileSize));
             $this->info("🆔 Video ID: {$video->id}");
             $this->line('');
 
@@ -97,7 +98,8 @@ class RecordObsOverlay extends Command
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('❌ Error: ' . $e->getMessage());
+            $this->error('❌ Error: '.$e->getMessage());
+
             return self::FAILURE;
         }
     }
@@ -112,10 +114,11 @@ class RecordObsOverlay extends Command
 
         if ($oldVideos->isEmpty()) {
             $this->info('🧹 No videos to prune');
+
             return;
         }
 
-        $this->info("🧹 Pruning " . $oldVideos->count() . " old videos...");
+        $this->info('🧹 Pruning '.$oldVideos->count().' old videos...');
 
         foreach ($oldVideos as $video) {
             try {
@@ -147,6 +150,6 @@ class RecordObsOverlay extends Command
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 }

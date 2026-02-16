@@ -23,8 +23,6 @@ class DeployCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -41,9 +39,10 @@ class DeployCommand extends Command
         // Get the deploy script path
         $deployScript = base_path('deploy.sh');
 
-        if (!file_exists($deployScript)) {
-            $this->error('Deploy script not found: ' . $deployScript);
+        if (! file_exists($deployScript)) {
+            $this->error('Deploy script not found: '.$deployScript);
             Log::error('Deploy script not found', ['script' => $deployScript]);
+
             return 1;
         }
 
@@ -61,7 +60,7 @@ class DeployCommand extends Command
 
         // Run deploy.sh with output buffering
         $process = proc_open(
-            'bash ' . escapeshellarg($deployScript),
+            'bash '.escapeshellarg($deployScript),
             [
                 1 => STDOUT,  // stdout
                 2 => STDERR,  // stderr
@@ -71,9 +70,10 @@ class DeployCommand extends Command
             $env
         );
 
-        if (!is_resource($process)) {
+        if (! is_resource($process)) {
             $this->error('Failed to start deployment script');
             Log::error('Failed to start deployment script');
+
             return 1;
         }
 
@@ -85,14 +85,16 @@ class DeployCommand extends Command
             Log::info('Deployment completed successfully', [
                 'webhook' => $isWebhook,
             ]);
+
             return 0;
         } else {
             $this->error('');
-            $this->error('✗ Deployment failed with exit code: ' . $exitCode);
+            $this->error('✗ Deployment failed with exit code: '.$exitCode);
             Log::error('Deployment failed', [
                 'exit_code' => $exitCode,
                 'webhook' => $isWebhook,
             ]);
+
             return $exitCode;
         }
     }
