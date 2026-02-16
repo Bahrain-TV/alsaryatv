@@ -23,6 +23,20 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // Record OBS overlay daily at 5:00 AM
+        $schedule->command('obs:record')
+            ->dailyAt('05:00')
+            ->name('obs-overlay-record-daily')
+            ->timezone('Asia/Bahrain')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/obs-overlay.log'))
+            ->onSuccess(function (): void {
+                \Illuminate\Support\Facades\Log::info('OBS overlay recording completed successfully');
+            })
+            ->onFailure(function (): void {
+                \Illuminate\Support\Facades\Log::error('OBS overlay recording failed');
+            });
+
         // Run persist-data command every hour to ensure data persistence
         $schedule->command('app:persist-data')
             ->hourly()

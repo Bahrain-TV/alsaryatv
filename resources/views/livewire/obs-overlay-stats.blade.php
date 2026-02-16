@@ -698,6 +698,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const timeline = gsap.timeline({ repeat: -1 });
+    
+    // Delay start by 1 second + random offset for animation warmup
+    const randomStartOffset = Math.random() * 2;
+    timeline.to({}, { duration: 1 + randomStartOffset });
+    
+    // Build full cycle
     timeline.add(() => setIntroBlankState());
     timeline.to({}, { duration: introDelaySeconds });
     timeline.add(buildLabelIntro());
