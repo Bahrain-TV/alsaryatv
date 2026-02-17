@@ -6,12 +6,8 @@
     <title>{{ config('app.name', 'AlSaryaTV') }}</title>
     <meta name="description" content="برنامج السارية - مسابقة رمضانية">
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=tajawal:400,500,600,700,800&display=swap" rel="stylesheet" />
-
-    <!-- Lottie Animation -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <style>
         * {
@@ -28,426 +24,336 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #2d1b69 50%, #1e1b4b 75%, #0f172a 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Animated background elements */
-        .bg-elements {
+        .scene-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+        }
+
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 25%, #0d0d1a 50%, #1a0a1a 75%, #0a0a0a 100%);
+            background-size: 400% 400%;
+            animation: gradientPulse 8s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes gradientPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            z-index: -1;
+            z-index: 1;
         }
 
-        .orb {
+        .particle {
             position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.3;
+            opacity: 0;
+            animation: particleFloat 4s ease-in-out infinite;
         }
 
-        .orb-1 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, #A81C2E 0%, rgba(168, 28, 46, 0) 70%);
-            top: -100px;
-            left: -100px;
-            animation: float 20s ease-in-out infinite;
+        @keyframes particleFloat {
+            0%, 100% { opacity: 0; transform: translateY(0) scale(1); }
+            50% { opacity: 0.6; transform: translateY(-20px) scale(1.5); }
         }
 
-        .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, #E8D7C3 0%, rgba(232, 215, 195, 0) 70%);
-            bottom: -150px;
-            right: -150px;
-            animation: float 25s ease-in-out infinite reverse;
-        }
-
-        .orb-3 {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, #7A1422 0%, rgba(122, 20, 34, 0) 70%);
-            top: 50%;
-            right: 10%;
-            animation: float 22s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            33% { transform: translate(30px, -30px); }
-            66% { transform: translate(-20px, 30px); }
-        }
-
-        /* Container */
-        .splash-container {
-            position: relative;
-            z-index: 10;
-            text-align: center;
+        /* ===== PHASE 1: SPONSORS ===== */
+        .sponsors-phase {
+            position: absolute;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2rem;
-            max-width: 600px;
-            width: 100%;
-            padding: 2rem;
+            gap: 3rem;
+            opacity: 0;
+            z-index: 10;
         }
 
-        /* Logo wrapper with animation */
-        .logo-wrapper {
-            position: relative;
+        .sponsored-by {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .sponsors-logos {
             display: flex;
             align-items: center;
             justify-content: center;
-            perspective: 1200px;
-            width: 320px;
-            height: 320px;
-            animation: slideInDown 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2s backwards;
+            gap: 4rem;
+            flex-wrap: wrap;
         }
 
-        .logo-flip-card {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
+        .sponsor-logo {
+            width: 140px;
+            height: auto;
+            opacity: 0;
+            transform: scale(0.8) translateY(30px);
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+            transition: filter 0.5s ease;
         }
 
-        .logo-wrapper.flip-active .logo-flip-card {
-            transform: rotateY(180deg);
+        .sponsor-logo:hover {
+            filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.6));
         }
 
-        .logo-face {
+        /* ===== PHASE 2: MAGICAL TRANSITION ===== */
+        .magic-transition {
             position: absolute;
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            backface-visibility: hidden;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .logo-face.front {
-            z-index: 2;
+        .magic-circle {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            opacity: 0;
         }
 
-        .logo-face.back {
-            transform: rotateY(180deg);
-            z-index: 1;
+        .magic-circle.inner {
+            border-color: rgba(168, 28, 46, 0.8);
+            animation: none;
+        }
+
+        .magic-circle.outer {
+            border-color: rgba(232, 215, 195, 0.5);
+            animation: none;
+        }
+
+        .magic-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(168, 28, 46, 0.6);
+            opacity: 0;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #E8D7C3;
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 10px #E8D7C3, 0 0 20px #A81C2E;
+        }
+
+        /* ===== PHASE 3: SHOW LOGO ===== */
+        .show-logo-phase {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            opacity: 0;
+            z-index: 30;
+            transform-style: preserve-3d;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
         }
 
         .logo-glow {
             position: absolute;
-            width: 320px;
-            height: 320px;
+            width: 350px;
+            height: 350px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(168, 28, 46, 0.4) 0%, rgba(232, 215, 195, 0.3) 50%, transparent 70%);
-            animation: pulse-glow 3s ease-in-out infinite;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 0;
+            background: radial-gradient(circle, rgba(168, 28, 46, 0.4) 0%, rgba(232, 215, 195, 0.2) 40%, transparent 70%);
+            opacity: 0;
+            animation: glowPulse 2s ease-in-out infinite;
         }
 
-        .logo-glow.front {
-            animation: pulse-glow 3s ease-in-out infinite;
+        @keyframes glowPulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.15); opacity: 0.8; }
         }
 
-        .logo-glow.back {
-            animation: pulse-glow 3s ease-in-out infinite, glow-expand 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 4s forwards;
-        }
-
-        @keyframes pulse-glow {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.5; }
-        }
-
-        @keyframes glow-expand {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            100% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
-        }
-
-        .logo-image {
-            position: relative;
-            z-index: 2;
+        .show-logo {
             width: 280px;
             height: auto;
-            filter: drop-shadow(0 20px 40px rgba(168, 28, 46, 0.5))
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 20px 40px rgba(168, 28, 46, 0.6))
                     drop-shadow(0 0 30px rgba(232, 215, 195, 0.4));
-            animation: bounce 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            opacity: 0;
+            transform: rotateY(180deg) scale(0.5);
         }
 
-        .logo-image.back-image {
-            animation: none;
-            filter: drop-shadow(0 20px 40px rgba(168, 28, 46, 0.7))
-                    drop-shadow(0 0 40px rgba(232, 215, 195, 0.6));
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        /* Logo flip animation for brand transition */
-        @keyframes flipCard {
-            0% {
-                transform: rotateY(0deg);
-            }
-            50% {
-                transform: rotateY(90deg);
-            }
-            100% {
-                transform: rotateY(180deg);
-            }
-        }
-
-        @keyframes fadeOutFront {
-            0% { opacity: 1; }
-            50% { opacity: 0; }
-            100% { opacity: 0; }
-        }
-
-        @keyframes fadeInBack {
-            0% { opacity: 0; }
-            50% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes expandGlow {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.8; }
-        }
-
-        .logo-wrapper.flip-animation .logo-flip-card {
-            animation: flipCard 1.5s ease-in-out 0s forwards !important;
-        }
-
-        .logo-wrapper.flip-animation .logo-glow.front {
-            animation: fadeOutFront 1.5s ease-in-out 0s forwards !important;
-        }
-
-        .logo-wrapper.flip-animation .logo-glow.back {
-            animation: expandGlow 1.5s ease-in-out 0s forwards !important;
-        }
-
-        .logo-wrapper.flip-animation .logo-image.front-image {
-            animation: fadeOutFront 1.5s ease-in-out 0s forwards !important;
-        }
-
-        .logo-wrapper.flip-animation .logo-image.back-image {
-            animation: fadeInBack 1.5s ease-in-out 0s forwards !important;
-        }
-
-        /* Text content */
-        .splash-content {
-            animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s backwards;
-        }
-
-        .splash-title {
+        .show-title {
             font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
-            background: linear-gradient(135deg, #E8D7C3 0%, #F5DEB3 50%, #A81C2E 100%);
+            background: linear-gradient(135deg, #E8D7C3 0%, #F5DEB3 40%, #A81C2E 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
+            opacity: 0;
+            transform: translateY(20px);
+            text-align: center;
         }
 
-        .splash-subtitle {
-            font-size: clamp(1rem, 3vw, 1.25rem);
-            color: #cbd5e1;
+        .show-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
-            margin-bottom: 1rem;
-            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(15px);
+            text-align: center;
         }
 
-        .splash-description {
-            font-size: 0.95rem;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            line-height: 1.8;
-            max-width: 400px;
-        }
-
-        /* Loading animation */
-        .loading-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2.4s backwards;
-        }
-
-        .loading-bar {
-            width: 200px;
-            height: 4px;
-            background: rgba(232, 215, 195, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-            box-shadow: inset 0 0 10px rgba(168, 28, 46, 0.2);
-        }
-
-        .loading-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #A81C2E 0%, #E8D7C3 50%, #F5DEB3 100%);
-            border-radius: 2px;
-            width: 0%;
-            animation: loading 9s ease-in-out forwards;
-            box-shadow: 0 0 10px rgba(168, 28, 46, 0.9);
-        }
-
-        @keyframes loading {
-            0% { width: 0%; }
-            80% { width: 80%; }
-            100% { width: 100%; }
-        }
-
-        .loading-text {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            font-weight: 500;
-            letter-spacing: 1px;
-        }
-
-        /* Animated text */
-        .dot {
-            display: inline-block;
-            animation: blink 1.4s infinite;
-        }
-
-        .dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes blink {
-            0%, 60%, 100% { opacity: 0.3; }
-            30% { opacity: 1; }
-        }
-
-        /* Slide animations */
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Star decorations */
-        .stars {
+        /* ===== PHASE 4: FADE TO OBLIVION ===== */
+        .oblivion-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
+            background: radial-gradient(circle at center, transparent 0%, #000 100%);
             opacity: 0;
-            animation: twinkle 3s infinite;
+            z-index: 100;
+            pointer-events: none;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 0.8; }
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
+            opacity: 0;
+            z-index: 99;
+            pointer-events: none;
         }
 
-        /* Responsive */
+        /* ===== ANIMATIONS ===== */
+        @keyframes sponsorFadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes sponsorLogoIn {
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes magicCircleExpand {
+            0% { transform: scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        @keyframes ringExpand {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        @keyframes sparkleBurst {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        @keyframes logoReveal {
+            0% { opacity: 0; transform: rotateY(180deg) scale(0.5); }
+            50% { opacity: 1; }
+            100% { opacity: 1; transform: rotateY(0deg) scale(1); }
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeToBlack {
+            to { opacity: 1; }
+        }
+
+        @keyframes finalFade {
+            to { opacity: 0; transform: scale(0.9); }
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .logo-image {
-                width: 180px;
+            .sponsors-logos {
+                gap: 2rem;
+                flex-direction: column;
+            }
+
+            .sponsor-logo {
+                width: 100px;
+            }
+
+            .logo-container {
+                width: 240px;
+                height: 240px;
+            }
+
+            .show-logo {
+                width: 200px;
             }
 
             .logo-glow {
-                width: 220px;
-                height: 220px;
+                width: 280px;
+                height: 280px;
             }
 
-            .splash-title {
-                font-size: 2.2rem;
-            }
-
-            .splash-subtitle {
-                font-size: 1.05rem;
-            }
-
-            .splash-container {
-                gap: 1.25rem;
-                padding: 1.25rem;
-            }
-
-            .splash-description {
-                font-size: 0.95rem;
-                margin-bottom: 1.25rem;
-                max-width: 320px;
-            }
-
-            .loading-bar {
-                width: 160px;
-            }
-
-            .loading-text {
-                font-size: 0.8rem;
-            }
-
-            .orb-1 { width: 300px; height: 300px; }
-            .orb-2 { width: 350px; height: 350px; }
-            .orb-3 { width: 250px; height: 250px; }
-        }
-
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #2d1b69 50%, #1e1b4b 75%, #0f172a 100%);
+            .magic-circle {
+                width: 350px;
+                height: 350px;
             }
         }
 
-        /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
-            * {
+            *, *::before, *::after {
                 animation-duration: 0.01ms !important;
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
@@ -456,146 +362,214 @@
     </style>
 </head>
 <body>
-    <!-- Background animated elements -->
-    <div class="bg-elements">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
+    <div class="bg-gradient"></div>
 
-    <!-- Starfield -->
-    <div class="stars" id="starfield"></div>
+    <div class="particles" id="particles"></div>
 
-    <!-- Main splash screen -->
-    <div class="splash-container">
-        <!-- Logo with glow - Animated flip -->
-        <div class="logo-wrapper">
-            <div class="logo-flip-card">
-                <!-- Front face -->
-                <div class="logo-face front">
-                    <div class="logo-glow front"></div>
-                    @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
-                        <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="برنامج السارية" class="logo-image front-image" title="Al-Sarya TV Show">
-                    @else
-                        <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="logo-image front-image" title="Al-Sarya TV Show">
-                    @endif
-                </div>
-                <!-- Back face -->
-                <div class="logo-face back">
-                    <div class="logo-glow back"></div>
-                    @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
-                        <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="برنامج السارية" class="logo-image back-image" title="Al-Sarya TV Show">
-                    @else
-                        <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="logo-image back-image" title="Al-Sarya TV Show">
-                    @endif
-                </div>
+    <div class="scene-container">
+        <!-- PHASE 1: SPONSORS -->
+        <div class="sponsors-phase" id="sponsorsPhase">
+            <div class="sponsored-by" id="sponsoredByText">برعاية</div>
+            <div class="sponsors-logos">
+                <img src="{{ asset('images/btv-logo-ar.png') }}" alt="تلفزيون البحرين" class="sponsor-logo" id="sponsor1">
+                <img src="{{ asset('images/beyon-money-logo-wide.png') }}" alt="Beyon Money" class="sponsor-logo" id="sponsor2">
             </div>
         </div>
 
-        <!-- Content -->
-        <div class="splash-content">
-            <h1 class="splash-title">برنامج السارية</h1>
-            <p class="splash-subtitle">مسابقة رمضانية حصرية</p>
-            <p class="splash-description">
-                انضم إلينا في رحلة مثيرة مليئة بالجوائز والمفاجآت الرائعة
-            </p>
+        <!-- PHASE 2: MAGICAL TRANSITION -->
+        <div class="magic-transition" id="magicTransition">
+            <div class="magic-circle inner" id="magicCircleInner"></div>
+            <div class="magic-circle outer" id="magicCircleOuter"></div>
+            <div class="magic-ring" id="magicRing1" style="width: 120%; height: 120%;"></div>
+            <div class="magic-ring" id="magicRing2" style="width: 140%; height: 140%;"></div>
+            <div class="magic-ring" id="magicRing3" style="width: 160%; height: 160%;"></div>
         </div>
 
-        <!-- Loading section -->
-        <div class="loading-section">
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
+        <!-- PHASE 3: SHOW LOGO -->
+        <div class="show-logo-phase" id="showLogoPhase">
+            <div class="logo-container">
+                <div class="logo-glow" id="logoGlow"></div>
+                @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
+                    <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="برنامج السارية" class="show-logo" id="showLogo">
+                @else
+                    <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" alt="برنامج السارية" class="show-logo" id="showLogo">
+                @endif
             </div>
-            <p class="loading-text">
-                جاري التحضير<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
-            </p>
+            <h1 class="show-title" id="showTitle">برنامج السارية</h1>
+            <p class="show-subtitle" id="showSubtitle">مسابقة رمضانية حصرية</p>
         </div>
     </div>
+
+    <!-- PHASE 4: OBLIVION -->
+    <div class="vignette" id="vignette"></div>
+    <div class="oblivion-overlay" id="oblivionOverlay"></div>
 
     <script>
-        // Dark mode detection with 1-second processing time
-        function detectAndApplyTheme() {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        (function() {
+            const particles = document.getElementById('particles');
+            const sponsorCount = window.innerWidth > 768 ? 40 : 20;
 
-            // Set CSS variables for theme detection (used throughout the app)
-            document.documentElement.style.setProperty('--user-theme', prefersDark ? 'dark' : 'light');
-            document.documentElement.style.setProperty('--theme-is-dark', prefersDark ? '1' : '0');
-
-            // Apply theme-specific class for accessibility
-            if (prefersDark) {
-                document.documentElement.classList.add('dark-mode-detected');
-            } else if (prefersLight) {
-                document.documentElement.classList.add('light-mode-detected');
+            for (let i = 0; i < sponsorCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (3 + Math.random() * 2) + 's';
+                particles.appendChild(particle);
             }
+        })();
 
-            // Log for debugging
-            console.log('🎨 Theme detected:', prefersDark ? 'Dark' : 'Light');
+        function createSparkles(container, count) {
+            const sparkles = [];
+            for (let i = 0; i < count; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                const angle = (i / count) * Math.PI * 2;
+                const radius = 150 + Math.random() * 100;
+                sparkle.style.left = `calc(50% + ${Math.cos(angle) * radius}px)`;
+                sparkle.style.top = `calc(50% + ${Math.sin(angle) * radius}px)`;
+                container.appendChild(sparkle);
+                sparkles.push(sparkle);
+            }
+            return sparkles;
         }
 
-        // Initialize theme detection immediately (allows 1 second for processing)
-        detectAndApplyTheme();
+        function animateSplash() {
+            const timeline = [];
 
-        // Listen for real-time theme changes
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', detectAndApplyTheme);
+            // PHASE 1: Sponsors (0-3s)
+            timeline.push(() => {
+                const sponsorsPhase = document.getElementById('sponsorsPhase');
+                const sponsoredBy = document.getElementById('sponsoredByText');
+                const sponsor1 = document.getElementById('sponsor1');
+                const sponsor2 = document.getElementById('sponsor2');
 
-        // Generate random stars
-        function generateStars() {
-            const starfield = document.getElementById('starfield');
-            const starCount = window.innerWidth > 768 ? 50 : 20;
+                sponsorsPhase.style.opacity = '1';
 
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starfield.appendChild(star);
-            }
-        }
+                setTimeout(() => {
+                    sponsoredBy.style.animation = 'sponsorFadeIn 0.8s ease-out forwards';
+                }, 300);
 
-        // Initialize stars on load
-        generateStars();
+                setTimeout(() => {
+                    sponsor1.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                }, 800);
 
-        // Trigger logo flip animation after loading completes
-        function triggerLogoFlip() {
-            const logoWrapper = document.querySelector('.logo-wrapper');
-            if (logoWrapper) {
-                logoWrapper.classList.add('flip-animation');
-            }
-        }
+                setTimeout(() => {
+                    sponsor2.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                }, 1100);
+            });
 
-        // Auto-redirect after loading and animation completes
-        window.addEventListener('load', () => {
-            // Trigger flip at 4 seconds (after initial logo display)
-            setTimeout(() => {
-                triggerLogoFlip();
-            }, 4000);
+            // PHASE 2: Fade sponsors & start magic (3-4s)
+            timeline.push(() => {
+                const sponsorsPhase = document.getElementById('sponsorsPhase');
+                const magicTransition = document.getElementById('magicTransition');
 
-            // Redirect after full animation: slide-in (2s) + first logo (2s) + flip (1.5s) + second logo (4s) = 9.5s
+                sponsorsPhase.style.transition = 'opacity 0.8s ease-out';
+                sponsorsPhase.style.opacity = '0';
+
+                setTimeout(() => {
+                    magicTransition.style.opacity = '1';
+
+                    const innerCircle = document.getElementById('magicCircleInner');
+                    const outerCircle = document.getElementById('magicCircleOuter');
+                    const rings = [
+                        document.getElementById('magicRing1'),
+                        document.getElementById('magicRing2'),
+                        document.getElementById('magicRing3')
+                    ];
+
+                    innerCircle.style.animation = 'magicCircleExpand 1.2s ease-out forwards';
+                    outerCircle.style.animation = 'magicCircleExpand 1.5s ease-out 0.2s forwards';
+
+                    rings.forEach((ring, i) => {
+                        ring.style.animation = `ringExpand ${1 + i * 0.3}s ease-out ${i * 0.15}s forwards`;
+                    });
+
+                    const sparkles = createSparkles(magicTransition, 20);
+                    sparkles.forEach((sparkle, i) => {
+                        setTimeout(() => {
+                            sparkle.style.animation = 'sparkleBurst 0.6s ease-out forwards';
+                        }, i * 50);
+                    });
+                }, 400);
+            });
+
+            // PHASE 3: Reveal show logo (4.5-6.5s)
+            timeline.push(() => {
+                const magicTransition = document.getElementById('magicTransition');
+                const showLogoPhase = document.getElementById('showLogoPhase');
+                const logoGlow = document.getElementById('logoGlow');
+                const showLogo = document.getElementById('showLogo');
+                const showTitle = document.getElementById('showTitle');
+                const showSubtitle = document.getElementById('showSubtitle');
+
+                magicTransition.style.transition = 'opacity 0.5s ease-out';
+                magicTransition.style.opacity = '0';
+
+                showLogoPhase.style.opacity = '1';
+
+                setTimeout(() => {
+                    logoGlow.style.opacity = '1';
+                }, 200);
+
+                setTimeout(() => {
+                    showLogo.style.animation = 'logoReveal 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                }, 300);
+
+                setTimeout(() => {
+                    showTitle.style.animation = 'textFadeIn 0.8s ease-out forwards';
+                }, 1000);
+
+                setTimeout(() => {
+                    showSubtitle.style.animation = 'textFadeIn 0.8s ease-out forwards';
+                }, 1200);
+            });
+
+            // PHASE 4: Fade to oblivion (8-10s)
+            timeline.push(() => {
+                const vignette = document.getElementById('vignette');
+                const oblivionOverlay = document.getElementById('oblivionOverlay');
+                const showLogoPhase = document.getElementById('showLogoPhase');
+
+                vignette.style.animation = 'fadeToBlack 1.5s ease-in forwards';
+
+                setTimeout(() => {
+                    oblivionOverlay.style.animation = 'fadeToBlack 2s ease-in forwards';
+                }, 500);
+
+                setTimeout(() => {
+                    showLogoPhase.style.animation = 'finalFade 1.5s ease-in forwards';
+                }, 1000);
+            });
+
+            // Execute timeline
+            timeline[0](); // 0s - Sponsors start
+            setTimeout(timeline[1], 3000); // 3s - Magic transition
+            setTimeout(timeline[2], 4500); // 4.5s - Show logo
+            setTimeout(timeline[3], 8000); // 8s - Oblivion
+
+            // Redirect after complete
             setTimeout(() => {
                 window.location.href = '/';
-            }, 9500);
-        });
+            }, 10500);
+        }
 
-        // Allow escape key or click to skip
+        // Skip handlers
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                window.location.href = '/';
-            }
+            if (e.key === 'Escape') window.location.href = '/';
         });
 
         document.addEventListener('click', () => {
             window.location.href = '/';
         });
 
-        // Handle visibility change (tab switching)
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                // When tab becomes visible again, redirect
-                window.location.href = '/';
-            }
+            if (!document.hidden) window.location.href = '/';
         });
+
+        // Start animation
+        window.addEventListener('load', animateSplash);
     </script>
 </body>
 </html>
