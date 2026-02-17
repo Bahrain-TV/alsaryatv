@@ -14,6 +14,7 @@
 #   ./deploy.sh --reset-db   # Reset database (migrate:fresh without seeding)
 #   ./deploy.sh --up         # Force deploy even if maintenance mode is active
 #   ./deploy.sh --dry-run    # Print steps without executing
+#   ./deploy.sh --diagnose   # Run production diagnostics (check images, config, etc)
 ###############################################################################
 
 # Configuration
@@ -33,6 +34,9 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     # Helper for local reporting
     local_info()  { echo -e "\033[0;36m[LOCAL]\033[0m  $*"; }
     local_error() { echo -e "\033[0;31m[ERROR]\033[0m $*"; }
+    local_ok()    { echo -e "\033[0;32m[  OK ]\033[0m  $*"; }
+    local_fail()  { echo -e "\033[0;31m[FAIL]\033[0m  $*"; }
+    local_warn()  { echo -e "\033[1;33m[WARN]\033[0m  $*"; }
     
     # Setup cleanup for local wrapper
     local_cleanup() {
@@ -69,6 +73,250 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
         exit 1
     fi
 
+    # ── DIAGNOSE MODE (local → remote) ───────────────────────────────────
+    # If --diagnose was passed, run diagnostics on production and exit
+    for arg in "$@"; do
+        if [[ "$arg" == "--diagnose" ]]; then
+            echo ""
+            local_info "🔍 Running Production Diagnostics..."
+            echo ""
+
+            ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" bash << 'DIAG_SCRIPT'
+cd /home/alsarya.tv/public_html
+
+C='\033[0;36m'  # Cyan
+G='\033[0;32m'  # Green
+R='\033[0;31m'  # Red
+Y='\033[1;33m'  # Yellow
+N='\033[0m'     # Reset
+
+ok()   { echo -e "${G}[  OK ]${N}  $*"; }
+fail() { echo -e "${R}[FAIL]${N}  $*"; }
+warn() { echo -e "${Y}[WARN]${N}  $*"; }
+hdr()  { echo -e "\n${C}━━━ $* ━━━${N}"; }
+
+ISSUES=0
+
+# ─── 1. .env Configuration ──────────────────────────────
+hdr "1. .env Configuration"
+
+APP_URL_VAL=$(grep '^APP_URL=' .env | cut -d= -f2- | tr -d '"')
+APP_ENV_VAL=$(grep '^APP_ENV=' .env | cut -d= -f2- | tr -d '"')
+APP_DEBUG_VAL=$(grep '^APP_DEBUG=' .env | cut -d= -f2- | tr -d '"')
+FS_DISK_VAL=$(grep '^FILESYSTEM_DISK=' .env | cut -d= -f2- | tr -d '"')
+ASSET_URL_VAL=$(grep '^ASSET_URL=' .env | cut -d= -f2- | tr -d '"')
+
+if [[ "$APP_URL_VAL" == *"localhost"* ]]; then
+    fail "APP_URL = $APP_URL_VAL  ← WRONG! Points to localhost"
+    ISSUES=$((ISSUES+1))
+else
+    ok "APP_URL = $APP_URL_VAL"
+fi
+
+if [[ "$APP_ENV_VAL" != "production" ]]; then
+    fail "APP_ENV = $APP_ENV_VAL  ← Should be 'production'"
+    ISSUES=$((ISSUES+1))
+else
+    ok "APP_ENV = $APP_ENV_VAL"
+fi
+
+if [[ "$APP_DEBUG_VAL" == "true" ]]; then
+    warn "APP_DEBUG = true  ← Should be 'false' in production"
+else
+    ok "APP_DEBUG = $APP_DEBUG_VAL"
+fi
+
+if [[ "$FS_DISK_VAL" == "public" ]]; then
+    ok "FILESYSTEM_DISK = $FS_DISK_VAL"
+else
+    warn "FILESYSTEM_DISK = $FS_DISK_VAL  ← Consider 'public' for uploaded files"
+fi
+
+if [[ -n "$ASSET_URL_VAL" ]]; then
+    warn "ASSET_URL = $ASSET_URL_VAL (overrides asset() helper)"
+else
+    ok "ASSET_URL not set (asset() uses APP_URL — correct)"
+fi
+
+# ─── 2. Cached Config vs Live Config ────────────────────
+hdr "2. Cached Config vs .env"
+
+if [[ -f bootstrap/cache/config.php ]]; then
+    CACHED_URL=$(php -r "echo (include 'bootstrap/cache/config.php')['app']['url'] ?? 'N/A';" 2>/dev/null)
+    if [[ "$CACHED_URL" != "$APP_URL_VAL" ]]; then
+        fail "CACHED APP_URL ($CACHED_URL) ≠ .env APP_URL ($APP_URL_VAL)"
+        fail "Fix: php artisan config:cache"
+        ISSUES=$((ISSUES+1))
+    else
+        ok "Cached config matches .env (APP_URL = $CACHED_URL)"
+    fi
+    
+    CACHED_ENV=$(php -r "echo (include 'bootstrap/cache/config.php')['app']['env'] ?? 'N/A';" 2>/dev/null)
+    if [[ "$CACHED_ENV" != "$APP_ENV_VAL" ]]; then
+        fail "CACHED APP_ENV ($CACHED_ENV) ≠ .env APP_ENV ($APP_ENV_VAL)"
+        ISSUES=$((ISSUES+1))
+    fi
+else
+    warn "No cached config (bootstrap/cache/config.php missing)"
+fi
+
+# ─── 3. Image Files ─────────────────────────────────────
+hdr "3. Image Files on Disk"
+
+for img in "public/images/alsarya-logo-2026-1.png" "public/images/alsarya-logo.png"; do
+    if [[ -f "$img" ]]; then
+        SIZE=$(stat -c%s "$img" 2>/dev/null || stat -f%z "$img" 2>/dev/null)
+        OWNER=$(stat -c'%U:%G' "$img" 2>/dev/null || stat -f'%Su:%Sg' "$img" 2>/dev/null)
+        PERMS=$(stat -c'%a' "$img" 2>/dev/null || stat -f'%Lp' "$img" 2>/dev/null)
+        ok "$img (${SIZE} bytes, $OWNER, mode $PERMS)"
+    else
+        fail "$img — FILE MISSING!"
+        ISSUES=$((ISSUES+1))
+    fi
+done
+
+# ─── 4. Storage Symlink ─────────────────────────────────
+hdr "4. Storage Symlink"
+
+if [[ -L "public/storage" ]]; then
+    TARGET=$(readlink public/storage)
+    if [[ -d "$TARGET" ]]; then
+        ok "public/storage → $TARGET (valid symlink)"
+    else
+        fail "public/storage → $TARGET (BROKEN — target doesn't exist!)"
+        ISSUES=$((ISSUES+1))
+    fi
+else
+    fail "public/storage symlink MISSING! Run: php artisan storage:link"
+    ISSUES=$((ISSUES+1))
+fi
+
+# ─── 5. Web Server Response ─────────────────────────────
+hdr "5. Web Server Response (from server itself)"
+
+for path in "/" "/images/alsarya-logo-2026-1.png"; do
+    STATUS=$(curl -sI -o /dev/null -w "%{http_code}" --max-time 5 "${APP_URL_VAL}${path}" 2>/dev/null || echo "000")
+    if [[ "$STATUS" == "200" || "$STATUS" == "302" ]]; then
+        ok "GET ${path} → HTTP $STATUS"
+    elif [[ "$STATUS" == "000" ]]; then
+        fail "GET ${path} → UNREACHABLE (connection failed)"
+        ISSUES=$((ISSUES+1))
+    else
+        fail "GET ${path} → HTTP $STATUS"
+        ISSUES=$((ISSUES+1))
+    fi
+done
+
+# Check cache-control headers on images (browser caching issue?)
+CACHE_HDR=$(curl -sI --max-time 5 "${APP_URL_VAL}/images/alsarya-logo-2026-1.png" 2>/dev/null | grep -i "cache-control" | tr -d '\r')
+if [[ -n "$CACHE_HDR" ]]; then
+    if echo "$CACHE_HDR" | grep -qi "max-age=[1-9]"; then
+        warn "Image caching: $CACHE_HDR"
+        warn "→ Browser may show stale images. Add ?v=timestamp to bust cache"
+    else
+        ok "Image caching: $CACHE_HDR"
+    fi
+fi
+
+ETAG_HDR=$(curl -sI --max-time 5 "${APP_URL_VAL}/images/alsarya-logo-2026-1.png" 2>/dev/null | grep -i "etag" | tr -d '\r')
+if [[ -n "$ETAG_HDR" ]]; then
+    ok "ETag header present: $ETAG_HDR"
+fi
+
+# ─── 6. Blade Template References ───────────────────────
+hdr "6. Blade Template Image References"
+
+BLADE_REFS=$(grep -rn "alsarya-logo" resources/views/ 2>/dev/null)
+if [[ -n "$BLADE_REFS" ]]; then
+    echo "$BLADE_REFS" | while read -r line; do
+        if echo "$line" | grep -q "alsarya-logo-2026-1"; then
+            ok "$line"
+        else
+            warn "$line  ← NOT using 2026 logo?"
+        fi
+    done
+else
+    warn "No logo references found in blade templates"
+fi
+
+# ─── 7. View Cache Age ──────────────────────────────────
+hdr "7. View Cache"
+
+VIEW_COUNT=$(ls storage/framework/views/*.php 2>/dev/null | wc -l)
+if [[ "$VIEW_COUNT" -gt 0 ]]; then
+    OLDEST=$(ls -t storage/framework/views/*.php | tail -1)
+    OLDEST_DATE=$(stat -c'%Y' "$OLDEST" 2>/dev/null || stat -f'%m' "$OLDEST" 2>/dev/null)
+    NOW=$(date +%s)
+    AGE_HOURS=$(( (NOW - OLDEST_DATE) / 3600 ))
+    if [[ "$AGE_HOURS" -gt 24 ]]; then
+        warn "$VIEW_COUNT cached views (oldest is ${AGE_HOURS}h old — might be stale)"
+        warn "Fix: php artisan view:clear && php artisan view:cache"
+    else
+        ok "$VIEW_COUNT cached views (oldest is ${AGE_HOURS}h old)"
+    fi
+else
+    ok "No cached views (Blade compiles on-the-fly)"
+fi
+
+# ─── 8. Permissions ─────────────────────────────────────
+hdr "8. Key Directory Permissions"
+
+for dir in "storage" "bootstrap/cache" "public/images"; do
+    if [[ -d "$dir" ]]; then
+        OWNER=$(stat -c'%U:%G' "$dir" 2>/dev/null || stat -f'%Su:%Sg' "$dir" 2>/dev/null)
+        PERMS=$(stat -c'%a' "$dir" 2>/dev/null || stat -f'%Lp' "$dir" 2>/dev/null)
+        if [[ "$OWNER" == *"alsar4210"* ]]; then
+            ok "$dir/ ($OWNER, mode $PERMS)"
+        else
+            fail "$dir/ owned by $OWNER — should be alsar4210"
+            ISSUES=$((ISSUES+1))
+        fi
+    fi
+done
+
+# ─── Summary ────────────────────────────────────────────
+hdr "SUMMARY"
+
+if [[ "$ISSUES" -eq 0 ]]; then
+    echo -e "${G}✅ All checks passed! No issues found.${N}"
+else
+    echo -e "${R}❌ Found $ISSUES issue(s) that need attention.${N}"
+fi
+echo ""
+DIAG_SCRIPT
+
+            local_info "Diagnostics complete."
+
+            # Now compare local vs remote images
+            echo ""
+            local_info "Comparing local vs remote image checksums..."
+            
+            LOCAL_HASH=$(md5 -q public/images/alsarya-logo-2026-1.png 2>/dev/null || echo "MISSING")
+            REMOTE_HASH=$(ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "md5sum /home/alsarya.tv/public_html/public/images/alsarya-logo-2026-1.png 2>/dev/null | cut -d' ' -f1" || echo "MISSING")
+            
+            if [[ "$LOCAL_HASH" == "$REMOTE_HASH" ]]; then
+                local_ok "Logo checksums match: $LOCAL_HASH"
+            else
+                local_fail "Logo checksums DIFFER! Local=$LOCAL_HASH Remote=$REMOTE_HASH"
+            fi
+
+            # Check local .env vs remote .env for dangerous differences
+            echo ""
+            local_info "Checking .env differences (critical keys only)..."
+            for key in APP_URL APP_ENV APP_DEBUG FILESYSTEM_DISK; do
+                L_VAL=$(grep "^${key}=" .env 2>/dev/null | cut -d= -f2- | tr -d '"')
+                R_VAL=$(ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "grep '^${key}=' /home/alsarya.tv/public_html/.env 2>/dev/null | cut -d= -f2- | tr -d '\"'")
+                if [[ "$L_VAL" == "$R_VAL" ]]; then
+                    local_warn "$key: local=$L_VAL == remote=$R_VAL (SAME — might be wrong for prod!)"
+                else
+                    local_ok "$key: local=$L_VAL | remote=$R_VAL (different — expected)"
+                fi
+            done
+
+            exit 0
+        fi
+    done
+
     # 2. Sync Assets (Images & Storage) - OPTIMIZED
     # We use rsync with checksum (-c) to avoid re-uploading identical files
     local_info "Syncing Assets (Images & Storage)..."
@@ -91,10 +339,10 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     # 3. Update Remote Configuration & Script
     local_info "Updating remote configuration and deployment script..."
     
-    # Sync .env (Differential sync using rsync instead of scp)
-    if [[ -f .env ]]; then
-        rsync -avzc --no-o --no-g -e "$RSYNC_SSH" ".env" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/.env" >/dev/null || local_error ".env sync failed"
-    fi
+    # Sync .env - DISABLED TO PREVENT OVERWRITING PROD CONFIG
+    # if [[ -f .env ]]; then
+    #    rsync -avzc --no-o --no-g -e "$RSYNC_SSH" ".env" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/.env" >/dev/null || local_error ".env sync failed"
+    # fi
 
     # Upload clean deploy script (Atomic upload: upload to tmp -> mv to target)
     scp -q -P "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$0" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/deploy.sh.new"
@@ -182,6 +430,7 @@ NO_BUILD=false
 FORCE=false
 DRY_RUN=false
 RESET_DB=false
+DIAGNOSE=false
 IGNORE_MAINTENANCE=false
 WEBHOOK_TRIGGER="${WEBHOOK_TRIGGER:-false}"
 TIMEOUT_PID=""
@@ -213,6 +462,7 @@ for arg in "$@"; do
         --dry-run)   DRY_RUN=true ;;
         --reset-db)  RESET_DB=true ;;
         --up)        IGNORE_MAINTENANCE=true ;;
+        --diagnose)  DIAGNOSE=true ;;
         *)           warn "Unknown flag: $arg" ;;
     esac
 done
