@@ -99,13 +99,17 @@
         }
 
         .sponsored-by {
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 500;
-            letter-spacing: 4px;
+            font-size: clamp(1.3rem, 3.5vw, 2.2rem);
+            background: linear-gradient(135deg, #E8D7C3 0%, #F5DEB3 50%, #A81C2E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: 6px;
             text-transform: uppercase;
             opacity: 0;
             transform: translateY(20px);
+            filter: drop-shadow(0 2px 8px rgba(168, 28, 46, 0.3));
         }
 
         /* Individual sponsor card display */
@@ -125,22 +129,35 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2rem;
+            gap: 3rem;
+            padding: 3rem;
+            background: rgba(168, 28, 46, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(232, 215, 195, 0.3);
         }
 
         .sponsor-card .sponsor-card-title {
-            font-size: clamp(1rem, 2.5vw, 1.5rem);
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 600;
+            font-size: clamp(1.2rem, 3.5vw, 2rem);
+            color: #E8D7C3;
+            font-weight: 700;
             text-align: center;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
         .sponsor-card .sponsor-card-logo {
-            width: 200px;
+            width: 240px;
             height: auto;
-            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.4));
-            transform: scale(0.8);
+            max-width: 90vw;
+            filter: drop-shadow(0 0 40px rgba(232, 215, 195, 0.6));
+            transform: scale(0.85);
+            transition: all 0.5s ease;
+        }
+
+        .sponsor-card:hover .sponsor-card-logo {
+            filter: drop-shadow(0 0 60px rgba(232, 215, 195, 0.8));
+            transform: scale(0.9);
         }
 
         /* Combined sponsors display */
@@ -148,18 +165,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4rem;
+            gap: 5rem;
             flex-wrap: wrap;
             opacity: 0;
+            padding: 2rem;
+            background: rgba(168, 28, 46, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(232, 215, 195, 0.2);
         }
 
         .sponsor-logo {
-            width: 140px;
+            width: 160px;
             height: auto;
+            max-width: 40vw;
             opacity: 0;
-            transform: scale(0.8) translateY(30px);
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
-            transition: filter 0.5s ease;
+            transform: scale(0.7) translateY(40px);
+            filter: drop-shadow(0 0 25px rgba(232, 215, 195, 0.5));
+            transition: all 0.5s ease;
         }
 
         .sponsor-logo.active {
@@ -168,7 +191,8 @@
         }
 
         .sponsor-logo:hover {
-            filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.6));
+            filter: drop-shadow(0 0 50px rgba(232, 215, 195, 0.8));
+            transform: scale(1.05) translateY(-5px);
         }
 
         /* Individual card animations */
@@ -383,21 +407,32 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
+            .sponsor-card .sponsor-card-content {
+                gap: 2rem;
+                padding: 2rem;
+                border-radius: 15px;
+            }
+
             .sponsor-card .sponsor-card-logo {
-                width: 150px;
+                width: 180px;
             }
 
             .sponsor-card .sponsor-card-title {
-                font-size: clamp(0.8rem, 2vw, 1.2rem);
+                font-size: clamp(1rem, 2.5vw, 1.4rem);
             }
 
             .sponsors-logos {
-                gap: 2rem;
+                gap: 2.5rem;
                 flex-direction: column;
+                padding: 1.5rem;
             }
 
             .sponsor-logo {
-                width: 100px;
+                width: 120px;
+            }
+
+            .sponsored-by {
+                font-size: clamp(1rem, 2.5vw, 1.6rem);
             }
 
             .logo-container {
@@ -435,9 +470,13 @@
     <div class="particles" id="particles"></div>
 
     <div class="scene-container">
-        <!-- PHASE 1: SPONSORS -->
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             PHASE 1: SPONSOR INTRODUCTION (0-6 seconds)
+             Individual cards slide in left/right, then combine
+             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
         <div class="sponsors-phase" id="sponsorsPhase">
             <!-- Individual Sponsor Cards -->
+            <!-- Card 1: تلفزيون البحرين (BTV) - enters from left at 0s, exits at 1.5s -->
             <div class="sponsor-card" id="sponsorCard1">
                 <div class="sponsor-card-content">
                     <div class="sponsor-card-title">تلفزيون البحرين</div>
@@ -445,6 +484,7 @@
                 </div>
             </div>
 
+            <!-- Card 2: Beyon Money - enters from right at 1.5s, exits at 3s -->
             <div class="sponsor-card" id="sponsorCard2">
                 <div class="sponsor-card-content">
                     <div class="sponsor-card-title">Beyon Money</div>
@@ -452,7 +492,7 @@
                 </div>
             </div>
 
-            <!-- Combined Display -->
+            <!-- Combined Display: Both sponsors together (3s-4.5s) -->
             <div class="sponsored-by" id="sponsoredByText">برعاية</div>
             <div class="sponsors-logos" id="sponsorsLogos">
                 <img src="{{ asset('images/btv-logo-ar.png') }}" alt="تلفزيون البحرين" class="sponsor-logo" id="sponsor1">
@@ -460,7 +500,10 @@
             </div>
         </div>
 
-        <!-- PHASE 2: MAGICAL TRANSITION -->
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             PHASE 2: MAGICAL TRANSITION (5.5-8.5 seconds)
+             Sponsors fade out, magical circles & sparkles appear
+             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
         <div class="magic-transition" id="magicTransition">
             <div class="magic-circle inner" id="magicCircleInner"></div>
             <div class="magic-circle outer" id="magicCircleOuter"></div>
@@ -469,7 +512,10 @@
             <div class="magic-ring" id="magicRing3" style="width: 160%; height: 160%;"></div>
         </div>
 
-        <!-- PHASE 3: SHOW LOGO -->
+        <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+             PHASE 3: SHOW LOGO REVEAL (8.5-12 seconds)
+             AlSarya TV logo spins and reveals with title/subtitle
+             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
         <div class="show-logo-phase" id="showLogoPhase">
             <div class="logo-container">
                 <div class="logo-glow" id="logoGlow"></div>
@@ -484,7 +530,10 @@
         </div>
     </div>
 
-    <!-- PHASE 4: OBLIVION -->
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         PHASE 4: FADE TO OBLIVION (12-14.5 seconds)
+         Screen fades to black with vignette, redirects to registration
+         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
     <div class="vignette" id="vignette"></div>
     <div class="oblivion-overlay" id="oblivionOverlay"></div>
 
@@ -669,26 +718,63 @@
             setTimeout(timeline[3], 12000); // 12s - Oblivion fade
 
             // Redirect after complete (total animation: 14.5 seconds)
+            // Mark that splash has been shown
+            sessionStorage.setItem('splashShown', 'true');
+
             setTimeout(() => {
+                // Redirect to registration form after splash
                 window.location.href = '/';
             }, 14500);
         }
 
+        // Check if splash has already been shown in this session
+        function shouldShowSplash() {
+            // Allow forcing splash with ?force-splash=true
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('force-splash') === 'true') {
+                sessionStorage.removeItem('splashShown');
+                return true;
+            }
+
+            // Check if splash was already shown in this session
+            const splashShown = sessionStorage.getItem('splashShown');
+            if (splashShown === 'true') {
+                console.log('Splash already shown in this session, skipping...');
+                return false;
+            }
+
+            return true;
+        }
+
         // Skip handlers
+        function skipToRegistration() {
+            sessionStorage.setItem('splashShown', 'true');
+            window.location.href = '/?skip-splash=true';
+        }
+
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') window.location.href = '/';
+            if (e.key === 'Escape') skipToRegistration();
         });
 
         document.addEventListener('click', () => {
-            window.location.href = '/';
+            skipToRegistration();
         });
 
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) window.location.href = '/';
+            if (!document.hidden && sessionStorage.getItem('splashShown') === 'true') {
+                skipToRegistration();
+            }
         });
 
-        // Start animation
-        window.addEventListener('load', animateSplash);
+        // Start animation only if splash should be shown
+        window.addEventListener('load', () => {
+            if (shouldShowSplash()) {
+                animateSplash();
+            } else {
+                // Skip splash and go directly to registration
+                skipToRegistration();
+            }
+        });
     </script>
 </body>
 </html>

@@ -23,10 +23,23 @@ $getRamadanContext = function () {
 };
 
 // Main Entry Routes
+
+// Home route - shows splash screen (session storage handles skip on return)
+Route::get('/', function () use ($getRamadanContext) {
+    // If skip-splash param present OR user came from splash, show registration
+    if (request()->has('skip-splash')) {
+        return view('welcome', $getRamadanContext());
+    }
+    // Default: show splash screen
+    return view('splash', $getRamadanContext());
+})->name('home');
+
+// Splash screen explicit route
 Route::get('/splash', fn () => view('splash', $getRamadanContext()))->name('splash');
 
-Route::get('/', fn () => view('welcome', $getRamadanContext()))->name('home');
+// Registration form routes
 Route::get('/welcome', fn () => view('welcome', $getRamadanContext()))->name('welcome');
+Route::get('/register', fn () => view('welcome', $getRamadanContext()))->name('registration.form');
 Route::get('/family', fn () => view('welcome', $getRamadanContext()))->name('family.registration');
 
 // Public OBS overlay — accessible without authentication for OBS Browser Source
