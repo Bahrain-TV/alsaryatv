@@ -24,7 +24,7 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: #000;
+            background: #0F172A;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -48,7 +48,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 25%, #0d0d1a 50%, #1a0a1a 75%, #0a0a0a 100%);
+            background: linear-gradient(135deg, #0F172A 0%, #1a0a2e 25%, #2d0a3a 50%, #1a0a2e 75%, #0F172A 100%);
             background-size: 400% 400%;
             animation: gradientPulse 8s ease-in-out infinite;
             z-index: 0;
@@ -100,7 +100,7 @@
 
         .sponsored-by {
             font-size: clamp(1.3rem, 3.5vw, 2.2rem);
-            background: linear-gradient(135deg, #E8D7C3 0%, #F5DEB3 50%, #A81C2E 100%);
+            background: linear-gradient(135deg, #F5DEB3 0%, #E8D7C3 40%, #A81C2E 75%, #8B6914 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -109,7 +109,7 @@
             text-transform: uppercase;
             opacity: 0;
             transform: translateY(20px);
-            filter: drop-shadow(0 2px 8px rgba(168, 28, 46, 0.3));
+            filter: drop-shadow(0 2px 10px rgba(168, 28, 46, 0.5));
         }
 
         /* Individual sponsor card display */
@@ -131,32 +131,36 @@
             justify-content: center;
             gap: 3rem;
             padding: 3rem;
-            background: rgba(168, 28, 46, 0.15);
-            backdrop-filter: blur(10px);
+            background: rgba(168, 28, 46, 0.2);
+            backdrop-filter: blur(12px);
             border-radius: 20px;
-            border: 1px solid rgba(232, 215, 195, 0.3);
+            border: 1px solid rgba(232, 215, 195, 0.4);
+            box-shadow: 0 8px 32px rgba(168, 28, 46, 0.2);
         }
 
         .sponsor-card .sponsor-card-title {
             font-size: clamp(1.2rem, 3.5vw, 2rem);
-            color: #E8D7C3;
+            color: #F5DEB3;
             font-weight: 700;
             text-align: center;
             letter-spacing: 3px;
             text-transform: uppercase;
+            text-shadow: 0 2px 8px rgba(168, 28, 46, 0.4);
         }
 
         .sponsor-card .sponsor-card-logo {
             width: 240px;
             height: auto;
             max-width: 90vw;
-            filter: drop-shadow(0 0 40px rgba(232, 215, 195, 0.6));
+            filter: drop-shadow(0 0 30px rgba(168, 28, 46, 0.6))
+                    drop-shadow(0 0 40px rgba(232, 215, 195, 0.4));
             transform: scale(0.85);
             transition: all 0.5s ease;
         }
 
         .sponsor-card:hover .sponsor-card-logo {
-            filter: drop-shadow(0 0 60px rgba(232, 215, 195, 0.8));
+            filter: drop-shadow(0 0 50px rgba(168, 28, 46, 0.7))
+                    drop-shadow(0 0 60px rgba(232, 215, 195, 0.5));
             transform: scale(0.9);
         }
 
@@ -168,11 +172,12 @@
             gap: 5rem;
             flex-wrap: wrap;
             opacity: 0;
-            padding: 2rem;
-            background: rgba(168, 28, 46, 0.1);
-            backdrop-filter: blur(15px);
+            padding: 3rem 2rem;
+            background: rgba(168, 28, 46, 0.15);
+            backdrop-filter: blur(18px);
             border-radius: 20px;
-            border: 1px solid rgba(232, 215, 195, 0.2);
+            border: 1px solid rgba(232, 215, 195, 0.35);
+            box-shadow: 0 8px 32px rgba(168, 28, 46, 0.15);
         }
 
         .sponsor-logo {
@@ -181,7 +186,8 @@
             max-width: 40vw;
             opacity: 0;
             transform: scale(0.7) translateY(40px);
-            filter: drop-shadow(0 0 25px rgba(232, 215, 195, 0.5));
+            filter: drop-shadow(0 0 20px rgba(168, 28, 46, 0.5))
+                    drop-shadow(0 0 30px rgba(232, 215, 195, 0.4));
             transition: all 0.5s ease;
         }
 
@@ -191,7 +197,8 @@
         }
 
         .sponsor-logo:hover {
-            filter: drop-shadow(0 0 50px rgba(232, 215, 195, 0.8));
+            filter: drop-shadow(0 0 40px rgba(168, 28, 46, 0.7))
+                    drop-shadow(0 0 50px rgba(232, 215, 195, 0.6));
             transform: scale(1.05) translateY(-5px);
         }
 
@@ -236,12 +243,12 @@
         }
 
         .magic-circle.inner {
-            border-color: rgba(168, 28, 46, 0.8);
+            border-color: rgba(168, 28, 46, 0.9);
             animation: none;
         }
 
         .magic-circle.outer {
-            border-color: rgba(232, 215, 195, 0.5);
+            border-color: rgba(139, 105, 20, 0.7);
             animation: none;
         }
 
@@ -250,7 +257,7 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 1px solid rgba(168, 28, 46, 0.6);
+            border: 1px solid rgba(168, 28, 46, 0.7);
             opacity: 0;
         }
 
@@ -261,7 +268,7 @@
             background: #E8D7C3;
             border-radius: 50%;
             opacity: 0;
-            box-shadow: 0 0 10px #E8D7C3, 0 0 20px #A81C2E;
+            box-shadow: 0 0 10px #E8D7C3, 0 0 20px #A81C2E, 0 0 30px rgba(139, 105, 20, 0.6);
         }
 
         /* ===== PHASE 3: SHOW LOGO ===== */
@@ -294,9 +301,10 @@
             width: 350px;
             height: 350px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(168, 28, 46, 0.4) 0%, rgba(232, 215, 195, 0.2) 40%, transparent 70%);
+            background: radial-gradient(circle, rgba(168, 28, 46, 0.5) 0%, rgba(139, 105, 20, 0.3) 40%, transparent 70%);
             opacity: 0;
-            animation: glowPulse 2s ease-in-out infinite;
+            animation: glowPulse 2.5s ease-in-out infinite;
+            filter: blur(2px);
         }
 
         @keyframes glowPulse {
@@ -309,8 +317,9 @@
             height: auto;
             position: relative;
             z-index: 2;
-            filter: drop-shadow(0 20px 40px rgba(168, 28, 46, 0.6))
-                    drop-shadow(0 0 30px rgba(232, 215, 195, 0.4));
+            filter: drop-shadow(0 20px 40px rgba(168, 28, 46, 0.7))
+                    drop-shadow(0 0 30px rgba(139, 105, 20, 0.5))
+                    drop-shadow(0 10px 20px rgba(232, 215, 195, 0.3));
             opacity: 0;
             transform: rotateY(180deg) scale(0.5);
         }
@@ -318,13 +327,14 @@
         .show-title {
             font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
-            background: linear-gradient(135deg, #E8D7C3 0%, #F5DEB3 40%, #A81C2E 100%);
+            background: linear-gradient(135deg, #F5DEB3 0%, #E8D7C3 35%, #A81C2E 65%, #8B6914 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             opacity: 0;
             transform: translateY(20px);
             text-align: center;
+            filter: drop-shadow(0 2px 15px rgba(168, 28, 46, 0.3));
         }
 
         .show-subtitle {
@@ -343,7 +353,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, transparent 0%, #000 100%);
+            background: radial-gradient(circle at center, transparent 0%, #0F172A 100%);
             opacity: 0;
             z-index: 100;
             pointer-events: none;
@@ -355,7 +365,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
+            box-shadow: inset 0 0 150px rgba(15, 23, 42, 0.95);
             opacity: 0;
             z-index: 99;
             pointer-events: none;
