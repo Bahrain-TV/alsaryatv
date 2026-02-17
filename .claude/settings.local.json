@@ -1,7 +1,25 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan optimize:*)"
+      "Bash(php artisan optimize:*)",
+      "Bash(chmod:*)",
+      "Bash(./publish.sh:*)",
+      "Bash(bash -x ./publish.sh --dry-run)",
+      "Bash(bash ./publish.sh --dry-run)",
+      "Bash(bash -c 'source publish.sh --dry-run')",
+      "Bash(bash)",
+      "Bash(bash -c '\nAPP_DIR=$\\(cd \"\"$\\(dirname \"\"./publish.sh\"\"\\)\"\" && pwd\\)\necho \"\"App Dir: $APP_DIR\"\"\ncd \"\"$APP_DIR\"\"\nif [[ ! -f .env ]]; then\n    echo \"\"ERROR: .env not found\"\"\n    exit 1\nfi\necho \"\"✓ .env exists\"\"\nif [[ ! -d .git ]]; then\n    echo \"\"ERROR: Not a git repo\"\"\n    exit 1\nfi\necho \"\"✓ Git repo exists\"\"\nCURRENT_BRANCH=$\\(git rev-parse --abbrev-ref HEAD\\)\necho \"\"Current branch: $CURRENT_BRANCH\"\"\n')",
+      "Bash(bash -c 'source /Users/aldoyh/Sites/RAMADAN/alsaryatv/publish.sh --dry-run')",
+      "Bash(bash -x ./publish.sh:*)",
+      "Bash(bash -c '\nset -u\nsource .env 2>/dev/null || true\nPROD_SSH_USER=\"\"${PROD_SSH_USER:-$\\(grep \"\"^PROD_SSH_USER=\"\" .env 2>/dev/null | cut -d\"\"=\"\" -f2- | tr -d \"\"\\\\\"\"\"\" || echo \"\"alsar4210\"\"\\)}\"\"\necho \"\"PROD_SSH_USER=$PROD_SSH_USER\"\"\n')",
+      "Bash(bash -c '\nset -eo pipefail\nDRY_RUN=true\nset -u\n\nAPP_DIR=\"\"$\\(cd \"\"$\\(dirname \"\"/Users/aldoyh/Sites/RAMADAN/alsaryatv/publish.sh\"\"\\)\"\" && pwd\\)\"\"\ncd \"\"$APP_DIR\"\" || {\n    echo \"\"ERROR: Failed to change to app directory\"\"\n    exit 1\n}\n\ninfo\\(\\) { echo \"\"[INFO] $*\"\"; }\n\ninfo \"\"Loading env config...\"\"\nload_env_config\\(\\) {\n    local env_file=\"\".env\"\"\n    if [[ ! -f \"\"$env_file\"\" ]]; then\n        echo \"\"ERROR: .env file not found\"\"\n        exit 1\n    fi\n    PROD_SSH_USER=\"\"${PROD_SSH_USER:-$\\(grep \"\"^PROD_SSH_USER=\"\" \"\"$env_file\"\" 2>/dev/null | cut -d\"\"=\"\" -f2- | tr -d \"\"\\\\\"\"\"\" || echo \"\"alsar4210\"\"\\)}\"\"\n    echo \"\"PROD_SSH_USER=$PROD_SSH_USER\"\"\n}\n\nload_env_config\n\ninfo \"\"All done\"\"\n')",
+      "Bash(bash -c '\nset -u\nAPP_DIR=\"\".\"\"\ncd \"\"$APP_DIR\"\"\nPROD_SSH_USER=\"\"\"\"\nPROD_SSH_HOST=\"\"\"\"\n\nload_env_config\\(\\) {\n    local env_file=\"\".env\"\"\n    if [[ ! -f \"\"$env_file\"\" ]]; then\n        echo \"\"ERROR: .env not found\"\"\n        exit 1\n    fi\n    PROD_SSH_USER=\"\"${PROD_SSH_USER:-$\\(grep \"\"^PROD_SSH_USER=\"\" \"\"$env_file\"\" 2>/dev/null | cut -d\"\"=\"\" -f2- | tr -d \"\"\\\\\"\"\"\" || echo \"\"alsar4210\"\"\\)}\"\"\n    echo \"\"Got PROD_SSH_USER=$PROD_SSH_USER\"\"\n}\n\necho \"\"About to call load_env_config\"\"\nload_env_config\necho \"\"Done\"\"\n')",
+      "Bash(bash -c '\nset -u\nAPP_DIR=\"\".\"\"\ncd \"\"$APP_DIR\"\"\nPROD_SSH_USER=\"\"\"\"\n\nload_env_config\\(\\) {\n    local env_file=\"\".env\"\"\n    if test ! -f \"\"$env_file\"\"; then\n        echo \"\"ERROR: .env not found\"\"\n        exit 1\n    fi\n    echo \"\"File exists\"\"\n}\n\nload_env_config\n')",
+      "Bash(bash /Users/aldoyh/Sites/RAMADAN/alsaryatv/publish.sh --dry-run)",
+      "Bash(echo:*)",
+      "Bash(strace:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

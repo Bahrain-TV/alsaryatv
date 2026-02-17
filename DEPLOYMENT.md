@@ -8,8 +8,11 @@ This document explains how to deploy the AlSarya TV application to production fr
 # Deploy to production
 ./publish.sh
 
-# Fresh database deployment (drops all data and re-creates)
+# Fresh database deployment (drops all data and re-creates with seeding)
 ./publish.sh --fresh
+
+# Reset database (drops all data, re-creates, but NO seeding)
+./publish.sh --reset-db
 
 # Add seeding after migration
 ./publish.sh --seed
@@ -151,6 +154,18 @@ Continue with deployment? (y/n) y
 
 ⚠️ **WARNING**: This **permanently deletes** all caller data!
 
+### Reset Database (Without Seeding)
+```bash
+./publish.sh --reset-db
+```
+- Drops all database tables
+- Re-creates schema from migrations
+- **Does NOT** seed the database
+- Useful when you want a clean slate without auto-seeding
+- Caller data is backed up first
+
+⚠️ **WARNING**: This **permanently deletes** all caller data!
+
 ### With Seeding
 ```bash
 ./publish.sh --seed
@@ -175,6 +190,15 @@ Continue with deployment? (y/n) y
 - Reinstalls dependencies
 - Rebuilds all assets
 - Useful if something is broken
+
+### Database Operation Comparison
+
+| Flag | Action | Seeding | Use Case | Data Loss |
+|------|--------|---------|----------|-----------|
+| (none) | `php artisan migrate` | No | Normal deployment | No |
+| `--fresh` | `php artisan migrate:fresh --seed` | Yes | Complete reset with data | Yes |
+| `--reset-db` | `php artisan migrate:fresh` | No | Clean slate, manual setup | Yes |
+| `--seed` | `php artisan db:seed` | Yes | Add seeders to existing DB | No |
 
 ### Dry-Run (Validate Only)
 ```bash
@@ -488,13 +512,39 @@ ssh alsar4210@alsarya.tv "tail -50 /home/alsarya.tv/public_html/storage/logs/lar
 
 ## Summary
 
-| Task | Command |
-|------|---------|
-| Deploy | `./publish.sh` |
-| Fresh DB | `./publish.sh --fresh` |
-| With seeding | `./publish.sh --seed` |
-| Validate only | `./publish.sh --dry-run` |
-| Force rebuild | `./publish.sh --force` |
-| Help | `./publish.sh --help` |
+### Common Commands
+
+| Task | Command | Effect |
+|------|---------|--------|
+| Deploy | `./publish.sh` | Normal deployment, migrate only |
+| Fresh DB | `./publish.sh --fresh` | Drop all, recreate, seed |
+| Reset DB | `./publish.sh --reset-db` | Drop all, recreate, NO seed |
+| With seeding | `./publish.sh --seed` | Run seeders after migration |
+| Validate only | `./publish.sh --dry-run` | Check but don't execute |
+| Force rebuild | `./publish.sh --force` | Rebuild everything |
+| Help | `./publish.sh --help` | Show this help message |
+
+### Database Reset Options
+
+When you need to reset the production database:
+
+- **`--fresh`**: Use when you want a complete reset WITH initial data (seeders)
+  ```bash
+  ./publish.sh --fresh
+  # Drops all tables, runs migrations, seeds initial data
+  ```
+
+- **`--reset-db`**: Use when you want just the schema (structure only)
+  ```bash
+  ./publish.sh --reset-db
+  # Drops all tables, runs migrations, no seeding
+  # Useful for clean slate before manual data import
+  ```
+
+Both options:
+- ✓ Automatically back up data first
+- ✓ Export callers to CSV before reset
+- ✓ Log the operation
+- ⚠️ **Permanently delete** all caller data
 
 The deployment system is designed to be **safe, fast, and reliable**. When in doubt, use `--dry-run` to validate before executing.

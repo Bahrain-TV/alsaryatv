@@ -11,6 +11,7 @@
 #   ./deploy.sh --seed       # Run seeders after migration
 #   ./deploy.sh --no-build   # Skip npm build step
 #   ./deploy.sh --force      # Force all steps even if no changes
+#   ./deploy.sh --reset-db   # Reset database (migrate:fresh without seeding)
 #   ./deploy.sh --up         # Force deploy even if maintenance mode is active
 #   ./deploy.sh --dry-run    # Print steps without executing
 ###############################################################################
@@ -54,6 +55,7 @@ SEED=false
 NO_BUILD=false
 FORCE=false
 DRY_RUN=false
+RESET_DB=false
 IGNORE_MAINTENANCE=false
 WEBHOOK_TRIGGER="${WEBHOOK_TRIGGER:-false}"
 TIMEOUT_PID=""
@@ -71,13 +73,14 @@ set -u
 # ── Parse flags ──────────────────────────────────────────────────────────────
 for arg in "$@"; do
     case "$arg" in
-        --fresh)    FRESH=true; SEED=true ;;
-        --seed)     SEED=true ;;
-        --no-build) NO_BUILD=true ;;
-        --force)    FORCE=true ;;
-        --dry-run)  DRY_RUN=true ;;
-        --up)       IGNORE_MAINTENANCE=true ;;
-        *)          warn "Unknown flag: $arg" ;;
+        --fresh)     FRESH=true; SEED=true ;;
+        --seed)      SEED=true ;;
+        --no-build)  NO_BUILD=true ;;
+        --force)     FORCE=true ;;
+        --dry-run)   DRY_RUN=true ;;
+        --reset-db)  RESET_DB=true ;;
+        --up)        IGNORE_MAINTENANCE=true ;;
+        *)           warn "Unknown flag: $arg" ;;
     esac
 done
 
@@ -318,6 +321,63 @@ if [[ "$WEBHOOK_TRIGGER" == "true" ]]; then
     info "Deployment triggered by GitHub webhook"
 fi
 
+# ── Step 0.5: Backup database before deployment ──────────────────────────────
+info "Creating database backup before deployment..."
+BACKUP_DIR="storage/backups"
+mkdir -p "$BACKUP_DIR"
+
+BACKUP_TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
+BACKUP_FILE="$BACKUP_DIR/backup_${BACKUP_TIMESTAMP}.sql"
+
+if [[ "$DB_CONNECTION" == "sqlite" ]]; then
+    # SQLite backup (just copy the database file)
+    if [[ -f "$DB_DATABASE" ]]; then
+        run cp "$DB_DATABASE" "${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
+        success "SQLite database backup created: ${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
+    fi
+elif [[ "$DB_CONNECTION" == "mysql" ]]; then
+    # MySQL dump
+    run mysqldump --single-transaction --quick --lock-tables=false \
+        -h"${DB_HOST:-localhost}" \
+        -u"${DB_USERNAME:-root}" \
+        -p"${DB_PASSWORD:-}" \
+        "${DB_DATABASE}" > "$BACKUP_FILE"
+    success "MySQL database backup created: $BACKUP_FILE"
+
+    # Also backup callers to CSV
+    info "Exporting callers data to CSV..."
+    php artisan tinker << 'TINKER'
+use App\Models\Caller;
+$callers = Caller::all();
+$file = fopen("storage/backups/callers_backup_${BACKUP_TIMESTAMP}.csv", 'w');
+if ($file) {
+    fputcsv($file, ['ID', 'CPR', 'Phone', 'Name', 'Hits', 'Status', 'Is Winner', 'IP Address', 'Created At', 'Updated At']);
+    foreach ($callers as $caller) {
+        fputcsv($file, [
+            $caller->id,
+            $caller->cpr,
+            $caller->phone,
+            $caller->name,
+            $caller->hits,
+            $caller->status,
+            $caller->is_winner ? 'Yes' : 'No',
+            $caller->ip_address,
+            $caller->created_at,
+            $caller->updated_at
+        ]);
+    }
+    fclose($file);
+    echo "Callers data exported to CSV\n";
+}
+TINKER
+    success "Callers CSV backup created"
+else
+    # Generic database export via artisan
+    run php artisan db:show || warn "Could not verify database connection"
+fi
+
+info "Backups stored in: $BACKUP_DIR"
+
 # ── Step 1: Maintenance mode ─────────────────────────────────────────────────
 if [[ -f "storage/framework/down" ]]; then
     if [[ -n "${PUBLISH_VERSION:-}" ]] || [[ "$IGNORE_MAINTENANCE" == "true" ]]; then
@@ -443,13 +503,17 @@ else
 fi
 
 # ── Step 5: Database migrations ─────────────────────────────────────────────
-if [[ "$MIGRATIONS_CHANGED" == "true" || "$FRESH" == "true" ]]; then
+if [[ "$MIGRATIONS_CHANGED" == "true" || "$FRESH" == "true" || "$RESET_DB" == "true" ]]; then
     info "Running database migrations..."
 
     if [[ "$FRESH" == "true" ]]; then
-        warn "Running migrate:fresh — this will DROP all tables!"
+        warn "Running migrate:fresh with seeding — this will DROP all tables!"
         run php artisan migrate:fresh --force --seed
         success "Fresh migration completed with seeding."
+    elif [[ "$RESET_DB" == "true" ]]; then
+        warn "Running migrate:fresh — this will DROP all tables and reset database structure!"
+        run php artisan migrate:fresh --force
+        success "Database reset completed (structure only, no seeding)."
     else
         run php artisan migrate --force
         success "Migrations applied."
@@ -459,7 +523,7 @@ else
 fi
 
 # Always check seeding if requested
-if [[ "$SEED" == "true" && "$FRESH" == "false" ]]; then
+if [[ "$SEED" == "true" && "$FRESH" == "false" && "$RESET_DB" == "false" ]]; then
     info "Running database seeders..."
     info "  → UserSeeder: Creates/updates admin users"
     info "  → CallerSeeder: Imports from CSV (only if table is empty)"
@@ -563,6 +627,51 @@ if [[ -n "${PUBLISH_VERSION:-}" ]] || [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH
     info "Detected remote execution (called from local machine)"
 fi
 
+# ── Step 12b: Log hits counter data to daily CSV ─────────────────────────────
+if [[ "$DRY_RUN" == "false" ]]; then
+    info "Logging hit counters to daily CSV..."
+
+    LOG_DIR="storage/logs/hits"
+    mkdir -p "$LOG_DIR"
+
+    TODAY=$(date '+%Y-%m-%d')
+    DAILY_LOG="$LOG_DIR/hits_${TODAY}.csv"
+
+    # Create header if file doesn't exist
+    if [[ ! -f "$DAILY_LOG" ]]; then
+        echo "timestamp,caller_id,cpr,name,phone,hits,status,ip_address" > "$DAILY_LOG"
+    fi
+
+    # Export all callers with their hit counts
+    php artisan tinker << TINKER 2>/dev/null || true
+use App\Models\Caller;
+use Carbon\Carbon;
+\$callers = Caller::all();
+\$logFile = "$DAILY_LOG";
+\$handle = fopen(\$logFile, 'a');
+if (\$handle) {
+    \$timestamp = Carbon::now()->toDateTimeString();
+    foreach (\$callers as \$caller) {
+        \$line = "\$timestamp," . implode(',', [
+            \$caller->id,
+            \$caller->cpr,
+            \$caller->name,
+            \$caller->phone,
+            \$caller->hits,
+            \$caller->status,
+            \$caller->ip_address
+        ]);
+        fputcsv(\$handle, explode(',', \$line));
+    }
+    fclose(\$handle);
+}
+TINKER
+
+    success "Hit counters logged to: $DAILY_LOG"
+    info "Daily logs stored in: $LOG_DIR"
+    info "Format: CSV with columns [timestamp, caller_id, cpr, name, phone, hits, status, ip_address]"
+fi
+
 # ── Step 13: Disable maintenance mode ────────────────────────────────────────
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Disabling maintenance mode..."
@@ -590,6 +699,7 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 
 [[ "$SEED" == "true" ]] && info "Seeders executed: UserSeeder, CallerSeeder"
-[[ "$FRESH" == "true" ]] && warn "Database was freshly rebuilt (all previous data dropped)."
+[[ "$FRESH" == "true" ]] && warn "Database was freshly rebuilt with seeding (all previous data dropped)."
+[[ "$RESET_DB" == "true" ]] && warn "Database was reset (all tables dropped and recreated - no seeding applied)."
 echo ""
 success "Deploy finished at $(date '+%Y-%m-%d %H:%M:%S')"
