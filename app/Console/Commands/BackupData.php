@@ -4,8 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Caller;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 
 class BackupData extends Command
 {
@@ -41,10 +39,10 @@ class BackupData extends Command
         $logsDir = storage_path('logs/hits');
 
         // Ensure directories exist
-        if (!is_dir($backupDir)) {
+        if (! is_dir($backupDir)) {
             mkdir($backupDir, 0755, true);
         }
-        if (!is_dir($logsDir)) {
+        if (! is_dir($logsDir)) {
             mkdir($logsDir, 0755, true);
         }
 
@@ -89,8 +87,9 @@ class BackupData extends Command
 
         // Create CSV file
         $handle = fopen($filepath, 'w');
-        if (!$handle) {
+        if (! $handle) {
             $this->error("Failed to create backup file: {$filepath}");
+
             return;
         }
 
@@ -105,7 +104,7 @@ class BackupData extends Command
             'Is Winner',
             'IP Address',
             'Created At',
-            'Updated At'
+            'Updated At',
         ]);
 
         // Write caller data
@@ -120,7 +119,7 @@ class BackupData extends Command
                 $caller->is_winner ? 'Yes' : 'No',
                 $caller->ip_address,
                 $caller->created_at,
-                $caller->updated_at
+                $caller->updated_at,
             ]);
         }
 
@@ -142,7 +141,7 @@ class BackupData extends Command
         $filepath = "{$logsDir}/{$filename}";
 
         // Create header if new file
-        if (!file_exists($filepath)) {
+        if (! file_exists($filepath)) {
             $handle = fopen($filepath, 'w');
             fputcsv($handle, [
                 'timestamp',
@@ -152,7 +151,7 @@ class BackupData extends Command
                 'phone',
                 'hits',
                 'status',
-                'ip_address'
+                'ip_address',
             ]);
             fclose($handle);
         }
@@ -161,8 +160,9 @@ class BackupData extends Command
         $callers = Caller::all();
         $handle = fopen($filepath, 'a');
 
-        if (!$handle) {
+        if (! $handle) {
             $this->error("Failed to write to log file: {$filepath}");
+
             return;
         }
 
@@ -176,7 +176,7 @@ class BackupData extends Command
                 $caller->phone,
                 $caller->hits,
                 $caller->status,
-                $caller->ip_address
+                $caller->ip_address,
             ]);
         }
 
@@ -193,7 +193,7 @@ class BackupData extends Command
     {
         $this->info("Cleaning up files older than {$days} days...");
 
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             return;
         }
 

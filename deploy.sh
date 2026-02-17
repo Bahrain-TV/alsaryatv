@@ -17,11 +17,78 @@
 ###############################################################################
 
 # Configuration
+# APP_USER is the OS user that owns the files and should run artisan commands
 APP_USER="alsar4210"
+
+# PROD_SSH_USER is the user we use to connect (keep as root if SSH requires it)
+# We will "su" or "sudo" to APP_USER when running commands on the server
 SUDO_PREFIX="sudo -u $APP_USER"
 
 # Start with basic error handling, we'll enable -u later after variable init
 set -eo pipefail
+
+# ── Local Execution Wrapper ──────────────────────────────────────────────────
+# Detect if running locally (e.g. macOS/Darwin) and proxy to remote
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    echo "----------------------------------------------------------------"
+    echo "  Detected Local Execution (macOS)"
+    echo "  Proxying to Remote Deployment..."
+    echo "----------------------------------------------------------------"
+
+    # Load .env for config
+    if [[ -f .env ]]; then
+        # Safer sourcing of .env (handles quoted values with spaces)
+        set -a
+        [ -f .env ] && . .env
+        set +a
+    fi
+
+    # Set defaults if not in .env
+    PROD_SSH_USER="${PROD_SSH_USER:-root}"
+    PROD_SSH_HOST="${PROD_SSH_HOST:-alsarya.tv}"
+    PROD_SSH_PORT="${PROD_SSH_PORT:-22}"
+    PROD_APP_DIR="${PROD_APP_DIR:-/home/alsarya.tv/public_html}"
+    SSH_KEY_PATH="${SSH_KEY_PATH:-${HOME}/.ssh/id_rsa}"
+
+    # 1. Image Sync (Rsync)
+    echo "» Syncing Assets (Images & Storage)..."
+    RSYNC_SSH="ssh -p $PROD_SSH_PORT -i $SSH_KEY_PATH -o StrictHostKeyChecking=accept-new"
+
+    # Sync public/images
+    if [[ -d "public/images" ]]; then
+        rsync -avz --no-o --no-g -e "$RSYNC_SSH" "public/images/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/public/images/" || echo "Warning: Image sync failed"
+    fi
+
+    # Sync storage/app/public
+    if [[ -d "storage/app/public" ]]; then
+        rsync -avz --no-o --no-g -e "$RSYNC_SSH" "storage/app/public/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/storage/app/public/" || echo "Warning: Storage sync failed"
+    fi
+    echo "✓ Assets Synced."
+
+    # Fix permissions after sync (since we uploaded as root)
+    if [[ "$PROD_SSH_USER" == "root" ]]; then
+        echo "» Fixing ownership on remote server (switching to $APP_USER)..."
+        FIX_PERM_CMD="chown -R $APP_USER:$APP_USER $PROD_APP_DIR/public/images $PROD_APP_DIR/storage/app/public"
+        ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$FIX_PERM_CMD" || echo "Warning: Could not fix permissions"
+    fi
+
+    # 2. Trigger Remote Deployment
+    echo "» Triggering Remote Deployment..."
+    REMOTE_CMD="cd '$PROD_APP_DIR' && ./deploy.sh $@"
+    
+    ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$REMOTE_CMD"
+    EXIT_CODE=$?
+
+    if [ $EXIT_CODE -eq 0 ]; then
+        echo "✓ Remote Deployment Successful."
+    else
+        echo "✗ Remote Deployment Failed (Exit Code: $EXIT_CODE)."
+    fi
+
+    exit $EXIT_CODE
+fi
+
+# ── Remote / Server Execution Logic Starts Here ──────────────────────────────
 
 # ── Colours ──────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -37,16 +104,33 @@ warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
 error()   { echo -e "${RED}[ERROR]${NC} $*"; }
 
 run() {
-    if [[ "${DRY_RUN:-false}" == "true" ]]; then
-        echo -e "${YELLOW}[DRY-RUN]${NC} $*"
-        return 0
-    else
-        "$@" || {
-            local exit_code=$?
-            error "Command failed with exit code $exit_code: $*"
-            return "$exit_code"
-        }
+    local cmd_str="$*"
+
+    # Check if we are physically running as root (ID 0)
+    if [[ "$(id -u)" == "0" ]]; then
+        # Commands that touch application files/db should be run as APP_USER
+        # We check if the command is NOT already prefixed with sudo
+        if [[ ! "$cmd_str" =~ ^sudo ]]; then
+            if [[ "$cmd_str" == *"php"* ]] || [[ "$cmd_str" == *"composer"* ]] || [[ "$cmd_str" == *"npm"* ]] || [[ "$cmd_str" == *"pnpm"* ]]; then
+                # Wrap in sudo -u APP_USER
+                # We use 'bash -c' to handle complex commands (pipes, redirects) if any, though risky.
+                # simpler: just prefix.
+                cmd_str="sudo -u $APP_USER $cmd_str"
+            fi
+        fi
     fi
+
+    if [[ "${DRY_RUN:-false}" == "true" ]]; then
+        echo -e "${YELLOW}[DRY-RUN]${NC} $cmd_str"
+        return 0
+    fi
+
+    # Execute
+    eval "$cmd_str" || {
+        local exit_code=$?
+        error "Command failed with exit code $exit_code: $cmd_str"
+        return "$exit_code"
+    }
 }
 
 # ── Initialize critical variables BEFORE enabling -u ──────────────────────────
@@ -66,6 +150,13 @@ NOTIFY_ENABLED="true"
 DISCORD_WEBHOOK=""
 NTFY_URL=""
 NOTIFY_DISCORD=""
+
+# Load .env variables if file exists (so DB_CONNECTION etc are available)
+if [[ -f .env ]]; then
+    set -a
+    source .env
+    set +a
+fi
 
 # NOW enable strict mode for undefined variables
 set -u
@@ -329,13 +420,13 @@ mkdir -p "$BACKUP_DIR"
 BACKUP_TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 BACKUP_FILE="$BACKUP_DIR/backup_${BACKUP_TIMESTAMP}.sql"
 
-if [[ "$DB_CONNECTION" == "sqlite" ]]; then
+if [[ "${DB_CONNECTION:-}" == "sqlite" ]]; then
     # SQLite backup (just copy the database file)
     if [[ -f "$DB_DATABASE" ]]; then
         run cp "$DB_DATABASE" "${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
         success "SQLite database backup created: ${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
     fi
-elif [[ "$DB_CONNECTION" == "mysql" ]]; then
+elif [[ "${DB_CONNECTION:-}" == "mysql" ]]; then
     # MySQL dump
     run mysqldump --single-transaction --quick --lock-tables=false \
         -h"${DB_HOST:-localhost}" \
@@ -580,6 +671,14 @@ fi
 info "Restarting queue workers..."
 run php artisan queue:restart || true
 success "Queue restart signal sent."
+
+# ── Step 11b: Final Ownership Fix (Crucial for root deployment) ──────
+if [[ "$(id -u)" == "0" ]]; then
+   info "Ensuring $APP_USER owns all files in $APP_DIR..."
+   chown -R "$APP_USER:$APP_USER" "$APP_DIR"
+   chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+   success "Ownership fixed."
+fi
 
 info "Skipping recursive ownership change (prevents HTTP 403 errors)"
 

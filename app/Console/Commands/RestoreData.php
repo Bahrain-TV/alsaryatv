@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Caller;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class RestoreData extends Command
 {
@@ -35,8 +34,9 @@ class RestoreData extends Command
         $this->line('');
 
         // List available backups if no file specified
-        if (!$this->option('file')) {
+        if (! $this->option('file')) {
             $this->listAvailableBackups();
+
             return;
         }
 
@@ -44,13 +44,14 @@ class RestoreData extends Command
         $confirm = $this->option('confirm');
 
         // Verify file exists
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             $this->error("File not found: {$file}");
+
             return;
         }
 
         $this->info("Restore file: {$file}");
-        $this->info("File size: " . human_filesize(filesize($file)));
+        $this->info('File size: '.human_filesize(filesize($file)));
 
         // Count records in CSV
         $records = count(file($file)) - 1; // Subtract header
@@ -58,20 +59,22 @@ class RestoreData extends Command
         $this->line('');
 
         // Confirm operation
-        if (!$confirm) {
+        if (! $confirm) {
             $this->warn('This will:');
             $this->line('  1. Truncate the callers table');
             $this->line('  2. Import all data from CSV');
             $this->line('  3. Update hit counters and statuses');
             $this->line('');
 
-            if (!$this->confirm('Do you want to proceed with the restore?', false)) {
+            if (! $this->confirm('Do you want to proceed with the restore?', false)) {
                 $this->info('Restore cancelled.');
+
                 return;
             }
 
-            if (!$this->confirm('Are you absolutely sure? This cannot be undone!', false)) {
+            if (! $this->confirm('Are you absolutely sure? This cannot be undone!', false)) {
                 $this->error('Restore cancelled by user.');
+
                 return;
             }
         }
@@ -86,14 +89,16 @@ class RestoreData extends Command
     {
         $backupDir = storage_path('backups');
 
-        if (!is_dir($backupDir)) {
+        if (! is_dir($backupDir)) {
             $this->error("Backup directory not found: {$backupDir}");
+
             return;
         }
 
         $files = glob("{$backupDir}/callers_backup_*.csv");
         if (empty($files)) {
-            $this->error('No backup files found in: ' . $backupDir);
+            $this->error('No backup files found in: '.$backupDir);
+
             return;
         }
 
@@ -142,16 +147,18 @@ class RestoreData extends Command
         try {
             // Open CSV file
             $handle = fopen($filepath, 'r');
-            if (!$handle) {
+            if (! $handle) {
                 $this->error("Cannot open file: {$filepath}");
+
                 return;
             }
 
             // Read header
             $header = fgetcsv($handle);
-            if (!$header) {
+            if (! $header) {
                 $this->error('Invalid CSV format: no header row');
                 fclose($handle);
+
                 return;
             }
 
@@ -192,7 +199,7 @@ class RestoreData extends Command
                     $bar->advance();
                 } catch (\Exception $e) {
                     $errors++;
-                    $this->error("Row {$imported}: " . $e->getMessage());
+                    $this->error("Row {$imported}: ".$e->getMessage());
                 }
             }
 
@@ -226,7 +233,7 @@ class RestoreData extends Command
 
             $this->line('');
         } catch (\Exception $e) {
-            $this->error('Restore failed: ' . $e->getMessage());
+            $this->error('Restore failed: '.$e->getMessage());
         }
     }
 }
@@ -234,7 +241,7 @@ class RestoreData extends Command
 /**
  * Convert bytes to human-readable format
  */
-if (!function_exists('human_filesize')) {
+if (! function_exists('human_filesize')) {
     function human_filesize($bytes)
     {
         $units = ['B', 'KB', 'MB', 'GB'];
@@ -243,6 +250,6 @@ if (!function_exists('human_filesize')) {
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 }
