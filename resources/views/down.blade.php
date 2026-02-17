@@ -112,11 +112,107 @@
             flex-shrink: 0;
             width: clamp(100px, 15vw, 140px);
             height: clamp(100px, 15vw, 140px);
+            perspective: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .lottie-wrapper lottie-player {
             width: 100%;
             height: 100%;
+        }
+
+        /* Logo 3D Rotation Container */
+        .logo-3d-container {
+            width: 100%;
+            height: 100%;
+            perspective: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo-3d-rotating {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate3D 8s linear infinite;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .logo-3d-rotating img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 30px rgba(255, 183, 3, 0.3));
+        }
+
+        /* Smooth 3D Rotation Animation */
+        @keyframes rotate3D {
+            0% {
+                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+            }
+            25% {
+                transform: rotateX(20deg) rotateY(90deg) rotateZ(0deg);
+            }
+            50% {
+                transform: rotateX(0deg) rotateY(180deg) rotateZ(20deg);
+            }
+            75% {
+                transform: rotateX(-20deg) rotateY(270deg) rotateZ(0deg);
+            }
+            100% {
+                transform: rotateX(0deg) rotateY(360deg) rotateZ(0deg);
+            }
+        }
+
+        /* Slow rotation variant for more subtle effect */
+        @keyframes rotate3D-slow {
+            0% {
+                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+            }
+            20% {
+                transform: rotateX(10deg) rotateY(72deg) rotateZ(0deg);
+            }
+            40% {
+                transform: rotateX(0deg) rotateY(144deg) rotateZ(10deg);
+            }
+            60% {
+                transform: rotateX(-10deg) rotateY(216deg) rotateZ(0deg);
+            }
+            80% {
+                transform: rotateX(0deg) rotateY(288deg) rotateZ(-10deg);
+            }
+            100% {
+                transform: rotateX(0deg) rotateY(360deg) rotateZ(0deg);
+            }
+        }
+
+        /* Glow effect around logo */
+        .logo-glow {
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255, 183, 3, 0.15), transparent 70%);
+            animation: pulseGlow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
         }
 
         .down-text {
@@ -278,6 +374,7 @@
 
             .down-brand {
                 flex: 1 1 100%;
+                justify-content: center;
             }
 
             .countdown-card {
@@ -286,6 +383,40 @@
 
             .fun-message {
                 grid-column: 1 / -1;
+            }
+
+            /* Slower rotation on mobile for better performance */
+            .logo-3d-rotating {
+                animation: rotate3D-slow 10s linear infinite;
+            }
+
+            /* Reduce glow intensity on mobile */
+            .logo-glow {
+                opacity: 0.4;
+            }
+        }
+
+        /* Medium screens optimization */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .lottie-wrapper {
+                width: clamp(90px, 12vw, 130px);
+                height: clamp(90px, 12vw, 130px);
+            }
+
+            /* Moderate rotation speed for tablets */
+            .logo-3d-rotating {
+                animation: rotate3D-slow 9s linear infinite;
+            }
+        }
+
+        /* Large screens - fast rotation */
+        @media (min-width: 1025px) {
+            .logo-3d-rotating {
+                animation: rotate3D 8s linear infinite;
+            }
+
+            .logo-glow {
+                opacity: 0.7;
             }
         }
 
@@ -318,14 +449,23 @@
             <div class="down-head">
                 <div class="down-brand">
                     <div class="lottie-wrapper">
-                        <lottie-player
-                            src="{{ asset('lottie/crecent-moon-ramadan.json') }}"
-                            background="transparent"
-                            speed="0.1"
-                            loop
-                            autoplay
-                            aria-hidden="true">
-                        </lottie-player>
+                        <!-- 3D Rotating Logo -->
+                        <div class="logo-3d-container">
+                            <div class="logo-glow"></div>
+                            <div class="logo-3d-rotating">
+                                @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
+                                    <img
+                                        src="{{ asset('images/alsarya-logo-2026-1.png') }}"
+                                        alt="برنامج السارية"
+                                        loading="lazy">
+                                @else
+                                    <img
+                                        src="{{ asset('images/alsarya-logo-2026-tiny.png') }}"
+                                        alt="برنامج السارية"
+                                        loading="lazy">
+                                @endif
+                            </div>
+                        </div>
                     </div>
                     <div class="down-text">
                         <div class="status-pill">صيانة مجدولة</div>

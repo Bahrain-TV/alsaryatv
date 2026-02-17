@@ -363,11 +363,17 @@ DIAG_SCRIPT
     # 4. Handover to Remote Server
     local_info "Handing over to production server..."
     echo ""
-    
-    # Interactive execution to preserve colors and see real-time output
-    REMOTE_CMD="cd '$PROD_APP_DIR' && ./deploy.sh $@"
-    ssh -t -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$REMOTE_CMD"
-    
+
+    # Non-interactive execution (avoid TTY deadlock when piped)
+    # Use shell redirection to prevent stdin from being consumed
+    REMOTE_CMD="cd '$PROD_APP_DIR' && bash ./deploy.sh"
+    for arg in "$@"; do
+        REMOTE_CMD="$REMOTE_CMD $(printf '%q' "$arg")"
+    done
+
+    # Execute without -t flag to avoid TTY conflicts when piped via stdin
+    ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$REMOTE_CMD" < /dev/null
+
     EXIT_CODE=$?
     echo ""
     if [ $EXIT_CODE -eq 0 ]; then
@@ -620,6 +626,21 @@ fi
 # Ensure storage/framework directory exists
 mkdir -p storage/framework
 
+# ── Recovery from stuck deployment ───────────────────────────────────────────
+# If a deployment got interrupted, the site might be stuck in maintenance mode
+# This section attempts to recover gracefully
+if [[ -f "storage/framework/down" ]]; then
+    MAINT_AGE=$(($(date +%s) - $(stat -f%m "storage/framework/down" 2>/dev/null || stat -c%Y "storage/framework/down" 2>/dev/null || echo 0)))
+    if [[ $MAINT_AGE -gt 3600 ]]; then
+        # Maintenance mode file is older than 1 hour - likely from a stuck deployment
+        warn "Detected maintenance mode lock older than 1 hour (likely from stuck deployment)."
+        warn "Attempting recovery: removing stale down state and bringing site online..."
+        rm -f "storage/framework/down"
+        php artisan up 2>/dev/null || warn "Could not bring site up immediately"
+        sleep 2
+    fi
+fi
+
 # ── Lock mechanism ───────────────────────────────────────────────────────────
 if [[ -f "$LOCK_FILE" ]]; then
     LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
@@ -674,12 +695,20 @@ cleanup_and_exit() {
         else
              info "Ensuring site is LIVE (--up flag active)..."
         fi
-        
-        if run php artisan up 2>/dev/null; then
-            success "Site restored to live."
-        else
-            error "WARNING: Could not restore site! Manual intervention may be needed."
-        fi
+
+        # Attempt to bring site up with retries
+        for attempt in 1 2 3; do
+            if php artisan up 2>/dev/null; then
+                success "Site restored to live."
+                break
+            elif [[ $attempt -lt 3 ]]; then
+                warn "Attempt $attempt failed, retrying..."
+                sleep 2
+            else
+                error "CRITICAL: Could not restore site after 3 attempts! Manual intervention required."
+                error "Run: php artisan up"
+            fi
+        done
     fi
 
     # Send notification
@@ -690,16 +719,19 @@ cleanup_and_exit() {
 trap cleanup_and_exit EXIT
 
 # ── Timeout mechanism ────────────────────────────────────────────────────────
-TIMEOUT=600  # 10 minutes max runtime
-(
-    sleep "$TIMEOUT"
-    if kill -0 $$ 2>/dev/null; then
-        # We need to write to the original stderr if possible, or just kill
-        # Since we redirected output, we can't easily echo to user unless we kept a descriptor
-        kill -9 $$ 2>/dev/null || true
-    fi
-) > /dev/null 2>&1 &
-TIMEOUT_PID=$!
+# DISABLED: Timeout was causing premature kills during long operations,
+# leaving the site in maintenance mode. Deployments should complete naturally.
+# If needed, configure timeouts at the CI/CD platform level instead.
+TIMEOUT_PID=""
+# To re-enable, use a longer duration (e.g., 1800 seconds = 30 min):
+# TIMEOUT=1800
+# (
+#     sleep "$TIMEOUT"
+#     if kill -0 $$ 2>/dev/null; then
+#         kill -TERM $$ 2>/dev/null || true  # Use SIGTERM, not SIGKILL
+#     fi
+# ) > /dev/null 2>&1 &
+# TIMEOUT_PID=$!
 
 # ── Load notification settings ───────────────────────────────────────────────
 DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || echo "")
@@ -781,8 +813,10 @@ fi
 
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Enabling maintenance mode..."
-    run php artisan down --retry=60 --render="down" || true
+    # Put site down with a longer retry and secret passphrase for testing
+    run php artisan down --retry=120 --render="down" --secret="deploy-$(date +%s)" || true
     MAINTENANCE_WAS_ENABLED=true
+    sleep 2  # Give nginx/php time to recognize the down state
 else
     NOTIFY_ENABLED="false"
     info "Skipping maintenance mode (handled by publish.sh)."
