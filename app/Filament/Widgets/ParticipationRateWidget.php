@@ -14,7 +14,12 @@ class ParticipationRateWidget extends BaseWidget
 
     protected ?string $heading = '🎯 مؤشرات المشاركة والنمو';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = [
+        'default' => 1,
+        'sm' => 1,
+        'md' => 2,
+        'lg' => 2,
+    ];
 
     protected function getStats(): array
     {

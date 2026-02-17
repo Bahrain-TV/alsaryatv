@@ -1,11 +1,12 @@
 <x-filament-widgets::widget>
-    <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-8 text-white shadow-lg">
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold mb-1">⚡ الإجراءات السريعة</h2>
-            <p class="text-indigo-100">الوصول السريع للعمليات الشائعة</p>
+    <div class="quick-actions-panel bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl p-4 md:p-8 text-white shadow-lg">
+        <div class="mb-4 md:mb-6">
+            <h2 class="text-lg md:text-2xl font-bold mb-1">⚡ الإجراءات السريعة</h2>
+            <p class="text-indigo-100 text-xs md:text-base hidden sm:block">الوصول السريع للعمليات الشائعة</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {{-- Mobile: horizontal scroll strip, Desktop: grid --}}
+        <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             @foreach($this->getQuickActions() as $action)
                 <a href="{{ $action['url'] }}"
                    class="group bg-white bg-opacity-10 hover:bg-opacity-20 backdrop-blur-md rounded-lg p-6 transition-all transform hover:scale-105 hover:shadow-xl">
@@ -19,8 +20,24 @@
             @endforeach
         </div>
 
-        <div class="mt-6 pt-6 border-t border-white border-opacity-20">
+        {{-- Mobile: compact horizontal list --}}
+        <div class="flex md:hidden gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory scrollbar-hide">
+            @foreach($this->getQuickActions() as $action)
+                <a href="{{ $action['url'] }}"
+                   class="snap-start flex-shrink-0 w-28 bg-white bg-opacity-10 backdrop-blur-md rounded-lg p-3 text-center transition-all active:scale-95">
+                    <div class="text-2xl mb-1">{{ $action['icon'] }}</div>
+                    <h3 class="font-semibold text-xs leading-tight">{{ $action['title'] }}</h3>
+                </a>
+            @endforeach
+        </div>
+
+        <div class="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-white border-opacity-20 hidden sm:block">
             <p class="text-sm text-indigo-100">💡 نصيحة: استخدم البحث السريع (⌘+K) للوصول لأي صفحة</p>
         </div>
     </div>
+
+    <style>
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </x-filament-widgets::widget>

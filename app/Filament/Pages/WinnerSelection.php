@@ -21,7 +21,7 @@ class WinnerSelection extends Page
     protected static ?int $navigationSort = 98;
 
     /**
-     * Get eligible callers for winner selection
+     * Get eligible callers for winner selection (not selected, not winner)
      */
     public function getEligibleCallers(): array
     {
@@ -39,7 +39,7 @@ class WinnerSelection extends Page
     }
 
     /**
-     * Get total eligible callers count
+     * Get total eligible callers count (excludes selected & winners)
      */
     public function getEligibleCallersCount(): int
     {
@@ -55,6 +55,14 @@ class WinnerSelection extends Page
     }
 
     /**
+     * Get current selected (but not yet confirmed as winners) count
+     */
+    public function getSelectedCount(): int
+    {
+        return Caller::where('is_selected', true)->where('is_winner', false)->count();
+    }
+
+    /**
      * Get total callers count
      */
     public function getTotalCallersCount(): int
@@ -63,18 +71,18 @@ class WinnerSelection extends Page
     }
 
     /**
-     * Select random winner and mark as winner
+     * Select random caller and mark as selected (NOT winner — that's manual).
      */
     public function selectWinner(): void
     {
-        $winner = Caller::selectRandomWinnerByCpr();
+        $selected = Caller::selectRandomWinnerByCpr();
 
-        if (! $winner) {
-            session()->flash('error', 'لا يوجد متصلين مؤهلين للفوز.');
+        if (! $selected) {
+            session()->flash('error', 'لا يوجد متصلين مؤهلين للاختيار.');
 
             return;
         }
 
-        session()->flash('success', 'تم اختيار الفائز: '.$winner->name.' (CPR: '.$winner->cpr.')');
+        session()->flash('success', 'تم اختيار: '.$selected->name.' (CPR: '.$selected->cpr.') — يمكنك تأكيده كفائز من صفحة المتصلين.');
     }
 }

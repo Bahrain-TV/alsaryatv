@@ -131,11 +131,6 @@
             justify-content: center;
             gap: 3rem;
             padding: 3rem;
-            background: rgba(168, 28, 46, 0.2);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            border: 1px solid rgba(232, 215, 195, 0.4);
-            box-shadow: 0 8px 32px rgba(168, 28, 46, 0.2);
         }
 
         .sponsor-card .sponsor-card-title {
@@ -173,11 +168,6 @@
             flex-wrap: wrap;
             opacity: 0;
             padding: 3rem 2rem;
-            background: rgba(168, 28, 46, 0.15);
-            backdrop-filter: blur(18px);
-            border-radius: 20px;
-            border: 1px solid rgba(232, 215, 195, 0.35);
-            box-shadow: 0 8px 32px rgba(168, 28, 46, 0.15);
         }
 
         .sponsor-logo {
@@ -346,23 +336,29 @@
             text-align: center;
         }
 
-        /* ===== BASMALA (ALWAYS AT TOP - ALWAYS VISIBLE) ===== */
+        /* ===== BASMALA (HIDDEN UNTIL SPLASH FINISHES) ===== */
         .basmala {
             position: fixed;
             top: 20px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(-10px);
             z-index: 200;
             font-size: clamp(1.2rem, 3vw, 1.8rem);
             color: #F5DEB3;
             font-weight: 600;
             letter-spacing: 2px;
             text-align: center;
-            opacity: 1;
+            opacity: 0;
             text-shadow: 0 2px 10px rgba(168, 28, 46, 0.5),
                          0 0 15px rgba(232, 215, 195, 0.3);
             filter: drop-shadow(0 2px 8px rgba(168, 28, 46, 0.4));
             pointer-events: none;
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+        }
+
+        .basmala.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         @keyframes basmalaFloat {
@@ -449,7 +445,6 @@
             .sponsor-card .sponsor-card-content {
                 gap: 2rem;
                 padding: 2rem;
-                border-radius: 15px;
             }
 
             .sponsor-card .sponsor-card-logo {
@@ -509,7 +504,7 @@
     <div class="particles" id="particles"></div>
 
     <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         BASMALA - ALWAYS AT TOP (Islamic tradition)
+         BASMALA - Revealed after splash completes (Phase 3)
          بسم الله الرحمن الرحيم
          "In the name of Allah, the Most Gracious, the Most Merciful"
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
@@ -618,11 +613,8 @@
         function animateSplash() {
             const timeline = [];
 
-            // Display basmala immediately and keep it visible throughout entire animation
+            // Basmala stays hidden until Phase 3 (logo reveal)
             const basmala = document.getElementById('basmala');
-            basmala.style.opacity = '1';
-            basmala.style.animation = 'basmalaFloat 4s ease-in-out infinite';
-            basmala.style.pointerEvents = 'none';
 
             // PHASE 1: Individual Sponsor Cards + Combined Display (0-12s)
             // EXTENDED FOR SPONSOR LOGO VISIBILITY
@@ -723,7 +715,7 @@
                 }, 400);
             });
 
-            // PHASE 3: Reveal show logo (14.5-17.5s)
+            // PHASE 3: Reveal show logo + Basmalah (14.5-17.5s)
             timeline.push(() => {
                 const magicTransition = document.getElementById('magicTransition');
                 const showLogoPhase = document.getElementById('showLogoPhase');
@@ -736,6 +728,12 @@
                 magicTransition.style.opacity = '0';
 
                 showLogoPhase.style.opacity = '1';
+
+                // Reveal Basmalah at the top — now that splash content is done
+                setTimeout(() => {
+                    basmala.classList.add('visible');
+                    basmala.style.animation = 'basmalaFloat 4s ease-in-out infinite';
+                }, 100);
 
                 setTimeout(() => {
                     logoGlow.style.opacity = '1';
@@ -761,8 +759,8 @@
                 const showLogoPhase = document.getElementById('showLogoPhase');
                 const basmala = document.getElementById('basmala');
 
-                // KEEP BASMALA VISIBLE - it always stays at top
-                basmala.style.opacity = '1';
+                // Basmalah stays visible through fade-out (already revealed in Phase 3)
+                // It keeps its .visible class so it remains shown
 
                 vignette.style.animation = 'fadeToBlack 1.5s ease-in forwards';
 

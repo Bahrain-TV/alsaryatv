@@ -23,23 +23,23 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            // ==================== QUICK ACTIONS ====================
+            // ==================== QUICK ACTIONS (full width, compact on mobile) ====================
             QuickActionsWidget::class,
 
-            // ==================== OVERVIEW SECTION ====================
+            // ==================== OVERVIEW STATS (full width) ====================
             AnimatedStatsOverviewWidget::class,
 
-            // ==================== TRENDS & ANALYTICS ====================
+            // ==================== TRENDS (full width chart) ====================
             RegistrationTrendsChart::class,
 
-            // ==================== CHARTS (Side by Side) ====================
+            // ==================== SIDE-BY-SIDE CHARTS ====================
             PeakHoursChart::class,
             StatusDistributionChart::class,
 
-            // ==================== PARTICIPATION METRICS ====================
+            // ==================== PARTICIPATION METRICS (full width) ====================
             ParticipationRateWidget::class,
 
-            // ==================== ACTIVITY & WINNERS ====================
+            // ==================== TABLES (side by side on desktop, stacked on mobile) ====================
             RecentActivityWidget::class,
             WinnersHistoryWidget::class,
         ];
@@ -48,9 +48,11 @@ class Dashboard extends BaseDashboard
     public function getColumns(): array|int
     {
         return [
-            'sm' => 1,   // Mobile: 1 column
-            'md' => 2,   // Tablet: 2 columns
-            'lg' => 4,   // Desktop: 4 columns
+            'default' => 1, // Mobile: single column (stacked)
+            'sm' => 1,      // Small: still single column
+            'md' => 2,      // Tablet: 2 columns
+            'lg' => 2,      // Desktop: 2 columns for a cleaner layout
+            'xl' => 2,      // Large desktop: 2 columns
         ];
     }
 }

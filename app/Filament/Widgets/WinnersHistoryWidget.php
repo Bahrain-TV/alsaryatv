@@ -11,7 +11,14 @@ class WinnersHistoryWidget extends BaseWidget
 {
     protected static ?int $sort = 5;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = [
+        'default' => 1,
+        'sm' => 1,
+        'md' => 1,
+        'lg' => 1,
+    ];
+
+    protected ?string $heading = '🏆 سجل الفائزين';
 
     protected ?string $pollingInterval = '60s';
 
@@ -25,7 +32,7 @@ class WinnersHistoryWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('👤 الاسم')
+                    ->label('الاسم')
                     ->searchable()
                     ->weight('bold')
                     ->size('lg')
@@ -33,51 +40,43 @@ class WinnersHistoryWidget extends BaseWidget
                     ->formatStateUsing(fn (string $state): string => "🎉 {$state}"),
 
                 Tables\Columns\TextColumn::make('phone')
-                    ->label('📱 الهاتف')
+                    ->label('الهاتف')
                     ->icon('heroicon-m-phone')
                     ->copyable()
                     ->copyMessage('تم نسخ رقم الهاتف')
-                    ->tooltip('اضغط لنسخ الرقم'),
+                    ->tooltip('اضغط لنسخ الرقم')
+                    ->toggleable()
+                    ->visibleFrom('md'),
 
                 Tables\Columns\TextColumn::make('cpr')
-                    ->label('🆔 الرقم الشخصي')
+                    ->label('الرقم الشخصي')
                     ->icon('heroicon-m-identification')
                     ->copyable()
                     ->copyMessage('تم نسخ رقم المواطن')
-                    ->tooltip('اضغط لنسخ الرقم'),
+                    ->tooltip('اضغط لنسخ الرقم')
+                    ->toggleable()
+                    ->visibleFrom('lg'),
 
                 Tables\Columns\BadgeColumn::make('hits')
-                    ->label('👋 المشاركات')
-                    ->formatStateUsing(fn (int $state): string => "{$state} مشاركة")
+                    ->label('المشاركات')
+                    ->formatStateUsing(fn (int $state): string => "{$state}")
                     ->color('warning')
                     ->icon('heroicon-m-hand-raised'),
 
-                Tables\Columns\BadgeColumn::make('status')
-                    ->label('📊 الحالة')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => '✅ نشط',
-                        'inactive' => '⏸️ غير نشط',
-                        'blocked' => '🚫 محظور',
-                        default => $state,
-                    })
-                    ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'warning',
-                        'blocked' => 'danger',
-                        default => 'gray',
-                    }),
-
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('🕐 تاريخ الفوز')
+                    ->label('تاريخ الفوز')
                     ->dateTime('Y-m-d H:i')
                     ->sortable()
                     ->tooltip(fn (Caller $record): string => $record->updated_at->format('l، d F Y H:i:s'))
-                    ->description(fn (Caller $record): string => $record->updated_at->diffForHumans()),
+                    ->description(fn (Caller $record): string => $record->updated_at->diffForHumans())
+                    ->toggleable()
+                    ->visibleFrom('md'),
             ])
             ->defaultSort('updated_at', 'desc')
             ->paginated([5, 10, 25])
             ->defaultPaginationPageOption(5)
-            ->emptyStateHeading('🏜️ لا يوجد فائزون')
+            ->striped()
+            ->emptyStateHeading('لا يوجد فائزون')
             ->emptyStateDescription('لم يتم اختيار أي فائز بعد. ابدأ باختيار الفائزين من قائمة المتصلين.')
             ->emptyStateIcon('heroicon-o-trophy');
     }

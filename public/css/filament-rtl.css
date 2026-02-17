@@ -72,6 +72,44 @@ body,
     overflow: hidden;
 }
 
+/* ── Active (current) page highlighting ── */
+.fi-sidebar-item.fi-active {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%) !important;
+    border-inline-start: 3px solid #f59e0b !important;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.1);
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: #f59e0b !important;
+    font-weight: 700 !important;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: #f59e0b !important;
+}
+
+.dark .fi-sidebar-item.fi-active {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.12) 100%) !important;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.15);
+}
+
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: #fbbf24 !important;
+}
+
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: #fbbf24 !important;
+}
+
+/* Hover state for non-active items */
+.fi-sidebar-item:not(.fi-active):hover {
+    background: rgba(245, 158, 11, 0.06) !important;
+}
+
+.dark .fi-sidebar-item:not(.fi-active):hover {
+    background: rgba(245, 158, 11, 0.08) !important;
+}
+
 /* Ensure nav items flow correctly in RTL */
 .fi-sidebar-item-button,
 .fi-sidebar-item a {
@@ -469,9 +507,13 @@ body,
 }
 
 /* =============================================
-   Responsive — RTL-aware
+   Responsive — RTL-aware + Mobile Optimization
    ============================================= */
-@media (max-width: 1023px) {
+
+/* ── MOBILE: Everything compact and minimal ── */
+@media (max-width: 639px) {
+
+    /* Sidebar overlay on mobile */
     .fi-sidebar {
         border-inline-end: none !important;
         border-bottom: 1px solid var(--sidebar-border) !important;
@@ -479,6 +521,165 @@ body,
 
     .fi-main {
         margin-inline-start: 0 !important;
+    }
+
+    /* Dashboard page compact padding */
+    .fi-page-content {
+        padding: 0.5rem !important;
+    }
+
+    .fi-dashboard .fi-page-content {
+        gap: 0.75rem !important;
+    }
+
+    /* Widget cards compact */
+    .fi-wi {
+        border-radius: 0.75rem !important;
+    }
+
+    .fi-wi-stats-overview {
+        padding: 0.75rem !important;
+    }
+
+    .fi-wi-stats-overview-stat {
+        padding: 0.75rem !important;
+    }
+
+    .fi-wi-stats-overview-stat-value {
+        font-size: 1.25rem !important;
+    }
+
+    .fi-wi-stats-overview-stat-label {
+        font-size: 0.7rem !important;
+    }
+
+    .fi-wi-stats-overview-stat-description {
+        font-size: 0.65rem !important;
+    }
+
+    /* Charts compact on mobile */
+    .fi-wi-chart {
+        padding: 0.75rem !important;
+    }
+
+    .fi-wi-chart-heading {
+        font-size: 0.85rem !important;
+    }
+
+    /* Tables compact */
+    .fi-ta-header-cell {
+        padding: 0.5rem !important;
+        font-size: 0.7rem !important;
+    }
+
+    .fi-ta-cell {
+        padding: 0.5rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Pagination compact */
+    .fi-pagination {
+        flex-wrap: wrap;
+        gap: 0.25rem !important;
+    }
+
+    .fi-pagination-items {
+        gap: 0.125rem !important;
+    }
+
+    .fi-pagination-item-btn {
+        min-width: 2rem !important;
+        padding: 0.25rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* Table per-page selector compact */
+    .fi-ta-page-option {
+        font-size: 0.75rem !important;
+    }
+
+    /* Section headers compact */
+    .fi-section-header {
+        padding: 0.75rem !important;
+    }
+
+    .fi-section-header-heading {
+        font-size: 0.9rem !important;
+    }
+
+    /* Breadcrumbs hidden on mobile */
+    .fi-breadcrumbs {
+        display: none !important;
+    }
+
+    /* Global search compact */
+    .fi-global-search {
+        max-width: 100% !important;
+    }
+
+    /* Modal full-width on mobile */
+    .fi-modal-window {
+        max-width: calc(100vw - 1rem) !important;
+        margin: 0.5rem !important;
+    }
+
+    /* Quick actions panel compact */
+    .quick-actions-panel {
+        border-radius: 0.75rem !important;
+    }
+
+    /* Page header compact */
+    .fi-header {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .fi-header-heading {
+        font-size: 1.1rem !important;
+    }
+
+    /* Account widget minimal */
+    .fi-account-widget {
+        padding: 0.5rem !important;
+    }
+
+    /* Filter indicators compact */
+    .fi-ta-filters-indicators {
+        flex-wrap: wrap;
+        gap: 0.25rem !important;
+    }
+}
+
+/* ── TABLET: Balanced view ── */
+@media (min-width: 640px) and (max-width: 1023px) {
+    .fi-sidebar {
+        border-inline-end: none !important;
+        border-bottom: 1px solid var(--sidebar-border) !important;
+    }
+
+    .fi-main {
+        margin-inline-start: 0 !important;
+    }
+
+    .fi-page-content {
+        padding: 1rem !important;
+    }
+
+    .fi-ta-header-cell {
+        padding: 0.75rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    .fi-ta-cell {
+        padding: 0.75rem !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ── DESKTOP: Sidebar visible ── */
+@media (min-width: 1024px) {
+    .fi-sidebar {
+        border-inline-end: 1px solid var(--sidebar-border) !important;
+        border-bottom: none !important;
     }
 }
 

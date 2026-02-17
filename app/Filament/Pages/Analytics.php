@@ -34,6 +34,7 @@ class Analytics extends Page
         // Status breakdown
         $activeCallers = Caller::where('status', 'active')->count();
         $inactiveCallers = Caller::where('status', 'inactive')->count();
+        $selectedCallers = Caller::where('status', 'selected')->count();
         $blockedCallers = Caller::where('status', 'blocked')->count();
 
         // Time-based stats
@@ -95,6 +96,7 @@ class Analytics extends Page
             'status' => [
                 'active' => $activeCallers,
                 'inactive' => $inactiveCallers,
+                'selected' => $selectedCallers,
                 'blocked' => $blockedCallers,
             ],
             'participation' => [

@@ -84,17 +84,22 @@ class CallerResource extends Resource
                     ->schema([
                         Forms\Components\Toggle::make('is_winner')
                             ->label('فائز')
-                            ->helperText('تحديد ما إذا كان المتصل فائزاً'),
+                            ->helperText('تحديد ما إذا كان المتصل فائزاً (يتم يدوياً)'),
+                        Forms\Components\Toggle::make('is_selected')
+                            ->label('مُختار')
+                            ->helperText('تم اختياره عشوائياً (لن يظهر في السحب مجدداً)')
+                            ->disabled(),
                         Forms\Components\Select::make('status')
                             ->label('حالة الحساب')
                             ->options([
                                 'active' => 'نشط',
                                 'inactive' => 'غير نشط',
+                                'selected' => 'مُختار',
                                 'blocked' => 'محظور',
                             ])
                             ->default('active')
                             ->native(false),
-                    ])->columns(2),
+                    ])->columns(3),
 
                 Forms\Components\Textarea::make('notes')
                     ->label('ملاحظات')
@@ -116,18 +121,28 @@ class CallerResource extends Resource
                     ->label('الهاتف')
                     ->searchable()
                     ->copyable()
-                    ->copyMessage('تم نسخ رقم الهاتف'),
+                    ->copyMessage('تم نسخ رقم الهاتف')
+                    ->toggleable()
+                    ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('cpr')
                     ->label('الرقم الشخصي')
                     ->searchable()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->visibleFrom('lg'),
                 Tables\Columns\TextColumn::make('hits')
                     ->label('المشاركات')
                     ->numeric()
                     ->sortable()
                     ->badge()
                     ->color('info'),
+                Tables\Columns\IconColumn::make('is_selected')
+                    ->label('مُختار')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-badge')
+                    ->falseIcon('heroicon-o-minus-circle')
+                    ->trueColor('warning')
+                    ->falseColor('gray'),
                 Tables\Columns\IconColumn::make('is_winner')
                     ->label('فائز')
                     ->boolean()
@@ -141,28 +156,37 @@ class CallerResource extends Resource
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'active' => 'نشط',
                         'inactive' => 'غير نشط',
+                        'selected' => 'مُختار',
                         'blocked' => 'محظور',
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'inactive' => 'warning',
+                        'selected' => 'info',
                         'blocked' => 'danger',
                         default => 'gray',
-                    }),
+                    })
+                    ->toggleable()
+                    ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('تاريخ التسجيل')
                     ->dateTime('Y-m-d H:i')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->visibleFrom('lg'),
             ])
             ->defaultSort('created_at', 'desc')
+            ->paginated([10, 25, 50, 100])
+            ->defaultPaginationPageOption(25)
+            ->striped()
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->label('الحالة')
                     ->options([
                         'active' => 'نشط',
                         'inactive' => 'غير نشط',
+                        'selected' => 'مُختار',
                         'blocked' => 'محظور',
                     ])
                     ->multiple(),
@@ -288,6 +312,7 @@ class CallerResource extends Resource
                                 ->options([
                                     'active' => 'نشط',
                                     'inactive' => 'غير نشط',
+                                    'selected' => 'مُختار',
                                     'blocked' => 'محظور',
                                 ])
                                 ->required()
@@ -309,12 +334,12 @@ class CallerResource extends Resource
 
                     // Winner Selection
                     Action::make('selectMultipleRandomWinners')
-                        ->label('اختيار فائزين عشوائيين')
-                        ->icon('heroicon-o-trophy')
-                        ->color('success')
+                        ->label('اختيار مُختارين عشوائيين')
+                        ->icon('heroicon-o-sparkles')
+                        ->color('info')
                         ->form([
                             Forms\Components\TextInput::make('count')
-                                ->label('عدد الفائزين')
+                                ->label('عدد المُختارين')
                                 ->required()
                                 ->numeric()
                                 ->minValue(1)
@@ -324,7 +349,7 @@ class CallerResource extends Resource
                         ->action(function (array $data): void {
                             $count = (int) $data['count'];
 
-                            // Get eligible callers
+                            // Get eligible callers (not selected, not winner)
                             $eligibleCallers = Caller::getEligibleCallers();
 
                             if ($eligibleCallers->count() < $count) {
@@ -333,10 +358,10 @@ class CallerResource extends Resource
                                 return;
                             }
 
-                            $selectedWinners = [];
+                            $selectedCallers = [];
                             $selectedCpRs = [];
 
-                            // Select unique winners based on CPR
+                            // Select unique callers based on CPR
                             for ($i = 0; $i < $count; $i++) {
                                 if ($eligibleCallers->isEmpty()) {
                                     break;
@@ -351,44 +376,51 @@ class CallerResource extends Resource
                                     break;
                                 }
 
-                                $winner = $availableCallers->random();
-                                $winner->is_winner = true;
-                                $winner->save();
+                                $selected = $availableCallers->random();
+                                $selected->update([
+                                    'is_selected' => true,
+                                    'status' => 'selected',
+                                ]);
 
-                                $selectedWinners[] = $winner;
-                                $selectedCpRs[] = $winner->cpr;
+                                $selectedCallers[] = $selected;
+                                $selectedCpRs[] = $selected->cpr;
                             }
 
-                            $winnerNames = implode('، ', array_map(function ($winner) {
-                                return $winner->name.' ('.$winner->cpr.')';
-                            }, $selectedWinners));
+                            $selectedNames = implode('، ', array_map(function ($caller) {
+                                return $caller->name.' ('.$caller->cpr.')';
+                            }, $selectedCallers));
 
-                            $this->notify('success', 'تم اختيار '.count($selectedWinners).' فائز: '.$winnerNames);
+                            $this->notify('success', 'تم اختيار '.count($selectedCallers).' مُختار: '.$selectedNames);
                         })
                         ->requiresConfirmation()
-                        ->modalHeading('اختيار فائزين عشوائيين')
-                        ->modalDescription('سيتم اختيار فائزين عشوائياً من المتصلين المؤهلين'),
+                        ->modalHeading('اختيار مُختارين عشوائيين')
+                        ->modalDescription('سيتم اختيار مُختارين عشوائياً من المتصلين المؤهلين. لن يتم تحديدهم كفائزين — يمكنك ذلك لاحقاً يدوياً.'),
 
-                    // Mark as Winners
+                    // Mark Selected as Winners (manual confirmation)
                     Action::make('markAsWinners')
-                        ->label('تحديد كفائزين')
+                        ->label('تأكيد كفائزين')
                         ->icon('heroicon-o-trophy')
                         ->color('success')
                         ->action(function ($records): void {
                             $records->each(function ($record): void {
-                                $record->update(['is_winner' => true]);
+                                $record->update([
+                                    'is_winner' => true,
+                                    'is_selected' => true, // also ensure they're marked selected
+                                ]);
                             });
 
                             \Filament\Notifications\Notification::make()
                                 ->success()
                                 ->title('تم التحديث')
-                                ->body('تم تحديد '.$records->count().' متصل كفائزين')
+                                ->body('تم تأكيد '.$records->count().' متصل كفائزين')
                                 ->send();
                         })
                         ->requiresConfirmation()
+                        ->modalHeading('تأكيد الفائزين')
+                        ->modalDescription('سيتم تأكيد المتصلين المحددين كفائزين نهائيين.')
                         ->deselectRecordsAfterCompletion(),
 
-                    // Remove Winner Status
+                    // Remove Winner Status (keeps selected)
                     Action::make('removeWinnerStatus')
                         ->label('إزالة حالة الفوز')
                         ->icon('heroicon-o-x-mark')
@@ -401,10 +433,35 @@ class CallerResource extends Resource
                             \Filament\Notifications\Notification::make()
                                 ->success()
                                 ->title('تم التحديث')
-                                ->body('تم إزالة حالة الفوز من '.$records->count().' متصل')
+                                ->body('تم إزالة حالة الفوز من '.$records->count().' متصل (لا يزالون مُختارين)')
                                 ->send();
                         })
                         ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion(),
+
+                    // Reset Selection (allow them back into draws)
+                    Action::make('resetSelection')
+                        ->label('إعادة إلى السحب')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('gray')
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
+                                $record->update([
+                                    'is_selected' => false,
+                                    'is_winner' => false,
+                                    'status' => 'active',
+                                ]);
+                            });
+
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('تم التحديث')
+                                ->body('تم إعادة '.$records->count().' متصل إلى قائمة السحب')
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('إعادة إلى السحب')
+                        ->modalDescription('سيتم إزالة حالة الاختيار والفوز وإعادتهم كمتصلين نشطين مؤهلين للسحب.')
                         ->deselectRecordsAfterCompletion(),
                 ])
                     ->icon('heroicon-o-ellipsis-horizontal')
@@ -432,24 +489,24 @@ class CallerResource extends Resource
                     }),
 
                 Action::make('selectRandomWinner')
-                    ->label('اختيار فائز عشوائي')
-                    ->icon('heroicon-o-trophy')
-                    ->color('success')
+                    ->label('اختيار مُختار عشوائي')
+                    ->icon('heroicon-o-sparkles')
+                    ->color('info')
                     ->action(function (): void {
-                        // Use the model method for selecting random winner by CPR
-                        $winner = Caller::selectRandomWinnerByCpr();
+                        // Use the model method for selecting random caller by CPR
+                        $selected = Caller::selectRandomWinnerByCpr();
 
-                        if (! $winner) {
-                            $this->notify('warning', 'لا يوجد متصلين مؤهلين للفوز.');
+                        if (! $selected) {
+                            $this->notify('warning', 'لا يوجد متصلين مؤهلين للاختيار.');
 
                             return;
                         }
 
-                        $this->notify('success', 'تم اختيار الفائز: '.$winner->name.' (CPR: '.$winner->cpr.')');
+                        $this->notify('success', 'تم اختيار: '.$selected->name.' (CPR: '.$selected->cpr.') — يمكنك تأكيده كفائز يدوياً.');
                     })
                     ->requiresConfirmation()
-                    ->modalHeading('اختيار فائز عشوائي')
-                    ->modalDescription('سيتم اختيار فائز واحد عشوائياً من المتصلين المؤهلين')
+                    ->modalHeading('اختيار مُختار عشوائي')
+                    ->modalDescription('سيتم اختيار متصل واحد عشوائياً وتغيير حالته إلى "مُختار". لن يتم تحديده كفائز — يجب تأكيد ذلك يدوياً.')
                     ->modalSubmitActionLabel('اختيار'),
             ])
             ->emptyStateHeading('لا يوجد متصلين')
@@ -483,6 +540,7 @@ class CallerResource extends Resource
                 'رقم الهاتف',
                 'الرقم الشخصي',
                 'المشاركات',
+                'مُختار',
                 'فائز',
                 'الحالة',
                 'تاريخ التسجيل',
@@ -496,10 +554,12 @@ class CallerResource extends Resource
                     $record->phone,
                     $record->cpr,
                     $record->hits,
+                    $record->is_selected ? 'نعم' : 'لا',
                     $record->is_winner ? 'نعم' : 'لا',
                     match ($record->status) {
                         'active' => 'نشط',
                         'inactive' => 'غير نشط',
+                        'selected' => 'مُختار',
                         'blocked' => 'محظور',
                         default => $record->status,
                     },
@@ -546,6 +606,7 @@ class CallerResource extends Resource
                 <th>رقم الهاتف</th>
                 <th>الرقم الشخصي</th>
                 <th>المشاركات</th>
+                <th>مُختار</th>
                 <th>فائز</th>
                 <th>الحالة</th>
                 <th>تاريخ التسجيل</th>
@@ -555,16 +616,18 @@ class CallerResource extends Resource
         <tbody>';
 
         foreach ($records as $record) {
-            $rowClass = $record->is_winner ? 'winner' : ($record->status === 'blocked' ? 'blocked' : ($record->status === 'active' ? 'active' : ''));
+            $rowClass = $record->is_winner ? 'winner' : ($record->is_selected ? 'selected' : ($record->status === 'blocked' ? 'blocked' : ($record->status === 'active' ? 'active' : '')));
             $html .= '<tr class="'.$rowClass.'">
                 <td>'.htmlspecialchars($record->name).'</td>
                 <td>'.htmlspecialchars($record->phone).'</td>
                 <td>'.htmlspecialchars($record->cpr).'</td>
                 <td>'.$record->hits.'</td>
+                <td>'.($record->is_selected ? '✅ نعم' : 'لا').'</td>
                 <td>'.($record->is_winner ? '🏆 نعم' : 'لا').'</td>
                 <td>'.match ($record->status) {
                 'active' => 'نشط',
                 'inactive' => 'غير نشط',
+                'selected' => 'مُختار',
                 'blocked' => 'محظور',
                 default => $record->status,
             }.'</td>

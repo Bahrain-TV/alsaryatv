@@ -28,8 +28,9 @@ class AdminPanelProvider extends PanelProvider
     {
         Table::configureUsing(function (Table $table): void {
             $table
-                ->defaultPaginationPageOption(50)
-                ->paginationPageOptions([10, 25, 50, 100, 200]);
+                ->defaultPaginationPageOption(25)
+                ->paginationPageOptions([10, 25, 50, 100])
+                ->striped();
         });
     }
 

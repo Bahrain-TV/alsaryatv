@@ -18,6 +18,7 @@ class Caller extends Model
         'cpr',
         'is_family',
         'is_winner',
+        'is_selected',
         'status',
         'ip_address',
         'hits',
@@ -29,6 +30,7 @@ class Caller extends Model
     protected $casts = [
         'is_family' => 'boolean',
         'is_winner' => 'boolean',
+        'is_selected' => 'boolean',
         'last_hit' => 'datetime',
     ];
 
@@ -41,11 +43,21 @@ class Caller extends Model
     }
 
     /**
-     * Scope a query to only include eligible callers for winner selection.
+     * Scope a query to only include selected callers (from random draw).
+     */
+    public function scopeSelected(Builder $query): Builder
+    {
+        return $query->where('is_selected', true);
+    }
+
+    /**
+     * Scope a query to only include eligible callers for random selection.
+     * Eligible = active, has CPR, NOT already selected, NOT already a winner.
      */
     public function scopeEligible(Builder $query): Builder
     {
         return $query->where('is_winner', false)
+            ->where('is_selected', false)
             ->where('status', 'active')
             ->whereNotNull('cpr')
             ->where('cpr', '!=', '');
@@ -60,14 +72,18 @@ class Caller extends Model
     }
 
     /**
-     * Select a random winner based on CPR uniqueness
+     * Select a random winner based on CPR uniqueness.
+     * Sets is_selected=true (not is_winner — that's manual).
      */
     public static function selectRandomWinnerByCpr(): ?Caller
     {
         $winner = self::eligible()->inRandomOrder()->first();
 
         if ($winner) {
-            $winner->update(['is_winner' => true]);
+            $winner->update([
+                'is_selected' => true,
+                'status' => 'selected',
+            ]);
             app(NtfyNotifier::class)->notifyWinner($winner);
         }
 

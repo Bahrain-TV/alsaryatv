@@ -14,9 +14,10 @@ class PeakHoursChart extends ChartWidget
     protected string $color = 'warning';
 
     protected int|string|array $columnSpan = [
+        'default' => 1,
         'sm' => 1,
         'md' => 1,
-        'lg' => 2,
+        'lg' => 1,
     ];
 
     protected ?string $maxHeight = '320px';
