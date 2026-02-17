@@ -44,6 +44,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | YouTube Videos Settings
+    |--------------------------------------------------------------------------
+    |
+    | Control the visibility of YouTube videos section on the homepage
+    | Keep disabled until ready to reveal on air
+    |
+    */
+    'youtube_videos' => [
+        'enabled' => env('YOUTUBE_VIDEOS_ENABLED', false),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Arabic Translations
     |--------------------------------------------------------------------------
     */

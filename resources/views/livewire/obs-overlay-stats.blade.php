@@ -80,7 +80,7 @@
 <div wire:poll.2s="refreshStats">
     <div class="obs-overlay-wrap">
         <div class="obs-overlay-float">
-            <div class="obs-overlay-panel rounded-2xl border border-white/10 bg-black/70 p-6 shadow-lg backdrop-blur">
+            <div class="obs-overlay-panel rounded-2xl border border-white/10 bg-black/70 p-8 shadow-lg backdrop-blur">
                 <!-- Ramadan-themed Three.js Background Canvas (INSIDE PANEL) -->
                 <canvas class="threejs-canvas" id="obs-ramadan-canvas"></canvas>
 
@@ -88,9 +88,9 @@
                 <div style="position: relative; z-index: 1;">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
-                    <span class="obs-overlay-pulse inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                    <span class="obs-overlay-pulse inline-flex h-3 w-3 rounded-full bg-emerald-400"></span>
                     <p
-                        class="text-sm font-semibold text-white"
+                        class="text-lg font-semibold text-white"
                         data-obs-text
                         data-obs-en="{{ __('Live dashboard feed', [], 'en') }}"
                         data-obs-ar="{{ __('Live dashboard feed', [], 'ar') }}"
@@ -99,13 +99,13 @@
                         {{ __('Live dashboard feed', [], 'en') }}
                     </p>
                 </div>
-                <span class="text-xs text-white/70">{{ __('Updated') }} {{ $lastUpdatedAt }}</span>
+                <span class="text-sm text-white/70">{{ __('Updated') }} {{ $lastUpdatedAt }}</span>
             </div>
 
-        <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="rounded-xl bg-white/5 p-4">
+        <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-xl bg-white/5 p-6">
                 <p
-                    class="text-xs uppercase tracking-wide text-white/60"
+                    class="text-sm uppercase tracking-widest text-white/60"
                     data-obs-text
                     data-obs-en="{{ __('Total callers', [], 'en') }}"
                     data-obs-ar="{{ __('Total callers', [], 'ar') }}"
@@ -114,7 +114,7 @@
                     {{ __('Total callers', [], 'en') }}
                 </p>
                 <p
-                    class="mt-2 text-4xl font-bold text-white"
+                    class="mt-3 text-[7rem] leading-none font-black text-white"
                     data-obs-text
                     data-obs-value="true"
                     data-obs-en="{{ number_format($totalCallers) }}"
@@ -123,9 +123,9 @@
                     {{ number_format($totalCallers) }}
                 </p>
             </div>
-            <div class="rounded-xl bg-white/5 p-4">
+            <div class="rounded-xl bg-white/5 p-6">
                 <p
-                    class="text-xs uppercase tracking-wide text-white/60"
+                    class="text-sm uppercase tracking-widest text-white/60"
                     data-obs-text
                     data-obs-en="{{ __('Today callers', [], 'en') }}"
                     data-obs-ar="{{ __('Today callers', [], 'ar') }}"
@@ -134,7 +134,7 @@
                     {{ __('Today callers', [], 'en') }}
                 </p>
                 <p
-                    class="mt-2 text-4xl font-bold text-white"
+                    class="mt-3 text-[7rem] leading-none font-black text-white"
                     data-obs-text
                     data-obs-value="true"
                     data-obs-en="{{ number_format($todayCallers) }}"
@@ -143,9 +143,9 @@
                     {{ number_format($todayCallers) }}
                 </p>
             </div>
-            <div class="rounded-xl bg-white/5 p-4">
+            <div class="rounded-xl bg-white/5 p-6">
                 <p
-                    class="text-xs uppercase tracking-wide text-white/60"
+                    class="text-sm uppercase tracking-widest text-white/60"
                     data-obs-text
                     data-obs-en="{{ __('Total hits', [], 'en') }}"
                     data-obs-ar="{{ __('Total hits', [], 'ar') }}"
@@ -154,7 +154,7 @@
                     {{ __('Total hits', [], 'en') }}
                 </p>
                 <p
-                    class="mt-2 text-4xl font-bold text-white"
+                    class="mt-3 text-[7rem] leading-none font-black text-white"
                     data-obs-text
                     data-obs-value="true"
                     data-obs-en="{{ number_format($totalHits) }}"
@@ -165,7 +165,7 @@
             </div>
         </div>
 
-        <div class="mt-4 flex justify-between items-center text-xs text-white/70">
+        <div class="mt-6 flex justify-between items-center text-base text-white/70">
             <div>
                 <span
                     data-obs-text
@@ -185,7 +185,7 @@
                     {{ $winRatio }}%
                 </span>
             </div>
-            <div class="text-white/50 font-mono">
+            <div class="text-white/50 font-mono text-sm">
                 v{{ config('alsarya.version', '1.0.0') }}
             </div>
         </div>

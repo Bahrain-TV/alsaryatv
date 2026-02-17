@@ -287,8 +287,8 @@
                 </div>
                 <div class="preloader-ring"></div>
                 <div class="preloader-ring-2"></div>
-                @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
-                    <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="AlSarya TV" class="preloader-logo" />
+                @if(file_exists(public_path('images/branding/logo.png')))
+                    <img src="{{ asset('images/branding/logo.png') }}" alt="AlSarya TV" class="preloader-logo" />
                 @else
                     <img src="{{ asset('images/bahrain-tv-sm.png') }}" alt="Bahrain TV" class="preloader-logo" />
                 @endif
@@ -322,10 +322,10 @@
         </button>
         <!-- Logo -->
         <div class="logo-section">
-            @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
-                <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
+            @if(file_exists(public_path('images/branding/logo.png')))
+                <img src="{{ asset('images/branding/logo.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
             @else
-                <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
+                <img src="{{ asset('images/branding/logo.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
             @endif
         </div>
 
@@ -372,7 +372,7 @@
         @endif
 
         <!-- YouTube Videos Section -->
-        @if(isset($activeYoutubeVideos) && $activeYoutubeVideos->count() > 0)
+        @if(config('alsarya.youtube_videos.enabled', false) && isset($activeYoutubeVideos) && $activeYoutubeVideos->count() > 0)
             <div class="gsap-entry w-full max-w-4xl mb-8">
                 <div class="text-center mb-6">
                     <h3 class="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-center gap-3">

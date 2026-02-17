@@ -77,6 +77,7 @@
 
                 <!-- Teams Dropdown -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
+                    @auth
                     <div class="ms-3 relative">
                         <x-dropdown align="right" width="60">
                             <x-slot name="trigger">
@@ -125,13 +126,15 @@
                             </x-slot>
                         </x-dropdown>
                     </div>
+                    @endauth
                 @endif
 
                 <!-- Settings Dropdown -->
+                @auth
                 <div class="ms-3 relative">
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
+                            @if (Laravel\Jetstream\Jetstream::managesProfilePhotos() && Auth::user())
                                 <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
                                     <img class="size-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
                                 </button>
@@ -178,6 +181,7 @@
                         </x-slot>
                     </x-dropdown>
                 </div>
+                @endauth
             </div>
 
             <!-- Hamburger -->
@@ -244,16 +248,17 @@
                 </div>
             </div>
 
+            @auth
             <div class="flex items-center px-4">
-                @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
+                @if (Laravel\Jetstream\Jetstream::managesProfilePhotos() && Auth::user())
                     <div class="shrink-0 me-3">
                         <img class="size-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
                     </div>
                 @endif
 
                 <div>
-                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                    <div class="font-medium text-base text-gray-800">{{ Auth::user()?->name }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()?->email }}</div>
                 </div>
             </div>
 
@@ -312,6 +317,7 @@
                     @endif
                 @endif
             </div>
+            @endauth
         </div>
     </div>
 </nav>

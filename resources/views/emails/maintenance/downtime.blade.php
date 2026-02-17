@@ -72,7 +72,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="{{ asset('images/alsarya-logo.png') }}" alt="AlSaryaTV Logo">
+            <img src="{{ asset('images/branding/logo.png') }}" alt="AlSaryaTV Logo">
         </div>
         
         <div class="content">

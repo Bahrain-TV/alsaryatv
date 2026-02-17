@@ -1,7 +1,7 @@
 <x-filament-panels::page.simple>
     <x-slot name="card">
         <div class="w-full flex justify-center mb-4">
-            <img src="{{ asset('images/alsarya-logo.png') }}" alt="{{ config('app.name', 'السارية') }}" class="h-16 w-auto" />
+            <img src="{{ asset('images/branding/logo.png') }}" alt="{{ config('app.name', 'السارية') }}" class="h-16 w-auto" />
         </div>
 
         <h2 class="text-center text-2xl font-bold tracking-tight text-gray-950">

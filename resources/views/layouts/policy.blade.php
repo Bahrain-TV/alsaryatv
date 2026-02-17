@@ -25,13 +25,13 @@
                 <nav class="relative flex items-start justify-stretch">
                     <div class="flex items-center" style="margin-inline-start: auto;">
                         <a href="{{ route('home') }}" class="flex items-start">
-                            <img class="h-12 w-auto" src="{{ asset('images/btv-logo-ar.png') }}" alt="{{ config('app.name') }}">
+                            <img class="h-12 w-auto" src="{{ asset('images/branding/logo.png') }}" alt="{{ config('app.name') }}">
                         </a>
                         <a href="{{ route('home') }}" class="flex items-start">
-                            <img class="h-16 w-auto px-8" src="{{ asset('images/moi-logo-2024-sm.png') }}" alt="{{ config('app.name') }}">
+                            <img class="h-16 w-auto px-8" src="{{ asset('images/branding/logo.png') }}" alt="{{ config('app.name') }}">
                         </a>
                         <a href="{{ route('home') }}" class="flex items-start">
-                            <img class="h-14 w-auto sm:h-4" src="{{ asset('images/alsarya-logo.png') }}" alt="{{ config('app.name') }}">
+                            <img class="h-14 w-auto sm:h-4" src="{{ asset('images/branding/logo.png') }}" alt="{{ config('app.name') }}">
                         </a>
                     </div>
                 </nav>

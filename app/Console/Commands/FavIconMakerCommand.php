@@ -141,6 +141,7 @@ class FavIconMakerCommand extends Command
             $sizes = [
                 'favicon-16x16.png' => 16,
                 'favicon-32x32.png' => 32,
+                'favicon-196x196.png' => 196,
                 'apple-touch-icon.png' => 180,
                 'android-chrome-192x192.png' => 192,
                 'android-chrome-512x512.png' => 512,
@@ -226,25 +227,62 @@ class FavIconMakerCommand extends Command
     }
 
     /**
-     * Create ICO format favicon
+     * Create ICO format favicon with multiple resolutions.
+     * Produces a real ICO file containing 16, 32, 48, and 196 px layers.
      */
     private function createIcoFavicon($sourceImage, string $outputPath): void
     {
-        // Create 32x32 for ICO
-        $ico = imagecreatetruecolor(32, 32);
         $width = imagesx($sourceImage);
         $height = imagesy($sourceImage);
+        $layerSizes = [16, 32, 48, 196];
+        $pngImages = [];
 
-        imagecopyresampled(
-            $ico, $sourceImage,
-            0, 0, 0, 0,
-            32, 32,
-            $width, $height
-        );
+        foreach ($layerSizes as $size) {
+            $layer = imagecreatetruecolor($size, $size);
+            imagealphablending($layer, false);
+            imagesavealpha($layer, true);
+            $transparent = imagecolorallocatealpha($layer, 0, 0, 0, 127);
+            imagefill($layer, 0, 0, $transparent);
+            imagecopyresampled($layer, $sourceImage, 0, 0, 0, 0, $size, $size, $width, $height);
 
-        // Save as PNG first, browsers understand PNG favicons
-        imagepng($ico, $outputPath);
-        imagedestroy($ico);
+            // Capture PNG data in-memory
+            ob_start();
+            imagepng($layer);
+            $pngImages[] = ['size' => $size, 'data' => ob_get_clean()];
+            imagedestroy($layer);
+        }
+
+        // Build ICO file structure
+        $imageCount = count($pngImages);
+        // ICONDIR header: 6 bytes
+        $header = pack('vvv', 0, 1, $imageCount);
+        $entries = '';
+        $dataOffset = 6 + ($imageCount * 16); // header + entries
+        $imageData = '';
+
+        foreach ($pngImages as $img) {
+            $data = $img['data'];
+            $size = $img['size'];
+            $w = $size >= 256 ? 0 : $size;
+            $h = $size >= 256 ? 0 : $size;
+
+            // ICONDIRENTRY: 16 bytes each
+            $entries .= pack('CCCCvvVV',
+                $w,              // width  (0 = 256+)
+                $h,              // height (0 = 256+)
+                0,               // color count
+                0,               // reserved
+                1,               // color planes
+                32,              // bits per pixel
+                strlen($data),   // image data size
+                $dataOffset      // offset to image data
+            );
+
+            $imageData .= $data;
+            $dataOffset += strlen($data);
+        }
+
+        file_put_contents($outputPath, $header . $entries . $imageData);
     }
 
     /**

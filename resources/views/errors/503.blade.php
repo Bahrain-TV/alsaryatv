@@ -36,7 +36,7 @@
     <div class="max-w-xl w-full text-center space-y-8 p-10 bg-white shadow-xl rounded-2xl border border-gray-100">
         <!-- Logo -->
         <div class="flex justify-center">
-             <img src="{{ asset('images/alsarya-logo-2026-tiny.png') }}" class="h-24 w-auto drop-shadow-md" alt="AlSarya TV">
+             <img src="{{ asset('images/branding/logo.png') }}" class="h-24 w-auto drop-shadow-md" alt="AlSarya TV">
         </div>
 
         <!-- Title -->

@@ -72,6 +72,8 @@ class UserSeeder extends Seeder
                     'name' => $admin['name'],
                     'password' => $admin['password'],
                 ]);
+            } else {
+                $this->command->warn('Admin user already exists: '.$admin['email']);
             }
         }
     }

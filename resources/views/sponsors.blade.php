@@ -9,7 +9,7 @@
                 <!-- Display logos -->
                 <div class="w-full flex flex-wrap justify-center items-center gap-6 sm:gap-8" id="sponsors-logos">
                     <div id="left-sponsor-logo" class="hover:scale-105 transition-transform duration-300">
-                        <img src="{{ asset('images/beyon-money-logo-wide.png') }}" 
+                        <img src="{{ asset('images/branding/logo.png') }}" 
                         alt="Beyon Money بيون موني" 
                         class="w-36 sm:w-44 lg:w-60 h-auto" />
                     </div>
