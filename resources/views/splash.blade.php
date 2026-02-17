@@ -471,12 +471,13 @@
 
     <div class="scene-container">
         <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-             PHASE 1: SPONSOR INTRODUCTION (0-6 seconds)
+             PHASE 1: SPONSOR INTRODUCTION (0-12 seconds)
              Individual cards slide in left/right, then combine
+             SPONSORS VISIBLE FOR 5.5+ SECONDS (crucial for brand awareness)
              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
         <div class="sponsors-phase" id="sponsorsPhase">
             <!-- Individual Sponsor Cards -->
-            <!-- Card 1: تلفزيون البحرين (BTV) - enters from left at 0s, exits at 1.5s -->
+            <!-- Card 1: تلفزيون البحرين (BTV) - enters from left at 0s, exits at 2s -->
             <div class="sponsor-card" id="sponsorCard1">
                 <div class="sponsor-card-content">
                     <div class="sponsor-card-title">تلفزيون البحرين</div>
@@ -484,7 +485,7 @@
                 </div>
             </div>
 
-            <!-- Card 2: Beyon Money - enters from right at 1.5s, exits at 3s -->
+            <!-- Card 2: Beyon Money - enters from right at 2s, exits at 4s -->
             <div class="sponsor-card" id="sponsorCard2">
                 <div class="sponsor-card-content">
                     <div class="sponsor-card-title">Beyon Money</div>
@@ -492,7 +493,7 @@
                 </div>
             </div>
 
-            <!-- Combined Display: Both sponsors together (3s-4.5s) -->
+            <!-- Combined Display: Both sponsors together (4s-11s) - LONGEST PHASE -->
             <div class="sponsored-by" id="sponsoredByText">برعاية</div>
             <div class="sponsors-logos" id="sponsorsLogos">
                 <img src="{{ asset('images/btv-logo-ar.png') }}" alt="تلفزيون البحرين" class="sponsor-logo" id="sponsor1">
@@ -501,7 +502,7 @@
         </div>
 
         <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-             PHASE 2: MAGICAL TRANSITION (5.5-8.5 seconds)
+             PHASE 2: MAGICAL TRANSITION (12-14.5 seconds)
              Sponsors fade out, magical circles & sparkles appear
              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
         <div class="magic-transition" id="magicTransition">
@@ -513,7 +514,7 @@
         </div>
 
         <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-             PHASE 3: SHOW LOGO REVEAL (8.5-12 seconds)
+             PHASE 3: SHOW LOGO REVEAL (14.5-17.5 seconds)
              AlSarya TV logo spins and reveals with title/subtitle
              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
         <div class="show-logo-phase" id="showLogoPhase">
@@ -531,7 +532,7 @@
     </div>
 
     <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         PHASE 4: FADE TO OBLIVION (12-14.5 seconds)
+         PHASE 4: FADE TO OBLIVION (17.5-20 seconds)
          Screen fades to black with vignette, redirects to registration
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
     <div class="vignette" id="vignette"></div>
@@ -571,7 +572,8 @@
         function animateSplash() {
             const timeline = [];
 
-            // PHASE 1: Individual Sponsor Cards + Combined Display (0-6s)
+            // PHASE 1: Individual Sponsor Cards + Combined Display (0-12s)
+            // EXTENDED FOR SPONSOR LOGO VISIBILITY
             timeline.push(() => {
                 const sponsorsPhase = document.getElementById('sponsorsPhase');
                 const sponsorCard1 = document.getElementById('sponsorCard1');
@@ -583,57 +585,63 @@
 
                 sponsorsPhase.style.opacity = '1';
 
-                // 0-1.5s: Display Sponsor 1 card individually
+                // 0-2s: Display Sponsor 1 card (BTV) individually
                 setTimeout(() => {
                     sponsorCard1.style.animation = 'cardSlideInFromLeft 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
                 }, 100);
 
-                // 1.5-3s: Replace with Sponsor 2 card
+                // 2-4s: Replace with Sponsor 2 card (Beyon Money)
                 setTimeout(() => {
                     sponsorCard1.style.animation = 'cardSlideOut 0.8s ease-in forwards';
-                }, 1500);
+                }, 2000);
 
                 setTimeout(() => {
                     sponsorCard2.style.animation = 'cardSlideInFromRight 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 1500);
+                }, 2000);
 
-                // 3-4.5s: Transition to combined display
+                // 4-5s: Transition to combined display
                 setTimeout(() => {
                     sponsorCard2.style.animation = 'cardSlideOut 0.8s ease-in forwards';
-                }, 3000);
+                }, 4000);
 
                 setTimeout(() => {
                     sponsorsLogos.style.opacity = '1';
                     sponsoredBy.style.animation = 'sponsorFadeIn 0.8s ease-out forwards';
-                }, 3100);
+                }, 4200);
 
-                // 3.2-4.2s: Animate both sponsor logos together
+                // 4.5-5.5s: Animate both sponsor logos together
                 setTimeout(() => {
                     sponsor1.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 3200);
+                }, 4500);
 
                 setTimeout(() => {
                     sponsor2.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 3500);
+                }, 4800);
 
-                // 4.5-6s: Hold sponsors logos visible
-                // Then fade out
+                // 5.5-11s: HOLD SPONSOR LOGOS VISIBLE FOR 5.5 SECONDS!
+                // Give plenty of time for images to load and display
                 setTimeout(() => {
-                    sponsoredBy.style.transition = 'opacity 0.8s ease-out';
+                    // Keep sponsors visible - they're the stars!
+                    console.log('Sponsors prominently displayed - 5.5+ seconds visible');
+                }, 5500);
+
+                // 11-12s: Fade out sponsors to transition to magic
+                setTimeout(() => {
+                    sponsoredBy.style.transition = 'opacity 1s ease-out';
                     sponsoredBy.style.opacity = '0';
-                    sponsor1.style.transition = 'opacity 0.8s ease-out';
+                    sponsor1.style.transition = 'opacity 1s ease-out';
                     sponsor1.style.opacity = '0';
-                    sponsor2.style.transition = 'opacity 0.8s ease-out';
+                    sponsor2.style.transition = 'opacity 1s ease-out';
                     sponsor2.style.opacity = '0';
-                }, 4500);
+                }, 11000);
             });
 
-            // PHASE 2: Fade sponsors & start magic (6-8.5s)
+            // PHASE 2: Fade sponsors & start magic (12-14.5s)
             timeline.push(() => {
                 const sponsorsPhase = document.getElementById('sponsorsPhase');
                 const magicTransition = document.getElementById('magicTransition');
 
-                sponsorsPhase.style.transition = 'opacity 0.8s ease-out';
+                sponsorsPhase.style.transition = 'opacity 1s ease-out';
                 sponsorsPhase.style.opacity = '0';
 
                 setTimeout(() => {
@@ -663,7 +671,7 @@
                 }, 400);
             });
 
-            // PHASE 3: Reveal show logo (8.5-10.5s)
+            // PHASE 3: Reveal show logo (14.5-17.5s)
             timeline.push(() => {
                 const magicTransition = document.getElementById('magicTransition');
                 const showLogoPhase = document.getElementById('showLogoPhase');
@@ -694,7 +702,7 @@
                 }, 1200);
             });
 
-            // PHASE 4: Fade to oblivion (12-14s)
+            // PHASE 4: Fade to oblivion (17.5-20s)
             timeline.push(() => {
                 const vignette = document.getElementById('vignette');
                 const oblivionOverlay = document.getElementById('oblivionOverlay');
@@ -711,20 +719,20 @@
                 }, 1000);
             });
 
-            // Execute timeline - Extended timing for enhanced animation sequence
-            timeline[0](); // 0s - Individual sponsor cards + combined display (0-6s)
-            setTimeout(timeline[1], 5500); // 5.5s - Magic transition starts
-            setTimeout(timeline[2], 8500); // 8.5s - Show logo reveal
-            setTimeout(timeline[3], 12000); // 12s - Oblivion fade
+            // Execute timeline - EXTENDED SPONSOR VISIBILITY
+            timeline[0](); // 0s - Individual sponsor cards + combined display (0-12s)
+            setTimeout(timeline[1], 12000); // 12s - Magic transition starts
+            setTimeout(timeline[2], 14500); // 14.5s - Show logo reveal
+            setTimeout(timeline[3], 17500); // 17.5s - Oblivion fade
 
-            // Redirect after complete (total animation: 14.5 seconds)
+            // Redirect after complete (total animation: 20 seconds)
             // Mark that splash has been shown
             sessionStorage.setItem('splashShown', 'true');
 
             setTimeout(() => {
                 // Redirect to registration form after splash
                 window.location.href = '/';
-            }, 14500);
+            }, 20000);
         }
 
         // Check if splash has already been shown in this session
