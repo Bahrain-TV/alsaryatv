@@ -329,24 +329,24 @@
             @endif
         </div>
 
-        <!-- Header Section (Animates as one block) -->
-        <header class="gsap-entry text-center mb-8 relative w-full max-w-lg">
-            <div class="inline-block mb-3 px-4 py-1 rounded-full border border-gold-500/20 bg-gold-900/10 backdrop-blur-sm">
-                <h3 class="text-gold-300 text-sm tracking-widest font-medium">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</h3>
-            </div>
+        @if(!config('alsarya.registration.enabled', false))
+            <!-- Header Section (Animates as one block) - Only show when registration is closed -->
+            <header class="gsap-entry text-center mb-8 relative w-full max-w-lg">
+                <div class="inline-block mb-3 px-4 py-1 rounded-full border border-gold-500/20 bg-gold-900/10 backdrop-blur-sm">
+                    <h3 class="text-gold-300 text-sm tracking-widest font-medium">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</h3>
+                </div>
 
-            <h1 class="text-5xl md:text-6xl font-black mb-2 tracking-tight gold-text drop-shadow-2xl leading-tight pb-2">
-                برنامج السارية
-            </h1>
-            <div class="flex items-center justify-center gap-3 opacity-90">
-                <div class="h-[1px] w-12 bg-gradient-to-l from-transparent to-gold-500/50"></div>
-                <p class="text-gray-300 text-base md:text-lg font-light tracking-wide">على شاشة تلفزيون البحرين</p>
-                <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-gold-500/50"></div>
-            </div>
-        </header>
+                <h1 class="text-5xl md:text-6xl font-black mb-2 tracking-tight gold-text drop-shadow-2xl leading-tight pb-2">
+                    برنامج السارية
+                </h1>
+                <div class="flex items-center justify-center gap-3 opacity-90">
+                    <div class="h-[1px] w-12 bg-gradient-to-l from-transparent to-gold-500/50"></div>
+                    <p class="text-gray-300 text-base md:text-lg font-light tracking-wide">على شاشة تلفزيون البحرين</p>
+                    <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-gold-500/50"></div>
+                </div>
+            </header>
 
-        @if(!auth()->check())
-            {{-- Countdown Timer - Outside the panel for full width --}}
+            {{-- Countdown Timer - Only show when registration is closed --}}
             <div class="gsap-entry w-full max-w-2xl mb-8">
                 <!-- Countdown Section -->
                 <div class="text-center mb-6">
@@ -368,6 +368,57 @@
                     <div class="text-xl text-white font-semibold mb-2">{{ $ramadanDate ?? '18 فبراير 2026' }}</div>
                     <div class="text-sm text-gray-300">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
                 </div>
+            </div>
+        @endif
+
+        <!-- YouTube Videos Section -->
+        @if(isset($activeYoutubeVideos) && $activeYoutubeVideos->count() > 0)
+            <div class="gsap-entry w-full max-w-4xl mb-8">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+                        <span class="text-4xl">📺</span>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-b from-red-400 to-red-600">فيديوهات و بث مباشر</span>
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($activeYoutubeVideos as $video)
+                        <div class="glass-panel rounded-2xl p-1 relative overflow-hidden group">
+                            <div class="bg-[#0B0D12]/80 rounded-xl p-4 relative">
+                                <div class="aspect-video mb-4 rounded-lg overflow-hidden">
+                                    <iframe
+                                        src="{{ $video->embed_url }}"
+                                        class="w-full h-full"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen
+                                        loading="lazy">
+                                    </iframe>
+                                </div>
+                                <h4 class="text-white font-bold mb-2 text-lg">{{ $video->title }}</h4>
+                                @if($video->description)
+                                    <p class="text-gray-300 text-sm">{{ Str::limit($video->description, 100) }}</p>
+                                @endif
+                                @if($video->is_live_stream)
+                                    <div class="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30">
+                                        <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                                        <span class="text-red-400 text-xs font-bold">بث مباشر</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        @if(config('alsarya.registration.enabled', false))
+            <!-- Simplified Header for Registration Mode -->
+            <div class="gsap-entry text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-tight gold-text drop-shadow-2xl">
+                    برنامج السارية
+                </h1>
+                <p class="text-gray-300 text-lg font-light">التسجيل مفتوح الآن</p>
             </div>
         @endif
 

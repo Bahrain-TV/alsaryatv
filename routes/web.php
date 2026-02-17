@@ -19,6 +19,7 @@ $getRamadanContext = function () {
         'registrationOpenISO' => $registrationOpenDate,
         'totalHits' => HitsCounter::getHits(),
         'appVersion' => trim(file_exists(base_path('VERSION')) ? file_get_contents(base_path('VERSION')) : '1.0.0'),
+        'activeYoutubeVideos' => \App\Models\YoutubeVideo::getActiveVideos(),
     ];
 };
 
