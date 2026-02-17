@@ -13,6 +13,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Admin dashboard with Filament
 - Security: CSRF protection, rate limiting, IP validation
 - Real-time features via Laravel Echo/Pusher
+- **Basmala (بسم الله الرحمن الرحيم) displayed at the top of all pages** ⭐
+
+---
+
+## ⭐ IMPORTANT: Basmala Placement
+
+**The Basmala (بسم الله الرحمن الرحيم - "In the name of Allah, the Most Gracious, the Most Merciful") MUST ALWAYS appear at the top of every page/view.**
+
+This is a fundamental Islamic principle in this project. When implementing any view:
+1. The basmala MUST be positioned fixed/absolutely at the top
+2. It should have the highest z-index to never be hidden
+3. Use consistent styling across all pages
+4. Mobile-responsive sizing
+5. Never allow other content to appear above it
+
+**Implementation:**
+- Add `<div class="basmala" id="basmala">بسم الله الرحمن الرحيم</div>` at top of layout
+- Include CSS for positioning: `position: fixed; top: 20px; z-index: 200;`
+- Apply theme colors: Light cream (#F5DEB3) text with maroon shadows
+- Test on all screen sizes to ensure visibility
 
 ---
 

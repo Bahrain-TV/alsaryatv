@@ -346,6 +346,33 @@
             text-align: center;
         }
 
+        /* ===== BASMALA (ALWAYS AT TOP) ===== */
+        .basmala {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: #F5DEB3;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-align: center;
+            opacity: 0;
+            text-shadow: 0 2px 10px rgba(168, 28, 46, 0.4),
+                         0 0 15px rgba(232, 215, 195, 0.2);
+            filter: drop-shadow(0 2px 8px rgba(168, 28, 46, 0.3));
+        }
+
+        @keyframes basmalaFadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes basmalaFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-8px); }
+        }
+
         /* ===== PHASE 4: FADE TO OBLIVION ===== */
         .oblivion-overlay {
             position: fixed;
@@ -417,6 +444,11 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
+            .basmala {
+                top: 15px;
+                font-size: clamp(1rem, 2.5vw, 1.4rem);
+            }
+
             .sponsor-card .sponsor-card-content {
                 gap: 2rem;
                 padding: 2rem;
@@ -478,6 +510,13 @@
     <div class="bg-gradient"></div>
 
     <div class="particles" id="particles"></div>
+
+    <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         BASMALA - ALWAYS AT TOP (Islamic tradition)
+         بسم الله الرحمن الرحيم
+         "In the name of Allah, the Most Gracious, the Most Merciful"
+         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+    <div class="basmala" id="basmala">بسم الله الرحمن الرحيم</div>
 
     <div class="scene-container">
         <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -581,6 +620,17 @@
 
         function animateSplash() {
             const timeline = [];
+
+            // Display basmala from the start
+            const basmala = document.getElementById('basmala');
+            basmala.style.animation = 'basmalaFadeIn 1.5s ease-out forwards';
+            basmala.style.animationDelay = '0.3s';
+
+            // Add floating animation to basmala throughout the animation
+            setTimeout(() => {
+                basmala.style.animation = 'basmalaFloat 3s ease-in-out infinite';
+                basmala.style.animationDelay = '1.8s';
+            }, 1800);
 
             // PHASE 1: Individual Sponsor Cards + Combined Display (0-12s)
             // EXTENDED FOR SPONSOR LOGO VISIBILITY
@@ -717,6 +767,11 @@
                 const vignette = document.getElementById('vignette');
                 const oblivionOverlay = document.getElementById('oblivionOverlay');
                 const showLogoPhase = document.getElementById('showLogoPhase');
+                const basmala = document.getElementById('basmala');
+
+                // Fade basmala gracefully
+                basmala.style.transition = 'opacity 1.5s ease-in';
+                basmala.style.opacity = '0';
 
                 vignette.style.animation = 'fadeToBlack 1.5s ease-in forwards';
 
