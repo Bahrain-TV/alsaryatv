@@ -30,80 +30,102 @@ set -eo pipefail
 # ── Local Execution Wrapper ──────────────────────────────────────────────────
 # Detect if running locally (e.g. macOS/Darwin) and proxy to remote
 if [[ "$(uname -s)" == "Darwin" ]]; then
+    # Helper for local reporting
+    local_info()  { echo -e "\033[0;36m[LOCAL]\033[0m  $*"; }
+    local_error() { echo -e "\033[0;31m[ERROR]\033[0m $*"; }
+    
+    # Setup cleanup for local wrapper
+    local_cleanup() {
+        # Restore terminal if needed, kill child processes
+        true
+    }
+    trap local_cleanup EXIT INT TERM
+
     echo "----------------------------------------------------------------"
-    echo "  Detected Local Execution (macOS)"
-    echo "  Proxying to Remote Deployment..."
+    echo "  🚀 AlSarya TV Deployment Launcher"
+    echo "  Detected Local Environment (macOS)"
     echo "----------------------------------------------------------------"
 
     # Load .env for config
     if [[ -f .env ]]; then
-        # Safer sourcing of .env (handles quoted values with spaces)
         set -a
         [ -f .env ] && . .env
         set +a
     fi
 
-    # Set defaults if not in .env
+    # Set defaults
     PROD_SSH_USER="${PROD_SSH_USER:-root}"
     PROD_SSH_HOST="${PROD_SSH_HOST:-alsarya.tv}"
     PROD_SSH_PORT="${PROD_SSH_PORT:-22}"
     PROD_APP_DIR="${PROD_APP_DIR:-/home/alsarya.tv/public_html}"
     SSH_KEY_PATH="${SSH_KEY_PATH:-${HOME}/.ssh/id_rsa}"
 
-    # 1. Image Sync (Rsync)
-    echo "» Syncing Assets (Images & Storage)..."
+    # 1. ESTABLISH CONNECTION FIRST ("Open up the production server")
+    # We verify we can talk to the server before doing any heavy lifting.
+    local_info "Testing connection to production server ($PROD_SSH_HOST)..."
+    if ! ssh -q -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" -o BatchMode=yes -o ConnectTimeout=5 "$PROD_SSH_USER@$PROD_SSH_HOST" "echo '✓ Connection Established'"; then
+        local_error "Could not connect to $PROD_SSH_USER@$PROD_SSH_HOST"
+        local_error "Please check your VPN, internet connection, or SSH keys."
+        exit 1
+    fi
+
+    # 2. Sync Assets (Images & Storage) - OPTIMIZED
+    # We use rsync with checksum (-c) to avoid re-uploading identical files
+    local_info "Syncing Assets (Images & Storage)..."
     RSYNC_SSH="ssh -p $PROD_SSH_PORT -i $SSH_KEY_PATH -o StrictHostKeyChecking=accept-new"
 
     # Sync public/images
     if [[ -d "public/images" ]]; then
-        rsync -avz --no-o --no-g -e "$RSYNC_SSH" "public/images/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/public/images/" || echo "Warning: Image sync failed"
+        # -c checksum, -u update (skip newer), --delete (optional, maybe too dangerous?)
+        rsync -avzc --no-o --no-g -e "$RSYNC_SSH" "public/images/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/public/images/" >/dev/null || local_error "Image sync warning"
     fi
 
     # Sync storage/app/public
     if [[ -d "storage/app/public" ]]; then
-        # Ensure remote directory exists first (as root is fine, we fix perms later)
+        # Ensure remote directory exists
         ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "mkdir -p $PROD_APP_DIR/storage/app/public" || true
-        
-        rsync -avz --no-o --no-g -e "$RSYNC_SSH" "storage/app/public/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/storage/app/public/" || echo "Warning: Storage sync failed"
+        rsync -avzc --no-o --no-g -e "$RSYNC_SSH" "storage/app/public/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/storage/app/public/" >/dev/null || local_error "Storage sync warning"
     fi
-    echo "✓ Assets Synced."
+    local_info "✓ Assets Synced (Differential)"
 
-    # Sync .env to ensure configuration matches (especially FILESYSTEM_DISK)
+    # 3. Update Remote Configuration & Script
+    local_info "Updating remote configuration and deployment script..."
+    
+    # Sync .env (Differential sync using rsync instead of scp)
     if [[ -f .env ]]; then
-        echo "» Syncing .env to remote..."
-        scp -P "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" ".env" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/.env" || echo "Warning: .env sync failed"
+        rsync -avzc --no-o --no-g -e "$RSYNC_SSH" ".env" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/.env" >/dev/null || local_error ".env sync failed"
     fi
 
-    # Fix permissions after sync (since we uploaded as root)
-    if [[ "$PROD_SSH_USER" == "root" ]]; then
-        echo "» Fixing ownership/permissions on remote server (switching to $APP_USER)..."
-        # We also chmod to ensure readability
-        FIX_PERM_CMD="
-           chown -R $APP_USER:$APP_USER $PROD_APP_DIR/public/images $PROD_APP_DIR/storage/app/public $PROD_APP_DIR/.env
-           chmod -R 775 $PROD_APP_DIR/storage
-           chmod -R 755 $PROD_APP_DIR/public/images
-        "
-        ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$FIX_PERM_CMD" || echo "Warning: Could not fix permissions"
-    fi
-
-    # 2. Upload latest deploy script to server
-    echo "» Uploading latest deploy.sh to remote..."
-    scp -P "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$0" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/deploy.sh" || warn "Failed to upload deploy.sh"
+    # Upload clean deploy script (Atomic upload: upload to tmp -> mv to target)
+    scp -q -P "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$0" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/deploy.sh.new"
     
-    # Ensure it's executable and owned by app user
-    ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "chmod +x $PROD_APP_DIR/deploy.sh && chown $APP_USER:$APP_USER $PROD_APP_DIR/deploy.sh" || true
+    # Fix permissions and swap script
+    FIX_CMD="
+        chmod +x $PROD_APP_DIR/deploy.sh.new
+        mv $PROD_APP_DIR/deploy.sh.new $PROD_APP_DIR/deploy.sh
+        chown $APP_USER:$APP_USER $PROD_APP_DIR/deploy.sh
+        
+        # Aggressive Permission Fixes
+        chown -R $APP_USER:$APP_USER $PROD_APP_DIR/public/images $PROD_APP_DIR/storage/app/public $PROD_APP_DIR/.env
+        chmod -R 775 $PROD_APP_DIR/storage
+        chmod -R 755 $PROD_APP_DIR/public/images
+    "
+    ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$FIX_CMD" || local_error "Permission fix warning"
 
-    # 3. Trigger Remote Deployment
-    echo "» Triggering Remote Deployment..."
+    # 4. Handover to Remote Server
+    local_info "Handing over to production server..."
+    echo ""
+    
+    # Interactive execution to preserve colors and see real-time output
     REMOTE_CMD="cd '$PROD_APP_DIR' && ./deploy.sh $@"
+    ssh -t -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$REMOTE_CMD"
     
-    ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$REMOTE_CMD"
     EXIT_CODE=$?
-
+    echo ""
     if [ $EXIT_CODE -eq 0 ]; then
-        echo "✓ Remote Deployment Successful."
+        local_info "✓ Deployment Cycle Complete."
     else
-        echo "✗ Remote Deployment Failed (Exit Code: $EXIT_CODE)."
+        local_error "✗ Remote Deployment Finished with Error (Code: $EXIT_CODE)"
     fi
 
     exit $EXIT_CODE
@@ -422,10 +444,11 @@ TIMEOUT=600  # 10 minutes max runtime
 (
     sleep "$TIMEOUT"
     if kill -0 $$ 2>/dev/null; then
-        error "Deploy script exceeded $TIMEOUT second timeout. Force-killing..."
+        # We need to write to the original stderr if possible, or just kill
+        # Since we redirected output, we can't easily echo to user unless we kept a descriptor
         kill -9 $$ 2>/dev/null || true
     fi
-) &
+) > /dev/null 2>&1 &
 TIMEOUT_PID=$!
 
 # ── Load notification settings ───────────────────────────────────────────────
