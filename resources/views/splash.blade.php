@@ -346,7 +346,7 @@
             text-align: center;
         }
 
-        /* ===== BASMALA (ALWAYS AT TOP) ===== */
+        /* ===== BASMALA (ALWAYS AT TOP - ALWAYS VISIBLE) ===== */
         .basmala {
             position: fixed;
             top: 20px;
@@ -358,19 +358,16 @@
             font-weight: 600;
             letter-spacing: 2px;
             text-align: center;
-            opacity: 0;
-            text-shadow: 0 2px 10px rgba(168, 28, 46, 0.4),
-                         0 0 15px rgba(232, 215, 195, 0.2);
-            filter: drop-shadow(0 2px 8px rgba(168, 28, 46, 0.3));
-        }
-
-        @keyframes basmalaFadeIn {
-            to { opacity: 1; }
+            opacity: 1;
+            text-shadow: 0 2px 10px rgba(168, 28, 46, 0.5),
+                         0 0 15px rgba(232, 215, 195, 0.3);
+            filter: drop-shadow(0 2px 8px rgba(168, 28, 46, 0.4));
+            pointer-events: none;
         }
 
         @keyframes basmalaFloat {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-8px); }
+            0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            50% { transform: translateX(-50%) translateY(-6px); opacity: 1; }
         }
 
         /* ===== PHASE 4: FADE TO OBLIVION ===== */
@@ -621,16 +618,11 @@
         function animateSplash() {
             const timeline = [];
 
-            // Display basmala from the start
+            // Display basmala immediately and keep it visible throughout entire animation
             const basmala = document.getElementById('basmala');
-            basmala.style.animation = 'basmalaFadeIn 1.5s ease-out forwards';
-            basmala.style.animationDelay = '0.3s';
-
-            // Add floating animation to basmala throughout the animation
-            setTimeout(() => {
-                basmala.style.animation = 'basmalaFloat 3s ease-in-out infinite';
-                basmala.style.animationDelay = '1.8s';
-            }, 1800);
+            basmala.style.opacity = '1';
+            basmala.style.animation = 'basmalaFloat 4s ease-in-out infinite';
+            basmala.style.pointerEvents = 'none';
 
             // PHASE 1: Individual Sponsor Cards + Combined Display (0-12s)
             // EXTENDED FOR SPONSOR LOGO VISIBILITY
@@ -769,9 +761,8 @@
                 const showLogoPhase = document.getElementById('showLogoPhase');
                 const basmala = document.getElementById('basmala');
 
-                // Fade basmala gracefully
-                basmala.style.transition = 'opacity 1.5s ease-in';
-                basmala.style.opacity = '0';
+                // KEEP BASMALA VISIBLE - it always stays at top
+                basmala.style.opacity = '1';
 
                 vignette.style.animation = 'fadeToBlack 1.5s ease-in forwards';
 
