@@ -72,7 +72,14 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
         ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$FIX_PERM_CMD" || echo "Warning: Could not fix permissions"
     fi
 
-    # 2. Trigger Remote Deployment
+    # 2. Upload latest deploy script to server
+    echo "» Uploading latest deploy.sh to remote..."
+    scp -P "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$0" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/deploy.sh" || warn "Failed to upload deploy.sh"
+    
+    # Ensure it's executable and owned by app user
+    ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "chmod +x $PROD_APP_DIR/deploy.sh && chown $APP_USER:$APP_USER $PROD_APP_DIR/deploy.sh" || true
+
+    # 3. Trigger Remote Deployment
     echo "» Triggering Remote Deployment..."
     REMOTE_CMD="cd '$PROD_APP_DIR' && ./deploy.sh $@"
     
@@ -109,9 +116,8 @@ run() {
     # Check if we are physically running as root (ID 0)
     if [[ "$(id -u)" == "0" ]]; then
         # Commands that touch application files/db should be run as APP_USER
-        # We check if the command is NOT already prefixed with sudo
         if [[ ! "$cmd_str" =~ ^sudo ]]; then
-            if [[ "$cmd_str" == *"php"* ]] || [[ "$cmd_str" == *"composer"* ]] || [[ "$cmd_str" == *"npm"* ]] || [[ "$cmd_str" == *"pnpm"* ]]; then
+            if [[ "$cmd_str" == *"php"* ]] || [[ "$cmd_str" == *"composer"* ]] || [[ "$cmd_str" == *"npm"* ]] || [[ "$cmd_str" == *"pnpm"* ]] || [[ "$cmd_str" == *"git"* ]]; then
                 # Wrap in sudo -u APP_USER
                 # We use 'bash -c' to handle complex commands (pipes, redirects) if any, though risky.
                 # simpler: just prefix.
