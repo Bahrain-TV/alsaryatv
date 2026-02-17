@@ -1017,9 +1017,9 @@ if [[ "$(id -u)" == "0" ]]; then
    chown -R "$APP_USER:$APP_USER" "$APP_DIR"
    chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
    success "Ownership fixed."
+else
+   info "Skipping recursive ownership change (not running as root)"
 fi
-
-info "Skipping recursive ownership change (prevents HTTP 403 errors)"
 
 # ── Step 11c: Update deployment record ───────────────────────────────────────
 if [[ "$DRY_RUN" == "false" ]]; then
@@ -1115,16 +1115,18 @@ if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Disabling maintenance mode..."
     run php artisan up
     success "Application is live."
-    MAINTENANCE_WAS_ENABLED=false
 
     if [[ "$IS_LOCAL_EXECUTION" == "true" && "$DRY_RUN" == "false" ]]; then
         echo ""
         if ! check_production_health; then
             error "Health check failed! Site is live but routes may not be working correctly."
             error "Please investigate immediately."
+            # Keep MAINTENANCE_WAS_ENABLED=true so cleanup can restore if needed
             exit 1
         fi
     fi
+    # Only set flag to false after health check passes
+    MAINTENANCE_WAS_ENABLED=false
 else
     info "Skipping maintenance mode restore (handled by publish.sh)."
 fi
