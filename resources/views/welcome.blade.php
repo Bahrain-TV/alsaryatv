@@ -287,11 +287,7 @@
                 </div>
                 <div class="preloader-ring"></div>
                 <div class="preloader-ring-2"></div>
-                @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
-                    <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="AlSarya TV" class="preloader-logo" />
-                @else
-                    <img src="{{ asset('images/bahrain-tv-sm.png') }}" alt="Bahrain TV" class="preloader-logo" />
-                @endif
+                <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="AlSarya TV" class="preloader-logo" />
             </div>
             <div class="preloader-text">جاري التحميل</div>
         </div>
@@ -322,11 +318,7 @@
         </button>
         <!-- Logo -->
         <div class="logo-section">
-            @if(file_exists(public_path('images/alsarya-logo-2026-1.png')))
                 <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
-            @else
-                <img src="{{ asset('images/alsarya-tv-show-logo.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
-            @endif
         </div>
 
         <!-- Header Section (Animates as one block) -->

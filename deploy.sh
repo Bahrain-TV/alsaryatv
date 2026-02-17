@@ -61,14 +61,28 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
 
     # Sync storage/app/public
     if [[ -d "storage/app/public" ]]; then
+        # Ensure remote directory exists first (as root is fine, we fix perms later)
+        ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "mkdir -p $PROD_APP_DIR/storage/app/public" || true
+        
         rsync -avz --no-o --no-g -e "$RSYNC_SSH" "storage/app/public/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/storage/app/public/" || echo "Warning: Storage sync failed"
     fi
     echo "✓ Assets Synced."
 
+    # Sync .env to ensure configuration matches (especially FILESYSTEM_DISK)
+    if [[ -f .env ]]; then
+        echo "» Syncing .env to remote..."
+        scp -P "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" ".env" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/.env" || echo "Warning: .env sync failed"
+    fi
+
     # Fix permissions after sync (since we uploaded as root)
     if [[ "$PROD_SSH_USER" == "root" ]]; then
-        echo "» Fixing ownership on remote server (switching to $APP_USER)..."
-        FIX_PERM_CMD="chown -R $APP_USER:$APP_USER $PROD_APP_DIR/public/images $PROD_APP_DIR/storage/app/public"
+        echo "» Fixing ownership/permissions on remote server (switching to $APP_USER)..."
+        # We also chmod to ensure readability
+        FIX_PERM_CMD="
+           chown -R $APP_USER:$APP_USER $PROD_APP_DIR/public/images $PROD_APP_DIR/storage/app/public $PROD_APP_DIR/.env
+           chmod -R 775 $PROD_APP_DIR/storage
+           chmod -R 755 $PROD_APP_DIR/public/images
+        "
         ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$FIX_PERM_CMD" || echo "Warning: Could not fix permissions"
     fi
 
@@ -381,9 +395,15 @@ cleanup_and_exit() {
     rm -f "$LOCK_FILE" "$INSTALL_FLAG"
 
     # CRITICAL: Restore site if maintenance mode was enabled and something failed
-    if [[ "$MAINTENANCE_WAS_ENABLED" == "true" && "$exit_code" -ne 0 ]]; then
-        error "Deploy failed (exit code: $exit_code)! Restoring site to LIVE status..."
-        if php artisan up 2>/dev/null; then
+    # OR if --up was explicitly passed (IGNORE_MAINTENANCE), ensuring site is always brought up
+    if [[ ("$MAINTENANCE_WAS_ENABLED" == "true" && "$exit_code" -ne 0) || "$IGNORE_MAINTENANCE" == "true" ]]; then
+        if [[ "$exit_code" -ne 0 ]]; then
+            warn "Deploy failed (exit code: $exit_code)! Restoring site to LIVE status..."
+        else
+             info "Ensuring site is LIVE (--up flag active)..."
+        fi
+        
+        if run php artisan up 2>/dev/null; then
             success "Site restored to live."
         else
             error "WARNING: Could not restore site! Manual intervention may be needed."
@@ -671,6 +691,12 @@ if [[ ! -L public/storage ]]; then
     info "Creating storage symlink..."
     run php artisan storage:link
     success "Storage symlink created."
+else
+    # Force refresh of storage link to be safe
+    info "Refreshing storage symlink..."
+    rm public/storage
+    run php artisan storage:link
+    success "Storage symlink refreshed."
 fi
 
 # ── Step 11: Queue restart ───────────────────────────────────────────────────
