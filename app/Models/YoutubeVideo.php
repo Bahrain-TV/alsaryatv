@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class YoutubeVideo extends Model
 {
@@ -30,7 +29,7 @@ class YoutubeVideo extends Model
     {
         static::saving(function ($video) {
             // Extract YouTube ID from URL if not set
-            if (!$video->youtube_id && $video->youtube_url) {
+            if (! $video->youtube_id && $video->youtube_url) {
                 $video->youtube_id = static::extractYoutubeId($video->youtube_url);
             }
         });
@@ -49,17 +48,17 @@ class YoutubeVideo extends Model
     public function isActive(): bool
     {
         return $this->is_enabled &&
-               !$this->isExpired() &&
-               (!$this->scheduled_at || now()->isAfter($this->scheduled_at));
+               ! $this->isExpired() &&
+               (! $this->scheduled_at || now()->isAfter($this->scheduled_at));
     }
 
     public function getEmbedUrlAttribute(): string
     {
-        if (!$this->youtube_id) {
+        if (! $this->youtube_id) {
             return '';
         }
 
-        $baseUrl = 'https://www.youtube.com/embed/' . $this->youtube_id;
+        $baseUrl = 'https://www.youtube.com/embed/'.$this->youtube_id;
         $params = [];
 
         if ($this->is_live_stream) {
@@ -67,7 +66,7 @@ class YoutubeVideo extends Model
             $params[] = 'mute=1';
         }
 
-        return $baseUrl . (count($params) > 0 ? '?' . implode('&', $params) : '');
+        return $baseUrl.(count($params) > 0 ? '?'.implode('&', $params) : '');
     }
 
     public static function extractYoutubeId(string $url): ?string
@@ -93,11 +92,11 @@ class YoutubeVideo extends Model
         return static::where('is_enabled', true)
             ->where(function ($query) {
                 $query->whereNull('scheduled_at')
-                      ->orWhere('scheduled_at', '<=', now());
+                    ->orWhere('scheduled_at', '<=', now());
             })
             ->where(function ($query) {
                 $query->whereNull('expires_at')
-                      ->orWhere('expires_at', '>', now());
+                    ->orWhere('expires_at', '>', now());
             })
             ->orderBy('sort_order')
             ->orderBy('created_at', 'desc')

@@ -49,11 +49,11 @@ class BrandingMakerCommand extends Command
         $searchPath = $this->option('path');
         $noAi = $this->option('no-ai');
 
-        $this->info("🔍 Starting Branding Investigation...");
+        $this->info('🔍 Starting Branding Investigation...');
 
         // 1. Check Ollama availability (skip if --no-ai)
-        if (!$noAi && !$this->checkOllama()) {
-            $this->warn("⚠️  Ollama is not accessible at http://localhost:11434. Falling back to heuristic-only mode.");
+        if (! $noAi && ! $this->checkOllama()) {
+            $this->warn('⚠️  Ollama is not accessible at http://localhost:11434. Falling back to heuristic-only mode.');
             $noAi = true;
         }
 
@@ -61,12 +61,13 @@ class BrandingMakerCommand extends Command
         $locations = $this->identifyBrandingLocations($searchPath, $model, $noAi);
 
         if (empty($locations)) {
-            $this->warn("⚠️ No branding locations identified.");
+            $this->warn('⚠️ No branding locations identified.');
+
             return self::SUCCESS;
         }
 
         $this->newLine();
-        $this->info("✅ Identified " . count($locations) . " file(s) with branding:");
+        $this->info('✅ Identified '.count($locations).' file(s) with branding:');
         $totalMatches = 0;
         foreach ($locations as $file => $matches) {
             $this->newLine();
@@ -83,25 +84,28 @@ class BrandingMakerCommand extends Command
 
         // 3. Replacement phase
         if ($shouldReplace && $newImagePath) {
-            if (!File::exists($newImagePath)) {
+            if (! File::exists($newImagePath)) {
                 $this->error("❌ New image file not found: {$newImagePath}");
+
                 return self::FAILURE;
             }
 
-            if (!$this->confirm("Replace all identified branding references with the new logo?", true)) {
-                $this->info("Aborted.");
+            if (! $this->confirm('Replace all identified branding references with the new logo?', true)) {
+                $this->info('Aborted.');
+
                 return self::SUCCESS;
             }
 
             $this->info("\n🚀 Starting Replacement...");
             $this->performReplacement($locations, $newImagePath, $model, $noAi);
             $this->info("\n✅ Branding update completed!");
-        } elseif ($shouldReplace && !$newImagePath) {
-            $this->error("❌ Replacement requested but no new image path provided.");
+        } elseif ($shouldReplace && ! $newImagePath) {
+            $this->error('❌ Replacement requested but no new image path provided.');
+
             return self::FAILURE;
         } else {
             $this->newLine();
-            $this->info("💡 To apply changes, re-run with --replace:");
+            $this->info('💡 To apply changes, re-run with --replace:');
             $this->line("   <comment>php artisan branding:maker {$newImagePath} --replace</comment>");
         }
 
@@ -115,6 +119,7 @@ class BrandingMakerCommand extends Command
     {
         try {
             $response = Http::timeout(2)->get('http://localhost:11434/api/tags');
+
             return $response->successful();
         } catch (\Exception $e) {
             return false;
@@ -132,13 +137,13 @@ class BrandingMakerCommand extends Command
         ];
 
         // Filter to existing paths
-        $searchPaths = array_filter($searchPaths, fn($p) => File::exists($p));
+        $searchPaths = array_filter($searchPaths, fn ($p) => File::exists($p));
 
         if (empty($searchPaths)) {
             return [];
         }
 
-        $finder = new Finder();
+        $finder = new Finder;
         $finder->files()
             ->in($searchPaths)
             ->exclude($this->ignoreFolders)
@@ -163,7 +168,7 @@ class BrandingMakerCommand extends Command
                 $hasImageRef = (bool) preg_match(self::IMG_PATTERN, $line);
                 $hasLogoKeyword = stripos($line, 'logo') !== false;
 
-                if (!$hasImageRef && !$hasLogoKeyword) {
+                if (! $hasImageRef && ! $hasLogoKeyword) {
                     continue;
                 }
 
@@ -196,7 +201,7 @@ class BrandingMakerCommand extends Command
                         'reason' => '🎯 File is a logo component with image reference.',
                         'full_path' => $file->getRealPath(),
                     ];
-                } elseif (!$noAi && $ollamaCalls < $maxOllamaCalls && $hasImageRef) {
+                } elseif (! $noAi && $ollamaCalls < $maxOllamaCalls && $hasImageRef) {
                     // Ambiguous — ask Ollama
                     $ollamaCalls++;
                     $analysis = $this->ollamaAnalyze($block, $model);
@@ -204,7 +209,7 @@ class BrandingMakerCommand extends Command
                         $results[$file->getRelativePathname()][] = [
                             'snippet' => $block,
                             'line' => $index + 1,
-                            'reason' => '🤖 AI: ' . $analysis['reason'],
+                            'reason' => '🤖 AI: '.$analysis['reason'],
                             'full_path' => $file->getRealPath(),
                         ];
                     }
@@ -251,13 +256,13 @@ class BrandingMakerCommand extends Command
         // 1. Copy new image into public/images/branding/
         $extension = pathinfo($newImagePath, PATHINFO_EXTENSION);
         $brandingDir = public_path('images/branding');
-        if (!File::exists($brandingDir)) {
+        if (! File::exists($brandingDir)) {
             File::makeDirectory($brandingDir, 0755, true);
         }
 
-        $targetFileName = 'logo.' . $extension;
-        $targetPath = $brandingDir . '/' . $targetFileName;
-        $publicAsset = 'images/branding/' . $targetFileName;
+        $targetFileName = 'logo.'.$extension;
+        $targetPath = $brandingDir.'/'.$targetFileName;
+        $publicAsset = 'images/branding/'.$targetFileName;
 
         File::copy($newImagePath, $targetPath);
         $this->info("  ✓ Saved new logo to: <comment>public/{$publicAsset}</comment>");
@@ -266,11 +271,12 @@ class BrandingMakerCommand extends Command
         $replacementMap = $this->buildReplacementMap($locations, $publicAsset, $model, $noAi);
 
         if (empty($replacementMap)) {
-            $this->warn("  ⚠️ Could not identify any image paths to replace.");
+            $this->warn('  ⚠️ Could not identify any image paths to replace.');
+
             return;
         }
 
-        $this->info("  Found " . count($replacementMap) . " unique image path(s) to replace:");
+        $this->info('  Found '.count($replacementMap).' unique image path(s) to replace:');
         foreach ($replacementMap as $old => $new) {
             $this->line("    <fg=red>{$old}</> → <fg=green>{$new}</>");
         }
@@ -294,7 +300,7 @@ class BrandingMakerCommand extends Command
         }
 
         $this->newLine();
-        $this->info("  Updated " . count($updatedFiles) . " file(s).");
+        $this->info('  Updated '.count($updatedFiles).' file(s).');
     }
 
     /**
@@ -344,6 +350,7 @@ class BrandingMakerCommand extends Command
     {
         $text = str_replace(["\n", "\r", "\t"], ' ', $text);
         $text = preg_replace('/\s+/', ' ', $text);
-        return strlen($text) > $length ? substr($text, 0, $length) . '…' : $text;
+
+        return strlen($text) > $length ? substr($text, 0, $length).'…' : $text;
     }
 }

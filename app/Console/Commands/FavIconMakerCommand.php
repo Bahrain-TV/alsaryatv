@@ -282,7 +282,7 @@ class FavIconMakerCommand extends Command
             $dataOffset += strlen($data);
         }
 
-        file_put_contents($outputPath, $header . $entries . $imageData);
+        file_put_contents($outputPath, $header.$entries.$imageData);
     }
 
     /**

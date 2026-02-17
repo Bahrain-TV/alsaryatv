@@ -80,9 +80,9 @@
 <div wire:poll.2s="refreshStats">
     <div class="obs-overlay-wrap">
         <div class="obs-overlay-float">
-            <div class="obs-overlay-panel rounded-2xl border border-white/10 bg-black/70 p-8 shadow-lg backdrop-blur">
+            <div class="obs-overlay-panel rounded-2xl border border-white/10 bg-black/70 p-8 shadow-lg">
                 <!-- Ramadan-themed Three.js Background Canvas (INSIDE PANEL) -->
-                <canvas class="threejs-canvas" id="obs-ramadan-canvas"></canvas>
+                <canvas class="threejs-canvas" id="obs-ramadan-canvas" wire:ignore></canvas>
 
                 <!-- Content wrapper with higher z-index -->
                 <div style="position: relative; z-index: 1;">
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderer = new THREE.WebGLRenderer({
         canvas: canvas,
         alpha: true,
-        antialias: true
+        antialias: false
     });
 
     renderer.setSize(panelRect.width, panelRect.height);
@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // STARS - Particle System with Twinkling
     // ============================
     const starGeometry = new THREE.BufferGeometry();
-    const starCount = 200;
+    const starCount = 100;
     const starPositions = new Float32Array(starCount * 3);
     const starColors = new Float32Array(starCount * 3);
     const starSizes = new Float32Array(starCount);
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ANIMATED PARTICLES - Golden Dust
     // ============================
     const dustGeometry = new THREE.BufferGeometry();
-    const dustCount = 300;
+    const dustCount = 150;
     const dustPositions = new Float32Array(dustCount * 3);
 
     for (let i = 0; i < dustCount; i++) {
@@ -497,58 +497,67 @@ document.addEventListener('DOMContentLoaded', () => {
     // ANIMATION LOOP
     // ============================
     let time = 0;
+    const fps = 30;
+    const frameInterval = 1000 / fps;
+    let lastFrameTime = 0;
 
-    function animate() {
+    function animate(currentTime = 0) {
         requestAnimationFrame(animate);
-        time += 0.01;
 
-        // Animate lanterns - floating and rotating
-        lanterns.forEach((lantern, index) => {
-            lantern.position.y += Math.sin(time * lantern.userData.floatSpeed + lantern.userData.floatOffset) * 0.01;
-            lantern.rotation.y += lantern.userData.rotationSpeed;
+        const deltaTime = currentTime - lastFrameTime;
 
-            // Glow pulsing
-            const glow = lantern.children.find(child => child.geometry?.type === 'SphereGeometry');
-            if (glow) {
-                glow.material.opacity = 0.6 + Math.sin(time * 2 + index) * 0.2;
+        if (deltaTime >= frameInterval) {
+            lastFrameTime = currentTime - (deltaTime % frameInterval);
+            time += 0.01;
+
+            // Animate lanterns - floating and rotating
+            lanterns.forEach((lantern, index) => {
+                lantern.position.y += Math.sin(time * lantern.userData.floatSpeed + lantern.userData.floatOffset) * 0.01;
+                lantern.rotation.y += lantern.userData.rotationSpeed;
+
+                // Glow pulsing
+                const glow = lantern.children.find(child => child.geometry?.type === 'SphereGeometry');
+                if (glow) {
+                    glow.material.opacity = 0.6 + Math.sin(time * 2 + index) * 0.2;
+                }
+            });
+
+            // Animate crescent - gentle rotation
+            crescent.rotation.z += 0.002;
+            crescent.children[2].material.opacity = 0.15 + Math.sin(time * 0.5) * 0.1; // Glow pulse
+
+            // Animate stars - twinkling effect
+            const starSizesAttr = stars.geometry.attributes.size;
+            for (let i = 0; i < starCount; i++) {
+                starSizesAttr.array[i] = (Math.sin(time * 2 + i * 0.1) + 1) * 0.5 + 0.5;
             }
-        });
+            starSizesAttr.needsUpdate = true;
+            stars.rotation.y += 0.0005;
 
-        // Animate crescent - gentle rotation
-        crescent.rotation.z += 0.002;
-        crescent.children[2].material.opacity = 0.15 + Math.sin(time * 0.5) * 0.1; // Glow pulse
+            // Animate mandala - rotating patterns
+            mandala.rotation.z += 0.003;
+            mandala.children.forEach((child, i) => {
+                if (child.geometry?.type === 'ShapeGeometry') {
+                    child.rotation.z += 0.001 * (i % 2 === 0 ? 1 : -1);
+                }
+            });
 
-        // Animate stars - twinkling effect
-        const starSizesAttr = stars.geometry.attributes.size;
-        for (let i = 0; i < starCount; i++) {
-            starSizesAttr.array[i] = (Math.sin(time * 2 + i * 0.1) + 1) * 0.5 + 0.5;
-        }
-        starSizesAttr.needsUpdate = true;
-        stars.rotation.y += 0.0005;
-
-        // Animate mandala - rotating patterns
-        mandala.rotation.z += 0.003;
-        mandala.children.forEach((child, i) => {
-            if (child.geometry?.type === 'ShapeGeometry') {
-                child.rotation.z += 0.001 * (i % 2 === 0 ? 1 : -1);
+            // Animate golden dust - slow drift
+            const dustPos = dust.geometry.attributes.position.array;
+            for (let i = 0; i < dustCount; i++) {
+                dustPos[i * 3 + 1] += Math.sin(time * 0.5 + i * 0.05) * 0.02;
+                if (dustPos[i * 3 + 1] > 12) dustPos[i * 3 + 1] = -12;
             }
-        });
+            dust.geometry.attributes.position.needsUpdate = true;
+            dust.rotation.y += 0.001;
 
-        // Animate golden dust - slow drift
-        const dustPos = dust.geometry.attributes.position.array;
-        for (let i = 0; i < dustCount; i++) {
-            dustPos[i * 3 + 1] += Math.sin(time * 0.5 + i * 0.05) * 0.02;
-            if (dustPos[i * 3 + 1] > 12) dustPos[i * 3 + 1] = -12;
+            // Subtle camera movement for depth
+            camera.position.x = Math.sin(time * 0.1) * 0.5;
+            camera.position.y = Math.cos(time * 0.15) * 0.3;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
         }
-        dust.geometry.attributes.position.needsUpdate = true;
-        dust.rotation.y += 0.001;
-
-        // Subtle camera movement for depth
-        camera.position.x = Math.sin(time * 0.1) * 0.5;
-        camera.position.y = Math.cos(time * 0.15) * 0.3;
-        camera.lookAt(scene.position);
-
-        renderer.render(scene, camera);
     }
 
     // Handle window resize

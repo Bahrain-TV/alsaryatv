@@ -210,23 +210,25 @@ class MainFunctionalityTest extends TestCase
     public function test_eligible_callers_scope(): void
     {
         // Create eligible callers
-        $eligibleCallers = Caller::factory()->count(3)->create([
-            'is_winner' => false,
-            'status' => 'active',
-            'cpr' => 'valid_cpr',
-        ]);
+        $eligibleCallers = Caller::factory()
+            ->count(3)
+            ->sequence(fn ($sequence) => ['cpr' => 'valid_cpr_' . $sequence->index])
+            ->create([
+                'is_winner' => false,
+                'status' => 'active',
+            ]);
 
         // Create ineligible callers
         Caller::factory()->create([
-            'is_winner' => true,  // Winner - not eligible
+            'is_winner' => true,
             'status' => 'active',
-            'cpr' => 'valid_cpr',
+            'cpr' => 'valid_cpr_winner',
         ]);
 
         Caller::factory()->create([
             'is_winner' => false,
-            'status' => 'inactive',  // Inactive - not eligible
-            'cpr' => 'valid_cpr',
+            'status' => 'inactive',
+            'cpr' => 'valid_cpr_inactive',
         ]);
 
         Caller::factory()->create([
