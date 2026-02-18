@@ -1,3 +1,4 @@
+```html
 <div class="w-full">
     <section class="py-3 sm:py-4" id="sponsors">
         <div class="container mx-auto px-4">

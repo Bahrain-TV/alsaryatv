@@ -29,8 +29,8 @@ class CallerController extends Controller
         if ($search = $request->input('q') ?? $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('cpr', 'like', "%{$search}%");
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('cpr', 'like', "%{$search}%");
             });
         }
 

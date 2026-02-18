@@ -50,12 +50,12 @@
         </div>
 
         <!-- Bottom copyright with BTV logo -->
-        <div class="mt-1.5 pt-1.5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4" style="border-top: 1px solid rgba(255,255,255,0.06);">
+        <div class="mt-1.5 pt-1.5 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3" style="border-top: 1px solid rgba(255,255,255,0.06);">
             <!-- BTV Logo -->
             <div class="flex items-center justify-center">
                 <img src="{{ asset('images/btv-logo-ar.png') }}" 
                      alt="تلفزيون البحرين" 
-                     class="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity duration-200"
+                     class="h-4 w-auto opacity-60 hover:opacity-100 transition-opacity duration-200"
                      style="filter: brightness(1.1);">
             </div>
             

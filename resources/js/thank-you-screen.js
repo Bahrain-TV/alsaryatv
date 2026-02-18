@@ -64,13 +64,18 @@ class ThankYouScreen {
 
     container.classList.add('thank-you-visible');
 
-    const accentColor = this.type === 'family' ? '#9A3412' : '#4338CA';
-    const accentColorRgb = this.type === 'family' ? '154, 52, 18' : '67, 56, 202';
+    // Brand Colors: Red #A81C2E, Gold #D4AF37
+    const accentColor = this.type === 'family' ? '#D4AF37' : '#A81C2E';
+    const accentColorRgb = this.type === 'family' ? '212, 175, 55' : '168, 28, 46';
+    
+    // Set CSS variable for the accent color
+    container.style.setProperty('--accent-color', accentColor);
+    container.style.setProperty('--accent-rgb', accentColorRgb);
 
     container.innerHTML = `
       <div class="thank-you-wrapper">
         <!-- Background -->
-        <div class="thank-you-bg" style="background: linear-gradient(135deg, rgba(${accentColorRgb}, 0.1) 0%, rgba(${accentColorRgb}, 0.05) 100%);"></div>
+        <div class="thank-you-bg"></div>
 
         <!-- SVG Defs for Effects -->
         <svg style="position: absolute; width: 0; height: 0;">
@@ -103,26 +108,29 @@ class ThankYouScreen {
         <!-- Confetti container -->
         <div class="confetti-container" id="thank-you-confetti"></div>
 
-        <!-- Success checkmark -->
-        <div class="success-checkmark-container">
-          <svg class="checkmark" viewBox="0 0 52 52">
-            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
-        </div>
+        <!-- Main Card -->
+        <div class="thank-you-card">
+            <!-- Success checkmark -->
+            <div class="success-checkmark-container">
+              <svg class="checkmark" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+              </svg>
+            </div>
 
-        <!-- Main message -->
-        <div class="thank-you-content">
-          <h1 class="thank-you-title" style="color: ${accentColor};">${this.message}</h1>
-          <p class="thank-you-subtitle">${this.subtitle}</p>
-          <div class="thank-you-details">
-            <p class="detail-text">تم تسجيل استدعاؤك بنجاح</p>
-            <p class="detail-text">Your call has been successfully registered</p>
-          </div>
+            <!-- Main message -->
+            <div class="thank-you-content">
+              <h1 class="thank-you-title">${this.message}</h1>
+              <p class="thank-you-subtitle">${this.subtitle}</p>
+              <div class="thank-you-details">
+                <p class="detail-text">تم تسجيل استدعاؤك بنجاح</p>
+                <p class="detail-text">Your call has been successfully registered</p>
+              </div>
+            </div>
         </div>
 
         <!-- Celebration rays -->
-        <div class="celebration-rays" style="--accent-color: ${accentColor};">
+        <div class="celebration-rays">
           <div class="ray ray-1"></div>
           <div class="ray ray-2"></div>
           <div class="ray ray-3"></div>
@@ -131,9 +139,9 @@ class ThankYouScreen {
 
         <!-- Animated shapes -->
         <div class="animated-shapes">
-          <div class="shape shape-1" style="background: ${accentColor};"></div>
-          <div class="shape shape-2" style="background: ${accentColor};"></div>
-          <div class="shape shape-3" style="background: ${accentColor};"></div>
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
         </div>
 
         <!-- Auto-close timer display -->

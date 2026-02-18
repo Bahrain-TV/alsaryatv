@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ProductionUrlTest extends TestCase
@@ -117,7 +116,7 @@ class ProductionUrlTest extends TestCase
     public function test_production_dashboard_requires_authentication(): void
     {
         $response = $this->get($this->productionUrl.'/dashboard');
-        
+
         // Should redirect to login or return 401/403
         $this->assertContains($response->status(), [302, 401, 403]);
     }
@@ -128,7 +127,7 @@ class ProductionUrlTest extends TestCase
     public function test_production_winners_requires_authentication(): void
     {
         $response = $this->get($this->productionUrl.'/winners');
-        
+
         // Should redirect to login or return 401/403
         $this->assertContains($response->status(), [302, 401, 403]);
     }
@@ -139,7 +138,7 @@ class ProductionUrlTest extends TestCase
     public function test_production_families_requires_authentication(): void
     {
         $response = $this->get($this->productionUrl.'/families');
-        
+
         // Should redirect to login or return 401/403
         $this->assertContains($response->status(), [302, 401, 403]);
     }
@@ -150,7 +149,7 @@ class ProductionUrlTest extends TestCase
     public function test_production_admin_requires_authentication(): void
     {
         $response = $this->get($this->productionUrl.'/admin');
-        
+
         // Should redirect to login or return 401/403
         $this->assertContains($response->status(), [302, 401, 403]);
     }
@@ -161,7 +160,7 @@ class ProductionUrlTest extends TestCase
     public function test_production_callers_success_requires_session(): void
     {
         $response = $this->get($this->productionUrl.'/callers/success');
-        
+
         // Should redirect since no session
         $this->assertContains($response->status(), [302, 401, 403]);
     }
