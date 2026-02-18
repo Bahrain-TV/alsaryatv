@@ -23,7 +23,30 @@ class CallerController extends Controller
     public function index(Request $request)
     {
         $perPage = 25;
-        $callers = Caller::latest()->paginate($perPage)->withQueryString();
+        $query = Caller::latest();
+
+        // Server-side search support (q parameter)
+        if ($search = $request->input('q') ?? $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('cpr', 'like', "%{$search}%");
+            });
+        }
+
+        $callers = $query->paginate($perPage)->withQueryString();
+
+        // Return JSON for AJAX / client-side fetching
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'data' => $callers->items(),
+                'current_page' => $callers->currentPage(),
+                'last_page' => $callers->lastPage(),
+                'per_page' => $callers->perPage(),
+                'total' => $callers->total(),
+                'next_page_url' => $callers->nextPageUrl(),
+            ]);
+        }
 
         return view('callers.index', ['callers' => $callers]);
     }
