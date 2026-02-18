@@ -9,12 +9,16 @@
                 <!-- Display logos -->
                 <div class="w-full flex flex-wrap justify-center items-center gap-6 sm:gap-8" id="sponsors-logos">
                     <div id="left-sponsor-logo" class="hover:scale-105 transition-transform duration-300">
-                        <img src="{{ asset('images/jasmis-logo.png') }}" 
-                        alt="Jasmis" 
-                        class="w-36 sm:w-44 lg:w-60 h-auto" />
+                        <div class="flex items-center gap-3 w-44 sm:w-56 lg:w-64">
+                            <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="h-12 sm:h-14 lg:h-16 object-contain" />
+                            <span class="text-white font-bold text-lg lg:text-xl">Jasmis</span>
+                        </div>
                     </div>
                     <div id="right-sponsor-logo" class="hover:scale-105 transition-transform duration-300">
-                        <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="w-32 sm:w-44 lg:w-60 h-auto" />
+                        <div class="flex items-center gap-3 w-44 sm:w-56 lg:w-64">
+                            <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="h-12 sm:h-14 lg:h-16 object-contain" />
+                            <span class="text-white font-bold text-lg lg:text-xl">Bapco Energies</span>
+                        </div>
                     </div>
                 </div>
             </div>

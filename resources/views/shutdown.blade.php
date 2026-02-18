@@ -94,10 +94,16 @@
                     <div class="w-auto flex flex-row space-x-7 gap-10 animate__animated animate__fadeInUp"
                         id="sponsors-logos">
                         <div class="intro-dance" id="left-sponsor-logo">
-                            <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="w-36 h-auto lg:w-60 pt-0" />
+                            <div class="flex items-center gap-3 w-44 sm:w-56 lg:w-64">
+                                <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="h-12 sm:h-14 lg:h-16 object-contain" />
+                                <span class="text-white font-bold text-lg lg:text-xl">Jasmis</span>
+                            </div>
                         </div>
                         <div class="intro-dance" id="right-sponsor-logo">
-                            <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="w-40 md:w-44 lg:w-60 h-auto pt-2 pr-2" />
+                            <div class="flex items-center gap-3 w-44 sm:w-56 lg:w-64">
+                                <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="h-12 sm:h-14 lg:h-16 object-contain" />
+                                <span class="text-white font-bold text-lg lg:text-xl">Bapco Energies</span>
+                            </div>
                         </div>
                     </div>
                     <div class="w-auto flex flex-row space-x-7 gap-10 animate__animated animate__fadeInUp intro-dance"

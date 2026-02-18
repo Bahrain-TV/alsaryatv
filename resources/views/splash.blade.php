@@ -540,9 +540,15 @@
 
             <!-- Combined Display: Both sponsors together (4s-11s) - LONGEST PHASE -->
             <div class="sponsored-by" id="sponsoredByText">برعاية</div>
-            <div class="sponsors-logos" id="sponsorsLogos">
-                <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="sponsor-logo" id="sponsor1">
-                <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="sponsor-logo" id="sponsor2">
+            <div class="sponsors-logos flex items-center justify-center gap-6" id="sponsorsLogos">
+                <div id="sponsor1" class="sponsor-logo-item flex items-center justify-center gap-3 w-44 sm:w-56 lg:w-64">
+                    <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="sponsor-logo h-12 sm:h-14 lg:h-16 object-contain" />
+                    <span class="sponsor-label text-white font-bold text-lg lg:text-xl">Jasmis</span>
+                </div>
+                <div id="sponsor2" class="sponsor-logo-item flex items-center justify-center gap-3 w-44 sm:w-56 lg:w-64">
+                    <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="sponsor-logo h-12 sm:h-14 lg:h-16 object-contain" />
+                    <span class="sponsor-label text-white font-bold text-lg lg:text-xl">Bapco Energies</span>
+                </div>
             </div>
         </div>
 
