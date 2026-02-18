@@ -742,6 +742,9 @@
                             </form>
                         </div>
 
+                        {{-- Sponsors Section --}}
+                        @include('sponsors')
+
                         {{-- Current Ramadan Info --}}
                         <div class="gsap-item mt-4 sm:mt-6 mx-2 sm:mx-4 p-[1px] rounded-2xl bg-gradient-to-r from-transparent via-green-800/50 to-transparent">
                             <div class="bg-black/40 backdrop-blur-md rounded-2xl p-3 sm:p-4 text-center border border-green-500/10 relative overflow-hidden">

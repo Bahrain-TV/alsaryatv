@@ -559,69 +559,6 @@ info "Deploying from $APP_DIR"
 
 validate_required_commands
 
-# ── Pre-Deployment Safety Checks ────────────────────────────────────────────
-pre_deployment_safety_check() {
-    step "Pre-Deployment Safety Checks"
-    
-    # 1. Check critical files exist
-    info "Checking critical files..."
-    for file in artisan .env composer.json package.json; do
-        if [[ ! -f "$file" ]]; then
-            error "CRITICAL: Required file missing: $file"
-            exit 1
-        fi
-    done
-    success "All critical files present"
-    
-    # 2. Check storage directory is writable
-    info "Checking storage permissions..."
-    if [[ ! -w "storage" ]]; then
-        error "storage directory is not writable! Fix permissions first."
-        error "Run: chown -R \$USER:\$USER storage"
-        exit 1
-    fi
-    success "Storage directory is writable"
-    
-    # 3. Check for uncommitted changes (warning only)
-    if [[ -d .git ]]; then
-        info "Checking for uncommitted changes..."
-        if ! git diff-index --quiet HEAD -- 2>/dev/null; then
-            warn "You have uncommitted changes! They will be overwritten by git reset --hard"
-            warn "Consider committing or stashing changes before deployment"
-            # List uncommitted files
-            git status --short 2>/dev/null | head -10
-        else
-            success "No uncommitted changes"
-        fi
-    fi
-    
-    # 4. Check PHP version
-    info "Checking PHP version..."
-    PHP_VERSION=$(php -r "echo PHP_VERSION;" 2>/dev/null || echo "unknown")
-    if [[ "$PHP_VERSION" =~ ^8\.[0-9]+ ]]; then
-        success "PHP version: $PHP_VERSION"
-    else
-        warn "PHP version $PHP_VERSION may not be compatible (expected 8.x)"
-    fi
-    
-    # 5. Check for recent errors in logs
-    if [[ -f "storage/logs/laravel.log" ]]; then
-        info "Checking recent errors in logs..."
-        RECENT_ERRORS=$(tail -100 storage/logs/laravel.log 2>/dev/null | grep -c "ERROR" || echo "0")
-        if [[ $RECENT_ERRORS -gt 10 ]]; then
-            warn "Found $RECENT_ERRORS recent errors in logs. Review before deploying!"
-            tail -20 storage/logs/laravel.log | grep ERROR
-        else
-            success "Log file looks healthy ($RECENT_ERRORS recent errors)"
-        fi
-    fi
-    
-    echo ""
-    success "Pre-deployment safety checks completed"
-}
-
-pre_deployment_safety_check
-
 # ── Step 0: Change Detection ────────────────────────────────────────────────
 PREV_DEPLOY_FILE="storage/framework/last_successful_deploy"
 INITIAL_GIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
@@ -747,17 +684,6 @@ NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | t
 # ── Step 0.5: Database Backup ───────────────────────────────────────────────
 step "Database Backup"
 info "Creating database backup..."
-
-# SAFETY FIX: Check disk space before backup
-DISK_AVAILABLE_KB=$(df -P . | awk 'NR==2 {print $4}')
-DISK_AVAILABLE_GB=$((DISK_AVAILABLE_KB / 1048576))
-if [[ $DISK_AVAILABLE_GB -lt 1 ]]; then
-    error "CRITICAL: Insufficient disk space (${DISK_AVAILABLE_GB}GB available, need at least 1GB)"
-    error "Deployment aborted for safety. Please free up disk space and try again."
-    exit 1
-fi
-info "Disk space check passed: ${DISK_AVAILABLE_GB}GB available"
-
 BACKUP_DIR="storage/backups"
 mkdir -p "$BACKUP_DIR"
 
@@ -768,33 +694,10 @@ if [[ "${DB_CONNECTION:-}" == "sqlite" && -f "$DB_DATABASE" ]]; then
     run cp "$DB_DATABASE" "${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
     success "SQLite backup created: ${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
 elif [[ "${DB_CONNECTION:-}" == "mysql" ]]; then
-    # SAFETY FIX: Verify mysqldump command exists
-    if ! command -v mysqldump &>/dev/null; then
-        error "mysqldump command not found! Cannot create database backup."
-        warn "Continuing deployment without backup (NOT RECOMMENDED)"
-    else
-        # SAFETY FIX: Verify database connection before backup
-        info "Testing database connection..."
-        if ! mysql -h"${DB_HOST:-localhost}" -u"${DB_USERNAME:-root}" -p"${DB_PASSWORD:-}" -e "SELECT 1" "${DB_DATABASE}" &>/dev/null; then
-            error "Cannot connect to database! Backup failed."
-            warn "Continuing deployment without backup (NOT RECOMMENDED)"
-        else
-            success "Database connection verified"
-            
-            run mysqldump --single-transaction --quick --lock-tables=false \
-                -h"${DB_HOST:-localhost}" -u"${DB_USERNAME:-root}" -p"${DB_PASSWORD:-}" \
-                "${DB_DATABASE}" > "$BACKUP_FILE"
-            
-            # SAFETY FIX: Verify backup was created and has content
-            if [[ -s "$BACKUP_FILE" ]]; then
-                BACKUP_SIZE=$(stat -c%s "$BACKUP_FILE" 2>/dev/null || stat -f%z "$BACKUP_FILE" 2>/dev/null || echo "unknown")
-                success "MySQL backup created: $BACKUP_FILE (${BACKUP_SIZE} bytes)"
-            else
-                error "WARNING: Backup file is empty! Database backup may have failed."
-                warn "Continuing deployment but manual backup recommended"
-            fi
-        fi
-    fi
+    run mysqldump --single-transaction --quick --lock-tables=false \
+        -h"${DB_HOST:-localhost}" -u"${DB_USERNAME:-root}" -p"${DB_PASSWORD:-}" \
+        "${DB_DATABASE}" > "$BACKUP_FILE"
+    success "MySQL backup created: $BACKUP_FILE"
 else
     run php artisan db:show || warn "Could not verify database connection"
 fi
@@ -1027,150 +930,77 @@ else
 fi
 
 # ── Step 7.6: Optional Image Optimization ───────────────────────────────────
-# SAFETY FIX: Only optimize if explicitly enabled, with backup and temp file strategy
 if [[ "${OPTIMIZE_IMAGES:-false}" == "true" ]]; then
     step "Image Optimization"
-    info "Optimizing images (this may take a while)... WARNING: This modifies original files!"
-    warn "Creating backup of images before optimization..."
+    info "Optimizing images (this may take a while)..."
     
-    # Create backup directory
-    OPTIMIZE_BACKUP_DIR="storage/backups/images_$(date +%Y%m%d_%H%M%S)"
-    mkdir -p "$OPTIMIZE_BACKUP_DIR"
-    
-    # Backup all images before optimization
-    if [[ -d "public/images" ]]; then
-        cp -r public/images/* "$OPTIMIZE_BACKUP_DIR/" 2>/dev/null || {
-            error "Failed to create image backup! Skipping optimization for safety."
-            OPTIMIZE_IMAGES=false
+    php -r "
+        use Intervention\Image\ImageManager;
+        use Intervention\Image\Drivers\Gd\Driver;
+        
+        require 'vendor/autoload.php';
+        
+        \$imageDir = public_path('images');
+        \$optimized = 0;
+        \$skipped = 0;
+        
+        if (!class_exists(ImageManager::class)) {
+            echo 'Intervention Image not available, skipping optimization\n';
+            exit(0);
         }
         
-        if [[ "$OPTIMIZE_IMAGES" == "true" ]]; then
-            info "Image backup created: $OPTIMIZE_BACKUP_DIR"
-            
-            php -r "
-                use Intervention\Image\ImageManager;
-                use Intervention\Image\Drivers\Gd\Driver;
+        \$manager = new ImageManager(new Driver());
+        
+        \$iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(\$imageDir)
+        );
+        
+        foreach (\$iterator as \$file) {
+            if (\$file->isFile() && preg_match('/\.(jpg|jpeg|png|webp)$/i', \$file->getFilename())) {
+                \$ext = strtolower(pathinfo(\$file->getFilename(), PATHINFO_EXTENSION));
+                \$originalSize = \$file->getSize();
                 
-                require 'vendor/autoload.php';
-                
-                \$imageDir = public_path('images');
-                \$optimized = 0;
-                \$skipped = 0;
-                \$errors = 0;
-                
-                if (!class_exists(ImageManager::class)) {
-                    echo 'Intervention Image not available, skipping optimization\n';
-                    exit(0);
-                }
-                
-                \$manager = new ImageManager(new Driver());
-                
-                \$iterator = new RecursiveIteratorIterator(
-                    new RecursiveDirectoryIterator(\$imageDir)
-                );
-                
-                foreach (\$iterator as \$file) {
-                    if (\$file->isFile() && preg_match('/\.(jpg|jpeg|png|webp)$/i', \$file->getFilename())) {
-                        \$ext = strtolower(pathinfo(\$file->getFilename(), PATHINFO_EXTENSION));
-                        \$originalSize = \$file->getSize();
-                        \$originalPath = \$file->getPathname();
-                        
-                        // SAFETY FIX: Use temp file to avoid corruption
-                        \$tempFile = tempnam(sys_get_temp_dir(), 'img_opt_');
-                        if (\$tempFile === false) {
-                            echo \"✗ Failed to create temp file for {\$file->getFilename()}\n\";
-                            \$errors++;
-                            continue;
-                        }
-                        
-                        try {
-                            \$image = \$manager->read(\$originalPath);
-                            
-                            // Optimize based on type
-                            if (in_array(\$ext, ['jpg', 'jpeg'])) {
-                                \$image->toJpeg(quality: 85, progressive: true)->save(\$tempFile);
-                            } elseif (\$ext === 'png') {
-                                \$image->toPng(compressionLevel: 6)->save(\$tempFile);
-                            } elseif (\$ext === 'webp') {
-                                \$image->toWebp(quality: 80)->save(\$tempFile);
-                            }
-                            
-                            // Verify temp file before replacing original
-                            \$newSize = filesize(\$tempFile);
-                            if (\$newSize > 0 && \$newSize <= \$originalSize * 1.1) { // Allow 10% tolerance
-                                // Move temp to original (atomic on same filesystem)
-                                if (rename(\$tempFile, \$originalPath)) {
-                                    \$savings = \$originalSize - \$newSize;
-                                    if (\$savings > 0) {
-                                        \$percent = round((\$savings / \$originalSize) * 100, 1);
-                                        echo \"✓ Optimized: {\$file->getFilename()} (saved {\$percent}%)\n\";
-                                        \$optimized++;
-                                    } else {
-                                        echo \"~ No savings: {\$file->getFilename()}\n\";
-                                        \$skipped++;
-                                    }
-                                } else {
-                                    echo \"✗ Failed to replace {\$file->getFilename()}\n\";
-                                    unlink(\$tempFile); // Clean up temp
-                                    \$errors++;
-                                }
-                            } else {
-                                echo \"✗ Optimized file size suspicious for {\$file->getFilename()} (orig: \$originalSize, new: \$newSize)\n\";
-                                unlink(\$tempFile);
-                                \$errors++;
-                            }
-                        } catch (Exception \$e) {
-                            echo \"✗ Error optimizing {\$file->getFilename()}: \" . \$e->getMessage() . \"\n\";
-                            if (file_exists(\$tempFile)) {
-                                unlink(\$tempFile);
-                            }
-                            \$errors++;
-                        }
+                try {
+                    \$image = \$manager->read(\$file->getPathname());
+                    
+                    // Optimize based on type
+                    if (in_array(\$ext, ['jpg', 'jpeg'])) {
+                        \$image->toJpeg(quality: 85, progressive: true)->save(\$file->getPathname());
+                    } elseif (\$ext === 'png') {
+                        \$image->toPng(compressionLevel: 6)->save(\$file->getPathname());
+                    } elseif (\$ext === 'webp') {
+                        \$image->toWebp(quality: 80)->save(\$file->getPathname());
                     }
+                    
+                    \$newSize = filesize(\$file->getPathname());
+                    \$savings = \$originalSize - \$newSize;
+                    
+                    if (\$savings > 0) {
+                        \$percent = round((\$savings / \$originalSize) * 100, 1);
+                        echo \"✓ Optimized: {\$file->getFilename()} (saved {\$percent}%)\n\";
+                        \$optimized++;
+                    } else {
+                        \$skipped++;
+                    }
+                } catch (Exception \$e) {
+                    echo \"✗ Error optimizing {\$file->getFilename()}: \" . \$e->getMessage() . \"\n\";
+                    \$skipped++;
                 }
-                
-                echo \"\n=== Optimization Summary ===\n\";
-                echo \"Optimized: \$optimized\n\";
-                echo \"Skipped: \$skipped\n\";
-                echo \"Errors: \$errors\n\";
-                echo \"Backup location: $OPTIMIZE_BACKUP_DIR\n\";
-                
-                if (\$errors > 0) {
-                    echo \"\n⚠️  WARNING: \$errors files had errors! Check backup if issues occur.\n\";
-                }
-            " 2>&1 | while read -r line; do
-                info "  $line"
-            done
-            
-            success "Image optimization complete (backup: $OPTIMIZE_BACKUP_DIR)"
-        fi
-    else
-        warn "public/images directory not found, skipping optimization"
-    fi
+            }
+        }
+        
+        echo \"\nOptimization complete: {\$optimized} optimized, {\$skipped} skipped/unchanged\n\";
+    " 2>&1 | while read -r line; do
+        info "  $line"
+    done
+    
+    success "Image optimization complete"
 fi
 
 # ── Step 8: Laravel Caches ──────────────────────────────────────────────────
 step "Laravel Caches"
 info "Caching configuration, routes, and views..."
-
-# SAFETY FIX: Validate configuration before caching
-info "Validating configuration before caching..."
-if ! php artisan config:clear 2>&1 | grep -q "OK"; then
-    warn "Config clear had issues, continuing with caution..."
-fi
-
-# SAFETY FIX: Test that PHP can read config without errors
-if ! php -r "require 'vendor/autoload.php'; \$app = require_once 'bootstrap/app.php'; echo 'Config OK';" &>/dev/null; then
-    error "Configuration validation failed! NOT caching config for safety."
-    error "Please fix .env or config files before deploying."
-    warn "Continuing deployment without config cache (site will be slower but functional)"
-else
-    info "Configuration validated successfully"
-    run php artisan config:cache
-    success "Configuration cached"
-fi
-
-# Cache other artifacts
+run php artisan config:cache
 run php artisan route:cache
 run php artisan view:cache
 run php artisan event:cache
@@ -1307,87 +1137,6 @@ if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     MAINTENANCE_WAS_ENABLED=false
 else
     info "Skipping maintenance mode (handled by publish.sh)."
-fi
-
-# ── Step 14: Post-Deployment Verification ───────────────────────────────────
-step "Post-Deployment Verification"
-
-post_deployment_verify() {
-    local all_passed=true
-    
-    info "Running post-deployment verification..."
-    
-    # 1. Verify homepage is accessible
-    info "Testing homepage accessibility..."
-    local app_url=$(grep "^APP_URL=" .env 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'" || echo "")
-    
-    if [[ -n "$app_url" ]]; then
-        local homepage_status=$(curl -sI -o /dev/null -w "%{http_code}" --max-time 10 "$app_url" 2>/dev/null || echo "000")
-        if [[ "$homepage_status" == "200" || "$homepage_status" == "302" ]]; then
-            success "Homepage is accessible (HTTP $homepage_status)"
-        else
-            error "Homepage returned HTTP $homepage_status (expected 200 or 302)"
-            all_passed=false
-        fi
-    else
-        warn "APP_URL not set in .env, skipping homepage test"
-    fi
-    
-    # 2. Verify registration form exists
-    info "Testing registration form..."
-    if [[ -n "$app_url" ]]; then
-        local form_status=$(curl -sI -o /dev/null -w "%{http_code}" --max-time 10 "${app_url}/" 2>/dev/null || echo "000")
-        if [[ "$form_status" == "200" || "$form_status" == "302" ]]; then
-            success "Registration form is accessible"
-        else
-            warn "Registration form returned HTTP $form_status"
-        fi
-    fi
-    
-    # 3. Check for PHP errors in recent logs
-    info "Checking for new errors in logs..."
-    if [[ -f "storage/logs/laravel.log" ]]; then
-        local new_errors=$(tail -50 storage/logs/laravel.log 2>/dev/null | grep -c "ERROR\|CRITICAL" || echo "0")
-        if [[ $new_errors -gt 0 ]]; then
-            warn "Found $new_errors new errors in logs since deployment"
-            tail -10 storage/logs/laravel.log 2>/dev/null | grep "ERROR\|CRITICAL"
-        else
-            success "No new errors in logs"
-        fi
-    fi
-    
-    # 4. Verify cache is working
-    info "Verifying cache is operational..."
-    if php artisan cache:table 2>&1 | grep -q "No table specified"; then
-        success "Cache system is operational"
-    else
-        warn "Cache system may have issues"
-    fi
-    
-    # 5. Check storage symlink
-    info "Verifying storage symlink..."
-    if [[ -L "public/storage" ]]; then
-        success "Storage symlink is present"
-    else
-        error "Storage symlink is MISSING! Run: php artisan storage:link"
-        all_passed=false
-    fi
-    
-    echo ""
-    if [[ "$all_passed" == "true" ]]; then
-        success "✓ All post-deployment checks passed!"
-        return 0
-    else
-        warn "⚠ Some post-deployment checks failed. Review logs above."
-        return 1
-    fi
-}
-
-if [[ "$DRY_RUN" == "false" ]]; then
-    post_deployment_verify || {
-        warn "Post-deployment verification had issues, but site is live."
-        warn "Monitor logs and fix any issues manually."
-    }
 fi
 
 # ── Summary ─────────────────────────────────────────────────────────────────
