@@ -20,9 +20,10 @@ class CallerController extends Controller
         $this->middleware('auth')->except(['store', 'create', 'success', 'checkCpr']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $callers = Caller::latest()->get();
+        $perPage = 25;
+        $callers = Caller::latest()->paginate($perPage)->withQueryString();
 
         return view('callers.index', ['callers' => $callers]);
     }

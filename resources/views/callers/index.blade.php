@@ -329,9 +329,13 @@
             {{ __('Showing') }}
             <span x-text="filteredCallers.length"></span>
             {{ __('of') }}
-            <span x-text="callers.length"></span>
+            <span x-text="totalCallers"></span>
             {{ __('records') }}
         </p>
+
+        <div class="mt-3">
+            {!! $callers->links() !!}
+        </div>
 
         <form id="delete-form" method="POST" class="hidden">
             @csrf
@@ -347,7 +351,8 @@
             searchMode: 'all',
             filterType: 'all',
             showWinnersOnly: false,
-            callers: @json($callers),
+            callers: @json($callers->items()),
+            totalCallers: @json($callers->total()),
             randomWinner: null,
             isPicking: false,
             pickError: null,

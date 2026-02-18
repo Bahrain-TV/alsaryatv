@@ -18,7 +18,7 @@ class WinnersHistoryWidget extends BaseWidget
         'lg' => 1,
     ];
 
-    protected ?string $heading = '🏆 سجل الفائزين';
+    protected static ?string $heading = '🏆 سجل الفائزين';
 
     protected ?string $pollingInterval = '60s';
 

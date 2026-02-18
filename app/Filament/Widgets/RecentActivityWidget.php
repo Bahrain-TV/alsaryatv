@@ -18,7 +18,7 @@ class RecentActivityWidget extends BaseWidget
         'lg' => 1,
     ];
 
-    protected ?string $heading = '📋 النشاط الأخير';
+    protected static ?string $heading = '📋 النشاط الأخير';
 
     protected ?string $pollingInterval = '30s';
 
