@@ -266,6 +266,176 @@
             .moon-glow { display: none !important; }
             #threejs-bg { display: none !important; }
         }
+
+        /* ── MOBILE RESPONSIVENESS ── */
+        @media (max-width: 767px) {
+            /* Main content wrapper - less padding, full width */
+            #main-content {
+                padding: 1rem 0.75rem !important;
+                min-height: 100vh;
+            }
+
+            /* Theme toggle - smaller and closer to edge */
+            #theme-toggle {
+                top: 4px !important;
+                right: 4px !important;
+                width: 36px !important;
+                height: 36px !important;
+            }
+            #theme-toggle svg {
+                width: 18px !important;
+                height: 18px !important;
+            }
+
+            /* Header - smaller text */
+            header h1 {
+                font-size: 1.75rem !important;
+                line-height: 1.2 !important;
+                margin-bottom: 0.25rem !important;
+            }
+            header p {
+                font-size: 0.75rem !important;
+            }
+            header .h-\[1px\] {
+                width: 6px !important;
+            }
+
+            /* Glass panel - less padding, full width */
+            .glass-panel {
+                padding: 0.75rem !important;
+                border-radius: 1rem !important;
+            }
+
+            /* Registration announcement panel */
+            .gsap-item.relative.overflow-hidden {
+                padding: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            .gsap-item.relative.overflow-hidden h2 {
+                font-size: 1rem !important;
+            }
+            .gsap-item.relative.overflow-hidden .gold-text {
+                font-size: 1.25rem !important;
+            }
+            .gsap-item.relative.overflow-hidden p {
+                font-size: 0.65rem !important;
+            }
+
+            /* Tab toggle - smaller */
+            .flex.bg-black\/40 {
+                padding: 0.25rem !important;
+                margin-bottom: 0.5rem !important;
+                border-radius: 0.75rem !important;
+            }
+            .flex.bg-black\/40 button {
+                padding: 0.5rem 0.25rem !important;
+                font-size: 0.7rem !important;
+            }
+            .flex.bg-black\/40 button svg {
+                width: 12px !important;
+                height: 12px !important;
+            }
+            #tab-bg {
+                left: 2px !important;
+            }
+
+            /* Form fields - compact */
+            .flip-scene {
+                height: 72px !important;
+                margin-bottom: 0.5rem !important;
+            }
+            .form-input {
+                padding: 0.5rem 0.625rem !important;
+                font-size: 0.85rem !important;
+                border-radius: 0.5rem !important;
+            }
+            .form-input::placeholder {
+                font-size: 0.75rem !important;
+            }
+            label {
+                font-size: 0.6rem !important;
+                padding-right: 0.125rem !important;
+            }
+
+            /* Submit button */
+            .flip-scene.h-\[60px\] {
+                height: 44px !important;
+            }
+            .btn-primary span {
+                font-size: 0.85rem !important;
+            }
+            .btn-primary svg {
+                width: 14px !important;
+                height: 14px !important;
+            }
+
+            /* Ramadan info panel */
+            .gsap-item.mt-6.mx-4 {
+                margin-top: 0.75rem !important;
+                margin-left: 0.5rem !important;
+                margin-right: 0.5rem !important;
+            }
+            .gsap-item.mt-6.mx-4 h4 {
+                font-size: 0.7rem !important;
+                margin-bottom: 0.25rem !important;
+            }
+            .gsap-item.mt-6.mx-4 .text-xs {
+                font-size: 0.6rem !important;
+            }
+
+            /* Footer */
+            footer {
+                margin-top: 1rem !important;
+                padding-bottom: 0.5rem !important;
+            }
+            footer p {
+                font-size: 6px !important;
+            }
+            footer a {
+                font-size: 6px !important;
+            }
+            footer .inline-flex {
+                padding: 0.25rem 0.5rem !important;
+            }
+            footer .inline-flex span {
+                font-size: 6px !important;
+            }
+        }
+
+        /* Extra small phones */
+        @media (max-width: 380px) {
+            #main-content {
+                padding: 0.5rem 0.5rem !important;
+            }
+            header h1 {
+                font-size: 1.5rem !important;
+            }
+            header p {
+                font-size: 0.65rem !important;
+            }
+            .glass-panel {
+                padding: 0.5rem !important;
+            }
+            .flip-scene {
+                height: 64px !important;
+            }
+            .form-input {
+                padding: 0.45rem 0.5rem !important;
+                font-size: 0.8rem !important;
+            }
+            label {
+                font-size: 0.55rem !important;
+            }
+            .flex.bg-black\/40 button {
+                font-size: 0.65rem !important;
+                gap: 2px !important;
+            }
+            .flex.bg-black\/40 button svg {
+                width: 10px !important;
+                height: 10px !important;
+            }
+        }
+
         /* Respect reduced-motion preference */
         @media (prefers-reduced-motion: reduce) {
             .spinning-circle { animation: none !important; }
@@ -334,77 +504,47 @@
     <div class="lottie-background" aria-hidden="true"></div>
 
     <!-- Main Content Wrapper -->
-    <div id="main-content" class="relative z-10 container mx-auto px-4 py-8 min-h-screen flex flex-col justify-center items-center">
+    <div id="main-content" class="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-8 min-h-screen flex flex-col justify-center items-center">
         <!-- Theme Toggle Button -->
-        <button id="theme-toggle" class="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-black/10 hover:bg-white/30 dark:bg-black/20 dark:border-white/10 dark:hover:bg-black/30 transition-all duration-300 flex items-center justify-center group shadow-lg" onclick="window.ThemeManager?.toggleTheme()" title="تبديل السمة">
-            <svg id="theme-icon-sun" class="w-6 h-6 text-yellow-400 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button id="theme-toggle" class="fixed top-4 sm:top-6 right-4 sm:right-6 z-50 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-md border border-black/10 hover:bg-white/30 dark:bg-black/20 dark:border-white/10 dark:hover:bg-black/30 transition-all duration-300 flex items-center justify-center group shadow-lg" onclick="window.ThemeManager?.toggleTheme()" title="تبديل السمة">
+            <svg id="theme-icon-sun" class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
             </svg>
-            <svg id="theme-icon-moon" class="w-6 h-6 text-blue-400 transition-opacity duration-300 absolute inset-0 m-auto opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg id="theme-icon-moon" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-400 transition-opacity duration-300 absolute inset-0 m-auto opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
             </svg>
         </button>
-        <!-- Logo -->
-        <div class="logo-section">
-                <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" class="mx-auto mb-6" style="max-width: 300px; height: auto;" />
-        </div>
 
         <!-- Header Section (Animates as one block) -->
-        <header class="gsap-entry text-center mb-8 relative w-full max-w-lg">
-            <h1 class="text-5xl md:text-6xl font-black mb-2 tracking-tight gold-text drop-shadow-2xl leading-tight pb-2">
+        <header class="gsap-entry text-center mb-4 sm:mb-8 relative w-full max-w-lg">
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-black mb-1 sm:mb-2 tracking-tight gold-text drop-shadow-2xl leading-tight pb-1 sm:pb-2">
                 برنامج السارية
             </h1>
-            <div class="flex items-center justify-center gap-3 opacity-90">
-                <div class="h-[1px] w-12 bg-gradient-to-l from-transparent to-gold-500/50"></div>
-                <p class="text-gray-300 text-base md:text-lg font-light tracking-wide">على شاشة تلفزيون البحرين</p>
-                <div class="h-[1px] w-12 bg-gradient-to-r from-transparent to-gold-500/50"></div>
+            <div class="flex items-center justify-center gap-2 sm:gap-3 opacity-90">
+                <div class="h-[1px] w-8 sm:w-12 bg-gradient-to-l from-transparent to-gold-500/50"></div>
+                <p class="text-gray-300 text-xs sm:text-base md:text-lg font-light tracking-wide">على شاشة تلفزيون البحرين</p>
+                <div class="h-[1px] w-8 sm:w-12 bg-gradient-to-r from-transparent to-gold-500/50"></div>
             </div>
         </header>
-
-        @if(!auth()->check())
-            {{-- Countdown Timer - Outside the panel for full width --}}
-            <div class="gsap-entry w-full max-w-2xl mb-8">
-                <!-- Countdown Section -->
-                <div class="text-center mb-6">
-                    <h3 class="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-center gap-3">
-                        <span class="text-4xl">🌙</span>
-                        <span class="bg-clip-text text-transparent bg-gradient-to-b from-gold-300 to-gold-500">العد التنازلي لشهر رمضان المبارك</span>
-                    </h3>
-                </div>
-
-                <!-- FlipDown Countdown -->
-                <div id="flipdown" class="flipdown flipdown__theme-dark mx-auto" style="margin-bottom: 2rem;"></div>
-
-                <!-- Ramadan Date Info -->
-                <div class="text-center p-6 rounded-2xl bg-gradient-to-br from-green-900/40 to-emerald-900/40 backdrop-blur-md border border-green-500/20">
-                    <h4 class="text-green-400 font-bold mb-3 flex items-center justify-center gap-2 text-lg">
-                        <span class="text-2xl">☪</span>
-                        <span>أول أيام شهر رمضان المبارك</span>
-                    </h4>
-                    <div class="text-xl text-white font-semibold mb-2">{{ $ramadanDate ?? '18 فبراير 2026' }}</div>
-                    <div class="text-sm text-gray-300">{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</div>
-                </div>
-            </div>
-        @endif
 
         <!-- Main Glass Card Container (Animates in separately) -->
         <main class="w-full max-w-lg relative group">
             <!-- Glow effect -->
             <div class="absolute -inset-1 bg-gradient-to-r from-bahrain-red to-gold-700 rounded-[2.2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
 
-            <div class="gsap-card glass-panel rounded-[2rem] p-6 md:p-8 relative overflow-hidden">
+            <div class="gsap-card glass-panel rounded-[2rem] p-4 sm:p-6 md:p-8 relative overflow-hidden">
                     @if(config('alsarya.registration.enabled', false) || auth()->check())
                         {{-- Registration is enabled - show registration form --}}
-                        <div class="gsap-item relative overflow-hidden rounded-2xl mb-8 border border-white/5">
+                        <div class="gsap-item relative overflow-hidden rounded-2xl mb-4 sm:mb-8 border border-white/5">
                             <div class="absolute inset-0 bg-gradient-to-r from-bahrain-dark to-[#4a0808] opacity-80"></div>
                             <div class="absolute -right-6 -top-6 w-24 h-24 bg-gold-500/20 rounded-full blur-2xl"></div>
 
-                            <div class="relative p-5 text-center">
-                                <h2 class="text-2xl font-bold text-white mb-1 flex items-center justify-center gap-3">
-                                    <span class="gold-text text-3xl drop-shadow-lg">☪</span>
+                            <div class="relative p-3 sm:p-5 text-center">
+                                <h2 class="text-lg sm:text-2xl font-bold text-white mb-1 flex items-center justify-center gap-2 sm:gap-3">
+                                    <span class="gold-text text-2xl sm:text-3xl drop-shadow-lg">☪</span>
                                     <span class="bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-300">رمضان كريم!</span>
                                 </h2>
-                                <p class="text-white/70 text-sm font-light">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
+                                <p class="text-white/70 text-xs sm:text-sm font-light">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
                             </div>
                         </div>
 
@@ -412,22 +552,22 @@
                         <div class="gsap-item">
                             {{-- Registration Type Toggle --}}
                             @if(env('ENABLE_FAMILY_REGISTRATION', false))
-                            <div class="flex bg-black/40 p-1.5 rounded-2xl mb-8 border border-white/5 relative">
+                            <div class="flex bg-black/40 p-1 sm:p-1.5 rounded-2xl mb-4 sm:mb-8 border border-white/5 relative">
                                 <!-- Start at Left (roughly 4px) to align with "Individual" (Left in RTL layout) -->
                                 <div id="tab-bg" class="w-1/2 h-full absolute top-0 bottom-0 rounded-xl bg-gradient-to-br from-bahrain-red to-bahrain-dark border border-white/10 shadow-lg left-[4px]">
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl"></div>
                                 </div>
 
                                 <!-- Family (Visually Right in RTL) -->
-                                <button onclick="switchTab('family')" id="tab-family" class="flex-1 relative z-10 py-3 text-sm font-bold text-gray-400 flex justify-center items-center gap-2 transition-colors duration-300">
-                                    <i data-lucide="users" class="w-4 h-4"></i>
-                                    <span>تسجيل عائلي</span>
+                                <button onclick="switchTab('family')" id="tab-family" class="flex-1 relative z-10 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-400 flex justify-center items-center gap-1 sm:gap-2 transition-colors duration-300">
+                                    <i data-lucide="users" class="w-3 h-3 sm:w-4 sm:h-4"></i>
+                                    <span class="truncate">تسجيل عائلي</span>
                                 </button>
 
                                 <!-- Individual (Visually Left in RTL) -->
-                                <button onclick="switchTab('individual')" id="tab-individual" class="flex-1 relative z-10 py-3 text-sm font-bold text-white flex justify-center items-center gap-2 transition-colors duration-300">
-                                    <i data-lucide="user" class="w-4 h-4"></i>
-                                    <span>تسجيل فردي</span>
+                                <button onclick="switchTab('individual')" id="tab-individual" class="flex-1 relative z-10 py-2 sm:py-3 text-xs sm:text-sm font-bold text-white flex justify-center items-center gap-1 sm:gap-2 transition-colors duration-300">
+                                    <i data-lucide="user" class="w-3 h-3 sm:w-4 sm:h-4"></i>
+                                    <span class="truncate">تسجيل فردي</span>
                                 </button>
                             </div>
                             @endif
@@ -439,16 +579,16 @@
                                 <input type="hidden" id="registration_type" name="registration_type" value="individual">
 
                                 {{-- Name --}}
-                                <div class="gsap-item flip-scene perspective-1000 h-[86px] mb-5">
+                                <div class="gsap-item flip-scene perspective-1000 h-[72px] sm:h-[86px] mb-3 sm:mb-5">
                                     <div class="flip-card w-full h-full relative transform-style-3d" id="field-1">
                                         <!-- Front -->
                                         <div class="face-front absolute inset-0 backface-hidden">
-                                            <div class="space-y-2">
-                                                <label for="name" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">الاسم الكامل</label>
+                                            <div class="space-y-1 sm:space-y-2">
+                                                <label for="name" class="text-gold-100/80 text-[10px] sm:text-xs font-bold mr-1 block uppercase tracking-wider">الاسم الكامل</label>
                                                 <input type="text" id="name" name="name" required value="{{ old('name') }}"
-                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-lg sm:rounded-xl py-2.5 sm:py-4 px-3 sm:px-4 text-sm sm:text-base text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل اسمك الكامل">
-                                                @error('name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                                @error('name') <span class="text-red-400 text-xs sm:text-sm">{{ $message }}</span> @enderror
                                             </div>
                                         </div>
                                         <!-- Back -->
@@ -1161,7 +1301,7 @@
             const driverObj = driver({
                 showProgress: true,
                 steps: [
-                    { element: '#name', popover: { title: 'الاسم الكامل', description: 'أدخل اسمك كما يظهر في البطاقة الذكية' } },
+                    { element: '#name', popover: { title: 'الاسم الكامل', description: 'أدخ�� اسمك كما يظهر في البطاقة الذكية' } },
                     { element: '#cpr', popover: { title: 'الرقم الشخصي', description: 'أدخل رقمك الشخصي المكون من 9 أرقام' } },
                     { element: '#phone_number', popover: { title: 'رقم الهاتف', description: 'أدخل رقم هاتف فعال للتواصل في حال الفوز' } },
                     { element: 'button[type="submit"]', popover: { title: 'تأكيد التسجيل', description: 'اضغط هنا لإرسال طلبك' } }
