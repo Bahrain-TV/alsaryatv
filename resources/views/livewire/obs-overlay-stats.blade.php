@@ -19,7 +19,9 @@
         position: relative;
         overflow: visible;
         font-family: 'Tajawal', sans-serif;
-        height: 200px;
+        height: 220px;
+        display: flex;
+        flex-direction: column;
     }
 
     .obs-overlay-panel [dir="auto"] {
@@ -44,14 +46,17 @@
 
     /* Individual Card Display Container */
     .stat-card-container {
-        position: fixed;
-        left: 50%;
-        bottom: 10vh;
-        width: 90vw;
-        height: 400px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
         opacity: 0;
         pointer-events: none;
         z-index: 40;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .stat-card-container.active {
@@ -60,29 +65,26 @@
     }
 
     .stat-card-individual {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         width: 100%;
-        height: 100%;
+        z-index: 50;
+        padding-top: 1rem; 
     }
 
     .stat-card-individual .card-label {
-        font-size: 2rem;
+        font-size: 1.5rem;
         font-weight: 600;
         color: rgba(255, 255, 255, 0.7);
         text-transform: uppercase;
         letter-spacing: 3px;
-        margin-bottom: 2rem;
+        margin-bottom: 0.5rem;
     }
 
     .stat-card-individual .card-value {
-        font-size: 8rem;
+        font-size: 5rem;
         font-weight: 900;
         background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
         -webkit-background-clip: text;
@@ -90,21 +92,23 @@
         background-clip: text;
         line-height: 1;
         font-variant-numeric: tabular-nums;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
     /* Combined Cards Grid */
     .stat-cards-grid {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) translateY(10px);
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 1.5rem;
-        padding: 1.5rem;
+        width: 90%;
         opacity: 0;
         pointer-events: none;
-        width: 100%;
-        position: relative;
         z-index: 1;
     }
-
     .stat-cards-grid.visible {
         opacity: 1;
         pointer-events: auto;

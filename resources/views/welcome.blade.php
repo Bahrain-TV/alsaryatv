@@ -388,6 +388,7 @@
                         {{-- Registration Form for Logged-in Users --}}
                         <div class="gsap-item">
                             {{-- Registration Type Toggle --}}
+                            @if(env('ENABLE_FAMILY_REGISTRATION', false))
                             <div class="flex bg-black/40 p-1.5 rounded-2xl mb-8 border border-white/5 relative">
                                 <!-- Start at Left (roughly 4px) to align with "Individual" (Left in RTL layout) -->
                                 <div id="tab-bg" class="w-1/2 h-full absolute top-0 bottom-0 rounded-xl bg-gradient-to-br from-bahrain-red to-bahrain-dark border border-white/10 shadow-lg left-[4px]">
@@ -406,6 +407,7 @@
                                     <span>تسجيل فردي</span>
                                 </button>
                             </div>
+                            @endif
 
                             <form method="POST" action="{{ route('callers.store') }}" dir="rtl">
                                 @csrf
@@ -958,7 +960,7 @@
                     const dateInfo = document.querySelector('.gsap-entry .text-center.p-6');
 
                     if (countdownTitle) {
-                        countdownTitle.innerHTML = '<span class="text-4xl">🎉</span><span class="bg-clip-text text-transparent bg-gradient-to-b from-gold-300 to-gold-500">رمضان كريم!</span>';
+                        countdownTitle.innerHTML = '<span class="bg-clip-text text-transparent bg-gradient-to-b from-gold-300 to-gold-500">رمضان كريم!</span>';
                     }
 
                     if (dateInfo) {
@@ -974,6 +976,30 @@
             }
         });
     </script>
+    <!-- Onboarding Tutorial Script -->
+    @if(request()->has('tutorial'))
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const driver = window.driver.js.driver;
+            
+            const driverObj = driver({
+                showProgress: true,
+                steps: [
+                    { element: '#name', popover: { title: 'الاسم الكامل', description: 'أدخل اسمك كما يظهر في البطاقة الذكية' } },
+                    { element: '#cpr', popover: { title: 'الرقم الشخصي', description: 'أدخل رقمك الشخصي المكون من 9 أرقام' } },
+                    { element: '#phone_number', popover: { title: 'رقم الهاتف', description: 'أدخل رقم هاتف فعال للتواصل في حال الفوز' } },
+                    { element: 'button[type="submit"]', popover: { title: 'تأكيد التسجيل', description: 'اضغط هنا لإرسال طلبك' } }
+                ]
+            });
+            
+            // Start tutorial after a delay to allow animations
+            setTimeout(() => {
+                driverObj.drive();
+            }, 3000);
+        });
+    </script>
+    @endif
 </body>
-
 </html>

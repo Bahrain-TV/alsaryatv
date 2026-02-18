@@ -30,6 +30,7 @@ Route::get('/', function () use ($getRamadanContext) {
     if (request()->has('skip-splash')) {
         return view('welcome', $getRamadanContext());
     }
+
     // Default: show splash screen
     return view('splash', $getRamadanContext());
 })->name('home');

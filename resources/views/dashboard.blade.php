@@ -38,6 +38,7 @@
                 'value' => $tableReady ? \App\Models\Caller::where('is_family', true)->count() : 0,
                 'hint' => __('Households registered as families.'),
                 'tone' => 'sky',
+                'visible' => env('ENABLE_FAMILY_REGISTRATION', false),
             ],
         ];
 
@@ -66,9 +67,10 @@
                 <section class="lg:col-span-2 space-y-6">
                     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 auto-rows-fr">
                         @foreach ($stats as $stat)
-                            @php
-                                $toneClass = $toneStyles[$stat['tone']] ?? $toneStyles['indigo'];
-                            @endphp
+                            @if (($stat['visible'] ?? true))
+                                @php
+                                    $toneClass = $toneStyles[$stat['tone']] ?? $toneStyles['indigo'];
+                                @endphp
                             <div class="relative flex h-full flex-col justify-between rounded-2xl border border-gray-200 bg-white p-5 shadow-sm ring-1 ring-inset ring-gray-100 transition hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:ring-gray-800">
                                 <div class="flex items-start justify-between gap-3">
                                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -86,6 +88,7 @@
                                     {{ $stat['hint'] }}
                                 </p>
                             </div>
+                            @endif
                         @endforeach
                     </div>
 
@@ -165,12 +168,14 @@
                             >
                                 {{ __('View Winners') }}
                             </a>
+                            @if(env('ENABLE_FAMILY_REGISTRATION', false))
                             <a
                                 href="{{ route('families') }}"
                                 class="inline-flex items-center justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
                             >
                                 {{ __('Family Registrations') }}
                             </a>
+                            @endif
                             <a
                                 href="{{ route('obs.overlay') }}"
                                 target="_blank"

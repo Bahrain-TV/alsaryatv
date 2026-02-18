@@ -14,7 +14,7 @@ class RecordObsOverlay extends Command
      *
      * @var string
      */
-    protected $signature = 'obs:record {--url=http://localhost:8000/obs-overlay} {--seconds=65} {--fps=30}';
+    protected $signature = 'obs:record {--url=http://localhost:8000/obs-overlay} {--seconds=65} {--fps=30} {--timeout=0}';
 
     /**
      * The console command description.
@@ -47,17 +47,25 @@ class RecordObsOverlay extends Command
 
         // Run the recording script
         $url = $this->option('url');
-        $seconds = $this->option('seconds');
-        $fps = $this->option('fps');
+        $seconds = (int) $this->option('seconds');
+        $fps = (int) $this->option('fps');
 
-        $this->info("⏱️  Recording {$seconds}s at {$fps} FPS...");
+        // Compute a generous timeout: each frame can take up to ~0.5s in Playwright
+        // plus 120s overhead for browser launch, pre-warm, and FFmpeg encoding.
+        $userTimeout = (int) $this->option('timeout');
+        $timeout = $userTimeout > 0
+            ? $userTimeout
+            : (int) ($seconds * $fps * 0.5) + 120;
+
+        $this->info("⏱️  Recording {$seconds}s at {$fps} FPS (process timeout: {$timeout}s)...");
         $this->line('');
 
         try {
-            $result = Process::run(
-                "npm run record:obs-overlay -- --url '{$url}' --out '{$fullPath}' --seconds {$seconds} --fps {$fps}",
-                cwd: base_path()
-            );
+            $result = Process::path(base_path())
+                ->timeout($timeout)
+                ->run(
+                    "npm run record:obs-overlay -- --url '{$url}' --out '{$fullPath}' --seconds {$seconds} --fps {$fps}"
+                );
 
             if ($result->failed()) {
                 $this->error('❌ Recording failed');
