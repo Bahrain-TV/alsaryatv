@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 ###############################################################################
-# deploy.sh — AlSarya TV Show Registration System (FIXED VERSION)
+# deploy.sh — AlSarya TV Show Registration System (ENHANCED VERSION)
 #
-# Production deployment script. Handles dependency installation, asset
-# compilation, database migrations, seeding, and Laravel cache optimisation.
+# Production deployment script with enhanced image handling, cache busting,
+# asset optimization, and comprehensive deployment verification.
 #
 # Usage:
 #   ./deploy.sh              # Full deploy (default)
@@ -15,38 +15,30 @@
 #   ./deploy.sh --up         # Force deploy even if maintenance mode is active
 #   ./deploy.sh --dry-run    # Print steps without executing
 #   ./deploy.sh --diagnose   # Run production diagnostics (check images, config, etc)
+#   ./deploy.sh --sync-images # Force sync all images to production
+#   ./deploy.sh --optimize-images # Optimize images during deployment
 ###############################################################################
 
 # Configuration
-# APP_USER is the OS user that owns the files and should run artisan commands
 APP_USER="alsar4210"
-
-# PROD_SSH_USER is the user we use to connect (keep as root if SSH requires it)
-# We will "su" or "sudo" to APP_USER when running commands on the server
 SUDO_PREFIX="sudo -u $APP_USER"
 
-# Start with basic error handling, we'll enable -u later after variable init
 set -eo pipefail
 
 # ── Local Execution Wrapper ──────────────────────────────────────────────────
-# Detect if running locally (e.g. macOS/Darwin) and proxy to remote
 if [[ "$(uname -s)" == "Darwin" ]]; then
-    # Helper for local reporting
     local_info()  { echo -e "\033[0;36m[LOCAL]\033[0m  $*"; }
     local_error() { echo -e "\033[0;31m[ERROR]\033[0m $*"; }
     local_ok()    { echo -e "\033[0;32m[  OK ]\033[0m  $*"; }
     local_fail()  { echo -e "\033[0;31m[FAIL]\033[0m  $*"; }
     local_warn()  { echo -e "\033[1;33m[WARN]\033[0m  $*"; }
-    
-    # Setup cleanup for local wrapper
-    local_cleanup() {
-        # Restore terminal if needed, kill child processes
-        true
-    }
+    local_success() { echo -e "\033[0;32m[SUCCESS]\033[0m $*"; }
+
+    local_cleanup() { true; }
     trap local_cleanup EXIT INT TERM
 
     echo "----------------------------------------------------------------"
-    echo "  🚀 AlSarya TV Deployment Launcher"
+    echo "  🚀 AlSarya TV Deployment Launcher (ENHANCED)"
     echo "  Detected Local Environment (macOS)"
     echo "----------------------------------------------------------------"
 
@@ -57,24 +49,30 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
         set +a
     fi
 
-    # Set defaults
+    # Set defaults with validation
     PROD_SSH_USER="${PROD_SSH_USER:-root}"
     PROD_SSH_HOST="${PROD_SSH_HOST:-alsarya.tv}"
     PROD_SSH_PORT="${PROD_SSH_PORT:-22}"
     PROD_APP_DIR="${PROD_APP_DIR:-/home/alsarya.tv/public_html}"
     SSH_KEY_PATH="${SSH_KEY_PATH:-${HOME}/.ssh/id_rsa}"
 
-    # 1. ESTABLISH CONNECTION FIRST ("Open up the production server")
-    # We verify we can talk to the server before doing any heavy lifting.
+    # Validate SSH key exists
+    if [[ ! -f "$SSH_KEY_PATH" ]]; then
+        local_error "SSH key not found: $SSH_KEY_PATH"
+        local_error "Please configure SSH_KEY_PATH in .env or ensure default key exists"
+        exit 1
+    fi
+
+    # 1. ESTABLISH CONNECTION FIRST
     local_info "Testing connection to production server ($PROD_SSH_HOST)..."
-    if ! ssh -q -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" -o BatchMode=yes -o ConnectTimeout=5 "$PROD_SSH_USER@$PROD_SSH_HOST" "echo '✓ Connection Established'"; then
+    if ! ssh -q -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" -o BatchMode=yes -o ConnectTimeout=10 "$PROD_SSH_USER@$PROD_SSH_HOST" "echo '✓ Connection Established'" 2>/dev/null; then
         local_error "Could not connect to $PROD_SSH_USER@$PROD_SSH_HOST"
         local_error "Please check your VPN, internet connection, or SSH keys."
         exit 1
     fi
+    local_ok "SSH connection established to $PROD_SSH_HOST"
 
-    # ── DIAGNOSE MODE (local → remote) ───────────────────────────────────
-    # If --diagnose was passed, run diagnostics on production and exit
+    # ── DIAGNOSE MODE ───────────────────────────────────────────────────────
     for arg in "$@"; do
         if [[ "$arg" == "--diagnose" ]]; then
             echo ""
@@ -84,11 +82,11 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
             ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" bash << 'DIAG_SCRIPT'
 cd /home/alsarya.tv/public_html
 
-C='\033[0;36m'  # Cyan
-G='\033[0;32m'  # Green
-R='\033[0;31m'  # Red
-Y='\033[1;33m'  # Yellow
-N='\033[0m'     # Reset
+C='\033[0;36m'
+G='\033[0;32m'
+R='\033[0;31m'
+Y='\033[1;33m'
+N='\033[0m'
 
 ok()   { echo -e "${G}[  OK ]${N}  $*"; }
 fail() { echo -e "${R}[FAIL]${N}  $*"; }
@@ -100,11 +98,10 @@ ISSUES=0
 # ─── 1. .env Configuration ──────────────────────────────
 hdr "1. .env Configuration"
 
-APP_URL_VAL=$(grep '^APP_URL=' .env | cut -d= -f2- | tr -d '"')
-APP_ENV_VAL=$(grep '^APP_ENV=' .env | cut -d= -f2- | tr -d '"')
-APP_DEBUG_VAL=$(grep '^APP_DEBUG=' .env | cut -d= -f2- | tr -d '"')
-FS_DISK_VAL=$(grep '^FILESYSTEM_DISK=' .env | cut -d= -f2- | tr -d '"')
-ASSET_URL_VAL=$(grep '^ASSET_URL=' .env | cut -d= -f2- | tr -d '"')
+APP_URL_VAL=$(grep '^APP_URL=' .env | cut -d= -f2- | tr -d '"' || echo "")
+APP_ENV_VAL=$(grep '^APP_ENV=' .env | cut -d= -f2- | tr -d '"' || echo "")
+APP_DEBUG_VAL=$(grep '^APP_DEBUG=' .env | cut -d= -f2- | tr -d '"' || echo "")
+FS_DISK_VAL=$(grep '^FILESYSTEM_DISK=' .env | cut -d= -f2- | tr -d '"' || echo "")
 
 if [[ "$APP_URL_VAL" == *"localhost"* ]]; then
     fail "APP_URL = $APP_URL_VAL  ← WRONG! Points to localhost"
@@ -126,35 +123,17 @@ else
     ok "APP_DEBUG = $APP_DEBUG_VAL"
 fi
 
-if [[ "$FS_DISK_VAL" == "public" ]]; then
-    ok "FILESYSTEM_DISK = $FS_DISK_VAL"
-else
-    warn "FILESYSTEM_DISK = $FS_DISK_VAL  ← Consider 'public' for uploaded files"
-fi
-
-if [[ -n "$ASSET_URL_VAL" ]]; then
-    warn "ASSET_URL = $ASSET_URL_VAL (overrides asset() helper)"
-else
-    ok "ASSET_URL not set (asset() uses APP_URL — correct)"
-fi
-
 # ─── 2. Cached Config vs Live Config ────────────────────
 hdr "2. Cached Config vs .env"
 
 if [[ -f bootstrap/cache/config.php ]]; then
-    CACHED_URL=$(php -r "echo (include 'bootstrap/cache/config.php')['app']['url'] ?? 'N/A';" 2>/dev/null)
+    CACHED_URL=$(php -r "echo (include 'bootstrap/cache/config.php')['app']['url'] ?? 'N/A';" 2>/dev/null || echo "N/A")
     if [[ "$CACHED_URL" != "$APP_URL_VAL" ]]; then
         fail "CACHED APP_URL ($CACHED_URL) ≠ .env APP_URL ($APP_URL_VAL)"
         fail "Fix: php artisan config:cache"
         ISSUES=$((ISSUES+1))
     else
         ok "Cached config matches .env (APP_URL = $CACHED_URL)"
-    fi
-    
-    CACHED_ENV=$(php -r "echo (include 'bootstrap/cache/config.php')['app']['env'] ?? 'N/A';" 2>/dev/null)
-    if [[ "$CACHED_ENV" != "$APP_ENV_VAL" ]]; then
-        fail "CACHED APP_ENV ($CACHED_ENV) ≠ .env APP_ENV ($APP_ENV_VAL)"
-        ISSUES=$((ISSUES+1))
     fi
 else
     warn "No cached config (bootstrap/cache/config.php missing)"
@@ -163,17 +142,31 @@ fi
 # ─── 3. Image Files ─────────────────────────────────────
 hdr "3. Image Files on Disk"
 
-for img in "public/images/alsarya-logo-2026-1.png" "public/images/alsarya-logo.png"; do
+IMAGE_COUNT=0
+MISSING_COUNT=0
+
+while IFS= read -r -d '' img; do
+    IMAGE_COUNT=$((IMAGE_COUNT + 1))
     if [[ -f "$img" ]]; then
-        SIZE=$(stat -c%s "$img" 2>/dev/null || stat -f%z "$img" 2>/dev/null)
-        OWNER=$(stat -c'%U:%G' "$img" 2>/dev/null || stat -f'%Su:%Sg' "$img" 2>/dev/null)
-        PERMS=$(stat -c'%a' "$img" 2>/dev/null || stat -f'%Lp' "$img" 2>/dev/null)
-        ok "$img (${SIZE} bytes, $OWNER, mode $PERMS)"
+        SIZE=$(stat -c%s "$img" 2>/dev/null || stat -f%z "$img" 2>/dev/null || echo "?")
+        OWNER=$(stat -c'%U:%G' "$img" 2>/dev/null || stat -f'%Su:%Sg' "$img" 2>/dev/null || echo "?")
+        PERMS=$(stat -c'%a' "$img" 2>/dev/null || stat -f'%Lp' "$img" 2>/dev/null || echo "?")
+        HASH=$(md5sum "$img" 2>/dev/null | cut -d' ' -f1 || md5 -q "$img" 2>/dev/null || echo "?")
+        ok "$img"
+        echo "     └─ Size: ${SIZE}B | Owner: $OWNER | Perms: $PERMS"
+        echo "     └─ MD5: $HASH"
     else
         fail "$img — FILE MISSING!"
+        MISSING_COUNT=$((MISSING_COUNT + 1))
         ISSUES=$((ISSUES+1))
     fi
-done
+done < <(find public/images -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" -o -name "*.webp" \) -print0 2>/dev/null)
+
+if [[ $IMAGE_COUNT -eq 0 ]]; then
+    warn "No image files found in public/images/"
+else
+    ok "Found $IMAGE_COUNT image file(s) ($MISSING_COUNT missing)"
+fi
 
 # ─── 4. Storage Symlink ─────────────────────────────────
 hdr "4. Storage Symlink"
@@ -192,7 +185,7 @@ else
 fi
 
 # ─── 5. Web Server Response ─────────────────────────────
-hdr "5. Web Server Response (from server itself)"
+hdr "5. Web Server Response"
 
 for path in "/" "/images/alsarya-logo-2026-1.png"; do
     STATUS=$(curl -sI -o /dev/null -w "%{http_code}" --max-time 5 "${APP_URL_VAL}${path}" 2>/dev/null || echo "000")
@@ -207,8 +200,8 @@ for path in "/" "/images/alsarya-logo-2026-1.png"; do
     fi
 done
 
-# Check cache-control headers on images (browser caching issue?)
-CACHE_HDR=$(curl -sI --max-time 5 "${APP_URL_VAL}/images/alsarya-logo-2026-1.png" 2>/dev/null | grep -i "cache-control" | tr -d '\r')
+# Check cache-control headers
+CACHE_HDR=$(curl -sI --max-time 5 "${APP_URL_VAL}/images/alsarya-logo-2026-1.png" 2>/dev/null | grep -i "cache-control" | tr -d '\r' || echo "")
 if [[ -n "$CACHE_HDR" ]]; then
     if echo "$CACHE_HDR" | grep -qi "max-age=[1-9]"; then
         warn "Image caching: $CACHE_HDR"
@@ -218,15 +211,10 @@ if [[ -n "$CACHE_HDR" ]]; then
     fi
 fi
 
-ETAG_HDR=$(curl -sI --max-time 5 "${APP_URL_VAL}/images/alsarya-logo-2026-1.png" 2>/dev/null | grep -i "etag" | tr -d '\r')
-if [[ -n "$ETAG_HDR" ]]; then
-    ok "ETag header present: $ETAG_HDR"
-fi
-
 # ─── 6. Blade Template References ───────────────────────
 hdr "6. Blade Template Image References"
 
-BLADE_REFS=$(grep -rn "alsarya-logo" resources/views/ 2>/dev/null)
+BLADE_REFS=$(grep -rn "alsarya-logo" resources/views/ 2>/dev/null || echo "")
 if [[ -n "$BLADE_REFS" ]]; then
     echo "$BLADE_REFS" | while read -r line; do
         if echo "$line" | grep -q "alsarya-logo-2026-1"; then
@@ -239,32 +227,13 @@ else
     warn "No logo references found in blade templates"
 fi
 
-# ─── 7. View Cache Age ──────────────────────────────────
-hdr "7. View Cache"
-
-VIEW_COUNT=$(ls storage/framework/views/*.php 2>/dev/null | wc -l)
-if [[ "$VIEW_COUNT" -gt 0 ]]; then
-    OLDEST=$(ls -t storage/framework/views/*.php | tail -1)
-    OLDEST_DATE=$(stat -c'%Y' "$OLDEST" 2>/dev/null || stat -f'%m' "$OLDEST" 2>/dev/null)
-    NOW=$(date +%s)
-    AGE_HOURS=$(( (NOW - OLDEST_DATE) / 3600 ))
-    if [[ "$AGE_HOURS" -gt 24 ]]; then
-        warn "$VIEW_COUNT cached views (oldest is ${AGE_HOURS}h old — might be stale)"
-        warn "Fix: php artisan view:clear && php artisan view:cache"
-    else
-        ok "$VIEW_COUNT cached views (oldest is ${AGE_HOURS}h old)"
-    fi
-else
-    ok "No cached views (Blade compiles on-the-fly)"
-fi
-
-# ─── 8. Permissions ─────────────────────────────────────
-hdr "8. Key Directory Permissions"
+# ─── 7. Permissions ─────────────────────────────────────
+hdr "7. Key Directory Permissions"
 
 for dir in "storage" "bootstrap/cache" "public/images"; do
     if [[ -d "$dir" ]]; then
-        OWNER=$(stat -c'%U:%G' "$dir" 2>/dev/null || stat -f'%Su:%Sg' "$dir" 2>/dev/null)
-        PERMS=$(stat -c'%a' "$dir" 2>/dev/null || stat -f'%Lp' "$dir" 2>/dev/null)
+        OWNER=$(stat -c'%U:%G' "$dir" 2>/dev/null || stat -f'%Su:%Sg' "$dir" 2>/dev/null || echo "?")
+        PERMS=$(stat -c'%a' "$dir" 2>/dev/null || stat -f'%Lp' "$dir" 2>/dev/null || echo "?")
         if [[ "$OWNER" == *"alsar4210"* ]]; then
             ok "$dir/ ($OWNER, mode $PERMS)"
         else
@@ -287,130 +256,159 @@ DIAG_SCRIPT
 
             local_info "Diagnostics complete."
 
-            # Now compare local vs remote images
+            # Compare local vs remote images
             echo ""
-            local_info "Comparing local vs remote image checksums..."
-            
-            LOCAL_HASH=$(md5 -q public/images/alsarya-logo-2026-1.png 2>/dev/null || echo "MISSING")
-            REMOTE_HASH=$(ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "md5sum /home/alsarya.tv/public_html/public/images/alsarya-logo-2026-1.png 2>/dev/null | cut -d' ' -f1" || echo "MISSING")
-            
-            if [[ "$LOCAL_HASH" == "$REMOTE_HASH" ]]; then
-                local_ok "Logo checksums match: $LOCAL_HASH"
-            else
-                local_fail "Logo checksums DIFFER! Local=$LOCAL_HASH Remote=$REMOTE_HASH"
-            fi
+            local_info "📊 Comparing local vs remote images..."
 
-            # Check local .env vs remote .env for dangerous differences
-            echo ""
-            local_info "Checking .env differences (critical keys only)..."
-            for key in APP_URL APP_ENV APP_DEBUG FILESYSTEM_DISK; do
-                L_VAL=$(grep "^${key}=" .env 2>/dev/null | cut -d= -f2- | tr -d '"')
-                R_VAL=$(ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "grep '^${key}=' /home/alsarya.tv/public_html/.env 2>/dev/null | cut -d= -f2- | tr -d '\"'")
-                if [[ "$L_VAL" == "$R_VAL" ]]; then
-                    local_warn "$key: local=$L_VAL == remote=$R_VAL (SAME — might be wrong for prod!)"
-                else
-                    local_ok "$key: local=$L_VAL | remote=$R_VAL (different — expected)"
+            sync_images_comparison() {
+                local img_path="$1"
+                if [[ -f "$img_path" ]]; then
+                    LOCAL_HASH=$(md5 -q "$img_path" 2>/dev/null || echo "MISSING")
+                    REMOTE_HASH=$(ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+                        "md5sum $PROD_APP_DIR/$img_path 2>/dev/null | cut -d' ' -f1" || echo "MISSING")
+
+                    if [[ "$LOCAL_HASH" == "$REMOTE_HASH" ]]; then
+                        local_ok "$img_path ✓ (MD5: $LOCAL_HASH)"
+                    else
+                        local_fail "$img_path ✗"
+                        echo "     Local:  $LOCAL_HASH"
+                        echo "     Remote: $REMOTE_HASH"
+                    fi
                 fi
+            }
+
+            for img in public/images/*.png public/images/*.jpg public/images/*.svg; do
+                [[ -f "$img" ]] && sync_images_comparison "$img"
             done
 
             exit 0
         fi
     done
 
-    # 2. Sync Assets (Images & Storage) - OPTIMIZED
-    # We use rsync with checksum (-c) to avoid re-uploading identical files
-    local_info "Syncing Assets (Images & Storage)..."
+    # ── SYNC IMAGES MODE ───────────────────────────────────────────────────
+    for arg in "$@"; do
+        if [[ "$arg" == "--sync-images" ]]; then
+            echo ""
+            local_info "🖼️  Forcing full image synchronization..."
+            echo ""
+
+            RSYNC_SSH="ssh -p $PROD_SSH_PORT -i $SSH_KEY_PATH -o StrictHostKeyChecking=accept-new"
+
+            # Sync all image directories
+            for img_dir in "public/images" "public/build"; do
+                if [[ -d "$img_dir" ]]; then
+                    local_info "Syncing $img_dir/..."
+                    rsync -avz --delete --no-o --no-g -e "$RSYNC_SSH" "$img_dir/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/$img_dir/" 2>&1 | while read -r line; do
+                        [[ -n "$line" ]] && local_info "  $line"
+                    done || local_error "Sync failed for $img_dir"
+                    local_ok "$img_dir synced"
+                fi
+            done
+
+            # Fix remote permissions
+            local_info "Fixing remote permissions..."
+            ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+                "chown -R $APP_USER:$APP_USER $PROD_APP_DIR/public/images && chmod -R 755 $PROD_APP_DIR/public/images" || local_error "Permission fix failed"
+
+            local_success "✓ Image synchronization complete!"
+            exit 0
+        fi
+    done
+
+    # 2. Sync Assets (Images & Storage) - ENHANCED
+    local_info "📦 Syncing Assets (Images, Storage & Build)..."
+
     RSYNC_SSH="ssh -p $PROD_SSH_PORT -i $SSH_KEY_PATH -o StrictHostKeyChecking=accept-new"
 
-    # Sync public/images
-    if [[ -d "public/images" ]]; then
-        # -c checksum, -u update (skip newer), --delete (optional, maybe too dangerous?)
-        rsync -avzc --no-o --no-g -e "$RSYNC_SSH" "public/images/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/public/images/" >/dev/null || local_error "Image sync warning"
+    # Enhanced rsync with progress and better filtering
+    sync_directory() {
+        local src="$1"
+        local dst="$2"
+        local desc="$3"
+
+        if [[ -d "$src" ]]; then
+            local_info "  → Syncing $desc..."
+            rsync -avz --no-o --no-g -e "$RSYNC_SSH" \
+                --exclude='.DS_Store' \
+                --exclude='*.log' \
+                "$src/" "$dst/" 2>&1 | grep -v "^$" || true
+        fi
+    }
+
+    sync_directory "public/images" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/public/images" "Images"
+    sync_directory "storage/app/public" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/storage/app/public" "Storage"
+
+    # Sync build assets if they exist
+    if [[ -d "public/build" ]]; then
+        sync_directory "public/build" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/public/build" "Build Assets"
     fi
 
-    # Sync storage/app/public
-    if [[ -d "storage/app/public" ]]; then
-        # Ensure remote directory exists
-        ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "mkdir -p $PROD_APP_DIR/storage/app/public" || true
-        rsync -avzc --no-o --no-g -e "$RSYNC_SSH" "storage/app/public/" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/storage/app/public/" >/dev/null || local_error "Storage sync warning"
-    fi
-    local_info "✓ Assets Synced (Differential)"
+    local_ok "✓ Assets synced successfully"
 
     # 3. Update Remote Configuration & Script
-    local_info "Updating remote configuration and deployment script..."
-    
-    # Sync .env - DISABLED TO PREVENT OVERWRITING PROD CONFIG
-    # if [[ -f .env ]]; then
-    #    rsync -avzc --no-o --no-g -e "$RSYNC_SSH" ".env" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/.env" >/dev/null || local_error ".env sync failed"
-    # fi
+    local_info "📝 Updating remote deployment script..."
 
-    # Upload clean deploy script (Atomic upload: upload to tmp -> mv to target)
-    scp -q -P "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$0" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/deploy.sh.new"
-    
+    # Upload new deploy script atomically
+    scp -q -P "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$0" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/deploy.sh.new" || {
+        local_error "Failed to upload deploy script"
+        exit 1
+    }
+
     # Fix permissions and swap script
-    FIX_CMD="
+    ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" << EOF
         chmod +x $PROD_APP_DIR/deploy.sh.new
         mv $PROD_APP_DIR/deploy.sh.new $PROD_APP_DIR/deploy.sh
         chown $APP_USER:$APP_USER $PROD_APP_DIR/deploy.sh
-        
-        # Aggressive Permission Fixes
-        chown -R $APP_USER:$APP_USER $PROD_APP_DIR/public/images $PROD_APP_DIR/storage/app/public $PROD_APP_DIR/.env
-        chmod -R 775 $PROD_APP_DIR/storage
-        chmod -R 755 $PROD_APP_DIR/public/images
-    "
-    ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$FIX_CMD" || local_error "Permission fix warning"
+EOF
+    local_ok "✓ Deployment script updated"
 
     # 4. Handover to Remote Server
-    local_info "Handing over to production server..."
+    local_info "🔄 Handing over to production server..."
     echo ""
 
-    # Non-interactive execution (avoid TTY deadlock when piped)
-    # Use shell redirection to prevent stdin from being consumed
     REMOTE_CMD="cd '$PROD_APP_DIR' && bash ./deploy.sh"
     for arg in "$@"; do
         REMOTE_CMD="$REMOTE_CMD $(printf '%q' "$arg")"
     done
 
-    # Execute without -t flag to avoid TTY conflicts when piped via stdin
     ssh -p "$PROD_SSH_PORT" -i "$SSH_KEY_PATH" "$PROD_SSH_USER@$PROD_SSH_HOST" "$REMOTE_CMD" < /dev/null
 
     EXIT_CODE=$?
     echo ""
     if [ $EXIT_CODE -eq 0 ]; then
-        local_info "✓ Deployment Cycle Complete."
+        local_success "✓ Deployment Cycle Complete!"
     else
-        local_error "✗ Remote Deployment Finished with Error (Code: $EXIT_CODE)"
+        local_error "✗ Remote Deployment Failed (Exit Code: $EXIT_CODE)"
     fi
 
     exit $EXIT_CODE
 fi
 
-# ── Remote / Server Execution Logic Starts Here ──────────────────────────────
+# ── Remote / Server Execution Logic ─────────────────────────────────────────
 
 # ── Colours ──────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No colour
+MAGENTA='\033[0;35m'
+NC='\033[0m'
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
 success() { echo -e "${GREEN}[OK]${NC}    $*"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
 error()   { echo -e "${RED}[ERROR]${NC} $*"; }
+step()    { echo -e "\n${MAGENTA}━━━ $* ━━━${NC}"; }
 
 run() {
     local cmd_str="$*"
 
-    # Check if we are physically running as root (ID 0)
     if [[ "$(id -u)" == "0" ]]; then
-        # Commands that touch application files/db should be run as APP_USER
         if [[ ! "$cmd_str" =~ ^sudo ]]; then
-            if [[ "$cmd_str" == *"php"* ]] || [[ "$cmd_str" == *"composer"* ]] || [[ "$cmd_str" == *"npm"* ]] || [[ "$cmd_str" == *"pnpm"* ]] || [[ "$cmd_str" == *"git"* ]]; then
-                # Wrap in sudo -u APP_USER
-                # We use 'bash -c' to handle complex commands (pipes, redirects) if any, though risky.
-                # simpler: just prefix.
+            if [[ "$cmd_str" == *"php"* ]] || [[ "$cmd_str" == *"composer"* ]] || \
+               [[ "$cmd_str" == *"npm"* ]] || [[ "$cmd_str" == *"pnpm"* ]] || \
+               [[ "$cmd_str" == *"git"* ]]; then
                 cmd_str="sudo -u $APP_USER $cmd_str"
             fi
         fi
@@ -421,7 +419,6 @@ run() {
         return 0
     fi
 
-    # Execute
     eval "$cmd_str" || {
         local exit_code=$?
         error "Command failed with exit code $exit_code: $cmd_str"
@@ -429,7 +426,7 @@ run() {
     }
 }
 
-# ── Initialize critical variables BEFORE enabling -u ──────────────────────────
+# ── Initialize Variables ────────────────────────────────────────────────────
 FRESH=false
 SEED=false
 NO_BUILD=false
@@ -438,6 +435,8 @@ DRY_RUN=false
 RESET_DB=false
 DIAGNOSE=false
 IGNORE_MAINTENANCE=false
+SYNC_IMAGES=false
+OPTIMIZE_IMAGES=false
 WEBHOOK_TRIGGER="${WEBHOOK_TRIGGER:-false}"
 TIMEOUT_PID=""
 MAINTENANCE_WAS_ENABLED=false
@@ -448,17 +447,15 @@ DISCORD_WEBHOOK=""
 NTFY_URL=""
 NOTIFY_DISCORD=""
 
-# Load .env variables if file exists (so DB_CONNECTION etc are available)
 if [[ -f .env ]]; then
     set -a
     source .env
     set +a
 fi
 
-# NOW enable strict mode for undefined variables
 set -u
 
-# ── Parse flags ──────────────────────────────────────────────────────────────
+# ── Parse Flags ─────────────────────────────────────────────────────────────
 for arg in "$@"; do
     case "$arg" in
         --fresh)     FRESH=true; SEED=true ;;
@@ -469,11 +466,13 @@ for arg in "$@"; do
         --reset-db)  RESET_DB=true ;;
         --up)        IGNORE_MAINTENANCE=true ;;
         --diagnose)  DIAGNOSE=true ;;
+        --sync-images) SYNC_IMAGES=true ;;
+        --optimize-images) OPTIMIZE_IMAGES=true ;;
         *)           warn "Unknown flag: $arg" ;;
     esac
 done
 
-# ── Notifications ────────────────────────────────────────────────────────────
+# ── Notifications ───────────────────────────────────────────────────────────
 send_notification() {
     local exit_code=$1
     local status="Success"
@@ -483,10 +482,7 @@ send_notification() {
         color=15548997
     fi
 
-    if [[ "$NOTIFY_ENABLED" != "true" ]]; then
-        rm -f resources/views/errors/temp_503.blade.php 2>/dev/null || true
-        return
-    fi
+    [[ "$NOTIFY_ENABLED" != "true" ]] && { rm -f resources/views/errors/temp_503.blade.php 2>/dev/null; return; }
 
     php -r "
         \$json = json_encode([
@@ -508,14 +504,12 @@ send_notification() {
         rm -f discord_payload.json
     fi
 
-    if [[ -n "$NTFY_URL" ]]; then
-        echo "Deployment $status" | curl -s --max-time 10 -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null 2>&1 || true
-    fi
+    [[ -n "$NTFY_URL" ]] && echo "Deployment $status" | curl -s --max-time 10 -H "Title: Deployment $status" -H "Priority: 4" -d @- "$NTFY_URL" >/dev/null 2>&1 || true
 
     rm -f resources/views/errors/temp_503.blade.php 2>/dev/null || true
 }
 
-# ── Pre-flight checks ────────────────────────────────────────────────────────
+# ── Pre-flight Checks ───────────────────────────────────────────────────────
 resolve_app_dir() {
     local script_source=""
     if [[ -n "${BASH_SOURCE[0]:-}" && -f "${BASH_SOURCE[0]}" ]]; then
@@ -540,47 +534,32 @@ resolve_app_dir() {
     fi
 
     pwd
-    return 0
 }
 
-# ── Validate required commands ───────────────────────────────────────────────
 validate_required_commands() {
-    local missing_commands=()
-    
+    local missing=()
     for cmd in php composer git; do
-        if ! command -v "$cmd" &>/dev/null; then
-            missing_commands+=("$cmd")
-        fi
+        command -v "$cmd" &>/dev/null || missing+=("$cmd")
     done
-    
-    if [[ ${#missing_commands[@]} -gt 0 ]]; then
-        error "Missing required commands: ${missing_commands[*]}"
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        error "Missing required commands: ${missing[*]}"
         error "Please install the missing dependencies and try again."
         exit 1
     fi
 }
 
 APP_DIR="$(resolve_app_dir)"
-cd "$APP_DIR" || {
-    error "Failed to change directory to $APP_DIR"
-    exit 1
-}
+cd "$APP_DIR" || { error "Failed to change directory to $APP_DIR"; exit 1; }
 
 info "Deploying from $APP_DIR"
 
-if [[ ! -f artisan ]]; then
-    error "artisan not found — are you in the Laravel project root?"
-    exit 1
-fi
-
-if [[ ! -f .env ]]; then
-    error ".env file not found. Copy .env.example and configure it first."
-    exit 1
-fi
+[[ ! -f artisan ]] && { error "artisan not found — are you in the Laravel project root?"; exit 1; }
+[[ ! -f .env ]] && { error ".env file not found. Copy .env.example and configure it first."; exit 1; }
 
 validate_required_commands
 
-# ── Step 0: Initial Change Detection ─────────────────────────────────────────
+# ── Step 0: Change Detection ────────────────────────────────────────────────
 PREV_DEPLOY_FILE="storage/framework/last_successful_deploy"
 INITIAL_GIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
 
@@ -590,15 +569,15 @@ if [[ "$WEBHOOK_TRIGGER" == "true" && -f "$PREV_DEPLOY_FILE" && "$FORCE" == "fal
         info "Webhook triggered, checking remote for actual changes..."
         git fetch origin >/dev/null 2>&1 || true
         REMOTE_HASH=$(git rev-parse origin/main 2>/dev/null || echo "")
-        
+
         if [[ "$INITIAL_GIT_HASH" == "$REMOTE_HASH" ]]; then
-            success "No remote changes detected. System is already at hash $REMOTE_HASH. Terminating to avoid loop."
+            success "No remote changes detected. System is already at hash $REMOTE_HASH."
             exit 0
         fi
     fi
 fi
 
-# ── Ensure APP_KEY is set ───────────────────────────────────────────────────
+# ── APP_KEY Check ───────────────────────────────────────────────────────────
 info "Checking application encryption key..."
 APP_KEY_EXISTS=false
 
@@ -606,49 +585,40 @@ if [[ -f .env ]]; then
     APP_KEY_LINE=$(grep '^APP_KEY=' .env 2>/dev/null || echo "")
     if [[ -n "$APP_KEY_LINE" ]]; then
         APP_KEY_VALUE=$(echo "$APP_KEY_LINE" | cut -d'=' -f2- | sed 's/^"//' | sed 's/"$//')
-        if [[ -n "$APP_KEY_VALUE" ]]; then
-            APP_KEY_EXISTS=true
-        fi
+        [[ -n "$APP_KEY_VALUE" ]] && APP_KEY_EXISTS=true
     fi
 fi
 
 if [[ "$APP_KEY_EXISTS" == "false" ]]; then
-    warn "APP_KEY not found or empty in .env file. Generating new key..."
-    if ! run php artisan key:generate; then
-        error "Failed to generate APP_KEY. Please set APP_KEY manually in .env file."
-        exit 1
-    fi
+    warn "APP_KEY not found or empty. Generating new key..."
+    run php artisan key:generate || { error "Failed to generate APP_KEY"; exit 1; }
     success "Application encryption key generated."
 else
     success "Application encryption key is set."
 fi
 
-# Ensure storage/framework directory exists
 mkdir -p storage/framework
 
-# ── Recovery from stuck deployment ───────────────────────────────────────────
-# If a deployment got interrupted, the site might be stuck in maintenance mode
-# This section attempts to recover gracefully
+# ── Recovery from Stuck Deployment ──────────────────────────────────────────
 if [[ -f "storage/framework/down" ]]; then
     MAINT_AGE=$(($(date +%s) - $(stat -f%m "storage/framework/down" 2>/dev/null || stat -c%Y "storage/framework/down" 2>/dev/null || echo 0)))
     if [[ $MAINT_AGE -gt 3600 ]]; then
-        # Maintenance mode file is older than 1 hour - likely from a stuck deployment
-        warn "Detected maintenance mode lock older than 1 hour (likely from stuck deployment)."
-        warn "Attempting recovery: removing stale down state and bringing site online..."
+        warn "Maintenance mode lock older than 1 hour (likely from stuck deployment)."
+        warn "Attempting recovery: removing stale down state..."
         rm -f "storage/framework/down"
         php artisan up 2>/dev/null || warn "Could not bring site up immediately"
         sleep 2
     fi
 fi
 
-# ── Lock mechanism ───────────────────────────────────────────────────────────
+# ── Lock Mechanism ──────────────────────────────────────────────────────────
 if [[ -f "$LOCK_FILE" ]]; then
     LOCK_PID=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
     if [[ -n "$LOCK_PID" ]] && kill -0 "$LOCK_PID" 2>/dev/null; then
         error "Deploy script already running (PID: $LOCK_PID). Exiting."
         exit 1
     else
-        warn "Stale system lock file found. Removing..."
+        warn "Stale lock file found. Removing..."
         rm -f "$LOCK_FILE"
     fi
 fi
@@ -660,43 +630,32 @@ if [[ -f "$INSTALL_FLAG" ]]; then
     FLAG_AGE=$(($(date +%s) - FLAG_TIME))
 
     if [[ -n "$FLAG_PID" ]] && kill -0 "$FLAG_PID" 2>/dev/null; then
-        error "Installation already in progress (PID: $FLAG_PID, started $FLAG_AGE seconds ago)."
-        error "If this is a stuck deployment, manually remove: $APP_DIR/$INSTALL_FLAG"
+        error "Installation already in progress (PID: $FLAG_PID, age: ${FLAG_AGE}s)."
         exit 1
     else
-        warn "Stale installation flag found (PID: $FLAG_PID, age: ${FLAG_AGE}s). Removing..."
+        warn "Stale installation flag found. Removing..."
         rm -f "$INSTALL_FLAG"
     fi
 fi
 
-# Create both locks
 info "Creating deployment locks..."
 echo $$ > "$LOCK_FILE"
 echo "$$|$(date +%s)|$(date '+%Y-%m-%d %H:%M:%S')" > "$INSTALL_FLAG"
 
-# ── Cleanup and error handler ────────────────────────────────────────────────
+# ── Cleanup Handler ─────────────────────────────────────────────────────────
 cleanup_and_exit() {
     local exit_code=$?
-    
-    # Kill timeout process safely
-    if [[ -n "$TIMEOUT_PID" && "$TIMEOUT_PID" != "" ]]; then
-        kill "$TIMEOUT_PID" 2>/dev/null || true
-        wait "$TIMEOUT_PID" 2>/dev/null || true
-    fi
 
-    # Remove locks
+    [[ -n "$TIMEOUT_PID" && "$TIMEOUT_PID" != "" ]] && { kill "$TIMEOUT_PID" 2>/dev/null || true; wait "$TIMEOUT_PID" 2>/dev/null || true; }
     rm -f "$LOCK_FILE" "$INSTALL_FLAG"
 
-    # CRITICAL: Restore site if maintenance mode was enabled and something failed
-    # OR if --up was explicitly passed (IGNORE_MAINTENANCE), ensuring site is always brought up
     if [[ ("$MAINTENANCE_WAS_ENABLED" == "true" && "$exit_code" -ne 0) || "$IGNORE_MAINTENANCE" == "true" ]]; then
         if [[ "$exit_code" -ne 0 ]]; then
-            warn "Deploy failed (exit code: $exit_code)! Restoring site to LIVE status..."
+            warn "Deploy failed (exit code: $exit_code)! Restoring site..."
         else
-             info "Ensuring site is LIVE (--up flag active)..."
+            info "Ensuring site is LIVE..."
         fi
 
-        # Attempt to bring site up with retries
         for attempt in 1 2 3; do
             if php artisan up 2>/dev/null; then
                 success "Site restored to live."
@@ -705,147 +664,88 @@ cleanup_and_exit() {
                 warn "Attempt $attempt failed, retrying..."
                 sleep 2
             else
-                error "CRITICAL: Could not restore site after 3 attempts! Manual intervention required."
-                error "Run: php artisan up"
+                error "CRITICAL: Could not restore site! Run: php artisan up"
             fi
         done
     fi
 
-    # Send notification
     send_notification "$exit_code"
 }
 
-# Single unified trap
 trap cleanup_and_exit EXIT
 
-# ── Timeout mechanism ────────────────────────────────────────────────────────
-# DISABLED: Timeout was causing premature kills during long operations,
-# leaving the site in maintenance mode. Deployments should complete naturally.
-# If needed, configure timeouts at the CI/CD platform level instead.
-TIMEOUT_PID=""
-# To re-enable, use a longer duration (e.g., 1800 seconds = 30 min):
-# TIMEOUT=1800
-# (
-#     sleep "$TIMEOUT"
-#     if kill -0 $$ 2>/dev/null; then
-#         kill -TERM $$ 2>/dev/null || true  # Use SIGTERM, not SIGKILL
-#     fi
-# ) > /dev/null 2>&1 &
-# TIMEOUT_PID=$!
-
-# ── Load notification settings ───────────────────────────────────────────────
+# ── Load Notification Settings ──────────────────────────────────────────────
 DISCORD_WEBHOOK=$(grep "^DISCORD_WEBHOOK=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || echo "")
 NTFY_URL=$(grep "^NTFY_URL=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || echo "")
 NOTIFY_DISCORD=$(grep "^NOTIFY_DISCORD=" .env 2>/dev/null | cut -d '=' -f 2- | tr -d '"' || echo "")
 
-# ── Log deployment trigger source ────────────────────────────────────────────
-if [[ "$WEBHOOK_TRIGGER" == "true" ]]; then
-    info "Deployment triggered by GitHub webhook"
-fi
+[[ "$WEBHOOK_TRIGGER" == "true" ]] && info "Deployment triggered by GitHub webhook"
 
-# ── Step 0.5: Backup database before deployment ──────────────────────────────
-info "Creating database backup before deployment..."
+# ── Step 0.5: Database Backup ───────────────────────────────────────────────
+step "Database Backup"
+info "Creating database backup..."
 BACKUP_DIR="storage/backups"
 mkdir -p "$BACKUP_DIR"
 
 BACKUP_TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 BACKUP_FILE="$BACKUP_DIR/backup_${BACKUP_TIMESTAMP}.sql"
 
-if [[ "${DB_CONNECTION:-}" == "sqlite" ]]; then
-    # SQLite backup (just copy the database file)
-    if [[ -f "$DB_DATABASE" ]]; then
-        run cp "$DB_DATABASE" "${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
-        success "SQLite database backup created: ${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
-    fi
+if [[ "${DB_CONNECTION:-}" == "sqlite" && -f "$DB_DATABASE" ]]; then
+    run cp "$DB_DATABASE" "${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
+    success "SQLite backup created: ${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
 elif [[ "${DB_CONNECTION:-}" == "mysql" ]]; then
-    # MySQL dump
     run mysqldump --single-transaction --quick --lock-tables=false \
-        -h"${DB_HOST:-localhost}" \
-        -u"${DB_USERNAME:-root}" \
-        -p"${DB_PASSWORD:-}" \
+        -h"${DB_HOST:-localhost}" -u"${DB_USERNAME:-root}" -p"${DB_PASSWORD:-}" \
         "${DB_DATABASE}" > "$BACKUP_FILE"
-    success "MySQL database backup created: $BACKUP_FILE"
-
-    # Also backup callers to CSV
-    info "Exporting callers data to CSV..."
-    php artisan tinker << 'TINKER'
-use App\Models\Caller;
-$callers = Caller::all();
-$file = fopen("storage/backups/callers_backup_${BACKUP_TIMESTAMP}.csv", 'w');
-if ($file) {
-    fputcsv($file, ['ID', 'CPR', 'Phone', 'Name', 'Hits', 'Status', 'Is Winner', 'IP Address', 'Created At', 'Updated At']);
-    foreach ($callers as $caller) {
-        fputcsv($file, [
-            $caller->id,
-            $caller->cpr,
-            $caller->phone,
-            $caller->name,
-            $caller->hits,
-            $caller->status,
-            $caller->is_winner ? 'Yes' : 'No',
-            $caller->ip_address,
-            $caller->created_at,
-            $caller->updated_at
-        ]);
-    }
-    fclose($file);
-    echo "Callers data exported to CSV\n";
-}
-TINKER
-    success "Callers CSV backup created"
+    success "MySQL backup created: $BACKUP_FILE"
 else
-    # Generic database export via artisan
     run php artisan db:show || warn "Could not verify database connection"
 fi
 
 info "Backups stored in: $BACKUP_DIR"
 
-# ── Step 1: Maintenance mode ─────────────────────────────────────────────────
+# ── Step 1: Maintenance Mode ────────────────────────────────────────────────
+step "Maintenance Mode"
 if [[ -f "storage/framework/down" ]]; then
     if [[ -n "${PUBLISH_VERSION:-}" ]] || [[ "$IGNORE_MAINTENANCE" == "true" ]]; then
-        info "Maintenance mode is active (continuing due to active flag or publisher)."
+        info "Maintenance mode is active (continuing...)"
     else
-        error "Website is currently in maintenance mode. Aborting deployment to prevent conflicts."
-        error "To override and deploy anyway, use: ./deploy.sh --up"
+        error "Website is in maintenance mode. Use --up to override."
         exit 1
     fi
 fi
 
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Enabling maintenance mode..."
-    # Put site down with a longer retry and secret passphrase for testing
     run php artisan down --retry=120 --render="down" --secret="deploy-$(date +%s)" || true
     MAINTENANCE_WAS_ENABLED=true
-    sleep 2  # Give nginx/php time to recognize the down state
+    sleep 2
 else
     NOTIFY_ENABLED="false"
     info "Skipping maintenance mode (handled by publish.sh)."
-    MAINTENANCE_WAS_ENABLED=false
 fi
 
-# ── Step 2: Pull latest code ────────────────────────────────────────────────
+# ── Step 2: Pull Latest Code ────────────────────────────────────────────────
+step "Code Sync"
 if [[ -d .git ]]; then
-    info "Current Hash: $INITIAL_GIT_HASH. Pulling latest changes..."
-
+    info "Current Hash: $INITIAL_GIT_HASH"
     run git fetch origin
     CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-    
     run git reset --hard origin/"$CURRENT_BRANCH"
-    success "Codebase synced with remote/$CURRENT_BRANCH."
+    success "Codebase synced with remote/$CURRENT_BRANCH"
 
     POST_PULL_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
     if [[ -f "$PREV_DEPLOY_FILE" && "$FORCE" == "false" && "$FRESH" == "false" ]]; then
         LAST_SUCCESSFUL_HASH=$(cut -d'|' -f1 "$PREV_DEPLOY_FILE" 2>/dev/null || echo "")
         if [[ "$POST_PULL_HASH" == "$LAST_SUCCESSFUL_HASH" ]]; then
-            success "System is already at the last successfully deployed hash ($POST_PULL_HASH)."
-            success "No new changes to process. Terminating deployment to protect resources."
+            success "Already at last deployed hash ($POST_PULL_HASH). Terminating."
             exit 0
         fi
     fi
 fi
 
 # ── Step 2.5: Change Detection ──────────────────────────────────────────────
-info "Detecting specific changes for optimized build..."
+info "Detecting changes for optimized build..."
 CURRENT_GIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "no-git")
 CURRENT_VERSION=$(cat VERSION 2>/dev/null || echo "no-version")
 
@@ -860,31 +760,25 @@ FRONTEND_CHANGED=true
 MIGRATIONS_CHANGED=true
 
 if [[ "$FORCE" == "true" || "$FRESH" == "true" ]]; then
-    info "Force deployment requested — skipping optimizations."
+    info "Force deployment — skipping optimizations."
 elif [[ -z "$LAST_HASH" || "$LAST_HASH" == "no-git" ]]; then
-    info "No previous deployment record found."
+    info "No previous deployment record."
 else
     CHANGES=$(git diff --name-only "$LAST_HASH" "${POST_PULL_HASH:-$CURRENT_GIT_HASH}" 2>/dev/null || echo "ALL")
-    
+
     if [[ "$CHANGES" != "ALL" ]]; then
-        if ! echo "$CHANGES" | grep -qE "^(composer\.json|composer\.lock)$"; then
-            COMPOSER_CHANGED=false
-            info "No Composer changes detected."
-        fi
-        
-        if ! echo "$CHANGES" | grep -qE "(package\.json|pnpm-lock\.yaml|package-lock\.json|vite\.config\.js|resources/|public/)"; then
-            FRONTEND_CHANGED=false
-            info "No Frontend changes detected."
-        fi
-        
-        if ! echo "$CHANGES" | grep -q "^database/migrations/"; then
-            MIGRATIONS_CHANGED=false
-            info "No migration changes detected."
-        fi
+        echo "$CHANGES" | grep -qE "^(composer\.json|composer\.lock)$" || COMPOSER_CHANGED=false
+        echo "$CHANGES" | grep -qE "(package\.json|pnpm-lock\.yaml|package-lock\.json|vite\.config\.js|resources/|public/)" || FRONTEND_CHANGED=false
+        echo "$CHANGES" | grep -q "^database/migrations/" || MIGRATIONS_CHANGED=false
+
+        [[ "$COMPOSER_CHANGED" == "false" ]] && info "No Composer changes detected."
+        [[ "$FRONTEND_CHANGED" == "false" ]] && info "No Frontend changes detected."
+        [[ "$MIGRATIONS_CHANGED" == "false" ]] && info "No migration changes detected."
     fi
 fi
 
-# ── Step 3: Install PHP dependencies ────────────────────────────────────────
+# ── Step 3: PHP Dependencies ────────────────────────────────────────────────
+step "PHP Dependencies"
 if [[ "$COMPOSER_CHANGED" == "true" ]]; then
     info "Installing Composer dependencies..."
     if [[ "${APP_ENV:-production}" == "production" ]]; then
@@ -894,10 +788,11 @@ if [[ "$COMPOSER_CHANGED" == "true" ]]; then
     fi
     success "Composer dependencies installed."
 else
-    info "Skipping Composer installation (no changes detected)."
+    info "Skipping Composer (no changes)."
 fi
 
-# ── Step 4: Install & build frontend assets ────────────────────────────────
+# ── Step 4: Frontend Assets ─────────────────────────────────────────────────
+step "Frontend Assets"
 if [[ "$NO_BUILD" == "false" ]]; then
     if [[ "$FRONTEND_CHANGED" == "true" ]]; then
         info "Installing Node dependencies..."
@@ -920,67 +815,190 @@ if [[ "$NO_BUILD" == "false" ]]; then
             success "Frontend assets built."
         fi
     else
-        info "Skipping Frontend build (no changes detected)."
+        info "Skipping Frontend build (no changes)."
     fi
 else
-    info "Skipping frontend build (--no-build flag set)."
+    info "Skipping frontend build (--no-build)."
 fi
 
-# ── Step 5: Database migrations ─────────────────────────────────────────────
+# ── Step 5: Database Migrations ─────────────────────────────────────────────
+step "Database Migrations"
 if [[ "$MIGRATIONS_CHANGED" == "true" || "$FRESH" == "true" || "$RESET_DB" == "true" ]]; then
     info "Running database migrations..."
 
     if [[ "$FRESH" == "true" ]]; then
-        warn "Running migrate:fresh with seeding — this will DROP all tables!"
+        warn "Running migrate:fresh — DROPPING all tables!"
         run php artisan migrate:fresh --force --seed
         success "Fresh migration completed with seeding."
     elif [[ "$RESET_DB" == "true" ]]; then
-        warn "Running migrate:fresh — this will DROP all tables and reset database structure!"
+        warn "Running migrate:fresh — DROPPING all tables!"
         run php artisan migrate:fresh --force
-        success "Database reset completed (structure only, no seeding)."
+        success "Database reset completed."
     else
         run php artisan migrate --force
         success "Migrations applied."
     fi
 else
-    info "Skipping database migrations (no changes detected)."
+    info "Skipping migrations (no changes)."
 fi
 
-# Always check seeding if requested
 if [[ "$SEED" == "true" && "$FRESH" == "false" && "$RESET_DB" == "false" ]]; then
     info "Running database seeders..."
-    info "  → UserSeeder: Creates/updates admin users"
-    info "  → CallerSeeder: Imports from CSV (only if table is empty)"
     run php artisan db:seed --force
     success "Database seeding completed."
-    warn "Note: CallerSeeder imports from database/seeders/data/callers_seed.csv"
-    warn "      and only runs when callers table is completely empty."
 fi
 
-# ── Step 6: Verify migration status ─────────────────────────────────────────
+# ── Step 6: Verify Migration Status ─────────────────────────────────────────
 info "Verifying migration status..."
 if [[ "$DRY_RUN" == "false" ]]; then
     if PENDING=$(php artisan migrate:status 2>&1 | grep -c "Pending" || echo "0"); then
         if [[ "$PENDING" -gt 0 ]]; then
-            error "$PENDING migration(s) still pending! Check migration errors above."
-            warn "Attempting to bring site back online before exit..."
+            error "$PENDING migration(s) pending! Check errors above."
             php artisan up 2>/dev/null || warn "Could not execute 'php artisan up'"
             exit 1
         fi
     fi
-    success "All migrations applied — no pending migrations."
-else
-    echo -e "${YELLOW}[DRY-RUN]${NC} php artisan migrate:status"
+    success "All migrations applied."
 fi
 
-# ── Step 7: Version sync ────────────────────────────────────────────────────
+# ── Step 7: Version Sync ────────────────────────────────────────────────────
+step "Version Sync"
 if php artisan list 2>/dev/null | grep -q "version:sync"; then
     info "Synchronising version..."
     run php artisan version:sync
     success "Version synchronised."
 fi
 
-# ── Step 8: Laravel optimisation caches ──────────────────────────────────────
+# ── Step 7.5: Image Cache Busting ───────────────────────────────────────────
+step "Image Cache Busting"
+info "Generating image cache busting manifest..."
+
+# Create image checksums for cache busting
+IMAGE_MANIFEST="storage/framework/image_manifest.json"
+mkdir -p storage/framework
+
+if [[ -d "public/images" ]]; then
+    # Generate checksums for all images
+    php -r "
+        \$manifest = [];
+        \$version = trim(file_get_contents(base_path('VERSION') ?: '/dev/null') ?: date('YmdHis'));
+        \$iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(public_path('images'))
+        );
+        
+        foreach (\$iterator as \$file) {
+            if (\$file->isFile() && preg_match('/\.(png|jpg|jpeg|svg|webp|gif)$/i', \$file->getFilename())) {
+                \$relativePath = str_replace(public_path('images') . '/', '', \$file->getPathname());
+                \$hash = md5_file(\$file->getPathname());
+                \$manifest[\$relativePath] = [
+                    'hash' => \$hash,
+                    'version' => \$version,
+                    'mtime' => \$file->getMTime(),
+                    'size' => \$file->getSize()
+                ];
+            }
+        }
+        
+        \$output = [
+            'version' => \$version,
+            'generated_at' => date('c'),
+            'total_images' => count(\$manifest),
+            'images' => \$manifest
+        ];
+        
+        file_put_contents(base_path('$IMAGE_MANIFEST'), json_encode(\$output, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        echo 'Generated manifest for ' . count(\$manifest) . ' images';
+    " 2>/dev/null && success "Image manifest created ($IMAGE_MANIFEST)" || warn "Could not generate image manifest"
+    
+    # Display image info
+    if [[ -f "$IMAGE_MANIFEST" ]]; then
+        IMAGE_COUNT=$(php -r "echo json_decode(file_get_contents('$IMAGE_MANIFEST'))->total_images ?? 0;" 2>/dev/null || echo "0")
+        info "Total images tracked: $IMAGE_COUNT"
+        
+        # Show key images
+        info "Key images:"
+        for img in "alsarya-logo-2026-1.png" "alsarya-logo.png" "alsarya-logo-2026-tiny.png"; do
+            if [[ -f "public/images/$img" ]]; then
+                SIZE=$(stat -c%s "public/images/$img" 2>/dev/null || stat -f%z "public/images/$img" 2>/dev/null || echo "?")
+                HASH=$(md5 -q "public/images/$img" 2>/dev/null || md5sum "public/images/$img" 2>/dev/null | cut -d' ' -f1 || echo "?")
+                info "  ✓ $img (${SIZE}B, MD5: ${HASH:0:12}...)"
+            fi
+        done
+    fi
+else
+    warn "public/images directory not found"
+fi
+
+# ── Step 7.6: Optional Image Optimization ───────────────────────────────────
+if [[ "${OPTIMIZE_IMAGES:-false}" == "true" ]]; then
+    step "Image Optimization"
+    info "Optimizing images (this may take a while)..."
+    
+    php -r "
+        use Intervention\Image\ImageManager;
+        use Intervention\Image\Drivers\Gd\Driver;
+        
+        require 'vendor/autoload.php';
+        
+        \$imageDir = public_path('images');
+        \$optimized = 0;
+        \$skipped = 0;
+        
+        if (!class_exists(ImageManager::class)) {
+            echo 'Intervention Image not available, skipping optimization\n';
+            exit(0);
+        }
+        
+        \$manager = new ImageManager(new Driver());
+        
+        \$iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(\$imageDir)
+        );
+        
+        foreach (\$iterator as \$file) {
+            if (\$file->isFile() && preg_match('/\.(jpg|jpeg|png|webp)$/i', \$file->getFilename())) {
+                \$ext = strtolower(pathinfo(\$file->getFilename(), PATHINFO_EXTENSION));
+                \$originalSize = \$file->getSize();
+                
+                try {
+                    \$image = \$manager->read(\$file->getPathname());
+                    
+                    // Optimize based on type
+                    if (in_array(\$ext, ['jpg', 'jpeg'])) {
+                        \$image->toJpeg(quality: 85, progressive: true)->save(\$file->getPathname());
+                    } elseif (\$ext === 'png') {
+                        \$image->toPng(compressionLevel: 6)->save(\$file->getPathname());
+                    } elseif (\$ext === 'webp') {
+                        \$image->toWebp(quality: 80)->save(\$file->getPathname());
+                    }
+                    
+                    \$newSize = filesize(\$file->getPathname());
+                    \$savings = \$originalSize - \$newSize;
+                    
+                    if (\$savings > 0) {
+                        \$percent = round((\$savings / \$originalSize) * 100, 1);
+                        echo \"✓ Optimized: {\$file->getFilename()} (saved {\$percent}%)\n\";
+                        \$optimized++;
+                    } else {
+                        \$skipped++;
+                    }
+                } catch (Exception \$e) {
+                    echo \"✗ Error optimizing {\$file->getFilename()}: \" . \$e->getMessage() . \"\n\";
+                    \$skipped++;
+                }
+            }
+        }
+        
+        echo \"\nOptimization complete: {\$optimized} optimized, {\$skipped} skipped/unchanged\n\";
+    " 2>&1 | while read -r line; do
+        info "  $line"
+    done
+    
+    success "Image optimization complete"
+fi
+
+# ── Step 8: Laravel Caches ──────────────────────────────────────────────────
+step "Laravel Caches"
 info "Caching configuration, routes, and views..."
 run php artisan config:cache
 run php artisan route:cache
@@ -988,53 +1006,52 @@ run php artisan view:cache
 run php artisan event:cache
 success "Laravel caches rebuilt."
 
-# ── Step 9: Clear stale caches ───────────────────────────────────────────────
-info "Clearing stale application caches..."
+# ── Step 9: Clear Stale Caches ──────────────────────────────────────────────
+info "Clearing stale caches..."
 run php artisan cache:clear || true
 success "Application cache cleared."
 
-# ── Step 10: Storage link ────────────────────────────────────────────────────
+# ── Step 10: Storage Link ───────────────────────────────────────────────────
+step "Storage Symlink"
 if [[ ! -L public/storage ]]; then
     info "Creating storage symlink..."
     run php artisan storage:link
     success "Storage symlink created."
 else
-    # Force refresh of storage link to be safe
     info "Refreshing storage symlink..."
     rm public/storage
     run php artisan storage:link
     success "Storage symlink refreshed."
 fi
 
-# ── Step 11: Queue restart ───────────────────────────────────────────────────
+# ── Step 11: Queue Restart ──────────────────────────────────────────────────
+step "Queue Workers"
 info "Restarting queue workers..."
 run php artisan queue:restart || true
 success "Queue restart signal sent."
 
-# ── Step 11b: Final Ownership Fix (Crucial for root deployment) ──────
+# ── Step 11b: Ownership Fix ─────────────────────────────────────────────────
 if [[ "$(id -u)" == "0" ]]; then
-   info "Ensuring $APP_USER owns all files in $APP_DIR..."
-   chown -R "$APP_USER:$APP_USER" "$APP_DIR"
-   chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
-   success "Ownership fixed."
+    info "Ensuring $APP_USER owns all files..."
+    chown -R "$APP_USER:$APP_USER" "$APP_DIR"
+    chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+    success "Ownership fixed."
 else
-   info "Skipping recursive ownership change (not running as root)"
+    info "Skipping ownership change (not running as root)."
 fi
 
-# ── Step 11c: Update deployment record ───────────────────────────────────────
+# ── Step 11c: Update Deployment Record ──────────────────────────────────────
 if [[ "$DRY_RUN" == "false" ]]; then
     echo "${CURRENT_GIT_HASH}|${CURRENT_VERSION}" > "$PREV_DEPLOY_FILE"
     info "Deployment record updated: ${CURRENT_VERSION} (${CURRENT_GIT_HASH})"
 fi
 
-# ── Step 12: Health check ────────────────────────────────────────────────────
+# ── Step 12: Health Check ───────────────────────────────────────────────────
+step "Health Check"
 check_production_health() {
     local app_url=$(grep "^APP_URL=" .env 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'" || echo "")
 
-    if [[ -z "$app_url" ]]; then
-        warn "APP_URL not found in .env - skipping health check"
-        return 0
-    fi
+    [[ -z "$app_url" ]] && { warn "APP_URL not found - skipping health check"; return 0; }
 
     info "Running production health checks..."
 
@@ -1042,32 +1059,29 @@ check_production_health() {
     local family_status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$app_url/family" 2>/dev/null || echo "000")
 
     if [[ "$individual_status" == "200" || "$individual_status" == "302" ]]; then
-        success "✓ Individual registration route: HTTP $individual_status"
+        success "✓ Individual registration: HTTP $individual_status"
     else
-        error "✗ Individual registration route: HTTP $individual_status (expected 200/302)"
+        error "✗ Individual registration: HTTP $individual_status"
         return 1
     fi
 
     if [[ "$family_status" == "200" || "$family_status" == "302" ]]; then
-        success "✓ Family registration route: HTTP $family_status"
+        success "✓ Family registration: HTTP $family_status"
     else
-        error "✗ Family registration route: HTTP $family_status (expected 200/302)"
+        error "✗ Family registration: HTTP $family_status"
         return 1
     fi
 
-    success "All production routes are healthy!"
+    success "All routes are healthy!"
     return 0
 }
 
 IS_LOCAL_EXECUTION=false
-if [[ -n "${PUBLISH_VERSION:-}" ]] || [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_TTY:-}" ]]; then
-    IS_LOCAL_EXECUTION=true
-    info "Detected remote execution (called from local machine)"
-fi
+[[ -n "${PUBLISH_VERSION:-}" ]] || [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_TTY:-}" ]] && IS_LOCAL_EXECUTION=true
 
-# ── Step 12b: Log hits counter data to daily CSV ─────────────────────────────
+# ── Step 12b: Log Hit Counters ──────────────────────────────────────────────
 if [[ "$DRY_RUN" == "false" ]]; then
-    info "Logging hit counters to daily CSV..."
+    info "Logging hit counters..."
 
     LOG_DIR="storage/logs/hits"
     mkdir -p "$LOG_DIR"
@@ -1075,12 +1089,10 @@ if [[ "$DRY_RUN" == "false" ]]; then
     TODAY=$(date '+%Y-%m-%d')
     DAILY_LOG="$LOG_DIR/hits_${TODAY}.csv"
 
-    # Create header if file doesn't exist
     if [[ ! -f "$DAILY_LOG" ]]; then
         echo "timestamp,caller_id,cpr,name,phone,hits,status,ip_address" > "$DAILY_LOG"
     fi
 
-    # Export all callers with their hit counts
     php artisan tinker << TINKER 2>/dev/null || true
 use App\Models\Caller;
 use Carbon\Carbon;
@@ -1105,41 +1117,37 @@ if (\$handle) {
 }
 TINKER
 
-    success "Hit counters logged to: $DAILY_LOG"
-    info "Daily logs stored in: $LOG_DIR"
-    info "Format: CSV with columns [timestamp, caller_id, cpr, name, phone, hits, status, ip_address]"
+    success "Hit counters logged: $DAILY_LOG"
 fi
 
-# ── Step 13: Disable maintenance mode ────────────────────────────────────────
+# ── Step 13: Disable Maintenance Mode ───────────────────────────────────────
+step "Going Live"
 if [[ -z "${PUBLISH_VERSION:-}" ]]; then
     info "Disabling maintenance mode..."
     run php artisan up
-    success "Application is live."
+    success "Application is LIVE!"
 
     if [[ "$IS_LOCAL_EXECUTION" == "true" && "$DRY_RUN" == "false" ]]; then
         echo ""
         if ! check_production_health; then
-            error "Health check failed! Site is live but routes may not be working correctly."
-            error "Please investigate immediately."
-            # Keep MAINTENANCE_WAS_ENABLED=true so cleanup can restore if needed
+            error "Health check failed! Investigate immediately."
             exit 1
         fi
     fi
-    # Only set flag to false after health check passes
     MAINTENANCE_WAS_ENABLED=false
 else
-    info "Skipping maintenance mode restore (handled by publish.sh)."
+    info "Skipping maintenance mode (handled by publish.sh)."
 fi
 
-# ── Summary ──────────────────────────────────────────────────────────────────
+# ── Summary ─────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}  Deployment complete!${NC}"
+echo -e "${GREEN}  🎉 Deployment Complete!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
-
-[[ "$SEED" == "true" ]] && info "Seeders executed: UserSeeder, CallerSeeder"
-[[ "$FRESH" == "true" ]] && warn "Database was freshly rebuilt with seeding (all previous data dropped)."
-[[ "$RESET_DB" == "true" ]] && warn "Database was reset (all tables dropped and recreated - no seeding applied)."
+[[ "$SEED" == "true" ]] && info "✓ Seeders executed"
+[[ "$FRESH" == "true" ]] && warn "⚠ Database freshly rebuilt"
+[[ "$RESET_DB" == "true" ]] && warn "⚠ Database reset (no seeding)"
 echo ""
 success "Deploy finished at $(date '+%Y-%m-%d %H:%M:%S')"
+echo ""

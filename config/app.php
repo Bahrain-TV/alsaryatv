@@ -167,6 +167,11 @@ return [
          * Mail Environment Guard - Prevents accidental emails in development
          */
         App\Providers\MailEnvironmentServiceProvider::class,
+
+        /*
+         * Asset Cache Busting
+         */
+        App\Providers\AssetServiceProvider::class,
     ],
 
     /*
