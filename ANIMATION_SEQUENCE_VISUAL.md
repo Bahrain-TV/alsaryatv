@@ -29,8 +29,8 @@ TIME    PHASE                   VISUAL                    DURATION
 
 2.3s    ┌─ PHASE 1B: Individual Sponsor 2  ──────────────────────┐
         │                                                          │
-        │            [  Beyon Money  ]                            │
-        │         [  BEYON MONEY LOGO  ]                          │
+        │            [  Bapco Energies  ]                            │
+        │         [  BAPCO ENERGIES LOGO  ]                          │
         │                                                          │
         │   → Slides in from RIGHT with elastic bounce           │
         └─────────────────────────────────────────────────────────┘
@@ -46,7 +46,7 @@ TIME    PHASE                   VISUAL                    DURATION
 3.1s    ┌─ PHASE 1C: Combined Sponsor Display  ────────────────┐
         │                                                        │
         │              برعاية                                   │
-        │  [BTV LOGO]              [BEYON LOGO]                │
+        │  [BTV LOGO]              [BAPCO LOGO]                │
         │                                                        │
         │   Both logos appear side-by-side                      │
         │   "برعاية" text fades in first                        │

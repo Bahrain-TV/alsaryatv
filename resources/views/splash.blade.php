@@ -147,6 +147,7 @@
             width: 240px;
             height: auto;
             max-width: 90vw;
+            max-height: 240px;
             filter: drop-shadow(0 0 30px rgba(168, 28, 46, 0.6))
                     drop-shadow(0 0 40px rgba(232, 215, 195, 0.4));
             transform: scale(0.85);
@@ -174,6 +175,7 @@
             width: 160px;
             height: auto;
             max-width: 40vw;
+            max-height: 160px;
             opacity: 0;
             transform: scale(0.7) translateY(40px);
             filter: drop-shadow(0 0 20px rgba(168, 28, 46, 0.5))
@@ -449,6 +451,7 @@
 
             .sponsor-card .sponsor-card-logo {
                 width: 180px;
+                max-height: 180px;
             }
 
             .sponsor-card .sponsor-card-title {
@@ -463,6 +466,7 @@
 
             .sponsor-logo {
                 width: 120px;
+                max-height: 120px;
             }
 
             .sponsored-by {
@@ -518,27 +522,27 @@
              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
         <div class="sponsors-phase" id="sponsorsPhase">
             <!-- Individual Sponsor Cards -->
-            <!-- Card 1: تلفزيون البحرين (BTV) - enters from left at 0s, exits at 2s -->
+            <!-- Card 1: Jasmis - enters from left at 0s, exits at 2s -->
             <div class="sponsor-card" id="sponsorCard1">
                 <div class="sponsor-card-content">
-                    <div class="sponsor-card-title">تلفزيون البحرين</div>
-                    <img src="{{ asset('images/btv-logo-ar.png') }}" alt="تلفزيون البحرين" class="sponsor-card-logo">
+                    <div class="sponsor-card-title">Jasmis</div>
+                    <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="sponsor-card-logo">
                 </div>
             </div>
 
-            <!-- Card 2: Beyon Money - enters from right at 2s, exits at 4s -->
+            <!-- Card 2: Bapco Energies - enters from right at 2s, exits at 4s -->
             <div class="sponsor-card" id="sponsorCard2">
                 <div class="sponsor-card-content">
-                    <div class="sponsor-card-title">Beyon Money</div>
-                    <img src="{{ asset('images/beyon-money-logo-wide.png') }}" alt="Beyon Money" class="sponsor-card-logo">
+                    <div class="sponsor-card-title">Bapco Energies</div>
+                    <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="sponsor-card-logo">
                 </div>
             </div>
 
             <!-- Combined Display: Both sponsors together (4s-11s) - LONGEST PHASE -->
             <div class="sponsored-by" id="sponsoredByText">برعاية</div>
             <div class="sponsors-logos" id="sponsorsLogos">
-                <img src="{{ asset('images/btv-logo-ar.png') }}" alt="تلفزيون البحرين" class="sponsor-logo" id="sponsor1">
-                <img src="{{ asset('images/beyon-money-logo-wide.png') }}" alt="Beyon Money" class="sponsor-logo" id="sponsor2">
+                <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="sponsor-logo" id="sponsor1">
+                <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="sponsor-logo" id="sponsor2">
             </div>
         </div>
 
@@ -634,7 +638,7 @@
                     sponsorCard1.style.animation = 'cardSlideInFromLeft 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
                 }, 100);
 
-                // 2-4s: Replace with Sponsor 2 card (Beyon Money)
+                // 2-4s: Replace with Sponsor 2 card (Bapco Energies)
                 setTimeout(() => {
                     sponsorCard1.style.animation = 'cardSlideOut 0.8s ease-in forwards';
                 }, 2000);

@@ -9,12 +9,12 @@
                 <!-- Display logos -->
                 <div class="w-full flex flex-wrap justify-center items-center gap-6 sm:gap-8" id="sponsors-logos">
                     <div id="left-sponsor-logo" class="hover:scale-105 transition-transform duration-300">
-                        <img src="{{ asset('images/beyon-money-logo-wide.png') }}" 
-                        alt="Beyon Money بيون موني" 
+                        <img src="{{ asset('images/jasmis-logo.png') }}" 
+                        alt="Jasmis" 
                         class="w-36 sm:w-44 lg:w-60 h-auto" />
                     </div>
                     <div id="right-sponsor-logo" class="hover:scale-105 transition-transform duration-300">
-                        <x-bapco-logo class="w-32 sm:w-44 lg:w-60 h-auto" />
+                        <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="w-32 sm:w-44 lg:w-60 h-auto" />
                     </div>
                 </div>
             </div>

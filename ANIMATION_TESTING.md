@@ -54,7 +54,7 @@ body {
 - [ ] Combined display appears at 3.1s
 - [ ] "برعاية" text fades in first
 - [ ] BTV logo animates in (staggered)
-- [ ] Beyon Money logo animates in (staggered 300ms later)
+- [ ] Bapco Energies logo animates in (staggered 300ms later)
 - [ ] Both logos visible side-by-side (140px desktop)
 - [ ] All sponsors fade out at 4.5s
 
@@ -188,7 +188,7 @@ http://192.168.x.x:8000/splash
 ```bash
 # Verify images exist
 ls -la public/images/btv-logo-ar.png
-ls -la public/images/beyon-money-logo-wide.png
+ls -la public/images/bapco-energies.svg
 ls -la public/images/alsarya-logo-2026-1.png
 ```
 
@@ -277,7 +277,7 @@ function logPhase(name, expectedTime) {
 ```
 splash.blade.php          - 1 page
 btv-logo-ar.png          - ~50 KB
-beyon-money-logo-wide.png - ~50 KB
+bapco-energies.svg - ~50 KB
 alsarya-logo-2026-1.png   - ~100 KB
 CSS (inline)              - ~8 KB
 JavaScript (inline)       - ~6 KB

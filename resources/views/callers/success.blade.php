@@ -184,7 +184,7 @@
             line-height: 1.6;
         }
 
-        .beyon-section {
+        .bapco-section {
             background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(16, 185, 129, 0.12) 100%);
             border: 1px solid rgba(251, 191, 36, 0.3);
             border-radius: clamp(12px, 3vw, 16px);
@@ -193,14 +193,14 @@
             text-align: center;
         }
 
-        .beyon-section p {
+        .bapco-section p {
             color: #e2e8f0;
             margin-bottom: clamp(8px, 2vw, 16px);
             font-size: clamp(0.9rem, 2.5vw, 0.95rem);
             line-height: 1.5;
         }
 
-        .beyon-section .app-name {
+        .bapco-section .app-name {
             color: #fbbf24;
             font-weight: 700;
             font-size: clamp(1rem, 3vw, 1.1rem);
@@ -505,7 +505,7 @@
                 margin-bottom: 24px;
             }
 
-            .beyon-section {
+            .bapco-section {
                 padding: 16px;
                 margin-bottom: 24px;
             }
@@ -658,7 +658,7 @@
                 margin-bottom: 16px;
             }
 
-            .beyon-section {
+            .bapco-section {
                 padding: 12px;
                 margin-bottom: 16px;
             }
@@ -745,12 +745,11 @@
                     شكراً <span class="font-bold">{{ session('name') ?: 'المشارك الكريم' }}</span> لمشاركتك في برنامج السارية
                 </p>
 
-                <!-- Beyon Money section -->
-                <div class="beyon-section">
+                <!-- Bapco Energies section -->
+                <div class="bapco-section">
                     <p>لاستلام الجائزة يجب على جميع المشاركين تحميل تطبيق</p>
-                    <p class="app-name">Beyon Money</p>
-                    <a href="https://beyonmoney.onelink.me/XTfh/homepage"
-                        class="app-store-link" target="_blank" rel="noopener noreferrer">
+                    <p class="app-name">Bapco Energies</p>
+                    <a href="#" class="app-store-link" target="_blank" rel="noopener noreferrer">
                         <img src="{{ asset('images/dl-from-app-stores.png') }}" alt="تحميل التطبيق" />
                     </a>
                 </div>

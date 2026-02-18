@@ -94,11 +94,10 @@
                     <div class="w-auto flex flex-row space-x-7 gap-10 animate__animated animate__fadeInUp"
                         id="sponsors-logos">
                         <div class="intro-dance" id="left-sponsor-logo">
-                            <x-bapco-logo class="w-36 h-auto lg:w-60 pt-0" />
+                            <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="w-36 h-auto lg:w-60 pt-0" />
                         </div>
                         <div class="intro-dance" id="right-sponsor-logo">
-                            <img src="{{ asset('images/beyon-money-logo-wide.png') }}" alt="Beyon Money بيون موني"
-                                class="w-40 md:w-44 lg:w-60 h-auto pt-2 pr-2" />
+                            <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="w-40 md:w-44 lg:w-60 h-auto pt-2 pr-2" />
                         </div>
                     </div>
                     <div class="w-auto flex flex-row space-x-7 gap-10 animate__animated animate__fadeInUp intro-dance"

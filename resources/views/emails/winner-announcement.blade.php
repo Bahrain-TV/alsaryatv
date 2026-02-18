@@ -468,7 +468,7 @@
             <div class="instructions">
                 <h4>📋 الخطوات التالية</h4>
                 <ol>
-                    <li><strong>تحميل تطبيق Beyon Money:</strong> يجب عليك تحميل تطبيق Beyon Money للاستفادة من جائزتك</li>
+                    <li><strong>تحميل تطبيق Bapco Energies:</strong> يجب عليك تحميل تطبيق Bapco Energies للاستفادة من جائزتك</li>
                     <li><strong>التحقق من البيانات:</strong> تأكد من صحة بيانات الهوية والهاتف لديك</li>
                     <li><strong>الانتظار للتواصل:</strong> سيتواصل معك فريقنا خلال 24 ساعة</li>
                     <li><strong>تأكيد الجائزة:</strong> سيتم تحويل الجائزة إلى حسابك مباشرة</li>
@@ -497,7 +497,7 @@
             <div class="footer-links">
                 <a href="{{ url('/') }}">الموقع الرئيسي</a>
                 <span class="separator">|</span>
-                <a href="https://beyonmoney.onelink.me/XTfh/homepage" target="_blank">تحميل Beyon Money</a>
+                <a href="#" target="_blank">تحميل Bapco Energies</a>
                 <span class="separator">|</span>
                 <a href="mailto:winners@alsarya.tv">تواصل معنا</a>
             </div>
