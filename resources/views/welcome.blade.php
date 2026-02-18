@@ -265,20 +265,30 @@
             .lottie-background { display: none !important; }
             .moon-glow { display: none !important; }
             #threejs-bg { display: none !important; }
+            .background-layers { display: none !important; }
         }
 
         /* ── MOBILE RESPONSIVENESS ── */
         @media (max-width: 767px) {
+            /* Disable all background animations for mobile */
+            body:not(.dark-mode) {
+                background: linear-gradient(135deg,
+                    oklch(0.97 0.02 85) 0%,
+                    oklch(0.96 0.02 75) 50%,
+                    oklch(0.95 0.02 65) 100%) !important;
+                animation: none !important;
+            }
+
             /* Main content wrapper - less padding, full width */
             #main-content {
-                padding: 1rem 0.75rem !important;
+                padding: 0.75rem 0.5rem !important;
                 min-height: 100vh;
             }
 
             /* Theme toggle - smaller and closer to edge */
             #theme-toggle {
-                top: 4px !important;
-                right: 4px !important;
+                top: 8px !important;
+                right: 8px !important;
                 width: 36px !important;
                 height: 36px !important;
             }
@@ -289,15 +299,21 @@
 
             /* Header - smaller text */
             header h1 {
-                font-size: 1.75rem !important;
+                font-size: 1.5rem !important;
                 line-height: 1.2 !important;
                 margin-bottom: 0.25rem !important;
             }
             header p {
-                font-size: 0.75rem !important;
+                font-size: 0.7rem !important;
             }
             header .h-\[1px\] {
                 width: 6px !important;
+            }
+
+            /* Logo - smaller on mobile */
+            .logo-section img {
+                width: 120px !important;
+                margin-bottom: 0.5rem !important;
             }
 
             /* Glass panel - less padding, full width */
@@ -312,13 +328,13 @@
                 margin-bottom: 0.5rem !important;
             }
             .gsap-item.relative.overflow-hidden h2 {
-                font-size: 1rem !important;
+                font-size: 0.9rem !important;
             }
             .gsap-item.relative.overflow-hidden .gold-text {
-                font-size: 1.25rem !important;
+                font-size: 1.1rem !important;
             }
             .gsap-item.relative.overflow-hidden p {
-                font-size: 0.65rem !important;
+                font-size: 0.6rem !important;
             }
 
             /* Tab toggle - smaller */
@@ -328,12 +344,12 @@
                 border-radius: 0.75rem !important;
             }
             .flex.bg-black\/40 button {
-                padding: 0.5rem 0.25rem !important;
-                font-size: 0.7rem !important;
+                padding: 0.45rem 0.25rem !important;
+                font-size: 0.65rem !important;
             }
             .flex.bg-black\/40 button svg {
-                width: 12px !important;
-                height: 12px !important;
+                width: 11px !important;
+                height: 11px !important;
             }
             #tab-bg {
                 left: 2px !important;
@@ -341,64 +357,90 @@
 
             /* Form fields - compact */
             .flip-scene {
-                height: 72px !important;
-                margin-bottom: 0.5rem !important;
+                height: 64px !important;
+                margin-bottom: 0.4rem !important;
             }
             .form-input {
-                padding: 0.5rem 0.625rem !important;
-                font-size: 0.85rem !important;
+                padding: 0.45rem 0.5rem !important;
+                font-size: 0.8rem !important;
                 border-radius: 0.5rem !important;
             }
             .form-input::placeholder {
-                font-size: 0.75rem !important;
+                font-size: 0.7rem !important;
             }
             label {
-                font-size: 0.6rem !important;
+                font-size: 0.55rem !important;
                 padding-right: 0.125rem !important;
             }
 
             /* Submit button */
-            .flip-scene.h-\[60px\] {
-                height: 44px !important;
+            .flip-scene.h-\[48px\] {
+                height: 40px !important;
             }
             .btn-primary span {
-                font-size: 0.85rem !important;
+                font-size: 0.75rem !important;
             }
             .btn-primary svg {
-                width: 14px !important;
-                height: 14px !important;
+                width: 12px !important;
+                height: 12px !important;
             }
 
             /* Ramadan info panel */
-            .gsap-item.mt-6.mx-4 {
-                margin-top: 0.75rem !important;
+            .gsap-item.mt-4.mx-2 {
+                margin-top: 0.5rem !important;
                 margin-left: 0.5rem !important;
                 margin-right: 0.5rem !important;
             }
-            .gsap-item.mt-6.mx-4 h4 {
-                font-size: 0.7rem !important;
-                margin-bottom: 0.25rem !important;
-            }
-            .gsap-item.mt-6.mx-4 .text-xs {
+            .gsap-item.mt-4.mx-2 h4 {
                 font-size: 0.6rem !important;
+                margin-bottom: 0.2rem !important;
+            }
+            .gsap-item.mt-4.mx-2 .text-\[10px\] {
+                font-size: 0.5rem !important;
             }
 
             /* Footer */
             footer {
-                margin-top: 1rem !important;
+                margin-top: 0.75rem !important;
                 padding-bottom: 0.5rem !important;
             }
             footer p {
-                font-size: 6px !important;
+                font-size: 5px !important;
             }
             footer a {
-                font-size: 6px !important;
+                font-size: 5px !important;
             }
             footer .inline-flex {
-                padding: 0.25rem 0.5rem !important;
+                padding: 0.2rem 0.4rem !important;
             }
             footer .inline-flex span {
-                font-size: 6px !important;
+                font-size: 5px !important;
+            }
+
+            /* Disable GSAP animations on mobile - use CSS transitions instead */
+            .gsap-entry,
+            .gsap-card,
+            .gsap-item {
+                opacity: 1 !important;
+                transform: none !important;
+                animation: none !important;
+            }
+
+            /* Disable flip animations on mobile */
+            .flip-card {
+                transition: none !important;
+            }
+
+            /* Disable preloader animations on mobile */
+            .preloader-logo {
+                animation: none !important;
+            }
+            .preloader-ring,
+            .preloader-ring-2 {
+                animation: none !important;
+            }
+            .particle {
+                animation: none !important;
             }
         }
 
@@ -514,6 +556,11 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
             </svg>
         </button>
+
+        <!-- Logo -->
+        <div class="logo-section gsap-entry mb-4 sm:mb-6">
+            <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" class="mx-auto w-40 sm:w-56 md:w-64 lg:w-72 h-auto" />
+        </div>
 
         <!-- Header Section (Animates as one block) -->
         <header class="gsap-entry text-center mb-4 sm:mb-8 relative w-full max-w-lg">
@@ -890,6 +937,14 @@
         // GSAP — Cinematic DOM Entry Sequence
         // ═══════════════════════════════════════════════════
         window.addEventListener('load', () => {
+            // Skip GSAP animations on mobile - elements are already visible via CSS
+            if (window.innerWidth < 768) {
+                // Set initial states to visible immediately on mobile
+                gsap.set(".gsap-entry", { opacity: 1, y: 0, scale: 1 });
+                gsap.set(".gsap-card", { opacity: 1, y: 0, scale: 1, rotationX: 0 });
+                gsap.set(".gsap-item", { opacity: 1, y: 0, x: 0, scale: 1, rotationX: 0 });
+                return;
+            }
 
             // 1. Hard-set initial states (3D positions off-screen)
             gsap.set(".gsap-entry", {
@@ -965,41 +1020,52 @@
             const tabInd = document.getElementById('tab-individual');
             const tabFam = document.getElementById('tab-family');
 
+            // Check if mobile - use simpler, slower animations
+            const isMobile = window.innerWidth < 768;
+            const duration = isMobile ? 0.3 : 0.6;
+            const flipDuration = isMobile ? 0 : 0.9;
+
             if (tab === 'family') {
                 gsap.to(bg, {
                     left: "98%",
                     xPercent: -100,
-                    duration: 0.6,
-                    ease: "power3.inOut"
+                    duration: duration,
+                    ease: isMobile ? "power2.out" : "power3.inOut"
                 });
 
                 tabFam.className = "flex-1 relative z-10 py-3 text-sm font-bold text-white flex justify-center items-center gap-2 transition-colors duration-300";
                 tabInd.className = "flex-1 relative z-10 py-3 text-sm font-bold text-gray-400 flex justify-center items-center gap-2 transition-colors duration-300";
 
-                gsap.to(".flip-card", {
-                    rotationY: 180,
-                    duration: 0.9,
-                    stagger: 0.08,
-                    ease: "back.out(1.2)"
-                });
+                // Skip flip animation on mobile
+                if (!isMobile) {
+                    gsap.to(".flip-card", {
+                        rotationY: 180,
+                        duration: 0.9,
+                        stagger: 0.08,
+                        ease: "back.out(1.2)"
+                    });
+                }
 
             } else {
                 gsap.to(bg, {
                     left: "4px",
                     xPercent: 0,
-                    duration: 0.6,
-                    ease: "power3.inOut"
+                    duration: duration,
+                    ease: isMobile ? "power2.out" : "power3.inOut"
                 });
 
                 tabFam.className = "flex-1 relative z-10 py-3 text-sm font-bold text-gray-400 flex justify-center items-center gap-2 transition-colors duration-300";
                 tabInd.className = "flex-1 relative z-10 py-3 text-sm font-bold text-white flex justify-center items-center gap-2 transition-colors duration-300";
 
-                gsap.to(".flip-card", {
-                    rotationY: 0,
-                    duration: 0.9,
-                    stagger: 0.08,
-                    ease: "back.out(1.2)"
-                });
+                // Skip flip animation on mobile
+                if (!isMobile) {
+                    gsap.to(".flip-card", {
+                        rotationY: 0,
+                        duration: 0.9,
+                        stagger: 0.08,
+                        ease: "back.out(1.2)"
+                    });
+                }
             }
         }
 
