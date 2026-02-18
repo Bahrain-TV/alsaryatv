@@ -27,6 +27,25 @@ export default {
                     'light-cream': '#F5DEB3', // Light cream variant
                     'dark-brown': '#5C4033', // Dark brown for accents
                 },
+                // Bahrain theme colors
+                bahrain: {
+                    red:  '#A81C2E',
+                    dark: '#380A12',
+                    deep: '#1C0808',
+                },
+                // Gold palette used throughout the UI
+                gold: {
+                    50:  '#FFFDF5',
+                    100: '#FFF8E1',
+                    200: '#FFE5A0',
+                    300: '#F5DEB3',
+                    400: '#D4A757',
+                    500: '#C59D5F',
+                    600: '#B8860B',
+                    700: '#9A7520',
+                    800: '#7A5F1A',
+                    900: '#5C4510',
+                },
                 // Custom dark backgrounds
                 dark: {
                     'navy': '#0F172A',      // Main dark background

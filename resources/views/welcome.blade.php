@@ -63,16 +63,15 @@
             filter: drop-shadow(0 0 10px oklch(0.65 0.18 70.0804 / 0.1));
         }
 
-        /* Beautiful Glassmorphism for Light Mode */
+        /* Dark Glassmorphism — seamlessly blends with dark background */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(10, 14, 26, 0.76);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(197, 157, 95, 0.12);
             box-shadow:
-                0 25px 50px -12px rgba(0, 0, 0, 0.08),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-                0 1px 0 rgba(255, 255, 255, 0.1) inset;
+                0 32px 64px -16px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(197, 157, 95, 0.05) inset;
         }
 
         .input-gradient-border {
@@ -225,9 +224,8 @@
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            height: 500px;
-            background: linear-gradient(to bottom, rgba(218, 41, 28, 0.1) 0%, transparent 100%);
-            filter: blur(60px);
+            height: 400px;
+            background: linear-gradient(to bottom, rgba(168, 28, 46, 0.12) 0%, transparent 100%);
         }
 
         @keyframes spin-slow {
@@ -240,6 +238,40 @@
             opacity: 0;
             transform: translateY(30px);
         }
+
+        /* ── Basmala — fixed at top of every page (CLAUDE.md requirement) ── */
+        #basmala {
+            position: fixed;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #F5DEB3;
+            text-shadow: 0 0 14px rgba(168, 28, 46, 0.7), 0 1px 3px rgba(0,0,0,0.9);
+            letter-spacing: 0.05em;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        @media (max-width: 480px) {
+            #basmala { font-size: 0.72rem; top: 12px; }
+        }
+
+        /* ── Mobile performance: disable heavy decorations ── */
+        @media (max-width: 767px) {
+            .spinning-circle { display: none !important; }
+            .lottie-background { display: none !important; }
+            .moon-glow { display: none !important; }
+            #threejs-bg { display: none !important; }
+        }
+        /* Respect reduced-motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            .spinning-circle { animation: none !important; }
+            .moon-glow { animation: none !important; }
+            body:not(.dark-mode) { animation: none !important; }
+        }
     </style>
 
     @vite([
@@ -249,6 +281,9 @@
 </head>
 
 <body dir="rtl">
+    <!-- Basmala — fixed at top per project requirement -->
+    <div id="basmala">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+
     <!-- Background Layers -->
     <div class="background-layers">
         <!-- Three.js cinematic particle canvas (renders below all other layers) -->
@@ -295,18 +330,8 @@
             <div class="preloader-text">جاري التحميل</div>
         </div>
     </div>
-    <!-- Lottie Animation Background -->
-    <div class="lottie-background">
-        <lottie-player
-            id="lottie-bg"
-            src="{{ asset('lottie/crecent-moon-ramadan.json') }}"
-            background="transparent"
-            speed="0.3"
-            mode="bounce"
-            loop
-            autoplay>
-        </lottie-player>
-    </div>
+    <!-- Ramadan decorative background (CSS-only, replaces heavy Lottie player) -->
+    <div class="lottie-background" aria-hidden="true"></div>
 
     <!-- Main Content Wrapper -->
     <div id="main-content" class="relative z-10 container mx-auto px-4 py-8 min-h-screen flex flex-col justify-center items-center">
@@ -326,10 +351,6 @@
 
         <!-- Header Section (Animates as one block) -->
         <header class="gsap-entry text-center mb-8 relative w-full max-w-lg">
-            <div class="inline-block mb-3 px-4 py-1 rounded-full border border-gold-500/20 bg-gold-900/10 backdrop-blur-sm">
-                <h3 class="text-gold-300 text-sm tracking-widest font-medium">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</h3>
-            </div>
-
             <h1 class="text-5xl md:text-6xl font-black mb-2 tracking-tight gold-text drop-shadow-2xl leading-tight pb-2">
                 برنامج السارية
             </h1>
@@ -371,8 +392,7 @@
             <!-- Glow effect -->
             <div class="absolute -inset-1 bg-gradient-to-r from-bahrain-red to-gold-700 rounded-[2.2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
 
-            <div class="gsap-card glass-panel rounded-[2rem] p-1 relative overflow-hidden">
-                <div class="bg-[#0B0D12]/80 rounded-[1.8rem] p-6 md:p-8 relative">
+            <div class="gsap-card glass-panel rounded-[2rem] p-6 md:p-8 relative overflow-hidden">
                     @if(config('alsarya.registration.enabled', false) || auth()->check())
                         {{-- Registration is enabled - show registration form --}}
                         <div class="gsap-item relative overflow-hidden rounded-2xl mb-8 border border-white/5">
@@ -565,7 +585,6 @@
                             </p>
                         </div>
                     @endif
-                </div>
             </div>
         </main>
 
@@ -594,8 +613,6 @@
         </footer>
     </div>
 
-    <!-- Lottie Player Library -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- GSAP -->
@@ -612,6 +629,8 @@
         (function initThreeBackground() {
             const canvas = document.getElementById('threejs-bg');
             if (!canvas || typeof THREE === 'undefined') return;
+            // Skip on mobile — CSS media query hides canvas but also bail early to save resources
+            if (window.innerWidth < 768) return;
 
             const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
