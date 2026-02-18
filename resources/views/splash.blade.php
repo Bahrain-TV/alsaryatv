@@ -48,7 +48,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0F172A 0%, #1a0a2e 25%, #2d0a3a 50%, #1a0a2e 75%, #0F172A 100%);
+            background: linear-gradient(135deg, #0F0F1A 0%, #1C0808 25%, #380A12 50%, #1C0808 75%, #0F0F1A 100%);
             background-size: 400% 400%;
             animation: gradientPulse 8s ease-in-out infinite;
             z-index: 0;
@@ -192,6 +192,21 @@
             filter: drop-shadow(0 0 40px rgba(168, 28, 46, 0.7))
                     drop-shadow(0 0 50px rgba(232, 215, 195, 0.6));
             transform: scale(1.05) translateY(-5px);
+        }
+
+        /* Al Salam logo has dark navy fill — invert to white on dark backgrounds */
+        .alsalam-logo {
+            filter: brightness(0) invert(1) sepia(0.15);
+        }
+        .alsalam-logo:hover {
+            filter: brightness(0) invert(1) sepia(0.15)
+                    drop-shadow(0 0 40px rgba(168, 28, 46, 0.7))
+                    drop-shadow(0 0 50px rgba(232, 215, 195, 0.6));
+        }
+        .sponsor-card:hover .sponsor-card-logo.alsalam-logo {
+            filter: brightness(0) invert(1) sepia(0.15)
+                    drop-shadow(0 0 50px rgba(168, 28, 46, 0.7))
+                    drop-shadow(0 0 60px rgba(232, 215, 195, 0.5));
         }
 
         /* Individual card animations */
@@ -530,25 +545,28 @@
                 </div>
             </div>
 
-            <!-- Card 2: Bapco Energies - enters from right at 2s, exits at 4s -->
+            <!-- Card 2: Bapco Energies - enters from right at 2s, exits at 3.5s -->
             <div class="sponsor-card" id="sponsorCard2">
                 <div class="sponsor-card-content">
                     <div class="sponsor-card-title">Bapco Energies</div>
-                    <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="sponsor-card-logo">
+                    <img src="{{ asset('images/bapco-energies.png') }}" alt="Bapco Energies" class="sponsor-card-logo">
                 </div>
             </div>
 
-            <!-- Combined Display: Both sponsors together (4s-11s) - LONGEST PHASE -->
+            <!-- Card 3: Al Salam - enters from center at 3.5s, exits at 5s -->
+            <div class="sponsor-card" id="sponsorCard3">
+                <div class="sponsor-card-content">
+                    <div class="sponsor-card-title">Al Salam</div>
+                    <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam" class="sponsor-card-logo alsalam-logo">
+                </div>
+            </div>
+
+            <!-- Combined Display: All three sponsors together (5s-11s) - LONGEST PHASE -->
             <div class="sponsored-by" id="sponsoredByText">برعاية</div>
-            <div class="sponsors-logos flex items-center justify-center gap-6" id="sponsorsLogos">
-                <div id="sponsor1" class="sponsor-logo-item flex items-center justify-center gap-3 w-44 sm:w-56 lg:w-64">
-                    <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="sponsor-logo h-12 sm:h-14 lg:h-16 object-contain" />
-                    <span class="sponsor-label text-white font-bold text-lg lg:text-xl">Jasmis</span>
-                </div>
-                <div id="sponsor2" class="sponsor-logo-item flex items-center justify-center gap-3 w-44 sm:w-56 lg:w-64">
-                    <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="sponsor-logo h-12 sm:h-14 lg:h-16 object-contain" />
-                    <span class="sponsor-label text-white font-bold text-lg lg:text-xl">Bapco Energies</span>
-                </div>
+            <div class="sponsors-logos" id="sponsorsLogos">
+                <img src="{{ asset('images/jasmis-logo.png') }}" id="sponsor1" alt="Jasmis" class="sponsor-logo">
+                <img src="{{ asset('images/alsalam-logo.svg') }}" id="sponsor3" alt="Al Salam" class="sponsor-logo alsalam-logo">
+                <img src="{{ asset('images/bapco-energies.png') }}" id="sponsor2" alt="Bapco Energies" class="sponsor-logo">
             </div>
         </div>
 
@@ -632,71 +650,79 @@
                 const sponsorsPhase = document.getElementById('sponsorsPhase');
                 const sponsorCard1 = document.getElementById('sponsorCard1');
                 const sponsorCard2 = document.getElementById('sponsorCard2');
+                const sponsorCard3 = document.getElementById('sponsorCard3');
                 const sponsoredBy = document.getElementById('sponsoredByText');
                 const sponsorsLogos = document.getElementById('sponsorsLogos');
+                // #sponsor1/2/3 are now the img elements directly
                 const sponsor1 = document.getElementById('sponsor1');
                 const sponsor2 = document.getElementById('sponsor2');
+                const sponsor3 = document.getElementById('sponsor3');
 
                 sponsorsPhase.style.opacity = '1';
 
-                // 0-2s: Display Sponsor 1 card (BTV) individually
+                // 0-1.5s: Display Sponsor 1 card (Jasmis) individually
                 setTimeout(() => {
                     sponsorCard1.style.animation = 'cardSlideInFromLeft 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
                 }, 100);
 
-                // 2-4s: Replace with Sponsor 2 card (Bapco Energies)
+                // 1.5-3s: Replace with Sponsor 2 card (Bapco Energies)
                 setTimeout(() => {
                     sponsorCard1.style.animation = 'cardSlideOut 0.8s ease-in forwards';
-                }, 2000);
+                }, 1500);
 
                 setTimeout(() => {
                     sponsorCard2.style.animation = 'cardSlideInFromRight 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 2000);
+                }, 1500);
 
-                // 4-5s: Transition to combined display
+                // 3-4.5s: Replace with Sponsor 3 card (Al Salam)
                 setTimeout(() => {
                     sponsorCard2.style.animation = 'cardSlideOut 0.8s ease-in forwards';
-                }, 4000);
+                }, 3000);
+
+                setTimeout(() => {
+                    sponsorCard3.style.animation = 'cardSlideInFromRight 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                }, 3000);
+
+                // 4.5-5.5s: Transition to combined display
+                setTimeout(() => {
+                    sponsorCard3.style.animation = 'cardSlideOut 0.8s ease-in forwards';
+                }, 4500);
 
                 setTimeout(() => {
                     sponsorsLogos.style.opacity = '1';
                     sponsoredBy.style.animation = 'sponsorFadeIn 0.8s ease-out forwards';
-                }, 4200);
+                }, 4700);
 
-                // 4.5-5.5s: Animate both sponsor logos together
+                // 5-6.5s: Animate all three sponsor logos together
                 setTimeout(() => {
                     sponsor1.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 4500);
+                }, 5000);
+
+                setTimeout(() => {
+                    sponsor3.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                }, 5300);
 
                 setTimeout(() => {
                     sponsor2.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 4800);
+                }, 5600);
 
-                // 5.5-11s: HOLD SPONSOR LOGOS VISIBLE FOR 5.5 SECONDS!
+                // 6.5-11s: HOLD SPONSOR LOGOS VISIBLE FOR 4.5+ SECONDS!
                 // Give plenty of time for images to load and display
                 setTimeout(() => {
                     // Keep sponsors visible - they're the stars!
-                    console.log('Sponsors prominently displayed - 5.5+ seconds visible');
-                }, 5500);
+                    console.log('Sponsors prominently displayed - 4.5+ seconds visible');
+                }, 6500);
 
-                // 11-12s: Fade out sponsors to transition to magic
+                // 11-12s: Fade entire sponsor phase to transition to magic
                 setTimeout(() => {
-                    sponsoredBy.style.transition = 'opacity 1s ease-out';
-                    sponsoredBy.style.opacity = '0';
-                    sponsor1.style.transition = 'opacity 1s ease-out';
-                    sponsor1.style.opacity = '0';
-                    sponsor2.style.transition = 'opacity 1s ease-out';
-                    sponsor2.style.opacity = '0';
+                    sponsorsPhase.style.transition = 'opacity 1.2s ease-out';
+                    sponsorsPhase.style.opacity = '0';
                 }, 11000);
             });
 
-            // PHASE 2: Fade sponsors & start magic (12-14.5s)
+            // PHASE 2: Start magic transition (12-14.5s — sponsors already fading from 11s)
             timeline.push(() => {
-                const sponsorsPhase = document.getElementById('sponsorsPhase');
                 const magicTransition = document.getElementById('magicTransition');
-
-                sponsorsPhase.style.transition = 'opacity 1s ease-out';
-                sponsorsPhase.style.opacity = '0';
 
                 setTimeout(() => {
                     magicTransition.style.opacity = '1';

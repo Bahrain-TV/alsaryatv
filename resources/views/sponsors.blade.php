@@ -5,21 +5,32 @@
                 <h2 class="text-xl sm:text-2xl font-bold text-white mb-4 drop-shadow-lg">
                     هذا البرنامج يأتيكم برعاية
                 </h2>
-                
-                <!-- Display logos -->
-                <div class="w-full flex flex-wrap justify-center items-center gap-6 sm:gap-8" id="sponsors-logos">
-                    <div id="left-sponsor-logo" class="hover:scale-105 transition-transform duration-300">
-                        <div class="flex items-center gap-3 w-44 sm:w-56 lg:w-64">
-                            <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="h-12 sm:h-14 lg:h-16 object-contain" />
-                            <span class="text-white font-bold text-lg lg:text-xl">Jasmis</span>
-                        </div>
+
+                <!-- Three sponsor logos — equal sizing, consistent presentation -->
+                <div class="flex flex-wrap justify-center items-center gap-8 sm:gap-12" id="sponsors-logos">
+
+                    {{-- Jasmis --}}
+                    <div class="flex items-center justify-center" style="width:160px; height:70px;">
+                        <img src="{{ asset('images/jasmis-logo.png') }}"
+                             alt="Jasmis"
+                             class="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg" />
                     </div>
-                    <div id="right-sponsor-logo" class="hover:scale-105 transition-transform duration-300">
-                        <div class="flex items-center gap-3 w-44 sm:w-56 lg:w-64">
-                            <img src="{{ asset('images/bapco-energies.svg') }}" alt="Bapco Energies" class="h-12 sm:h-14 lg:h-16 object-contain" />
-                            <span class="text-white font-bold text-lg lg:text-xl">Bapco Energies</span>
-                        </div>
+
+                    {{-- Al Salam — SVG has dark navy fill, invert to white for dark backgrounds --}}
+                    <div class="flex items-center justify-center" style="width:160px; height:70px;">
+                        <img src="{{ asset('images/alsalam-logo.svg') }}"
+                             alt="Al Salam"
+                             class="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg"
+                             style="filter: brightness(0) invert(1) sepia(0.15);" />
                     </div>
+
+                    {{-- Bapco Energies --}}
+                    <div class="flex items-center justify-center" style="width:160px; height:70px;">
+                        <img src="{{ asset('images/bapco-energies.png') }}"
+                             alt="Bapco Energies"
+                             class="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg" />
+                    </div>
+
                 </div>
             </div>
         </div>

@@ -1,45 +1,58 @@
-<footer id="footer" class="w-full bg-black bg-opacity-70 text-white py-2 sm:py-3 z-10 rtl">
+<footer id="footer" class="w-full text-white py-2 sm:py-3 z-10 rtl"
+        style="background: rgba(0,0,0,0.72); backdrop-filter: blur(8px); border-top: 1px solid rgba(168,28,46,0.25);">
     <div class="container mx-auto px-4">
-        <!-- Single row footer with tight spacing -->
+        <!-- Single-row with tight spacing -->
         <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+
             <!-- Left: Branding -->
             <div class="text-center sm:text-start">
-                <p class="opacity-90 font-tajawal">
+                <p class="font-bold" style="color: #F5DEB3; letter-spacing: 0.5px;">
                     {{ config('app.ar_translations.footer_title') ?? 'برنامج الســارية ©️ ' . date('Y') }}
                 </p>
             </div>
 
-            <!-- Center: Stats -->
+            <!-- Center: Live stats -->
             @if(isset($hits))
-            <div class="flex gap-3 justify-center opacity-90">
-                <span class="text-orange-300">المشاركات: {{ $totalHits ?? 0 }}</span>
-                <span class="text-gray-500">•</span>
-                <span class="text-orange-300">الزيارات: {{ $hits ?? 0 }}</span>
+            <div class="flex gap-3 justify-center items-center opacity-90">
+                <span style="color: #F5DEB3;">المشاركات: <strong>{{ number_format($totalHits ?? 0) }}</strong></span>
+                <span style="color: rgba(168,28,46,0.6);">•</span>
+                <span style="color: #F5DEB3;">الزيارات: <strong>{{ number_format($hits ?? 0) }}</strong></span>
             </div>
             @endif
 
-            <!-- Right: Links and copyright -->
+            <!-- Right: Links -->
             <div class="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-end items-center">
-                <a href="{{ route('privacy') }}" class="text-indigo-300 hover:text-indigo-100 transition-colors">
+                <a href="{{ route('privacy') }}"
+                   class="transition-colors"
+                   style="color: rgba(245,222,179,0.6);"
+                   onmouseover="this.style.color='#F5DEB3'" onmouseout="this.style.color='rgba(245,222,179,0.6)'">
                     سياسة الخصوصية
                 </a>
-                <span class="text-gray-500">•</span>
-                <a href="{{ route('terms') }}" class="text-indigo-300 hover:text-indigo-100 transition-colors">
+                <span style="color: rgba(168,28,46,0.5);">•</span>
+                <a href="{{ route('terms') }}"
+                   class="transition-colors"
+                   style="color: rgba(245,222,179,0.6);"
+                   onmouseover="this.style.color='#F5DEB3'" onmouseout="this.style.color='rgba(245,222,179,0.6)'">
                     شروط الاستخدام
                 </a>
-                <span class="text-gray-500">•</span>
-                <a href="{{ route('policy') }}" class="text-indigo-300 hover:text-indigo-100 transition-colors">
+                <span style="color: rgba(168,28,46,0.5);">•</span>
+                <a href="{{ route('policy') }}"
+                   class="transition-colors"
+                   style="color: rgba(245,222,179,0.6);"
+                   onmouseover="this.style.color='#F5DEB3'" onmouseout="this.style.color='rgba(245,222,179,0.6)'">
                     الشروط والأحكام
                 </a>
-                <span class="text-gray-500">•</span>
-                <span class="opacity-90">تلفزيون البحرين © {{ date('Y') }}</span>
+                <span style="color: rgba(168,28,46,0.5);">•</span>
+                <span style="color: rgba(245,222,179,0.35); font-size: 0.6rem; font-family: monospace;">
+                    {{ config('app.version', 'v1.0') }}
+                </span>
             </div>
         </div>
 
-        <!-- Bottom: Single copyright line -->
-        <div class="border-t border-gray-700 border-opacity-30 mt-1.5 pt-1.5 text-center">
-            <p class="text-xs opacity-80">
-                تصميم وبرمجة فريق عمل برنامج السارية | الإصدار <span class="text-indigo-300">{{ config('app.version', 'v1.0') }}</span>
+        <!-- Bottom copyright -->
+        <div class="mt-1.5 pt-1.5 text-center" style="border-top: 1px solid rgba(255,255,255,0.06);">
+            <p style="font-size: 0.65rem; color: rgba(255,255,255,0.35);">
+                تصميم وبرمجة فريق عمل برنامج السارية &nbsp;|&nbsp; تلفزيون البحرين — وزارة الإعلام
             </p>
         </div>
     </div>

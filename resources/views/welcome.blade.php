@@ -251,8 +251,11 @@
 <body dir="rtl">
     <!-- Background Layers -->
     <div class="background-layers">
+        <!-- Three.js cinematic particle canvas (renders below all other layers) -->
+        <canvas id="threejs-bg" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+
         <!-- Light Mode Beautiful Background -->
-        <div class="background-layer light-mode-bg"></div>
+        <div class="background-layer light-mode-bg" style="z-index:1;"></div>
 
         <!-- Ramadan Moon Glow Effect -->
         <div class="moon-glow"></div>
@@ -597,47 +600,199 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Three.js — cinematic background -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.min.js"></script>
 
     <script>
         lucide.createIcons();
 
-        // Animation Sequence
-        window.addEventListener('load', () => {
-            const tl = gsap.timeline();
+        // ═══════════════════════════════════════════════════
+        // THREE.JS — Cinematic Particle Warp Background
+        // ═══════════════════════════════════════════════════
+        (function initThreeBackground() {
+            const canvas = document.getElementById('threejs-bg');
+            if (!canvas || typeof THREE === 'undefined') return;
 
-            // 1. Initial State Set (Crucial for preventing FOUC)
-            // We set opacity: 0 HERE via JS so if JS fails, content remains visible (fallback)
-            gsap.set(".gsap-entry, .gsap-card, .gsap-item", {
-                opacity: 0,
-                y: 30
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
+            camera.position.z = 6;
+
+            // ── Particle geometry ──────────────────────────
+            const PARTICLE_COUNT = 320;
+            const positions  = new Float32Array(PARTICLE_COUNT * 3);
+            const colors     = new Float32Array(PARTICLE_COUNT * 3);
+            const velocities = new Float32Array(PARTICLE_COUNT); // z-velocity per particle
+
+            const palettes = [
+                new THREE.Color('#C59D5F'),  // gold
+                new THREE.Color('#F5DEB3'),  // cream
+                new THREE.Color('#A81C2E'),  // maroon
+                new THREE.Color('#ffffff'),  // white star
+            ];
+
+            function resetParticle(i) {
+                // Spread in a wide cone ahead of camera
+                positions[i*3]   = (Math.random() - 0.5) * 22;
+                positions[i*3+1] = (Math.random() - 0.5) * 22;
+                positions[i*3+2] = -60 - Math.random() * 60; // far behind
+
+                velocities[i] = 2.5 + Math.random() * 4; // z-speed
+
+                const c = palettes[Math.floor(Math.random() * palettes.length)];
+                colors[i*3]   = c.r;
+                colors[i*3+1] = c.g;
+                colors[i*3+2] = c.b;
+            }
+
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                resetParticle(i);
+                // Scatter some already close for immediate effect
+                if (i < 80) positions[i*3+2] = (Math.random() - 0.5) * 60;
+            }
+
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+
+            const mat = new THREE.PointsMaterial({
+                size: 0.12,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.65,
+                sizeAttenuation: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
             });
-            gsap.set(".flip-card", { rotationY: 0 }); // Enforce 3D state
 
-            // 2. Animate Header First
+            const particles = new THREE.Points(geo, mat);
+            scene.add(particles);
+
+            // ── Animation loop ─────────────────────────────
+            const clock  = new THREE.Clock();
+            let settled  = false;
+            const WARP_DURATION = 2.2; // seconds of warp phase
+
+            function tick() {
+                requestAnimationFrame(tick);
+
+                const delta   = Math.min(clock.getDelta(), 0.05);
+                const elapsed = clock.getElapsedTime();
+
+                const pos = geo.attributes.position.array;
+
+                if (!settled) {
+                    // WARP PHASE: particles rush toward camera
+                    const progress = Math.min(elapsed / WARP_DURATION, 1);
+                    const speed    = (1 - progress) * 18 + 2; // fast → gentle
+
+                    for (let i = 0; i < PARTICLE_COUNT; i++) {
+                        pos[i*3+2] += velocities[i] * speed * delta;
+                        if (pos[i*3+2] > 8) resetParticle(i); // recycle behind camera
+                    }
+
+                    mat.opacity = Math.min(0.65, elapsed * 0.45);
+
+                    if (elapsed >= WARP_DURATION) settled = true;
+                } else {
+                    // SETTLED PHASE: slow gentle float
+                    for (let i = 0; i < PARTICLE_COUNT; i++) {
+                        pos[i*3+2] += delta * (velocities[i] * 0.18);
+                        pos[i*3+1] += Math.sin(elapsed * 0.4 + i * 0.07) * delta * 0.04;
+                        pos[i*3]   += Math.cos(elapsed * 0.3 + i * 0.11) * delta * 0.02;
+                        if (pos[i*3+2] > 8) resetParticle(i);
+                    }
+                }
+
+                geo.attributes.position.needsUpdate = true;
+
+                // Subtle camera drift
+                camera.position.x = Math.sin(elapsed * 0.09) * 0.35;
+                camera.position.y = Math.cos(elapsed * 0.07) * 0.2;
+                camera.lookAt(0, 0, 0);
+
+                renderer.render(scene, camera);
+            }
+            tick();
+
+            // Resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        })();
+
+        // ═══════════════════════════════════════════════════
+        // GSAP — Cinematic DOM Entry Sequence
+        // ═══════════════════════════════════════════════════
+        window.addEventListener('load', () => {
+
+            // 1. Hard-set initial states (3D positions off-screen)
+            gsap.set(".gsap-entry", {
+                opacity: 0,
+                y: -70,
+                scale: 0.88,
+                transformPerspective: 900,
+            });
+            gsap.set(".gsap-card", {
+                opacity: 0,
+                y: 120,
+                scale: 0.82,
+                rotationX: 28,
+                transformPerspective: 1100,
+                transformOrigin: "50% 110%",
+            });
+            gsap.set(".gsap-item", {
+                opacity: 0,
+                y: 55,
+                x: function(i) { return i % 2 === 0 ? -40 : 40; }, // alternate sides
+                scale: 0.88,
+                rotationX: 12,
+                transformPerspective: 900,
+            });
+            gsap.set(".flip-card", { rotationY: 0 });
+
+            // 2. Main timeline — starts after Three.js warp completes (≈2.2s)
+            const tl = gsap.timeline({ delay: 1.6 });
+
+            // Header sweeps down from above
             tl.to(".gsap-entry", {
                 opacity: 1,
                 y: 0,
-                duration: 1,
-                ease: "power3.out"
+                scale: 1,
+                duration: 1.1,
+                ease: "power4.out",
             });
 
-            // 3. Animate Main Card Container
+            // Card RISES from below with a satisfying 3D flip
             tl.to(".gsap-card", {
                 opacity: 1,
                 y: 0,
-                duration: 0.8,
-                ease: "power2.out"
-            }, "-=0.5");
+                scale: 1,
+                rotationX: 0,
+                duration: 1.25,
+                ease: "power4.out",
+            }, "-=0.55");
 
-            // 4. Stagger Inner Items (Banner, Tabs, Inputs, Button, Footer)
-            // This creates the "stacking up" effect you wanted
+            // Inner items cascade in with elastic spring — alternating left/right
             tl.to(".gsap-item", {
                 opacity: 1,
                 y: 0,
-                duration: 0.8,
-                stagger: 0.15, // Nice delay between each box
-                ease: "power2.out"
-            }, "-=0.4");
+                x: 0,
+                scale: 1,
+                rotationX: 0,
+                duration: 0.9,
+                stagger: {
+                    amount: 0.75,
+                    ease: "power2.inOut",
+                },
+                ease: "back.out(1.4)",
+            }, "-=0.65");
         });
 
         // Tab Logic (Preserved)
