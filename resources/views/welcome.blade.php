@@ -593,36 +593,36 @@
                                         </div>
                                         <!-- Back -->
                                         <div class="face-back absolute inset-0 backface-hidden">
-                                            <div class="space-y-2">
-                                                <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">اسم رب العائلة</label>
+                                            <div class="space-y-1 sm:space-y-2">
+                                                <label class="text-gold-100/80 text-[10px] sm:text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">اسم رب العائلة</label>
                                                 <input type="text" id="family_name" name="family_name" value="{{ old('family_name') }}"
-                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-lg sm:rounded-xl py-2.5 sm:py-4 px-3 sm:px-4 text-sm sm:text-base text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل اسم العائلة">
-                                                @error('family_name') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                                @error('family_name') <span class="text-red-400 text-xs sm:text-sm">{{ $message }}</span> @enderror
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 {{-- CPR --}}
-                                <div class="gsap-item flip-scene perspective-1000 h-[86px] mb-5">
+                                <div class="gsap-item flip-scene perspective-1000 h-[72px] sm:h-[86px] mb-3 sm:mb-5">
                                     <div class="flip-card w-full h-full relative transform-style-3d" id="field-2">
                                         <!-- Front -->
                                         <div class="face-front absolute inset-0 backface-hidden">
-                                            <div class="space-y-2">
-                                                <label for="cpr" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">رقم الهوية (CPR)</label>
+                                            <div class="space-y-1 sm:space-y-2">
+                                                <label for="cpr" class="text-gold-100/80 text-[10px] sm:text-xs font-bold mr-1 block uppercase tracking-wider">رقم الهوية (CPR)</label>
                                                 <input type="text" id="cpr" name="cpr" required value="{{ old('cpr') }}" pattern="\d*"
-                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-lg sm:rounded-xl py-2.5 sm:py-4 px-3 sm:px-4 text-sm sm:text-base text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل رقم الهوية">
-                                                @error('cpr') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                                @error('cpr') <span class="text-red-400 text-xs sm:text-sm">{{ $message }}</span> @enderror
                                             </div>
                                         </div>
                                         <!-- Back -->
                                         <div class="face-back absolute inset-0 backface-hidden">
-                                            <div class="space-y-2">
-                                                <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">رقم الهوية (CPR) لرب العائلة</label>
+                                            <div class="space-y-1 sm:space-y-2">
+                                                <label class="text-gold-100/80 text-[10px] sm:text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">رقم الهوية (CPR) لرب العائلة</label>
                                                 <input type="text" id="responsible_cpr" name="responsible_cpr" value="{{ old('responsible_cpr') }}" pattern="\d*"
-                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-lg sm:rounded-xl py-2.5 sm:py-4 px-3 sm:px-4 text-sm sm:text-base text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل رقم الهوية">
                                             </div>
                                         </div>
@@ -630,24 +630,24 @@
                                 </div>
 
                                 {{-- Phone --}}
-                                <div class="gsap-item flip-scene perspective-1000 h-[86px] mb-5">
+                                <div class="gsap-item flip-scene perspective-1000 h-[72px] sm:h-[86px] mb-3 sm:mb-5">
                                     <div class="flip-card w-full h-full relative transform-style-3d" id="field-3">
                                         <!-- Front -->
                                         <div class="face-front absolute inset-0 backface-hidden">
-                                            <div class="space-y-2">
-                                                <label for="phone_number" class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider">رقم الهاتف</label>
+                                            <div class="space-y-1 sm:space-y-2">
+                                                <label for="phone_number" class="text-gold-100/80 text-[10px] sm:text-xs font-bold mr-1 block uppercase tracking-wider">رقم الهاتف</label>
                                                 <input type="tel" id="phone_number" name="phone_number" required value="{{ old('phone_number') }}"
-                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-lg sm:rounded-xl py-2.5 sm:py-4 px-3 sm:px-4 text-sm sm:text-base text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل رقم الهاتف">
-                                                @error('phone_number') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                                @error('phone_number') <span class="text-red-400 text-xs sm:text-sm">{{ $message }}</span> @enderror
                                             </div>
                                         </div>
                                         <!-- Back -->
                                         <div class="face-back absolute inset-0 backface-hidden">
-                                            <div class="space-y-2">
-                                                <label class="text-gold-100/80 text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">رقم هاتف التواصل لرب العائلة</label>
+                                            <div class="space-y-1 sm:space-y-2">
+                                                <label class="text-gold-100/80 text-[10px] sm:text-xs font-bold mr-1 block uppercase tracking-wider text-bahrain-red">رقم هاتف التواصل لرب العائلة</label>
                                                 <input type="tel" id="contact_phone" name="contact_phone" value="{{ old('contact_phone') }}"
-                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-xl py-4 px-4 text-right focus:outline-none transition-all duration-300"
+                                                       class="w-full form-input text-gray-800 placeholder-gray-500 rounded-lg sm:rounded-xl py-2.5 sm:py-4 px-3 sm:px-4 text-sm sm:text-base text-right focus:outline-none transition-all duration-300"
                                                        placeholder="أدخل رقم للتواصل">
                                             </div>
                                         </div>
@@ -657,25 +657,25 @@
                                 {{-- Family Fields (Hidden by default) --}}
                                 <div id="family-fields" class="hidden">
                                     {{-- Number of Family Members --}}
-                                    <div class="gsap-item">
-                                        <label for="family_members" class="block text-brand-cream mb-2 font-semibold">عدد أفراد العائلة</label>
+                                    <div class="gsap-item mb-3 sm:mb-4">
+                                        <label for="family_members" class="block text-brand-cream mb-1 sm:mb-2 text-xs sm:text-sm font-semibold">عدد أفراد العائلة</label>
                                         <input type="number" id="family_members" name="family_members" min="2" max="10" value="{{ old('family_members', 2) }}"
-                                               class="w-full py-3 px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-xl text-white text-base focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100">
-                                        @error('family_members') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                               class="w-full py-2.5 sm:py-3 px-3 sm:px-4 bg-dark-navy/80 border border-brand-cream/30 rounded-lg sm:rounded-xl text-white text-sm sm:text-base focus:border-brand-cream focus:ring-2 focus:ring-brand-cream/30 transition-all opacity-100">
+                                        @error('family_members') <span class="text-red-400 text-xs sm:text-sm">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
 
                                 {{-- Submit Button --}}
-                                <div class="gsap-item flip-scene perspective-1000 h-[60px] mt-4">
+                                <div class="gsap-item flip-scene perspective-1000 h-[48px] sm:h-[60px] mt-3 sm:mt-4">
                                     <div class="flip-card w-full h-full relative transform-style-3d" id="btn-flip">
                                         <!-- Front Button -->
                                         <div class="face-front absolute inset-0 backface-hidden">
                                             <button type="submit" class="w-full h-full btn-primary group relative overflow-hidden rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99]">
                                                 <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                                                 <div class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-30 group-hover:animate-shine left-0"></div>
-                                                <div class="relative w-full h-full flex items-center justify-center gap-2">
-                                                    <span class="text-lg font-bold text-white tracking-wide drop-shadow-md">سجّل الآن</span>
-                                                    <i data-lucide="target" class="w-5 h-5 text-white"></i>
+                                                <div class="relative w-full h-full flex items-center justify-center gap-1 sm:gap-2">
+                                                    <span class="text-base sm:text-lg font-bold text-white tracking-wide drop-shadow-md">سجّل الآن</span>
+                                                    <i data-lucide="target" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i>
                                                 </div>
                                             </button>
                                         </div>
@@ -684,9 +684,9 @@
                                             <button type="submit" class="w-full h-full btn-primary group relative overflow-hidden rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99]">
                                                 <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                                                 <div class="absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-30 group-hover:animate-shine left-0"></div>
-                                                <div class="relative w-full h-full flex items-center justify-center gap-2">
-                                                    <span class="text-lg font-bold text-white tracking-wide drop-shadow-md">سجّل الآن</span>
-                                                    <i data-lucide="users" class="w-5 h-5 text-white"></i>
+                                                <div class="relative w-full h-full flex items-center justify-center gap-1 sm:gap-2">
+                                                    <span class="text-base sm:text-lg font-bold text-white tracking-wide drop-shadow-md">سجّل الآن</span>
+                                                    <i data-lucide="users" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i>
                                                 </div>
                                             </button>
                                         </div>
@@ -696,31 +696,31 @@
                         </div>
 
                         {{-- Current Ramadan Info --}}
-                        <div class="gsap-item mt-6 mx-4 p-[1px] rounded-2xl bg-gradient-to-r from-transparent via-green-800/50 to-transparent">
-                            <div class="bg-black/40 backdrop-blur-md rounded-2xl p-4 text-center border border-green-500/10 relative overflow-hidden">
+                        <div class="gsap-item mt-4 sm:mt-6 mx-2 sm:mx-4 p-[1px] rounded-2xl bg-gradient-to-r from-transparent via-green-800/50 to-transparent">
+                            <div class="bg-black/40 backdrop-blur-md rounded-2xl p-3 sm:p-4 text-center border border-green-500/10 relative overflow-hidden">
                                 <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-green-500/50 to-transparent"></div>
 
-                                <h4 class="text-green-400 font-bold mb-2 flex items-center justify-center gap-2 text-sm md:text-base">
-                                    <i data-lucide="moon" class="w-4 h-4 fill-green-400/20"></i>
+                                <h4 class="text-green-400 font-bold mb-1 sm:mb-2 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
+                                    <i data-lucide="moon" class="w-3 h-3 sm:w-4 sm:h-4 fill-green-400/20"></i>
                                     <span>أهلاً بكم في شهر رمضان المبارك</span>
                                 </h4>
-                                <div class="flex justify-center items-center gap-4 text-xs md:text-sm text-gray-400 font-mono">
+                                <div class="flex justify-center items-center gap-2 sm:gap-4 text-[10px] sm:text-xs md:text-sm text-gray-400 font-mono">
                                     <span>{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</span>
-                                    <span class="w-1 h-1 rounded-full bg-gray-600"></span>
+                                    <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-600"></span>
                                     <span>{{ $ramadanDate ?? '18 فبراير 2026' }}</span>
                                 </div>
                             </div>
                         </div>
                     @else
                         {{-- Registration is closed - Simple "Coming Soon" message --}}
-                        <div class="text-center py-12">
-                            <div class="mb-6">
-                                <span class="text-6xl md:text-7xl">🌙</span>
+                        <div class="text-center py-8 sm:py-12">
+                            <div class="mb-4 sm:mb-6">
+                                <span class="text-4xl sm:text-6xl md:text-7xl">🌙</span>
                             </div>
-                            <h2 class="text-4xl md:text-5xl font-black mb-4 gold-text">
+                            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black mb-2 sm:mb-4 gold-text">
                                 قريباً
                             </h2>
-                            <p class="text-gray-300 text-lg md:text-xl font-light">
+                            <p class="text-gray-300 text-sm sm:text-lg md:text-xl font-light">
                                 سيتم فتح التسجيل مع بداية شهر رمضان المبارك
                             </p>
                         </div>
@@ -728,26 +728,26 @@
             </div>
         </main>
 
-        <footer class="gsap-item mt-12 text-center relative z-10 pb-6">
-            <p class="text-gray-500 text-[10px] mb-2 tracking-widest uppercase">© {{ date('Y') }} Bahrain Television | All Rights Reserved</p>
+        <footer class="gsap-item mt-6 sm:mt-12 text-center relative z-10 pb-4 sm:pb-6">
+            <p class="text-gray-500 text-[9px] sm:text-[10px] mb-2 tracking-widest uppercase">© {{ date('Y') }} Bahrain Television | All Rights Reserved</p>
 
-            <div class="flex justify-center flex-wrap gap-x-4 gap-y-2 mb-3 text-[10px] font-bold text-gray-400">
-                <a href="{{ route('privacy') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Privacy Policy</a>
+            <div class="flex justify-center flex-wrap gap-x-3 sm:gap-x-4 gap-y-1 sm:gap-y-2 mb-2 sm:mb-3 text-[9px] sm:text-[10px] font-bold text-gray-400">
+                <a href="{{ route('privacy') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Privacy</a>
                 <span class="text-gray-700 hidden sm:inline">/</span>
-                <a href="{{ route('terms') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Terms of Use</a>
+                <a href="{{ route('terms') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Terms</a>
                 <span class="text-gray-700 hidden sm:inline">/</span>
-                <a href="{{ route('policy') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Terms & Conditions</a>
+                <a href="{{ route('policy') }}" class="hover:text-gold-500 transition-colors uppercase tracking-widest">Conditions</a>
             </div>
 
-            <div class="inline-flex items-center gap-3 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-mono text-gray-400">
-                <div class="flex items-center gap-1.5">
-                    <span class="relative flex h-2 w-2">
+            <div class="inline-flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/5 text-[9px] sm:text-[10px] font-mono text-gray-400">
+                <div class="flex items-center gap-1 sm:gap-1.5">
+                    <span class="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      <span class="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-green-500"></span>
                     </span>
                     <span>{{ number_format($totalHits ?? 0) }} Live</span>
                 </div>
-                <div class="w-[1px] h-3 bg-gray-600"></div>
+                <div class="w-[1px] h-2 sm:h-3 bg-gray-600"></div>
                 <span class="text-gold-500">v{{ $appVersion ?? '1.0.0' }}</span>
             </div>
         </footer>
