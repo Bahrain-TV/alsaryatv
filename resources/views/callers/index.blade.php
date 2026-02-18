@@ -66,7 +66,7 @@
                     <div class="rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
                         <div class="flex items-center justify-between px-4 py-2 border-b bg-gray-50 dark:bg-gray-900">
                             <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ __('Live Stats') }}</h3>
-                            <button type="button" @click="collapsed = !collapsed" class="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800"> <span x-show="collapsed">{{ __('Show') }}</span><span x-show="!collapsed">{{ __('Hide') }}</span> </button>
+                            <button type="button" @click="collapsed = !collapsed" :aria-expanded="!collapsed" class="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800"> <span x-show="collapsed">{{ __('Show') }}</span><span x-show="!collapsed">{{ __('Hide') }}</span> </button>
                         </div>
                         <div x-show="!collapsed" x-transition class="p-4">
                             @livewire('dashboard-live-stats')
@@ -124,27 +124,32 @@
             </div>
         </div>
 
-        <div class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
-            <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div x-data="{ collapsed: window.innerWidth <= 768 }" class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ __('Random Winner Draw') }}</h2>
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('Tap the button to pick a random winner and mark them.') }}</p>
                 </div>
-                <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-4 text-center">
-                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100" x-text="randomWinner ? randomWinner.name : '{{ __('Ready to draw') }}'"></p>
-                    <p class="mt-1 text-xs text-gray-500" x-text="randomWinner ? randomWinner.phone : '---'"></p>
-                    <p class="text-xs text-gray-500" x-text="randomWinner ? randomWinner.cpr : '---'"></p>
-                </div>
-                <div class="flex flex-col items-start gap-2">
-                    <button
-                        type="button"
-                        class="inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-600 disabled:opacity-60"
-                        @click="pickRandomWinner"
-                        :disabled="isPicking || callers.length === 0"
-                    >
-                        {{ __('Select Random Winner') }}
-                    </button>
-                    <span x-show="pickError" class="text-sm text-red-600" x-text="pickError"></span>
+                <button type="button" @click="collapsed = !collapsed" :aria-expanded="!collapsed" class="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800"> <span x-show="collapsed">{{ __('Show') }}</span><span x-show="!collapsed">{{ __('Hide') }}</span></button>
+            </div>
+            <div x-show="!collapsed" x-transition>
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-4 text-center">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100" x-text="randomWinner ? randomWinner.name : '{{ __('Ready to draw') }}'"></p>
+                        <p class="mt-1 text-xs text-gray-500" x-text="randomWinner ? randomWinner.phone : '---'"></p>
+                        <p class="text-xs text-gray-500" x-text="randomWinner ? randomWinner.cpr : '---'"></p>
+                    </div>
+                    <div class="flex flex-col items-start gap-2">
+                        <button
+                            type="button"
+                            class="inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-600 disabled:opacity-60"
+                            @click="pickRandomWinner"
+                            :disabled="isPicking || callers.length === 0"
+                        >
+                            {{ __('Select Random Winner') }}
+                        </button>
+                        <span x-show="pickError" class="text-sm text-red-600" x-text="pickError"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -370,6 +375,13 @@
         <div class="mt-3">
             {!! $callers->links() !!}
         </div>
+        <div class="mt-2 text-center">
+            <button type="button" x-show="currentPage < lastPage" @click="loadPage(currentPage + 1, false)" :disabled="loading" class="inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+                <span x-show="!loading">{{ __('Load more') }}</span>
+                <span x-show="loading">{{ __('Loading...') }}</span>
+            </button>
+            <div id="infinite-sentinel" style="height:1px;"></div>
+        </div>
 
         <form id="delete-form" method="POST" class="hidden">
             @csrf
@@ -411,6 +423,19 @@
                 }
                 const input = document.getElementById('caller-search');
                 if (input) input.addEventListener('input', () => this.onSearchInput());
+
+                // Infinite scroll sentinel
+                const sentinel = document.getElementById('infinite-sentinel');
+                if (sentinel && 'IntersectionObserver' in window) {
+                    const io = new IntersectionObserver(entries => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && !this.loading && this.currentPage < this.lastPage) {
+                                this.loadPage(this.currentPage + 1, false);
+                            }
+                        });
+                    }, { root: null, rootMargin: '400px' });
+                    io.observe(sentinel);
+                }
             },
 
             get filteredCallers() {
@@ -474,7 +499,7 @@
 
                 this.loading = true;
                 try {
-                    const response = await fetch(`/callers?${params.toString()}`, {
+                    const response = await fetch(`/dashboard?${params.toString()}`, {
                         headers: { 'Accept': 'application/json' },
                         signal: this.abortController.signal,
                     });
@@ -595,142 +620,5 @@
         };
     }
 </script>
-                return this.callers.filter(caller => {
-                    const rawSearch = this.search.trim();
-                    const searchLower = rawSearch.toLowerCase();
-                    const searchDigits = rawSearch.replace(/\D/g, '');
 
-                    const nameValue = (caller.name || '').toLowerCase();
-                    const cprValue = (caller.cpr || '').toString();
-                    const phoneValue = (caller.phone || '').toString();
-                    const cprDigits = cprValue.replace(/\D/g, '');
-                    const phoneDigits = phoneValue.replace(/\D/g, '');
-
-                    let matchesSearch = true;
-                    if (rawSearch.length > 0) {
-                        if (this.searchMode === 'cpr_phone') {
-                            matchesSearch = cprValue.includes(rawSearch) || phoneValue.includes(rawSearch);
-                            if (!matchesSearch && searchDigits.length > 0) {
-                                matchesSearch = cprDigits.includes(searchDigits) || phoneDigits.includes(searchDigits);
-                            }
-                        } else {
-                            matchesSearch =
-                                nameValue.includes(searchLower) ||
-                                cprValue.includes(rawSearch) ||
-                                phoneValue.includes(rawSearch);
-                            if (!matchesSearch && searchDigits.length > 0) {
-                                matchesSearch = cprDigits.includes(searchDigits) || phoneDigits.includes(searchDigits);
-                            }
-                        }
-                    }
-
-                    const matchesType =
-                        this.filterType === 'all' ? true :
-                        this.filterType === 'family' ? caller.is_family :
-                        !caller.is_family;
-
-                    const matchesWinner = this.showWinnersOnly ? caller.is_winner : true;
-
-                    return matchesSearch && matchesType && matchesWinner;
-                });
-            },
-
-            toggleWinnersOnly() {
-                this.showWinnersOnly = !this.showWinnersOnly;
-            },
-
-            async pickRandomWinner() {
-                if (this.isPicking) {
-                    return;
-                }
-
-                this.pickError = null;
-                this.isPicking = true;
-
-                const spinInterval = 120;
-                const minSpinMs = 2200;
-                const startedAt = Date.now();
-                const spinner = setInterval(() => {
-                    if (this.callers.length > 0) {
-                        this.randomWinner = this.callers[Math.floor(Math.random() * this.callers.length)];
-                    }
-                }, spinInterval);
-
-                let responseData = null;
-
-                try {
-                    const response = await fetch('/callers/random-winner', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        },
-                    });
-
-                    responseData = await response.json();
-
-                    if (!response.ok || !responseData.success) {
-                        throw new Error(responseData.message || this.selectWinnerError);
-                    }
-                } catch (error) {
-                    this.pickError = error.message || this.selectWinnerFallback;
-                }
-
-                const elapsed = Date.now() - startedAt;
-                const remaining = Math.max(0, minSpinMs - elapsed);
-
-                setTimeout(() => {
-                    clearInterval(spinner);
-                    this.isPicking = false;
-
-                    if (responseData && responseData.success) {
-                        const winner = responseData.winner;
-                        this.randomWinner = winner;
-
-                        const idx = this.callers.findIndex(c => c.id === winner.id);
-                        if (idx !== -1) {
-                            this.callers[idx].is_winner = true;
-                        }
-                    }
-                }, remaining);
-            },
-
-            async toggleWinner(caller) {
-                const originalState = caller.is_winner;
-
-                try {
-                    const response = await fetch(`/callers/${caller.id}/toggle-winner`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        },
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        caller.is_winner = data.is_winner;
-                        return;
-                    }
-
-                    caller.is_winner = originalState;
-                    alert(this.statusUpdateError);
-                } catch (error) {
-                    caller.is_winner = originalState;
-                    alert(this.statusUpdateFallback);
-                }
-            },
-
-            confirmDelete(caller) {
-                const message = this.deleteMessage.replace(':name', caller.name);
-                if (confirm(message)) {
-                    const form = document.getElementById('delete-form');
-                    form.action = `/callers/${caller.id}`;
-                    form.submit();
-                }
-            },
-        };
-    }
-</script>
 @endsection
