@@ -22,7 +22,7 @@ class ProductionUrlCurlTest extends TestCase
     protected function curlRequest(string $url, bool $followRedirects = false): array
     {
         $ch = curl_init($url);
-        
+
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => $followRedirects,
@@ -39,10 +39,10 @@ class ProductionUrlCurlTest extends TestCase
         $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $error = curl_error($ch);
         $sslVerifyResult = curl_getinfo($ch, CURLINFO_SSL_VERIFYRESULT);
-        
+
         $headers = '';
         $body = '';
-        
+
         if ($response !== false) {
             $headers = substr($response, 0, $headerSize);
             $body = substr($response, $headerSize);
@@ -65,7 +65,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_home_page_is_accessible(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/');
-        
+
         $this->assertEquals(200, $result['code'], 'Home page should return 200');
         $this->assertEmpty($result['error'], 'Should not have cURL errors');
     }
@@ -76,7 +76,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_splash_screen_is_accessible(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/splash');
-        
+
         $this->assertEquals(200, $result['code'], 'Splash screen should return 200');
         $this->assertEmpty($result['error'], 'Should not have cURL errors');
     }
@@ -87,7 +87,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_family_page_is_accessible(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/family');
-        
+
         $this->assertEquals(200, $result['code'], 'Family page should return 200');
         $this->assertEmpty($result['error'], 'Should not have cURL errors');
     }
@@ -98,7 +98,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_privacy_page_is_accessible(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/privacy');
-        
+
         $this->assertEquals(200, $result['code'], 'Privacy page should return 200');
         $this->assertEmpty($result['error'], 'Should not have cURL errors');
     }
@@ -109,7 +109,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_register_page_is_accessible(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/register');
-        
+
         $this->assertEquals(200, $result['code'], 'Register page should return 200');
         $this->assertEmpty($result['error'], 'Should not have cURL errors');
     }
@@ -120,7 +120,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_ssl_certificate_is_valid(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/');
-        
+
         $this->assertEquals(0, $result['ssl_verify'], 'SSL certificate should be valid');
         $this->assertEmpty($result['error'], 'Should not have SSL errors');
     }
@@ -131,7 +131,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_dashboard_requires_authentication(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/dashboard');
-        
+
         $this->assertContains($result['code'], [302, 401, 403], 'Dashboard should require authentication');
     }
 
@@ -141,7 +141,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_winners_requires_authentication(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/winners');
-        
+
         $this->assertContains($result['code'], [302, 401, 403], 'Winners page should require authentication');
     }
 
@@ -151,7 +151,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_families_requires_authentication(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/families');
-        
+
         $this->assertContains($result['code'], [302, 401, 403], 'Families page should require authentication');
     }
 
@@ -161,7 +161,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_admin_requires_authentication(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/admin');
-        
+
         $this->assertContains($result['code'], [302, 401, 403], 'Admin panel should require authentication');
     }
 
@@ -171,12 +171,12 @@ class ProductionUrlCurlTest extends TestCase
     public function test_security_headers_are_present(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/');
-        
+
         $this->assertEquals(200, $result['code'], 'Home page should be accessible');
-        
+
         // Check for important security headers (may vary based on server config)
         $headers = strtolower($result['headers']);
-        
+
         // Note: Not all headers may be present, but we check for common ones
         // X-Frame-Options, X-Content-Type-Options, etc.
         $this->assertNotEmpty($headers, 'Response should contain headers');
@@ -190,9 +190,9 @@ class ProductionUrlCurlTest extends TestCase
         $startTime = microtime(true);
         $result = $this->curlRequest($this->productionUrl.'/');
         $endTime = microtime(true);
-        
+
         $responseTime = ($endTime - $startTime) * 1000; // Convert to milliseconds
-        
+
         $this->assertEquals(200, $result['code'], 'Home page should be accessible');
         $this->assertLessThan($this->timeout * 1000, $responseTime, 'Response time should be under timeout');
     }
@@ -203,7 +203,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_obs_overlay_is_accessible(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/obs-overlay');
-        
+
         $this->assertEquals(200, $result['code'], 'OBS overlay should return 200');
         $this->assertEmpty($result['error'], 'Should not have cURL errors');
     }
@@ -214,7 +214,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_terms_page_is_accessible(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/terms');
-        
+
         $this->assertEquals(200, $result['code'], 'Terms page should return 200');
         $this->assertEmpty($result['error'], 'Should not have cURL errors');
     }
@@ -225,7 +225,7 @@ class ProductionUrlCurlTest extends TestCase
     public function test_curl_policy_page_is_accessible(): void
     {
         $result = $this->curlRequest($this->productionUrl.'/policy');
-        
+
         $this->assertEquals(200, $result['code'], 'Policy page should return 200');
         $this->assertEmpty($result['error'], 'Should not have cURL errors');
     }

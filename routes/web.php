@@ -27,7 +27,7 @@ $getRamadanContext = function () {
 // Home route - shows splash screen (session storage handles skip on return)
 Route::get('/', function () use ($getRamadanContext) {
     // If skip-splash param present OR user came from splash, show registration
-    if (request()->has('skip-splash')) {
+    if (request()->has('skip-splash') && !app()->isLocal()) {
         return view('welcome', $getRamadanContext());
     }
 

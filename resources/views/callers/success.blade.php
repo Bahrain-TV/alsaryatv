@@ -20,6 +20,13 @@
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <style>
+        :root {
+            --primary-gold: #D4AF37;
+            --primary-red: #A81C2E;
+            --glass-bg: rgba(20, 20, 20, 0.65);
+            --glass-border: rgba(212, 175, 55, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -27,7 +34,7 @@
         }
 
         body {
-            background-image: url("{{ asset('images/seef-district-from-sea.jpg') }}");
+            background-image: url("{{ asset('images/alsarya-bg-2026-by-gemini-compressed.jpeg') }}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -38,6 +45,7 @@
             position: relative;
             min-height: 100vh;
             padding: 0;
+            color: #ffffff;
         }
 
         body::before {
@@ -47,7 +55,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url("{{ asset('images/seef-district-from-sea.jpg') }}");
+            background-image: url("{{ asset('images/alsarya-bg-2026-by-gemini-compressed.jpeg') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -59,29 +67,32 @@
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             padding: clamp(16px, 4vw, 32px);
-            background: linear-gradient(135deg, rgba(9, 12, 18, 0.9) 0%, rgba(16, 24, 40, 0.85) 100%);
+            background: rgba(0, 0, 0, 0.4); /* Overlay to ensure text readability */
             padding-top: max(env(safe-area-inset-top), 16px);
             padding-bottom: max(env(safe-area-inset-bottom), 16px);
         }
 
         .success-card {
-            background: rgba(10, 12, 20, 0.7);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(251, 191, 36, 0.35);
-            border-radius: clamp(16px, 4vw, 24px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
-                        0 0 50px rgba(251, 191, 36, 0.2),
-                        inset 0 1px 1px rgba(255, 255, 255, 0.08);
-            animation: slideIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(212, 175, 55, 0.5);
+            border-radius: 24px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(168, 28, 46, 0.2),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
             width: 100%;
-            max-width: min(450px, 95vw);
-            padding: clamp(24px, 6vw, 40px) clamp(20px, 5vw, 28px);
+            max-width: min(500px, 95vw);
+            padding: clamp(32px, 6vw, 48px) clamp(24px, 5vw, 36px);
             position: relative;
             overflow: hidden;
-            margin-top: clamp(20px, 8vh, 60px);
+            text-align: center;
         }
 
         .success-card::before {
@@ -90,9 +101,8 @@
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 20%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
-            pointer-events: none;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-gold), var(--primary-red));
         }
 
         .success-card > * {
@@ -112,13 +122,8 @@
         }
 
         @keyframes pulse-glow {
-            0%, 100% { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.5)); }
-            50% { filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.85)); }
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3)); }
+            50% { filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.6)); }
         }
 
         .lottie-wrapper {
@@ -130,8 +135,8 @@
         .check-mark-wrapper {
             display: flex;
             justify-content: center;
-            margin-bottom: 32px;
-            animation: pulse-glow 2s ease-in-out infinite;
+            margin-bottom: 24px;
+            animation: pulse-glow 3s ease-in-out infinite;
         }
 
         .check-mark {
@@ -140,13 +145,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            padding: 16px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
             animation: bounceIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .check-mark svg {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 4px 12px rgba(34, 197, 94, 0.4));
+            color: var(--primary-gold);
+            filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.4));
         }
 
         @keyframes bounceIn {
@@ -164,11 +174,10 @@
         }
 
         h2 {
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-size: clamp(2rem, 5vw, 2.75rem);
             font-weight: 800;
-            text-align: center;
-            margin-bottom: clamp(16px, 4vw, 24px);
-            background: linear-gradient(135deg, #ffffff 0%, #fde68a 100%);
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 20%, var(--primary-gold) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -177,269 +186,224 @@
         }
 
         .subtitle {
-            font-size: clamp(0.9rem, 2.8vw, 1rem);
-            text-align: center;
-            color: #cbd5e1;
-            margin-bottom: clamp(24px, 6vw, 32px);
+            font-size: clamp(1rem, 2.8vw, 1.1rem);
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 32px;
             line-height: 1.6;
         }
 
+        .subtitle .highlight {
+            color: var(--primary-gold);
+            font-weight: 700;
+        }
+
         .bapco-section {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(16, 185, 129, 0.12) 100%);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            border-radius: clamp(12px, 3vw, 16px);
-            padding: clamp(16px, 4vw, 24px);
-            margin-bottom: clamp(24px, 6vw, 32px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
             text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .bapco-section:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .bapco-section p {
-            color: #e2e8f0;
-            margin-bottom: clamp(8px, 2vw, 16px);
-            font-size: clamp(0.9rem, 2.5vw, 0.95rem);
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+            font-size: 0.95rem;
             line-height: 1.5;
         }
 
         .bapco-section .app-name {
-            color: #fbbf24;
+            color: var(--primary-gold);
             font-weight: 700;
-            font-size: clamp(1rem, 3vw, 1.1rem);
+            font-size: 1.1rem;
         }
 
         .app-store-link {
             display: inline-block;
             transition: all 0.3s ease;
-            transform: scale(1);
-            margin-top: clamp(8px, 2vw, 12px);
+            margin-top: 12px;
         }
 
         .app-store-link:hover {
             transform: scale(1.05);
+            filter: brightness(1.1);
         }
 
         .app-store-link img {
-            width: clamp(180px, 25vw, 240px);
-            height: auto;
-            border-radius: clamp(6px, 1.5vw, 8px);
-            max-width: 100%;
+            height: 48px;
+            width: auto;
+            border-radius: 8px;
         }
 
         .stats-container {
-            background: rgba(251, 191, 36, 0.08);
-            border-radius: clamp(8px, 2vw, 12px);
-            padding: clamp(16px, 4vw, 24px);
-            margin-bottom: clamp(16px, 4vw, 24px);
-            border: 1px solid rgba(251, 191, 36, 0.2);
+            background: rgba(168, 28, 46, 0.1);
+            border: 1px solid rgba(168, 28, 46, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
             text-align: center;
         }
 
         .stat-label {
-            font-size: clamp(0.8rem, 2.5vw, 0.875rem);
-            color: #94a3b8;
-            margin-bottom: clamp(8px, 2.5vw, 12px);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
         }
 
         .stat-value {
-            font-size: clamp(2rem, 8vw, 3rem);
-            font-weight: 900;
-            text-align: center;
-            background: linear-gradient(135deg, #fbbf24 0%, #34d399 100%);
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, var(--primary-gold) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-            margin-bottom: clamp(4px, 1.5vw, 8px);
+            margin-bottom: 4px;
             line-height: 1;
         }
 
         .stat-total {
-            font-size: clamp(0.75rem, 2.5vw, 0.875rem);
-            color: #cbd5e1;
-            text-align: center;
-            line-height: 1.4;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .warning-box {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(234, 88, 12, 0.15) 100%);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: clamp(8px, 2vw, 12px);
-            padding: clamp(12px, 3vw, 16px);
-            margin-bottom: clamp(24px, 6vw, 32px);
+            background: rgba(168, 28, 46, 0.2);
+            border: 1px solid rgba(168, 28, 46, 0.4);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 32px;
             text-align: center;
         }
 
         .warning-box .label {
-            color: #fca5a5;
+            color: #ff8a8a;
             font-weight: 700;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-            margin-bottom: clamp(2px, 1vw, 4px);
+            font-size: 0.95rem;
+            margin-bottom: 4px;
         }
 
         .warning-box .text {
-            color: #fecaca;
-            font-size: clamp(0.8rem, 2.5vw, 0.875rem);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
             line-height: 1.5;
         }
 
         .countdown-section {
-            margin-top: clamp(24px, 6vw, 32px);
+            margin-top: 32px;
             text-align: center;
         }
 
         .progress-bar {
             width: 100%;
-            height: clamp(6px, 2vw, 8px);
+            height: 6px;
             background-color: rgba(255, 255, 255, 0.1);
-            border-radius: clamp(3px, 1vw, 4px);
+            border-radius: 3px;
             overflow: hidden;
-            margin-bottom: clamp(16px, 4vw, 24px);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
         }
 
         .progress-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #fbbf24 0%, #34d399 60%, #0ea5e9 100%);
-            border-radius: clamp(3px, 1vw, 4px);
-            transition: width 0.1s linear;
-            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+            background: linear-gradient(90deg, var(--primary-gold) 0%, var(--primary-red) 100%);
+            border-radius: 3px;
+            transition: width 1s linear;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
         }
 
         .countdown-text {
             display: flex;
             align-items: baseline;
             justify-content: center;
-            gap: clamp(4px, 1.5vw, 8px);
-            margin-bottom: clamp(16px, 4vw, 24px);
-            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
         }
 
         .countdown-number {
-            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            font-size: 2.5rem;
             font-weight: 900;
-            color: #fbbf24;
+            color: var(--primary-gold);
             font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-            min-width: clamp(60px, 15vw, 90px);
         }
 
         .countdown-label {
-            font-size: clamp(0.85rem, 2.5vw, 1rem);
-            color: #cbd5e1;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .action-button {
-            display: inline-block;
-            padding: clamp(12px, 3vw, 14px) clamp(24px, 6vw, 32px);
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: #0f172a;
-            border: none;
-            border-radius: clamp(10px, 2.5vw, 12px);
-            font-size: clamp(14px, 3.5vw, 16px);
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.35);
-            text-decoration: none;
-            font-family: 'Tajawal', sans-serif;
-            text-align: center;
-            min-height: 44px; /* Touch-friendly minimum */
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             max-width: 280px;
             margin: 0 auto;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, #B8860B 100%);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
         }
 
         .action-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.45);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+            filter: brightness(1.1);
         }
 
-        .action-button:active {
-            transform: translateY(0);
-        }
-
-        /* Touch device optimizations */
-        @media (hover: none) and (pointer: coarse) {
-            .action-button {
-                padding: 16px 32px;
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-
-            .action-button:hover {
-                transform: none;
-            }
-
-            .app-store-link {
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-        }
-
-        .rate-limit-container {
-            text-align: center;
-        }
-
+        /* Rate limit styles */
         .rate-limit-icon {
-            width: clamp(80px, 20vw, 100px);
-            height: clamp(80px, 20vw, 100px);
-            margin: 0 auto clamp(16px, 4vw, 24px);
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(234, 88, 12, 0.15) 100%);
+            background: rgba(168, 28, 46, 0.15);
             border-radius: 50%;
-            border: 2px solid rgba(239, 68, 68, 0.3);
+            border: 2px solid rgba(168, 28, 46, 0.3);
             animation: pulse 2s ease-in-out infinite;
         }
 
         .rate-limit-icon svg {
-            width: clamp(50%, 15vw, 60%);
-            height: clamp(50%, 15vw, 60%);
-            color: #fca5a5;
-        }
-
-        .rate-limit-message {
-            color: #e2e8f0;
-            margin-bottom: clamp(8px, 2vw, 12px);
-            font-size: clamp(1rem, 3vw, 1.1rem);
-        }
-
-        .rate-limit-submessage {
-            color: #cbd5e1;
-            font-size: clamp(0.9rem, 2.5vw, 0.95rem);
-            margin-bottom: clamp(24px, 6vw, 32px);
-            line-height: 1.5;
+            width: 50px;
+            height: 50px;
+            color: var(--primary-red);
         }
 
         .timer-circle {
-            width: clamp(100px, 25vw, 140px);
-            height: clamp(100px, 25vw, 140px);
-            margin: 0 auto clamp(16px, 4vw, 24px);
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: conic-gradient(#fbbf24, #f97316, #34d399);
-            padding: clamp(3px, 1vw, 4px);
+            background: conic-gradient(var(--primary-gold), var(--primary-red));
+            padding: 4px;
             position: relative;
-            animation: rotate 3s linear infinite;
+            animation: rotate 4s linear infinite;
         }
 
         .timer-circle::after {
             content: '';
             position: absolute;
-            width: calc(100% - clamp(6px, 2vw, 8px));
-            height: calc(100% - clamp(6px, 2vw, 8px));
+            inset: 4px;
             border-radius: 50%;
-            background: rgba(15, 23, 42, 0.95);
-            top: clamp(3px, 1vw, 4px);
-            left: clamp(3px, 1vw, 4px);
+            background: rgba(20, 20, 20, 0.95);
         }
 
         .timer-content {
@@ -448,22 +412,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-        }
-
-        .timer-value {
-            font-size: clamp(1.8rem, 5vw, 2.5rem);
-            font-weight: 900;
-            color: #fbbf24;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-        }
-
-        .timer-label {
-            font-size: clamp(0.6rem, 2vw, 0.75rem);
-            color: #cbd5e1;
-            text-transform: uppercase;
-            letter-spacing: clamp(0.5px, 1.5vw, 1px);
         }
 
         @keyframes rotate {
@@ -471,248 +419,21 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Enhanced Responsive Design */
+        /* Responsive */
         @media (max-width: 480px) {
             .success-container {
-                padding: 12px;
                 align-items: flex-start;
+                padding: 12px;
             }
-
             .success-card {
+                padding: 24px 20px;
+                border-radius: 20px;
                 margin-top: 20px;
-                padding: 20px 16px;
-                border-radius: 16px;
-                max-width: 100%;
             }
-
-            .lottie-wrapper lottie-player {
-                width: 120px !important;
-                height: 120px !important;
-            }
-
-            .check-mark {
-                width: 60px;
-                height: 60px;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-                margin-bottom: 16px;
-            }
-
-            .subtitle {
-                font-size: 0.9rem;
-                margin-bottom: 24px;
-            }
-
-            .bapco-section {
-                padding: 16px;
-                margin-bottom: 24px;
-            }
-
-            .app-store-link img {
-                width: 180px;
-            }
-
-            .stats-container {
-                padding: 16px;
-                margin-bottom: 16px;
-            }
-
-            .stat-value {
-                font-size: 2rem;
-            }
-
-            .warning-box {
-                padding: 12px;
-                margin-bottom: 24px;
-            }
-
-            .countdown-section {
-                margin-top: 24px;
-            }
-
-            .timer-circle {
-                width: 100px;
-                height: 100px;
-            }
-
-            .timer-value {
-                font-size: 1.8rem;
-            }
-
-            .rate-limit-icon {
-                width: 80px;
-                height: 80px;
-            }
-
-            .rate-limit-icon svg {
-                width: 50%;
-                height: 50%;
-            }
-        }
-
-        @media (min-width: 481px) and (max-width: 768px) {
-            .success-card {
-                max-width: 500px;
-                padding: 32px 24px;
-            }
-
-            .lottie-wrapper lottie-player {
-                width: 150px !important;
-                height: 150px !important;
-            }
-
-            .check-mark {
-                width: 70px;
-                height: 70px;
-            }
-
-            h2 {
-                font-size: 2rem;
-            }
-
-            .app-store-link img {
-                width: 220px;
-            }
-
-            .stat-value {
-                font-size: 2.8rem;
-            }
-
-            .timer-circle {
-                width: 120px;
-                height: 120px;
-            }
-
-            .timer-value {
-                font-size: 2.2rem;
-            }
-        }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .success-card {
-                max-width: 550px;
-                padding: 36px 32px;
-            }
-
-            .lottie-wrapper lottie-player {
-                width: 160px !important;
-                height: 160px !important;
-            }
-
-            .check-mark {
-                width: 75px;
-                height: 75px;
-            }
-
-            h2 {
-                font-size: 2.2rem;
-            }
-
-            .app-store-link img {
-                width: 240px;
-            }
-
-            .stat-value {
-                font-size: 3.2rem;
-            }
-        }
-
-        @media (min-width: 1025px) {
-            .success-card {
-                max-width: 450px;
-            }
-
-            .lottie-wrapper lottie-player {
-                width: 180px !important;
-                height: 180px !important;
-            }
-        }
-
-        /* Landscape orientation adjustments */
-        @media (max-height: 600px) and (orientation: landscape) {
-            .success-container {
-                align-items: center;
-                padding: 16px;
-            }
-
-            .success-card {
-                margin-top: 0;
-                max-height: calc(100vh - 32px);
-                overflow-y: auto;
-            }
-
-            .lottie-wrapper lottie-player {
-                width: 100px !important;
-                height: 100px !important;
-            }
-
-            h2 {
-                font-size: 1.4rem;
-                margin-bottom: 12px;
-            }
-
-            .subtitle {
-                font-size: 0.85rem;
-                margin-bottom: 16px;
-            }
-
-            .bapco-section {
-                padding: 12px;
-                margin-bottom: 16px;
-            }
-
-            .stats-container {
-                padding: 12px;
-                margin-bottom: 12px;
-            }
-
-            .warning-box {
-                padding: 10px;
-                margin-bottom: 16px;
-            }
-
-            .countdown-section {
-                margin-top: 16px;
-            }
-        }
-
-        /* High DPI displays */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .success-card {
-                border-width: 1px;
-            }
-
-            .app-store-link img {
-                image-rendering: -webkit-optimize-contrast;
-                image-rendering: crisp-edges;
-            }
-        }
-
-        /* Reduced motion preferences */
-        @media (prefers-reduced-motion: reduce) {
-            .success-card {
-                animation: none;
-            }
-
-            .check-mark {
-                animation: none;
-            }
-
-            .timer-circle {
-                animation: none;
-            }
-
-            .rate-limit-icon {
-                animation: none;
-            }
-
-            * {
-                transition-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-            }
+            .check-mark { width: 60px; height: 60px; }
+            h2 { font-size: 1.75rem; }
+            .stat-value { font-size: 2.5rem; }
+            .action-button { font-size: 1rem; padding: 14px 24px; }
         }
     </style>
 </head>
@@ -726,14 +447,14 @@
                 <!-- Lottie animation -->
                 <div class="lottie-wrapper">
                     <lottie-player src="{{ asset('lottie/crecent-moon-ramadan.json') }}" background="transparent"
-                        speed="0.5" style="width: clamp(120px, 20vw, 180px); height: clamp(120px, 20vw, 180px);" count="1" autoplay>
+                        speed="0.5" style="width: 160px; height: 160px;" count="1" autoplay>
                     </lottie-player>
                 </div>
 
                 <!-- Success check mark -->
                 <div class="check-mark-wrapper">
-                    <div class="check-mark">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #22c55e;">
+                    <div class="check-mark" id="celebration-target">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                     </div>
@@ -742,7 +463,7 @@
                 <h2>تم التسجيل بنجاح!</h2>
 
                 <p class="subtitle">
-                    شكراً <span class="font-bold">{{ session('name') ?: 'المشارك الكريم' }}</span> لمشاركتك في برنامج السارية
+                    شكراً <span class="highlight">{{ session('name') ?: 'المشارك الكريم' }}</span> لمشاركتك في برنامج السارية
                 </p>
 
                 <!-- Bapco Energies section -->
@@ -784,9 +505,8 @@
 
             @else
                 <!-- ===== RATE LIMIT COUNTDOWN SCREEN ===== -->
-
+                <!-- (Kept largely the same but with new styling classes) -->
                 <div class="rate-limit-container">
-                    <!-- Clock icon -->
                     <div class="rate-limit-icon">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -796,10 +516,9 @@
 
                     <h2>انتظر قليلاً</h2>
 
-                    <p class="rate-limit-message">عاد تحاول تسجيل بسرعة كثير! 😊</p>
-                    <p class="rate-limit-submessage">يمكنك التسجيل مجدداً بعد انتهاء المدة المحددة أدناه</p>
+                    <p class="subtitle">عاد تحاول تسجيل بسرعة كثير! 😊</p>
+                    <p class="subtitle" style="font-size: 0.9rem; margin-top: -20px;">يمكنك التسجيل مجدداً بعد انتهاء المدة المحددة أدناه</p>
 
-                    <!-- Timer circle with animation -->
                     <div class="timer-circle" id="timer-circle">
                         <div class="timer-content">
                             <div class="timer-value" id="timer-countdown">300</div>
@@ -807,7 +526,6 @@
                         </div>
                     </div>
 
-                    <!-- Detailed countdown -->
                     <div class="countdown-section">
                         <div class="countdown-text">
                             <span class="countdown-label">الوقت المتبقي:</span>
@@ -815,11 +533,6 @@
                             <span class="countdown-label" id="minutes-word">دقائق</span>
                         </div>
                     </div>
-
-                    <!-- Help text -->
-                    <p class="rate-limit-submessage" style="margin-top: 24px; color: #64748b;">
-                        هذا الحد الزمني يحمي التطبيق من الاستخدام غير المسؤول
-                    </p>
 
                     <a href="/" class="action-button" style="margin-top: 24px;">العودة للصفحة الرئيسية</a>
                 </div>
@@ -829,6 +542,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Trigger Confetti on Load
+            if (typeof fireConfetti === 'function') {
+                const target = document.getElementById('celebration-target');
+                if (target) {
+                    setTimeout(() => {
+                        fireConfetti(target, ['#D4AF37', '#A81C2E', '#FFFFFF']);
+                    }, 500);
+                }
+            }
+
             const isDirtyFile = @json($isDirtyFile);
             const cpr = @json($cpr);
 
@@ -883,6 +606,8 @@
                 updateSecondsWord(secondsLeft);
                 
                 const countdownInterval = setInterval(() => {
+                    if (!isRunning) return;
+                    
                     secondsLeft -= 1;
                     
                     countdownEl.textContent = Math.max(0, secondsLeft);
