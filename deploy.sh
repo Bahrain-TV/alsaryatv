@@ -394,15 +394,55 @@ CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 NC='\033[0m'
 
+# ── Deployment Logging Setup ──────────────────────────────────────────────────
+DEPLOY_LOG_DIR="storage/logs/deployments"
+mkdir -p "$DEPLOY_LOG_DIR"
+DEPLOY_LOG="$DEPLOY_LOG_DIR/deploy_$(date '+%Y%m%d_%H%M%S').log"
+DEPLOY_PERF_LOG="$DEPLOY_LOG_DIR/deploy_performance.log"
+
+# Initialize logs
+: >"$DEPLOY_LOG"  # Create empty log file
+echo "====== AlSarya TV Deployment Log ======" >> "$DEPLOY_LOG"
+echo "Started: $(date '+%Y-%m-%d %H:%M:%S')" >> "$DEPLOY_LOG"
+echo "Hostname: $(hostname)" >> "$DEPLOY_LOG"
+echo "User: $(whoami)" >> "$DEPLOY_LOG"
+echo "PHP Version: $(php -v 2>&1 | head -1)" >> "$DEPLOY_LOG"
+echo "==========================================" >> "$DEPLOY_LOG"
+echo "" >> "$DEPLOY_LOG"
+
 # ── Helpers ──────────────────────────────────────────────────────────────────
-info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
-success() { echo -e "${GREEN}[OK]${NC}    $*"; }
-warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
-error()   { echo -e "${RED}[ERROR]${NC} $*"; }
-step()    { echo -e "\n${MAGENTA}━━━ $* ━━━${NC}"; }
+log() { echo "[$(date '+%H:%M:%S')] $*" >> "$DEPLOY_LOG"; }
+info()    { echo -e "${CYAN}[INFO]${NC}  $*"; log "INFO: $*"; }
+success() { echo -e "${GREEN}[OK]${NC}    $*"; log "SUCCESS: $*"; }
+warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; log "WARN: $*"; }
+error()   { echo -e "${RED}[ERROR]${NC} $*"; log "ERROR: $*"; }
+step()    { echo -e "\n${MAGENTA}━━━ $* ━━━${NC}"; log "━━━ STEP: $* ━━━"; }
+
+# Log command execution with timing
+log_cmd() {
+    local cmd="$*"
+    local start_time=$(date '+%s.%N')
+    log "Executing: $cmd"
+    
+    if eval "$cmd" 2>&1 | tee -a "$DEPLOY_LOG"; then
+        local end_time=$(date '+%s.%N')
+        local duration=$(echo "$end_time - $start_time" | bc)
+        log "✓ Command succeeded (${duration}s): $cmd"
+        echo "$cmd|SUCCESS|${duration}s" >> "$DEPLOY_PERF_LOG"
+        return 0
+    else
+        local exit_code=$?
+        local end_time=$(date '+%s.%N')
+        local duration=$(echo "$end_time - $start_time" | bc)
+        log "✗ Command failed with exit $exit_code (${duration}s): $cmd"
+        echo "$cmd|FAILED|${duration}s|EXIT_CODE:$exit_code" >> "$DEPLOY_PERF_LOG"
+        return "$exit_code"
+    fi
+}
 
 run() {
     local cmd_str="$*"
+    local start_time=$(date '+%s.%N')
 
     if [[ "$(id -u)" == "0" ]]; then
         if [[ ! "$cmd_str" =~ ^sudo ]]; then
@@ -414,16 +454,30 @@ run() {
         fi
     fi
 
+    log "EXECUTE: $cmd_str"
+
     if [[ "${DRY_RUN:-false}" == "true" ]]; then
         echo -e "${YELLOW}[DRY-RUN]${NC} $cmd_str"
+        log "DRY-RUN: $cmd_str"
         return 0
     fi
 
-    eval "$cmd_str" || {
+    if eval "$cmd_str" 2>&1 | tee -a "$DEPLOY_LOG"; then
+        local exit_code=0
+        local end_time=$(date '+%s.%N')
+        local duration=$(echo "$end_time - $start_time" | bc 2>/dev/null || echo "0")
+        log "✓ Success (${duration}s): $cmd_str"
+        echo "$(date '+%H:%M:%S')|$cmd_str|SUCCESS|${duration}s" >> "$DEPLOY_PERF_LOG"
+        return 0
+    else
         local exit_code=$?
+        local end_time=$(date '+%s.%N')
+        local duration=$(echo "$end_time - $start_time" | bc 2>/dev/null || echo "0")
         error "Command failed with exit code $exit_code: $cmd_str"
+        log "✗ Failed (${duration}s, EXIT $exit_code): $cmd_str"
+        echo "$(date '+%H:%M:%S')|$cmd_str|FAILED|${duration}s|EXIT:$exit_code" >> "$DEPLOY_PERF_LOG"
         return "$exit_code"
-    }
+    fi
 }
 
 # ── Initialize Variables ────────────────────────────────────────────────────
@@ -709,29 +763,63 @@ echo "$$|$(date +%s)|$(date '+%Y-%m-%d %H:%M:%S')" > "$INSTALL_FLAG"
 cleanup_and_exit() {
     local exit_code=$?
 
+    log "═══════════════════════════════════════════════"
+    log "DEPLOYMENT SUMMARY"
+    log "═══════════════════════════════════════════════"
+    log "End Time: $(date '+%Y-%m-%d %H:%M:%S')"
+    log "Exit Code: $exit_code"
+    
+    if [[ $exit_code -eq 0 ]]; then
+        log "STATUS: ✅ SUCCESSFUL"
+    else
+        log "STATUS: ❌ FAILED"
+    fi
+
+    # Append performance metrics
+    if [[ -f "$DEPLOY_PERF_LOG" ]]; then
+        log ""
+        log "PERFORMANCE METRICS:"
+        log "$(tail -20 "$DEPLOY_PERF_LOG")"
+    fi
+
+    log "═══════════════════════════════════════════════"
+    log "Log file: $DEPLOY_LOG"
+    log ""
+
     [[ -n "$TIMEOUT_PID" && "$TIMEOUT_PID" != "" ]] && { kill "$TIMEOUT_PID" 2>/dev/null || true; wait "$TIMEOUT_PID" 2>/dev/null || true; }
     rm -f "$LOCK_FILE" "$INSTALL_FLAG"
 
     if [[ ("$MAINTENANCE_WAS_ENABLED" == "true" && "$exit_code" -ne 0) || "$IGNORE_MAINTENANCE" == "true" ]]; then
         if [[ "$exit_code" -ne 0 ]]; then
             warn "Deploy failed (exit code: $exit_code)! Restoring site..."
+            log "RECOVERY: Attempting to restore site from maintenance mode..."
         else
             info "Ensuring site is LIVE..."
+            log "RECOVERY: Bringing site live..."
         fi
 
         for attempt in 1 2 3; do
-            if php artisan up 2>/dev/null; then
+            if php artisan up 2>&1 | tee -a "$DEPLOY_LOG"; then
                 success "Site restored to live."
+                log "RECOVERY: ✓ Site successfully restored to live"
                 break
             elif [[ $attempt -lt 3 ]]; then
                 warn "Attempt $attempt failed, retrying..."
+                log "RECOVERY: Attempt $attempt failed, retrying in 2s..."
                 sleep 2
             else
                 error "CRITICAL: Could not restore site! Run: php artisan up"
+                log "RECOVERY: ✗ CRITICAL - Could not restore site from maintenance mode!"
             fi
         done
     fi
 
+    echo ""
+    echo "📋 Deployment logs available:"
+    echo "   Full log:  $DEPLOY_LOG"
+    echo "   Perf log:  $DEPLOY_PERF_LOG"
+    echo ""
+    
     send_notification "$exit_code"
 }
 
