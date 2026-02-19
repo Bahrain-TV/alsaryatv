@@ -11,6 +11,16 @@ class ProductionUrlCurlTest extends TestCase
      */
     protected string $productionUrl = 'https://alsarya.tv';
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Skip production cURL tests by default in local/test environments
+        if (empty(env('RUN_PRODUCTION_TESTS'))) {
+            $this->markTestSkipped('Skipping production cURL tests (RUN_PRODUCTION_TESTS not set).');
+        }
+    }
+
     /**
      * Timeout for cURL requests in seconds
      */

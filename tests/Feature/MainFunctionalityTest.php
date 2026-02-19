@@ -24,7 +24,7 @@ class MainFunctionalityTest extends TestCase
     public function test_complete_registration_flow(): void
     {
         // Test the complete registration flow from form access to success page
-        $response = $this->get('/');
+        $response = $this->get('/welcome');
         $response->assertStatus(200);
         $response->assertSee('سجّل الآن'); // Check for registration button
 
@@ -74,7 +74,7 @@ class MainFunctionalityTest extends TestCase
         ]);
 
         // Get CSRF token
-        $response = $this->get('/');
+        $response = $this->get('/welcome');
         preg_match('/<meta name="csrf-token" content="([^"]+)"/', $response->getContent(), $matches);
         $csrfToken = $matches[1] ?? '';
 
@@ -108,12 +108,12 @@ class MainFunctionalityTest extends TestCase
         // Select a random winner
         $winner = Caller::selectRandomWinnerByCpr();
 
-        // Verify a winner was selected
+        // Verify a winner (selection) was made
         $this->assertNotNull($winner);
-        $this->assertTrue($winner->is_winner);
+        $this->assertTrue($winner->is_selected);
 
-        // Verify only one winner was selected
-        $this->assertEquals(1, Caller::winners()->count());
+        // Verify only one selected caller exists
+        $this->assertEquals(1, Caller::selected()->count());
     }
 
     public function test_cpr_hashing_and_verification(): void
@@ -213,20 +213,17 @@ class MainFunctionalityTest extends TestCase
         $eligibleCallers = Caller::factory()->count(3)->create([
             'is_winner' => false,
             'status' => 'active',
-            'cpr' => 'valid_cpr',
         ]);
 
         // Create ineligible callers
         Caller::factory()->create([
             'is_winner' => true,  // Winner - not eligible
             'status' => 'active',
-            'cpr' => 'valid_cpr',
         ]);
 
         Caller::factory()->create([
             'is_winner' => false,
             'status' => 'inactive',  // Inactive - not eligible
-            'cpr' => 'valid_cpr',
         ]);
 
         Caller::factory()->create([

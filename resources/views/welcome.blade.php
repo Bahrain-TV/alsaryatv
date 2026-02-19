@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon/favicon-32x32.png') }}" />
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon/favicon-16x16.png') }}" />
 
-    <title>{{ config('app.ar_translations.title') ?? 'السارية' }} - قريباً في رمضان</title>
+    <title>{{ config('app.ar_translations.title') ?? 'السارية' }} - برنامج مسابقات رمضاني من تلفزيون البحرين</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net" />

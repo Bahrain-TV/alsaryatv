@@ -86,11 +86,12 @@ class CallerModelTest extends TestCase
         $winner = Caller::selectRandomWinnerByCpr();
 
         $this->assertNotNull($winner);
-        $this->assertTrue((bool) $winner->is_winner); // Should be marked winner now
+        $this->assertTrue((bool) $winner->is_selected); // Should be marked selected now
         $this->assertEquals('123456789', $winner->cpr);
 
         // Verify persists in DB
-        $this->assertTrue((bool) $winner->fresh()->is_winner);
+        $this->assertTrue((bool) $winner->fresh()->is_selected);
+        $this->assertEquals('selected', $winner->fresh()->status);
     }
 
     public function test_select_random_winner_returns_null_when_no_eligible_callers(): void

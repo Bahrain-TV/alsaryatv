@@ -41,6 +41,11 @@ class AppServiceProvider extends ServiceProvider
             Css::make('debug-styles', asset('css/debug-styles.css'))->loadedOnRequest(),
         ]);
 
+        // Ensure local images are cache-busted after deployments by appending file-modified timestamps.
+        // This appends ?v=<filemtime> to local image, favicon and lottie URLs found in HTML responses.
+        $router = $this->app->make(\Illuminate\Routing\Router::class);
+        $router->pushMiddlewareToGroup('web', \App\Http\Middleware\AppendImageVersion::class);
+
         // Persistence Hooks: Automatically backup/restore data during migrations
         if ($this->app->runningInConsole()) {
             $this->registerMigrationHooks();

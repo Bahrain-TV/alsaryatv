@@ -50,6 +50,12 @@ class CallerRegistrationTest extends TestCase
         // Extract CSRF token from the HTML response
         preg_match('/<meta name="csrf-token" content="([^"]+)"/', $response->getContent(), $matches);
 
+        // Fallback to the welcome page if splash does not include CSRF meta
+        if (empty($matches[1])) {
+            $welcome = $this->get('/welcome');
+            preg_match('/<meta name="csrf-token" content="([^"]+)"/', $welcome->getContent(), $matches);
+        }
+
         return $matches[1] ?? '';
     }
 
