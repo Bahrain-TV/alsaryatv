@@ -821,9 +821,11 @@
 
             setTimeout(() => {
                 // Redirect to registration form after splash
-                window.location.href = '/';
+                window.location.href = '/?skip-splash=true';
             }, 20000);
         }
+
+        const isLocalEnvironment = @json(app()->isLocal());
 
         // Check if splash has already been shown in this session
         function shouldShowSplash() {
@@ -831,6 +833,11 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('force-splash') === 'true') {
                 sessionStorage.removeItem('splashShown');
+                return true;
+            }
+
+            // In local mode, always allow replaying splash for preview/testing
+            if (isLocalEnvironment) {
                 return true;
             }
 

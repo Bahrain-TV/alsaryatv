@@ -743,19 +743,23 @@ if [[ "$WEBHOOK_TRIGGER" == "true" ]]; then
     info "Deployment triggered by GitHub webhook"
 fi
 
-# ── Step 0.5: Backup database before deployment ──────────────────────────────
+# ── Step 0.5: Backup database + callers before deployment ───────────────────
 info "Creating database backup before deployment..."
 BACKUP_DIR="storage/backups"
 mkdir -p "$BACKUP_DIR"
 
 BACKUP_TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 BACKUP_FILE="$BACKUP_DIR/backup_${BACKUP_TIMESTAMP}.sql"
+CALLERS_BACKUP_FILE="$BACKUP_DIR/callers_backup_${BACKUP_TIMESTAMP}.csv"
 
 if [[ "${DB_CONNECTION:-}" == "sqlite" ]]; then
-    # SQLite backup (just copy the database file)
+    # SQLite backup (copy database file)
     if [[ -f "$DB_DATABASE" ]]; then
-        run cp "$DB_DATABASE" "${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
-        success "SQLite database backup created: ${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
+        SQLITE_BACKUP_FILE="$BACKUP_DIR/sqlite_backup_${BACKUP_TIMESTAMP}.sqlite"
+        run cp "$DB_DATABASE" "$SQLITE_BACKUP_FILE"
+        success "SQLite database backup created: $SQLITE_BACKUP_FILE"
+    else
+        warn "SQLite database file not found: ${DB_DATABASE:-unset}"
     fi
 elif [[ "${DB_CONNECTION:-}" == "mysql" ]]; then
     # MySQL dump
@@ -765,37 +769,63 @@ elif [[ "${DB_CONNECTION:-}" == "mysql" ]]; then
         -p"${DB_PASSWORD:-}" \
         "${DB_DATABASE}" > "$BACKUP_FILE"
     success "MySQL database backup created: $BACKUP_FILE"
+else
+    # Generic database check for unsupported drivers
+    run php artisan db:show || warn "Could not verify database connection"
+fi
 
-    # Also backup callers to CSV
-    info "Exporting callers data to CSV..."
+# Always backup callers data to CSV (regardless of DB driver)
+info "Exporting callers data to CSV..."
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo -e "${YELLOW}[DRY-RUN]${NC} php artisan tinker (export callers to $CALLERS_BACKUP_FILE)"
+else
+    export CALLERS_BACKUP_FILE
     php artisan tinker << 'TINKER'
 use App\Models\Caller;
+
+$filePath = getenv('CALLERS_BACKUP_FILE') ?: 'storage/backups/callers_backup.csv';
 $callers = Caller::all();
-$file = fopen("storage/backups/callers_backup_${BACKUP_TIMESTAMP}.csv", 'w');
-if ($file) {
-    fputcsv($file, ['ID', 'CPR', 'Phone', 'Name', 'Hits', 'Status', 'Is Winner', 'IP Address', 'Created At', 'Updated At']);
-    foreach ($callers as $caller) {
-        fputcsv($file, [
-            $caller->id,
-            $caller->cpr,
-            $caller->phone,
-            $caller->name,
-            $caller->hits,
-            $caller->status,
-            $caller->is_winner ? 'Yes' : 'No',
-            $caller->ip_address,
-            $caller->created_at,
-            $caller->updated_at
-        ]);
-    }
-    fclose($file);
-    echo "Callers data exported to CSV\n";
+$file = fopen($filePath, 'w');
+
+if (! $file) {
+    throw new RuntimeException("Unable to create callers backup file at {$filePath}");
 }
+
+fputcsv($file, ['ID', 'CPR', 'Phone', 'Name', 'Hits', 'Status', 'Is Winner', 'IP Address', 'Created At', 'Updated At']);
+
+foreach ($callers as $caller) {
+    fputcsv($file, [
+        $caller->id,
+        $caller->cpr,
+        $caller->phone,
+        $caller->name,
+        $caller->hits,
+        $caller->status,
+        $caller->is_winner ? 'Yes' : 'No',
+        $caller->ip_address,
+        $caller->created_at,
+        $caller->updated_at,
+    ]);
+}
+
+fclose($file);
+echo "Callers data exported to CSV: {$filePath}\n";
 TINKER
-    success "Callers CSV backup created"
+    unset CALLERS_BACKUP_FILE
+fi
+success "Callers CSV backup created: $CALLERS_BACKUP_FILE"
+
+# Keep only last 5 callers CSV backups
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo -e "${YELLOW}[DRY-RUN]${NC} rotate callers backups in $BACKUP_DIR (keep latest 5)"
 else
-    # Generic database export via artisan
-    run php artisan db:show || warn "Could not verify database connection"
+    mapfile -t CALLERS_BACKUPS < <(ls -1t "$BACKUP_DIR"/callers_backup_*.csv 2>/dev/null || true)
+    if [[ ${#CALLERS_BACKUPS[@]} -gt 5 ]]; then
+        for old_backup in "${CALLERS_BACKUPS[@]:5}"; do
+            rm -f "$old_backup"
+            info "Removed old callers backup: $old_backup"
+        done
+    fi
 fi
 
 info "Backups stored in: $BACKUP_DIR"

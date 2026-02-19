@@ -17,7 +17,7 @@
                                  alt="Jasmis"
                                  class="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg" />
                         </div>
-                        <span class="text-white text-sm sm:text-base font-semibold mt-2 drop-shadow-lg">Jasmis</span>
+                        <span class="text-white text-sm sm:text-base font-semibold mt-2 drop-shadow-lg">Jasmi's</span>
                     </div>
 
                     <!-- Al Salam — SVG has dark navy fill, invert to white for dark backgrounds -->
@@ -28,7 +28,7 @@
                                  class="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg"
                                  style="filter: brightness(0) invert(1) sepia(0.15);" />
                         </div>
-                        <span class="text-white text-sm sm:text-base font-semibold mt-2 drop-shadow-lg">Al Salam</span>
+                        <span class="text-white text-sm sm:text-base font-semibold mt-2 drop-shadow-lg">Al Salam Bank</span>
                     </div>
 
                     <!-- Bapco Energies -->
