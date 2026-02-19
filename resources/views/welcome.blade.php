@@ -254,9 +254,52 @@
             letter-spacing: 0.05em;
             pointer-events: none;
             white-space: nowrap;
+            transition: top 0.35s ease, font-size 0.35s ease;
         }
         @media (max-width: 480px) {
             #basmala { font-size: 0.72rem; top: 12px; }
+        }
+
+        /* ── Sticky header bar (basmala + shrunken logo) ── */
+        #sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 190;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px 10px;
+            background: rgba(10, 10, 18, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(197,157,95,0.15);
+            transform: translateY(-110%);
+            transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        #sticky-header.visible {
+            transform: translateY(0);
+        }
+        #sticky-header .sticky-basmala {
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #F5DEB3;
+            text-shadow: 0 0 10px rgba(168,28,46,0.6);
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        #sticky-header .sticky-logo {
+            width: auto;
+            height: 44px;
+            object-fit: contain;
+        }
+        @media (max-width: 480px) {
+            #sticky-header .sticky-logo { height: 34px; }
+            #sticky-header .sticky-basmala { font-size: 0.62rem; }
         }
 
         /* ── Mobile performance: disable heavy decorations ── */
@@ -310,9 +353,8 @@
                 width: 6px !important;
             }
 
-            /* Logo - smaller on mobile */
+            /* Logo - clamp handles sizing; just keep bottom spacing */
             .logo-section img {
-                width: 120px !important;
                 margin-bottom: 0.5rem !important;
             }
 
@@ -496,6 +538,12 @@
     <!-- Basmala — fixed at top per project requirement -->
     <div id="basmala">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
 
+    <!-- Sticky header: slides in when user focuses a form field or scrolls into form -->
+    <div id="sticky-header" aria-hidden="true">
+        <span class="sticky-basmala">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</span>
+        <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" class="sticky-logo" />
+    </div>
+
     <!-- Background Layers -->
     <div class="background-layers">
         <!-- Three.js cinematic particle canvas (renders below all other layers) -->
@@ -558,13 +606,14 @@
         </button>
 
         <!-- Logo -->
-        <div class="logo-section gsap-entry mb-4 sm:mb-6">
-            <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" class="mx-auto w-40 sm:w-56 md:w-64 lg:w-72 h-auto" />
+        <div class="logo-section gsap-entry mb-4 sm:mb-6" id="main-logo-wrap">
+            <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية"
+                 style="display:block; margin:0 auto; width:auto; height:clamp(100px,22vw,180px); object-fit:contain;" />
         </div>
 
         <!-- Header Section (Animates as one block) -->
         <header class="gsap-entry text-center mb-4 sm:mb-8 relative w-full max-w-lg">
-            <h1 class="text-3xl sm:text-5xl md:text-6xl font-black mb-1 sm:mb-2 tracking-tight gold-text drop-shadow-2xl leading-tight pb-1 sm:pb-2">
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-black mb-1 sm:mb-2 tracking-tight gold-text drop-shadow-2xl leading-tight pt-2 sm:pt-3 pb-1 sm:pb-2">
                 برنامج السارية
             </h1>
             <div class="flex items-center justify-center gap-2 sm:gap-3 opacity-90">
@@ -582,18 +631,7 @@
             <div class="gsap-card glass-panel rounded-[2rem] p-4 sm:p-6 md:p-8 relative overflow-hidden">
                     @if(config('alsarya.registration.enabled', false) || auth()->check())
                         {{-- Registration is enabled - show registration form --}}
-                        <div class="gsap-item relative overflow-hidden rounded-2xl mb-4 sm:mb-8 border border-white/5">
-                            <div class="absolute inset-0 bg-gradient-to-r from-bahrain-dark to-[#4a0808] opacity-80"></div>
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-gold-500/20 rounded-full blur-2xl"></div>
 
-                            <div class="relative p-3 sm:p-5 text-center">
-                                <h2 class="text-lg sm:text-2xl font-bold text-white mb-1 flex items-center justify-center gap-2 sm:gap-3">
-                                    <span class="gold-text text-2xl sm:text-3xl drop-shadow-lg">☪</span>
-                                    <span class="bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-300">رمضان كريم!</span>
-                                </h2>
-                                <p class="text-white/70 text-xs sm:text-sm font-light">التسجيل مفتوح الآن - سجّل للمشاركة في المسابقة</p>
-                            </div>
-                        </div>
 
                         {{-- Registration Form for Logged-in Users --}}
                         <div class="gsap-item">
@@ -812,6 +850,72 @@
 
     <script>
         lucide.createIcons();
+
+        // ═══════════════════════════════════════════════════
+        // STICKY HEADER — slides in when user is filling the form
+        // ═══════════════════════════════════════════════════
+        (function initStickyHeader() {
+            const stickyHeader = document.getElementById('sticky-header');
+            const fixedBasmala = document.getElementById('basmala');
+            const mainContent  = document.getElementById('main-content');
+            if (!stickyHeader || !mainContent) return;
+
+            let isVisible = false;
+
+            function showSticky() {
+                if (isVisible) return;
+                isVisible = true;
+                stickyHeader.classList.add('visible');
+                stickyHeader.setAttribute('aria-hidden', 'false');
+                // Hide the stand-alone basmala so they don't overlap
+                if (fixedBasmala) fixedBasmala.style.opacity = '0';
+            }
+
+            function hideSticky() {
+                if (!isVisible) return;
+                isVisible = false;
+                stickyHeader.classList.remove('visible');
+                stickyHeader.setAttribute('aria-hidden', 'true');
+                if (fixedBasmala) fixedBasmala.style.opacity = '1';
+            }
+
+            // Activate on any form input focus
+            mainContent.addEventListener('focusin', function (e) {
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
+                    showSticky();
+                }
+            });
+
+            // Deactivate when focus leaves the form area entirely
+            mainContent.addEventListener('focusout', function (e) {
+                // Use a tick so the next focused element is already set
+                setTimeout(function () {
+                    const active = document.activeElement;
+                    if (!active || (active.tagName !== 'INPUT' && active.tagName !== 'SELECT' && active.tagName !== 'TEXTAREA')) {
+                        hideSticky();
+                    }
+                }, 150);
+            });
+
+            // Also activate once the main logo scrolls out of view
+            const mainLogoWrap = document.getElementById('main-logo-wrap');
+            if (mainLogoWrap && 'IntersectionObserver' in window) {
+                const logoObserver = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (!entry.isIntersecting) {
+                            showSticky();
+                        } else {
+                            // Only hide if no input is focused
+                            const active = document.activeElement;
+                            if (!active || (active.tagName !== 'INPUT' && active.tagName !== 'SELECT' && active.tagName !== 'TEXTAREA')) {
+                                hideSticky();
+                            }
+                        }
+                    });
+                }, { threshold: 0.1 });
+                logoObserver.observe(mainLogoWrap);
+            }
+        })();
 
         // ═══════════════════════════════════════════════════
         // THREE.JS — Cinematic Particle Warp Background

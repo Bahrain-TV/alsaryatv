@@ -17,9 +17,17 @@
 
 ## النسخة الحالية
 
-- v 1.5.20250211
-- v 2.0.20250116
+- v 5.1.0 - Daily Selected Names Email Feature (2026-02-19)
+- v 3.7.0 - Synchronized version (2026-02-15)
 - v 3.1.22233440
+
+## الميزات الحديثة
+
+### 🌟 البريد الإلكتروني اليومي للأسماء المختارة
+إرسال تقرير بريدي يومي يحتوي على آخر 10 أسماء تم اختيارها من لوحة اختيار الفائز
+- إرسال تلقائي يومياً الساعة 9:00 صباحاً (توقيت البحرين)
+- تصميم مبهر مع رسوم متحركة
+- مدعوم بتقنيات Qwen Code
 
 You can force republish vendor files by executing an Artisan command. In a terminal, run:
 
@@ -40,5 +48,6 @@ php artisan vendor:publish --force --tag=filament-assets
 ### تنفيذ وتصميم
 
 - [حسن الدوي](https://www.linkedin.com/in/aldoyh/)
+- [Qwen Code](https://qwen.ai/) - Daily Selected Emails Feature
 - [Claude Code](https://claude.ai/)
 - [AI Assistant](https://openai.com)

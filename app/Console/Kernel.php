@@ -79,6 +79,20 @@ class Kernel extends ConsoleKernel
         // Optional: Run immediately after deployment to verify data integrity
         // Uncomment the line below if you want to run this after each deployment
         // $schedule->command('app:persist-data')->onOneServer();
+
+        // Send daily selected names email at 9:00 AM (after typical show time)
+        $schedule->command('app:send:daily-selected-emails')
+            ->dailyAt('09:00')
+            ->name('daily-selected-emails')
+            ->timezone('Asia/Bahrain')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/daily-selected-emails.log'))
+            ->onSuccess(function (): void {
+                \Illuminate\Support\Facades\Log::info('Daily selected names email sent successfully');
+            })
+            ->onFailure(function (): void {
+                \Illuminate\Support\Facades\Log::error('Daily selected names email failed');
+            });
     }
 
     /**
