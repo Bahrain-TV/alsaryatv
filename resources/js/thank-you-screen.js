@@ -14,6 +14,8 @@ class ThankYouScreen {
     this.particleCount = options.particleCount || 200;
     this.confettiCount = options.confettiCount || 100;
     this.type = options.type || 'individual'; // 'individual' or 'family'
+    this.userHits = options.userHits || 1; // User's hit count
+    this.totalHits = options.totalHits || 0; // Total hits
     this.timeline = null;
     this.particles = [];
     this.confetti = [];
@@ -126,6 +128,15 @@ class ThankYouScreen {
                 <p class="detail-text">تم تسجيل استدعاؤك بنجاح</p>
                 <p class="detail-text">Your call has been successfully registered</p>
               </div>
+
+              <!-- Hit Counter Display -->
+              <div class="thank-you-stats" style="display: none; opacity: 0;">
+                <div class="stat-container">
+                  <div class="stat-label">عدد مرات مشاركتك</div>
+                  <div class="stat-value" id="thank-you-hits-counter">${this.userHits}</div>
+                  ${this.totalHits > 0 ? `<div class="stat-total">من إجمالي <strong>${new Intl.NumberFormat('ar-SA').format(this.totalHits)}</strong> مشارك</div>` : ''}
+                </div>
+              </div>
             </div>
         </div>
 
@@ -168,6 +179,32 @@ class ThankYouScreen {
       }
     };
     document.addEventListener('keydown', this._escHandler);
+  }
+
+  /**
+   * Create particle system for celebration
+   */
+  animateHitsCounter() {
+    const hitsCounter = document.getElementById('thank-you-hits-counter');
+    if (!hitsCounter || this.userHits <= 0) return;
+
+    // Start from 10% of the final count
+    let currentCount = Math.max(1, Math.floor(this.userHits * 0.1));
+    hitsCounter.textContent = currentCount;
+
+    const duration = 1500; // 1.5 seconds
+    const interval = 30;
+    const steps = duration / interval;
+    const increment = (this.userHits - currentCount) / steps;
+
+    const counterInterval = setInterval(() => {
+      currentCount += increment;
+      if (currentCount >= this.userHits) {
+        currentCount = this.userHits;
+        clearInterval(counterInterval);
+      }
+      hitsCounter.textContent = Math.floor(currentCount);
+    }, interval);
   }
 
   /**
@@ -328,6 +365,21 @@ class ThankYouScreen {
       { opacity: 1, x: 0, duration: 0.3, stagger: 0.15 },
       0.8
     );
+
+    // 5.5. Show and animate stats if we have data
+    if (this.userHits > 0) {
+      this.timeline.fromTo(
+        '.thank-you-stats',
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.4 },
+        1.0
+      );
+
+      // Trigger counter animation
+      this.timeline.call(() => {
+        this.animateHitsCounter();
+      }, [], 1.1);
+    }
 
     // 6. Celebration rays animation
     this.timeline.to(
