@@ -185,13 +185,18 @@ if [[ -d ".git" ]]; then
     git merge --abort 2>/dev/null || true
 
     if [[ "$DRY_RUN" == "true" ]]; then
-        log_deploy "DRY RUN: Would pull from git"
+        log_deploy "DRY RUN: Would fetch and reset from git"
         log "Status:"
         git status --short || true
     else
-        git pull origin main --force --no-edit || err "Git pull failed"
-        ok "Code pulled from git"
-        log_deploy "Git pull completed"
+        # Fetch latest from remote
+        git fetch origin main || err "Git fetch failed"
+        
+        # Hard reset to remote branch (ignores local divergence)
+        git reset --hard origin/main || err "Git reset failed"
+        
+        ok "Code synced from git"
+        log_deploy "Git fetch and reset completed"
     fi
 fi
 
