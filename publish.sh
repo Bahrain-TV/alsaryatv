@@ -371,6 +371,25 @@ trigger_remote_deployment() {
         fi
     fi
 
+    # Ensure remote .env has an APP_KEY; generate one if missing/empty
+    info "Checking remote APP_KEY..."
+    if [[ "$DRY_RUN" != "true" ]]; then
+        remote_app_key=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+            "grep '^APP_KEY=' '$PROD_APP_DIR/.env' 2>/dev/null | cut -d'=' -f2- | tr -d '\"'" 2>/dev/null || echo "")
+
+        if [[ -z "$remote_app_key" || "$remote_app_key" == "base64:" && ${#remote_app_key} -le 8 ]]; then
+            warn "APP_KEY is missing or empty on remote; generating a new one..."
+            ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+                "cd '$PROD_APP_DIR' && php artisan key:generate --force --no-interaction" 2>/dev/null \
+                && success "APP_KEY generated on remote" \
+                || warn "Failed to generate APP_KEY on remote — you may need to do this manually"
+        else
+            success "Remote APP_KEY is set"
+        fi
+    else
+        info "[DRY-RUN] Would check/generate APP_KEY on remote"
+    fi
+
     debug "Remote command: $deploy_cmd"
 
     if [[ "$DRY_RUN" == "true" ]]; then
