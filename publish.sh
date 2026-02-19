@@ -301,17 +301,74 @@ trigger_remote_deployment() {
     [[ "$RESET_DB" == "true" ]] && deploy_cmd="$deploy_cmd --reset-db"
     [[ "$DRY_RUN" == "true" ]] && deploy_cmd="$deploy_cmd --dry-run"
 
-    # Attempt to remediate missing .env on remote before running deploy.sh
-    info "Ensuring remote .env exists (auto-create from .env.example if missing)..."
+    # Attempt to remediate missing or mismatched .env on remote before running deploy.sh
+    info "Ensuring remote .env exists and matches local .env.production (if present)..."
     if [[ "$DRY_RUN" != "true" ]]; then
-        ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
-            "if [ ! -f '$PROD_APP_DIR/.env' ]; then \
-                 if [ -f '$PROD_APP_DIR/.env.example' ]; then \
-                     cp '$PROD_APP_DIR/.env.example' '$PROD_APP_DIR/.env' && echo '[OK] .env created from .env.example' || echo '[WARN] Failed to copy .env.example to .env'; \
-                 else \
-                     echo '[WARN] No .env.example present on remote to create .env'; \
-                 fi; \
-             fi" 2>/dev/null || true
+        # If local .env.production exists, compare with remote .env and upload if missing/different
+        if [[ -f ".env.production" ]]; then
+            info "Local .env.production found; comparing with remote .env"
+
+            # compute local hash (portable)
+            if command -v shasum >/dev/null 2>&1; then
+                local_hash=$(shasum -a 256 .env.production | awk '{print $1}')
+            elif command -v sha256sum >/dev/null 2>&1; then
+                local_hash=$(sha256sum .env.production | awk '{print $1}')
+            elif command -v openssl >/dev/null 2>&1; then
+                local_hash=$(openssl dgst -sha256 .env.production | awk '{print $2}')
+            else
+                local_hash=""
+            fi
+            debug "Local .env.production hash: ${local_hash:-<none>}"
+
+            # gather remote hash (or missing flag)
+            remote_hash=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+                "if [ -f '$PROD_APP_DIR/.env' ]; then \
+                    if command -v shasum >/dev/null 2>&1; then shasum -a 256 '$PROD_APP_DIR/.env' | awk '{print \\$1}'; \
+                    elif command -v sha256sum >/dev/null 2>&1; then sha256sum '$PROD_APP_DIR/.env' | awk '{print \\$1}'; \
+                    elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 '$PROD_APP_DIR/.env' | awk '{print \\$2}'; \
+                    else echo ''; fi; \
+                 else echo '__MISSING__'; fi" 2>/dev/null || echo "__SSH_FAIL__")
+
+            debug "Remote .env hash: ${remote_hash:-<none>}"
+
+            if [[ "$remote_hash" == "__MISSING__" ]] || [[ -z "$remote_hash" ]] || [[ -n "$local_hash" && "$local_hash" != "$remote_hash" ]]; then
+                info "Remote .env is missing or differs from local .env.production; uploading local .env.production → $PROD_APP_DIR/.env"
+                # Try scp first
+                scp_cmd=(scp -P "$PROD_SSH_PORT")
+                if [[ -f "$SSH_KEY_PATH" ]]; then
+                    scp_cmd+=( -i "$SSH_KEY_PATH" )
+                fi
+                scp_cmd+=( ".env.production" "${PROD_SSH_USER}@${PROD_SSH_HOST}:${PROD_APP_DIR}/.env" )
+
+                if [[ "$DRY_RUN" == "true" ]]; then
+                    info "[DRY-RUN] Would run: ${scp_cmd[*]}"
+                else
+                    if "${scp_cmd[@]}" 2>/dev/null; then
+                        success "Uploaded .env.production to remote .env"
+                    else
+                        warn "scp failed; attempting upload via ssh+stdin"
+                        # Fallback: write file contents via ssh stdin
+                        if ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" "cat > '$PROD_APP_DIR/.env'" < .env.production; then
+                            success "Wrote local .env.production to remote .env via ssh"
+                        else
+                            warn "Failed to transfer .env.production to remote; remote deploy may fail if .env is required"
+                        fi
+                    fi
+                fi
+            else
+                success "Remote .env matches local .env.production; no upload required"
+            fi
+        else
+            # No local .env.production — ensure remote .env exists (fallback to .env.example)
+            ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+                "if [ ! -f '$PROD_APP_DIR/.env' ]; then \
+                     if [ -f '$PROD_APP_DIR/.env.example' ]; then \
+                         cp '$PROD_APP_DIR/.env.example' '$PROD_APP_DIR/.env' && echo '[OK] .env created from .env.example' || echo '[WARN] Failed to copy .env.example to .env'; \
+                     else \
+                         echo '[WARN] No .env.example present on remote to create .env'; \
+                     fi; \
+                 fi" 2>/dev/null || true
+        fi
     fi
 
     debug "Remote command: $deploy_cmd"
