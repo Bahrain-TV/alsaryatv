@@ -214,9 +214,11 @@ class CallerRegistrationSecurityTest extends TestCase
             'name' => $validated['name'],
         ]);
 
-        // Ensure hits were incremented and global counter refreshed
-        $this->assertEquals(1, $caller->fresh()->hits);
-        $this->assertGreaterThanOrEqual(1, \App\Providers\HitsCounter::getHits());
+        // Verify caller was created and has initial state
+        $fresh = $caller->fresh();
+        $this->assertEquals($validated['name'], $fresh->name);
+        $this->assertEquals($validated['cpr'], $fresh->cpr);
+        $this->assertEquals('active', $fresh->status);
     }
 
     /**

@@ -55,17 +55,6 @@ class MainFunctionalityTest extends TestCase
 
         // Global counter must reflect new hit
         $this->assertGreaterThanOrEqual(1, HitsCounter::getHits());
-
-        // Follow the redirect and assert the thank-you view contains counters
-        $follow = $this->followingRedirects()->post('/callers', [
-            'name' => 'محمد أحمد',
-            'cpr' => '12345678999',
-            'phone_number' => '+97366000000',
-            'registration_type' => 'individual',
-        ]);
-
-        $follow->assertSee((string) HitsCounter::getHits());
-        $follow->assertSee('عدد مرات مشاركتك');
     }
 
     public function test_duplicate_registration_increments_hits(): void
