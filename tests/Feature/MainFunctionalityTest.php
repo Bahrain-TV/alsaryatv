@@ -28,20 +28,9 @@ class MainFunctionalityTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('سجّل الآن'); // Check for registration button
 
-        // Get CSRF token from the response
-        $dom = new \DOMDocument;
-        libxml_use_internal_errors(true);
-        $dom->loadHTML($response->getContent());
-        $xpath = new \DOMXPath($dom);
-        $csrfTokenNodes = $xpath->query("//meta[@name='csrf-token']");
-
-        if ($csrfTokenNodes->length > 0) {
-            $csrfToken = $csrfTokenNodes->item(0)->getAttribute('content');
-        } else {
-            // Alternative method to get CSRF token
-            preg_match('/<meta name="csrf-token" content="([^"]+)"/', $response->getContent(), $matches);
-            $csrfToken = $matches[1] ?? '';
-        }
+        // Get CSRF token from the response using regex (simpler, more reliable)
+        preg_match('/<meta name="csrf-token" content="([^"]+)"/', $response->getContent(), $matches);
+        $csrfToken = $matches[1] ?? '';
 
         // Submit registration form
         $response = $this->post('/callers', [
