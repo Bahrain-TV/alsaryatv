@@ -194,19 +194,17 @@
             transform: scale(1.05) translateY(-5px);
         }
 
-        /* Al Salam logo has dark navy fill — invert to white on dark backgrounds */
+        /* Al Salam logo now has white text in SVG — no filter needed */
         .alsalam-logo {
-            filter: brightness(0) invert(1) sepia(0.15);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
         }
         .alsalam-logo:hover {
-            filter: brightness(0) invert(1) sepia(0.15)
-                    drop-shadow(0 0 40px rgba(168, 28, 46, 0.7))
-                    drop-shadow(0 0 50px rgba(232, 215, 195, 0.6));
+            filter: drop-shadow(0 0 20px rgba(168, 28, 46, 0.6))
+                    drop-shadow(0 0 30px rgba(232, 215, 195, 0.5));
         }
         .sponsor-card:hover .sponsor-card-logo.alsalam-logo {
-            filter: brightness(0) invert(1) sepia(0.15)
-                    drop-shadow(0 0 50px rgba(168, 28, 46, 0.7))
-                    drop-shadow(0 0 60px rgba(232, 215, 195, 0.5));
+            filter: drop-shadow(0 0 30px rgba(168, 28, 46, 0.8))
+                    drop-shadow(0 0 40px rgba(232, 215, 195, 0.6));
         }
 
         /* Individual card animations */
