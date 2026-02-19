@@ -1,12 +1,14 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * Test script to verify the Caller model boot() fix
  * Simulates the registration update logic
  */
 
 // Simulate the boot() updating event logic
-function testCallerBootLogic($isDirty = [], $isAuthenticated = false, $isAdmin = false, $environment = 'production') {
+function testCallerBootLogic($isDirty = [], $isAuthenticated = false, $isAdmin = false, $environment = 'production')
+{
     // Allow hits update for everyone
     if (isset($isDirty['hits']) && count($isDirty) === 1) {
         return 'ALLOW: hits-only update';
@@ -20,7 +22,7 @@ function testCallerBootLogic($isDirty = [], $isAuthenticated = false, $isAdmin =
     // Allow public caller registration updates (name, phone, ip_address, status)
     $dirtyKeys = array_keys($isDirty);
     $allowedPublicFields = ['name', 'phone', 'ip_address', 'status'];
-    if (!$isAuthenticated && count($dirtyKeys) > 0 && count(array_diff($dirtyKeys, $allowedPublicFields)) === 0) {
+    if (! $isAuthenticated && count($dirtyKeys) > 0 && count(array_diff($dirtyKeys, $allowedPublicFields)) === 0) {
         return 'ALLOW: public registration update';
     }
 
@@ -96,13 +98,13 @@ foreach ($tests as $test) {
         $test['admin'],
         $test['env']
     );
-    
+
     $isPass = strpos($result, substr($test['expected'], 0, 5)) === 0;
     $status = $isPass ? '✓ PASS' : '✗ FAIL';
-    
+
     echo "$status | {$test['name']}\n";
     echo "       Result: $result\n";
-    
+
     if ($isPass) {
         $passed++;
     } else {

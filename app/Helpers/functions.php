@@ -7,7 +7,6 @@ use App\Helpers\AssetHelper;
  *
  * @param  string  $path  Relative path to asset (e.g., 'images/logo.png')
  * @param  string|null  $version  Optional version override
- * @return string
  */
 function asset_bust(string $path, ?string $version = null): string
 {
@@ -19,7 +18,6 @@ function asset_bust(string $path, ?string $version = null): string
  *
  * @param  string  $image  Image filename (e.g., 'logo.png')
  * @param  string|null  $version  Optional version override
- * @return string
  */
 function image_bust(string $image, ?string $version = null): string
 {
@@ -31,7 +29,6 @@ function image_bust(string $image, ?string $version = null): string
  *
  * @param  string  $file  CSS filename
  * @param  string|null  $version  Optional version override
- * @return string
  */
 function css_bust(string $file, ?string $version = null): string
 {
@@ -43,7 +40,6 @@ function css_bust(string $file, ?string $version = null): string
  *
  * @param  string  $file  JS filename
  * @param  string|null  $version  Optional version override
- * @return string
  */
 function js_bust(string $file, ?string $version = null): string
 {
@@ -52,8 +48,6 @@ function js_bust(string $file, ?string $version = null): string
 
 /**
  * Get current application version
- *
- * @return string
  */
 function app_version(): string
 {
@@ -62,8 +56,6 @@ function app_version(): string
 
 /**
  * Get version string safe for use in URLs/cache keys
- *
- * @return string
  */
 function app_version_safe(): string
 {

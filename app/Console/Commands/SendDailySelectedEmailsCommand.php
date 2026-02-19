@@ -93,7 +93,7 @@ class SendDailySelectedEmailsCommand extends Command
             $ccEmails = $this->option('cc') ? $this->parseEmails($this->option('cc')) : $this->getConfigValue('recipients.cc', []);
             $bccEmails = $this->option('bcc') ? $this->parseEmails($this->option('bcc')) : $this->getConfigValue('recipients.bcc', []);
 
-            $this->info("📧 Sending to: ".implode(', ', $toEmails));
+            $this->info('📧 Sending to: '.implode(', ', $toEmails));
 
             if (! empty($ccEmails)) {
                 $this->info('CC: '.implode(', ', $ccEmails));

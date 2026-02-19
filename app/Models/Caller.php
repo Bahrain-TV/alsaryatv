@@ -135,7 +135,7 @@ class Caller extends Model
             // Allow public caller registration updates (name, phone, ip_address, status)
             $dirtyKeys = array_keys($caller->getDirty());
             $allowedPublicFields = ['name', 'phone', 'ip_address', 'status'];
-            if (!Auth::check() && count($dirtyKeys) > 0 && count(array_diff($dirtyKeys, $allowedPublicFields)) === 0) {
+            if (! Auth::check() && count($dirtyKeys) > 0 && count(array_diff($dirtyKeys, $allowedPublicFields)) === 0) {
                 return true;
             }
 

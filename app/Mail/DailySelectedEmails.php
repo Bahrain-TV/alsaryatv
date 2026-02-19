@@ -29,7 +29,7 @@ class DailySelectedEmails extends Mailable
      */
     public function envelope(): Envelope
     {
-        $subject = "🎉 الأسماء المختارة اليوم - ".
+        $subject = '🎉 الأسماء المختارة اليوم - '.
             $this->reportDate->locale('ar')->translatedFormat('j F Y').' | برنامج السارية';
 
         return new Envelope(

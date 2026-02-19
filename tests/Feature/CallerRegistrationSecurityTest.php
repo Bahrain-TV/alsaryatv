@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 /**
  * CallerRegistrationSecurityTest
- * 
+ *
  * Tests for the Caller model's security boot method to ensure:
  * 1. Public users can register with registration fields (name, phone, ip_address, status)
  * 2. Public users cannot update sensitive fields (is_winner, is_selected)
@@ -25,11 +25,11 @@ class CallerRegistrationSecurityTest extends TestCase
      * Test that public users can create new caller via updateOrCreate
      * This is the critical registration flow that was broken
      */
-    public function test_public_user_can_register_new_caller_via_updateOrCreate(): void
+    public function test_public_user_can_register_new_caller_via_update_or_create(): void
     {
         // Simulate: POST /callers with registration form data
         $cpr = '123456789';
-        
+
         $caller = Caller::updateOrCreate(
             ['cpr' => $cpr],
             [
@@ -47,7 +47,7 @@ class CallerRegistrationSecurityTest extends TestCase
             'phone' => '+97366123456',
             'status' => 'active',
         ]);
-        
+
         $this->assertTrue($caller->wasRecentlyCreated);
     }
 
@@ -98,11 +98,11 @@ class CallerRegistrationSecurityTest extends TestCase
 
         // Define allowed fields for public users
         $allowedPublicFields = ['name', 'phone', 'ip_address', 'status'];
-        
+
         // Verify that sensitive fields are NOT in allowed list
         $this->assertNotContains('is_winner', $allowedPublicFields);
         $this->assertNotContains('is_selected', $allowedPublicFields);
-        
+
         // Test: Public user tries to update sensitive field
         // In production, the boot hook will prevent this update
         $sensitiveTouched = count(array_intersect(['is_winner', 'is_selected'], $allowedPublicFields)) === 0;
@@ -176,10 +176,10 @@ class CallerRegistrationSecurityTest extends TestCase
         // This simulates a malicious request
         $dirtyKeys = ['name', 'is_winner'];
         $allowedPublicFields = ['name', 'phone', 'ip_address', 'status'];
-        
+
         // Check boot logic: all dirty keys must be in allowed list for public user
         $illegalAttempt = count(array_diff($dirtyKeys, $allowedPublicFields)) > 0;
-        
+
         // Should be true (name is allowed, but is_winner is NOT)
         $this->assertTrue($illegalAttempt);
     }
@@ -227,22 +227,22 @@ class CallerRegistrationSecurityTest extends TestCase
     public function test_boot_allows_only_whitelisted_fields_for_public_users(): void
     {
         $allowedPublicFields = ['name', 'phone', 'ip_address', 'status'];
-        
+
         // Test case 1: Single allowed field
         $dirtyKeys = ['name'];
         $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
         $this->assertTrue($allFieldsAllowed, 'name field should be allowed');
-        
+
         // Test case 2: Single disallowed field
         $dirtyKeys = ['is_winner'];
         $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
         $this->assertFalse($allFieldsAllowed, 'is_winner field should NOT be allowed');
-        
+
         // Test case 3: Multiple allowed fields
         $dirtyKeys = ['name', 'phone'];
         $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
         $this->assertTrue($allFieldsAllowed, 'name and phone should both be allowed');
-        
+
         // Test case 4: Mixed allowed and disallowed
         $dirtyKeys = ['name', 'is_winner'];
         $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
@@ -289,10 +289,10 @@ class CallerRegistrationSecurityTest extends TestCase
         // Should update existing, not create new
         $this->assertFalse($second->wasRecentlyCreated);
         $this->assertEquals($firstId, $second->id);
-        
+
         // Hits should be preserved
         $this->assertEquals(1, $second->fresh()->hits);
-        
+
         // Name/phone should be updated
         $this->assertEquals('Ahmed M.', $second->fresh()->name);
         $this->assertEquals('+97366222222', $second->fresh()->phone);

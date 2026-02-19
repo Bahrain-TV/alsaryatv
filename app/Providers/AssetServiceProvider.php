@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Helpers\AssetHelper;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 

@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class AppendImageVersion
 {
@@ -29,7 +28,7 @@ class AppendImageVersion
             $path = parse_url($url, PHP_URL_PATH) ?: $url;
             // Only handle local files that map to public/
             if (! str_starts_with($path, '/')) {
-                $path = '/' . ltrim($path, '/');
+                $path = '/'.ltrim($path, '/');
             }
 
             $filePath = public_path(ltrim($path, '/'));
@@ -45,14 +44,15 @@ class AppendImageVersion
 
             $sep = (strpos($urlWithoutV, '?') === false) ? '?' : '&';
 
-            return $urlWithoutV . $sep . 'v=' . $version;
+            return $urlWithoutV.$sep.'v='.$version;
         };
 
         // Replace src="..." and src='...'
         $content = preg_replace_callback('/\bsrc=("|\')([^"\']+)\1/i', function ($m) use ($addVersion) {
             $url = $m[2];
             $new = $addVersion($url);
-            return 'src=' . $m[1] . $new . $m[1];
+
+            return 'src='.$m[1].$new.$m[1];
         }, $content);
 
         // Replace srcset="..." with multiple comma-separated URLs
@@ -61,13 +61,14 @@ class AppendImageVersion
             $newParts = [];
             foreach ($parts as $part) {
                 if (preg_match('/\s+/', $part)) {
-                    list($u, $desc) = preg_split('/\s+/', $part, 2);
-                    $newParts[] = $addVersion($u) . ' ' . $desc;
+                    [$u, $desc] = preg_split('/\s+/', $part, 2);
+                    $newParts[] = $addVersion($u).' '.$desc;
                 } else {
                     $newParts[] = $addVersion($part);
                 }
             }
-            return 'srcset=' . $m[1] . implode(', ', $newParts) . $m[1];
+
+            return 'srcset='.$m[1].implode(', ', $newParts).$m[1];
         }, $content);
 
         // Replace url(...) occurrences in inline styles
@@ -75,7 +76,8 @@ class AppendImageVersion
             $url = $m[2];
             $new = $addVersion($url);
             $quote = $m[1] ?: '';
-            return 'url(' . $quote . $new . $quote . ')';
+
+            return 'url('.$quote.$new.$quote.')';
         }, $content);
 
         $response->setContent($content);
@@ -90,6 +92,7 @@ class AppendImageVersion
         }
 
         $contentType = $response->headers->get('Content-Type') ?? '';
+
         return stripos($contentType, 'text/html') !== false || stripos($contentType, 'application/xhtml+xml') !== false;
     }
 }

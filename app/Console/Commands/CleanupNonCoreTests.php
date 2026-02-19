@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\File;
 class CleanupNonCoreTests extends Command
 {
     protected $signature = 'tests:cleanup-non-core';
+
     protected $description = 'Remove non-core business tests, keeping only caller registration, security, and admin tests';
 
     public function handle(): int

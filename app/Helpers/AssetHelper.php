@@ -18,7 +18,6 @@ class AssetHelper
      *
      * @param  string  $path  Relative path to asset (e.g., 'images/logo.png')
      * @param  string|null  $version  Optional version override (defaults to VERSION file)
-     * @return string
      */
     public static function bust(string $path, ?string $version = null): string
     {
@@ -40,10 +39,10 @@ class AssetHelper
         $fullPath = public_path($path);
         if (File::exists($fullPath)) {
             $mtime = File::lastModified($fullPath);
-            $version .= '_' . $mtime;
+            $version .= '_'.$mtime;
         }
 
-        return asset($path) . '?v=' . $version;
+        return asset($path).'?v='.$version;
     }
 
     /**
@@ -51,11 +50,10 @@ class AssetHelper
      *
      * @param  string  $image  Image filename (e.g., 'logo.png')
      * @param  string|null  $version  Optional version override
-     * @return string
      */
     public static function image(string $image, ?string $version = null): string
     {
-        return self::bust('images/' . $image, $version);
+        return self::bust('images/'.$image, $version);
     }
 
     /**
@@ -63,11 +61,10 @@ class AssetHelper
      *
      * @param  string  $file  CSS filename
      * @param  string|null  $version  Optional version override
-     * @return string
      */
     public static function css(string $file, ?string $version = null): string
     {
-        return self::bust('css/' . $file, $version);
+        return self::bust('css/'.$file, $version);
     }
 
     /**
@@ -75,17 +72,14 @@ class AssetHelper
      *
      * @param  string  $file  JS filename
      * @param  string|null  $version  Optional version override
-     * @return string
      */
     public static function js(string $file, ?string $version = null): string
     {
-        return self::bust('js/' . $file, $version);
+        return self::bust('js/'.$file, $version);
     }
 
     /**
      * Get current version string
-     *
-     * @return string
      */
     public static function getVersion(): string
     {
@@ -99,8 +93,6 @@ class AssetHelper
 
     /**
      * Get version as cache-safe string
-     *
-     * @return string
      */
     public static function getVersionSafe(): string
     {
