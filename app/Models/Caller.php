@@ -92,13 +92,20 @@ class Caller extends Model
 
     /**
      * Increment hits for this caller (atomic operation)
+     * - Performs DB atomic increment
+     * - Refreshes model instance
+     * - Invalidates/refreshes global cache via HitsCounter
      */
     public function incrementHits(): void
     {
         // Use atomic increment to prevent race conditions
         $this->increment('hits', 1, ['last_hit' => now()]);
+
         // Refresh instance to reflect database state
         $this->refresh();
+
+        // Ensure global counters are refreshed
+        \App\Providers\HitsCounter::incrementHits();
     }
 
     /**

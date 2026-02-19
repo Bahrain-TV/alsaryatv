@@ -63,6 +63,20 @@ class MainFunctionalityTest extends TestCase
         $this->assertEquals('+97366123456', $caller->phone);
         $this->assertEquals(1, $caller->hits);
         $this->assertEquals('active', $caller->status);
+
+        // Global counter must reflect new hit
+        $this->assertGreaterThanOrEqual(1, HitsCounter::getHits());
+
+        // Follow the redirect and assert the thank-you view contains counters
+        $follow = $this->followingRedirects()->post('/callers', [
+            'name' => 'محمد أحمد',
+            'cpr' => '12345678999',
+            'phone_number' => '+97366000000',
+            'registration_type' => 'individual',
+        ]);
+
+        $follow->assertSee((string) HitsCounter::getHits());
+        $follow->assertSee('عدد مرات مشاركتك');
     }
 
     public function test_duplicate_registration_increments_hits(): void
@@ -167,6 +181,10 @@ class MainFunctionalityTest extends TestCase
         $updatedCaller = $caller->fresh();
         $this->assertEquals(1, $updatedCaller->hits);
         $this->assertNotNull($updatedCaller->last_hit);
+
+        // Global hits cache should be refreshed by Caller::incrementHits()
+        $totalHits = HitsCounter::getHits();
+        $this->assertGreaterThanOrEqual(1, $totalHits);
     }
 
     public function test_rate_limiting_by_cpr(): void
