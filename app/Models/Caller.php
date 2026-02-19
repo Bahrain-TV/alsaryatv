@@ -108,6 +108,12 @@ class Caller extends Model
     {
         parent::boot();
 
+        // Allow creating (new registrations)
+        static::creating(function ($caller) {
+            return true;
+        });
+
+        // Allow updating with restrictions
         static::updating(function ($caller) {
             // Allow hits update for everyone
             if ($caller->isDirty('hits') && count($caller->getDirty()) === 1) {
