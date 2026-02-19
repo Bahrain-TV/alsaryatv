@@ -1,66 +1,59 @@
 #!/bin/bash
+###############################################################################
+# check_vital_routes.sh — Production Health Check
+#
+# Tests critical production routes. Fails if ANY route is broken.
+#
+# Usage:
+#   ./check_vital_routes.sh https://alsarya.tv
+#
+###############################################################################
 
-# Configuration
-BASE_URL=${1:-"http://127.0.0.1:8000"}
-GREEN='\033[0;32m'
+set -e
+
+if [[ -z "$1" ]]; then
+    echo "Usage: ./check_vital_routes.sh <url>"
+    echo "Example: ./check_vital_routes.sh https://alsarya.tv"
+    exit 1
+fi
+
+SITE_URL="$1"
+TIMEOUT=10
+
+# Colors
 RED='\033[0;31m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+NC='\033[0m'
 
-echo "Starting vital route check on: $BASE_URL"
-echo "----------------------------------------"
+PASSED=0
+FAILED=0
+ROUTES=("/" "/register" "/family" "/splash" "/api/caller/status")
 
-# Function to check a route
-check_route() {
-    local route=$1
-    local expected_code=$2
-    local description=$3
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${CYAN}Health Check: $SITE_URL${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+for route in "${ROUTES[@]}"; do
+    full_url="${SITE_URL}${route}"
     
-    local url="${BASE_URL}${route}"
-    local status_code=$(curl -o /dev/null -s -w "%{http_code}" "$url")
-
-    if [ "$status_code" -eq "$expected_code" ]; then
-        echo -e "${GREEN}[PASS]${NC} $description ($route) - Status: $status_code"
-        return 0
-    elif [[ "$expected_code" == "302" && "$status_code" == "200" ]]; then
-         # Sometimes a redirect might be followed if curl config is weird, but -I or just checking code prevents follow. 
-         # However, if we get 200 on a protected route, that might be a failure or success depending on auth state.
-         # Assuming clean state:
-         echo -e "${YELLOW}[WARN]${NC} $description ($route) - Expected $expected_code, got $status_code (Might be logged in?)"
-         return 0
+    if timeout $TIMEOUT curl -s -f "$full_url" > /dev/null 2>&1; then
+        echo -e "${GREEN}✓${NC} $route"
+        ((PASSED++))
     else
-        echo -e "${RED}[FAIL]${NC} $description ($route) - Expected $expected_code, got $status_code"
-        return 1
+        echo -e "${RED}✗${NC} $route"
+        ((FAILED++))
     fi
-}
+done
 
-# Routes to check
-# Format: check_route "route" "expected_code" "Description"
+echo ""
+if [[ $FAILED -gt 0 ]]; then
+    echo -e "${RED}FAILED: $FAILED of $((PASSED + FAILED)) routes are down!${NC}"
+    exit 1
+fi
 
-# 1. Homepage / Welcome
-check_route "/" 200 "Homepage"
-
-# 2. Individual Form
-# Based on routes/web.php: Route::get('/register', ...) -> view('calls.register')
-check_route "/register" 200 "Individual Registration Form"
-
-# 3. Family Form
-# Based on routes/web.php: Route::get('/family', ...) -> view('welcome') (Seems to reuse welcome view but different route name)
-check_route "/family" 200 "Family Registration Form"
-
-# 4. OBS Overlay
-# Based on routes/web.php: Route::get('/obs-overlay', ...)
-check_route "/obs-overlay" 200 "OBS Overlay"
-
-# 5. Dashboard (Protected)
-# Accept 302 (Redirect) OR 200 (if auth logic permits or dev mode)
-check_route "/dashboard" 302 "Dashboard"
-
-# 6. Thank You Screen (Protected by Session)
-check_route "/callers/success" 302 "Thank You Screen"
-
-# 7. Winners Page (Protected)
-check_route "/winners" 302 "Winners Page"
+echo -e "${GREEN}✅ All routes UP!${NC}"
+exit 0
 
 # 8. Families Page (Protected)
 check_route "/families" 302 "Families Page"

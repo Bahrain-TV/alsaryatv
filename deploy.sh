@@ -1,53 +1,103 @@
-#!/usr/bin/env bash
+#!/bin/bash
 ###############################################################################
-# deploy.sh — AlSarya TV Show Registration System (ENHANCED VERSION)
+# deploy.sh — AlSarya TV Production Deployment
 #
-# Production deployment script with enhanced image handling, cache busting,
-# asset optimization, and comprehensive deployment verification.
+# Simple, direct deployment: commit locally, push to GitHub, 
+# deploy to production, bring site up.
 #
 # Usage:
-#   ./deploy.sh              # Full deploy (default)
-#   ./deploy.sh --fresh      # Drop all tables, re-migrate and seed
-#   ./deploy.sh --seed       # Run seeders after migration
-#   ./deploy.sh --no-build   # Skip npm build step
-#   ./deploy.sh --force      # Force all steps even if no changes
-#   ./deploy.sh --reset-db   # Reset database (migrate:fresh without seeding)
-#   ./deploy.sh --up         # Force deploy even if maintenance mode is active
-#   ./deploy.sh --dry-run    # Print steps without executing
-#   ./deploy.sh --diagnose   # Run production diagnostics (check images, config, etc)
-#   ./deploy.sh --sync-images # Force sync all images to production
-#   ./deploy.sh --optimize-images # Optimize images during deployment
+#   ./deploy.sh              # Standard deployment
+#   ./deploy.sh --check      # Check production links after deploy
+#
 ###############################################################################
 
-# Configuration
-APP_USER="alsar4210"
-SUDO_PREFIX="sudo -u $APP_USER"
+set -e
 
-set -eo pipefail
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
 
-# ── Local Execution Wrapper ──────────────────────────────────────────────────
-if [[ "$(uname -s)" == "Darwin" ]]; then
-    local_info()  { echo -e "\033[0;36m[LOCAL]\033[0m  $*"; }
-    local_error() { echo -e "\033[0;31m[ERROR]\033[0m $*"; }
-    local_ok()    { echo -e "\033[0;32m[  OK ]\033[0m  $*"; }
-    local_fail()  { echo -e "\033[0;31m[FAIL]\033[0m  $*"; }
-    local_warn()  { echo -e "\033[1;33m[WARN]\033[0m  $*"; }
-    local_success() { echo -e "\033[0;32m[SUCCESS]\033[0m $*"; }
+log()   { echo -e "${CYAN}→${NC} $*"; }
+ok()    { echo -e "${GREEN}✓${NC} $*"; }
+err()   { echo -e "${RED}✗${NC} $*"; exit 1; }
+warn()  { echo -e "${YELLOW}!${NC} $*"; }
 
-    local_cleanup() { true; }
-    trap local_cleanup EXIT INT TERM
+# Config
+PROD_HOST="root@alsarya.tv"
+PROD_DIR="/home/alsarya.tv/public_html"
+CHECK_LINKS="false"
 
-    echo "----------------------------------------------------------------"
-    echo "  🚀 AlSarya TV Deployment Launcher (ENHANCED)"
-    echo "  Detected Local Environment (macOS)"
-    echo "----------------------------------------------------------------"
+# Parse arguments
+for arg in "$@"; do
+    [[ "$arg" == "--check" ]] && CHECK_LINKS="true"
+done
 
-    # Load .env for config
-    if [[ -f .env ]]; then
-        set -a
-        [ -f .env ] && . .env
-        set +a
-    fi
+cd "$(dirname "$0")"
+
+# ─────────────────────────────────────────────────────────────────────────
+# 1. COMMIT & PUSH
+# ─────────────────────────────────────────────────────────────────────────
+log "Preparing local changes..."
+
+if ! git diff --quiet || ! git diff --staged --quiet; then
+    log "Committing changes..."
+    git add -A
+    git commit -m "chore: deployment changes" || warn "Nothing new to commit"
+fi
+
+log "Pushing to GitHub..."
+git push origin main || warn "Push may have issues, continuing..."
+ok "Code pushed"
+
+# ─────────────────────────────────────────────────────────────────────────
+# 2. SSH & DEPLOY TO PRODUCTION
+# ─────────────────────────────────────────────────────────────────────────
+log "Deploying to production..."
+
+ssh "$PROD_HOST" << 'DEPLOY_CMD'
+cd /home/alsarya.tv/public_html
+
+# Fix any stuck git state
+git rebase --abort 2>/dev/null || true
+git merge --abort 2>/dev/null || true
+
+# Pull latest code
+git pull origin main --force --no-edit
+
+# Run Laravel commands
+php artisan config:clear
+php artisan cache:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+echo "✅ Deployment complete"
+DEPLOY_CMD
+
+ok "Production deployed"
+
+# ─────────────────────────────────────────────────────────────────────────
+# 3. CHECK PRODUCTION LINKS (if requested)
+# ─────────────────────────────────────────────────────────────────────────
+if [[ "$CHECK_LINKS" == "true" ]]; then
+    sleep 3
+    log "Checking production links..."
+    bash ./check_vital_routes.sh "https://alsarya.tv" || err "Production health check failed"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────
+# SUCCESS
+# ─────────────────────────────────────────────────────────────────────────
+echo ""
+ok "DEPLOYMENT COMPLETE"
+ok "Site: https://alsarya.tv"
+ok ""
+ok "Run with --check flag to verify production: ./deploy.sh --check"
+
+exit 0
 
     # Set defaults with validation
     PROD_SSH_USER="${PROD_SSH_USER:-root}"
