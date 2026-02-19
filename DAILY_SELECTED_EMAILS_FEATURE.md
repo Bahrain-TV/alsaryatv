@@ -23,6 +23,7 @@ Automated daily email feature that sends the last 10 selected names from the Win
 ### 3. Console Command
 - **Path:** `app/Console/Commands/SendDailySelectedEmailsCommand.php`
 - **Purpose:** Retrieves selected callers and triggers email sending
+- **Config:** `config/daily-selected-emails.php` - Persistent email settings
 
 ### 4. Scheduler Configuration
 - **Path:** `app/Console/Kernel.php`
@@ -30,43 +31,56 @@ Automated daily email feature that sends the last 10 selected names from the Win
 
 ## Usage
 
-### Manual Execution
+### Quick Start
+
+```bash
+# First time - set your email and send
+php artisan app:send:daily-selected-emails --email=your-email@example.com
+
+# Future runs - uses persisted email automatically
+php artisan app:send:daily-selected-emails
+```
+
+### Email Management Commands
+
+```bash
+# Set persistent email (replaces all existing TO recipients)
+php artisan app:send:daily-selected-emails --set-email=your-email@example.com
+
+# Add email to existing recipients
+php artisan app:send:daily-selected-emails --add-email=another@example.com
+
+# Remove email from recipients
+php artisan app:send:daily-selected-emails --remove-email=unwanted@example.com
+
+# Clear all custom emails and restore defaults
+php artisan app:send:daily-selected-emails --clear-emails
+
+# Send with temporary email (also persists for future runs)
+php artisan app:send:daily-selected-emails --email=temp@example.com
+```
+
+### Full Command Options
 
 ```bash
 # Send with default recipients
 php artisan app:send:daily-selected-emails
 
-# Send to specific email
+# Send to specific email (persists for future runs)
 php artisan app:send:daily-selected-emails --email=example@gmail.com
 
-# Include CC recipients
+# Include CC recipients (persists)
 php artisan app:send:daily-selected-emails --cc=user1@example.com,user2@example.com
 
-# Include BCC recipients
+# Include BCC recipients (persists)
 php artisan app:send:daily-selected-emails --bcc=hidden@example.com
 
-# Change the number of names (default: 10)
+# Change the number of names (default: 10, persists)
 php artisan app:send:daily-selected-emails --limit=5
 
 # Force send even if no selections today
 php artisan app:send:daily-selected-emails --force
 ```
-
-### Automatic Execution
-
-The email is automatically sent every day at **9:00 AM Bahrain time** via the Laravel scheduler.
-
-Ensure your cron is set up:
-
-```bash
-* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
-```
-
-## Default Recipients
-
-If no email is specified, the report is sent to:
-- `aldoyh.info@gmail.com`
-- `alsaryatv@gmail.com`
 
 ## Email Design Features
 
@@ -85,6 +99,44 @@ If no email is specified, the report is sent to:
 - Mobile-friendly layout
 - Adaptive grid system
 - Touch-optimized interactions
+
+## Persistent Configuration
+
+### How It Works
+
+Email recipients are stored in `config/daily-selected-emails.php`. When you specify an email address using `--email`, it is automatically saved for future runs.
+
+**Example:**
+```bash
+# First run - sets and persists the email
+php artisan app:send:daily-selected-emails --email=my@email.com
+
+# Second run - uses the persisted email automatically
+php artisan app:send:daily-selected-emails
+# → Sends to my@email.com without needing to specify it again
+```
+
+### Config File Structure
+
+```php
+<?php
+
+return [
+    'recipients' => [
+        'to' => ['your-email@example.com'],
+        'cc' => ['cc@example.com'],
+        'bcc' => ['bcc@example.com'],
+    ],
+    'limit' => 10,  // Number of names to include
+    'last_updated' => '2026-02-19T12:30:00Z',
+];
+```
+
+### Default Recipients
+
+If no custom email is configured, the report is sent to:
+- `aldoyh.info@gmail.com`
+- `alsaryatv@gmail.com`
 
 ## Configuration
 
