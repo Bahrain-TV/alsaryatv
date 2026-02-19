@@ -26,7 +26,7 @@ err()   { echo -e "${RED}✗${NC} $*"; exit 1; }
 warn()  { echo -e "${YELLOW}!${NC} $*"; }
 
 # Config
-PROD_HOST="root@alsarya.tv"
+PROD_HOST="root@h6.doy.tech"
 PROD_DIR="/home/alsarya.tv/public_html"
 CHECK_LINKS="false"
 
