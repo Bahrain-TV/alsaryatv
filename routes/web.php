@@ -118,7 +118,8 @@ Route::prefix('callers')->name('callers.')->group(function (): void {
 });
 
 // Registration forms with toggle
-Route::get('/register', fn () => view('calls.register'))->name('registration.form');
+// (removed duplicate route that referenced missing view 'calls.register')
+// The '/register' route is defined above and renders the welcome/registration page.
 
 // CSRF Test Routes
 Route::get('/csrf-test', fn () => view('csrf-test'))->name('csrf.test.page');
