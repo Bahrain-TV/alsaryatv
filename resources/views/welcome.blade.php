@@ -783,22 +783,6 @@
                         {{-- Sponsors Section --}}
                         @include('sponsors')
 
-                        {{-- Current Ramadan Info --}}
-                        <div class="gsap-item mt-4 sm:mt-6 mx-2 sm:mx-4 p-[1px] rounded-2xl bg-gradient-to-r from-transparent via-green-800/50 to-transparent">
-                            <div class="bg-black/40 backdrop-blur-md rounded-2xl p-3 sm:p-4 text-center border border-green-500/10 relative overflow-hidden">
-                                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-gradient-to-r from-transparent via-green-500/50 to-transparent"></div>
-
-                                <h4 class="text-green-400 font-bold mb-1 sm:mb-2 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base">
-                                    <i data-lucide="moon" class="w-3 h-3 sm:w-4 sm:h-4 fill-green-400/20"></i>
-                                    <span>أهلاً بكم في شهر رمضان المبارك</span>
-                                </h4>
-                                <div class="flex justify-center items-center gap-2 sm:gap-4 text-[10px] sm:text-xs md:text-sm text-gray-400 font-mono">
-                                    <span>{{ $ramadanHijri ?? '1 رمضان 1447 هـ' }}</span>
-                                    <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-600"></span>
-                                    <span>{{ $ramadanDate ?? '18 فبراير 2026' }}</span>
-                                </div>
-                            </div>
-                        </div>
                     @else
                         {{-- Registration is closed - Simple "Coming Soon" message --}}
                         <div class="text-center py-8 sm:py-12">
