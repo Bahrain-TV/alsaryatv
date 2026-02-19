@@ -128,6 +128,7 @@
                 @endif
 
                 <!-- Settings Dropdown -->
+                @if(Auth::check())
                 <div class="ms-3 relative">
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
@@ -178,6 +179,14 @@
                         </x-slot>
                     </x-dropdown>
                 </div>
+                @else
+                <!-- Guest Links -->
+                <div class="ms-3">
+                    <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                        {{ __('Login') }}
+                    </a>
+                </div>
+                @endif
             </div>
 
             <!-- Hamburger -->
@@ -245,6 +254,7 @@
             </div>
 
             <div class="flex items-center px-4">
+                @if(Auth::check())
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="shrink-0 me-3">
                         <img class="size-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
@@ -255,9 +265,11 @@
                     <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                     <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
                 </div>
+                @endif
             </div>
 
             <div class="mt-3 space-y-1">
+                @if(Auth::check())
                 <!-- Account Management -->
                 <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
                     {{ __('Profile') }}
@@ -278,6 +290,18 @@
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
                 </form>
+                @else
+                <!-- Guest Links -->
+                <x-responsive-nav-link href="{{ route('login') }}">
+                    {{ __('Login') }}
+                </x-responsive-nav-link>
+
+                @if (Route::has('register'))
+                <x-responsive-nav-link href="{{ route('register') }}">
+                    {{ __('Register') }}
+                </x-responsive-nav-link>
+                @endif
+                @endif
 
                 <!-- Team Management -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
