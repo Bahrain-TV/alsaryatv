@@ -607,7 +607,7 @@ pre_deployment_safety_check() {
     # 5. Check for recent errors in logs
     if [[ -f "storage/logs/laravel.log" ]]; then
         info "Checking recent errors in logs..."
-        RECENT_ERRORS=$(tail -100 storage/logs/laravel.log 2>/dev/null | grep -c "ERROR" || echo "0")
+        RECENT_ERRORS=$(tail -100 storage/logs/laravel.log 2>/dev/null | grep -c "ERROR") || RECENT_ERRORS=0
         if [[ $RECENT_ERRORS -gt 10 ]]; then
             warn "Found $RECENT_ERRORS recent errors in logs. Review before deploying!"
             tail -20 storage/logs/laravel.log | grep ERROR
@@ -949,12 +949,11 @@ fi
 # ── Step 6: Verify Migration Status ─────────────────────────────────────────
 info "Verifying migration status..."
 if [[ "$DRY_RUN" == "false" ]]; then
-    if PENDING=$(php artisan migrate:status 2>&1 | grep -c "Pending" || echo "0"); then
-        if [[ "$PENDING" -gt 0 ]]; then
-            error "$PENDING migration(s) pending! Check errors above."
-            php artisan up 2>/dev/null || warn "Could not execute 'php artisan up'"
-            exit 1
-        fi
+    PENDING=$(php artisan migrate:status 2>&1 | grep -c "Pending") || PENDING=0
+    if [[ "$PENDING" -gt 0 ]]; then
+        error "$PENDING migration(s) pending! Check errors above."
+        php artisan up 2>/dev/null || warn "Could not execute 'php artisan up'"
+        exit 1
     fi
     success "All migrations applied."
 fi
@@ -1348,7 +1347,8 @@ post_deployment_verify() {
     # 3. Check for PHP errors in recent logs
     info "Checking for new errors in logs..."
     if [[ -f "storage/logs/laravel.log" ]]; then
-        local new_errors=$(tail -50 storage/logs/laravel.log 2>/dev/null | grep -c "ERROR\|CRITICAL" || echo "0")
+        local new_errors
+        new_errors=$(tail -50 storage/logs/laravel.log 2>/dev/null | grep -c "ERROR\|CRITICAL") || new_errors=0
         if [[ $new_errors -gt 0 ]]; then
             warn "Found $new_errors new errors in logs since deployment"
             tail -10 storage/logs/laravel.log 2>/dev/null | grep "ERROR\|CRITICAL"
