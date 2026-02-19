@@ -66,7 +66,7 @@ class CallerController extends Controller
 
         // Rate limiting by CPR and IP using Laravel's RateLimiter
         if (RateLimiter::tooManyAttempts('caller-registration:'.$cpr, 1)) {
-            return back()->withErrors(['cpr' => 'You can only register once every 5 minutes.'])->withInput();
+            return back()->withErrors(['cpr' => 'You can only register once every 1 minute.'])->withInput();
         }
 
         if (RateLimiter::tooManyAttempts('caller-registration-ip:'.$request->ip(), 10)) {
@@ -90,7 +90,7 @@ class CallerController extends Controller
         $caller->incrementHits();
 
         // Record attempts
-        RateLimiter::hit('caller-registration:'.$cpr, 300);
+        RateLimiter::hit('caller-registration:'.$cpr, 60);
         RateLimiter::hit('caller-registration-ip:'.$request->ip(), 3600);
 
         session([

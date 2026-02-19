@@ -107,7 +107,7 @@ This is a fundamental Islamic principle in this project. When implementing any v
 - **Hit Increment**: Protected via flag checks in `StoreCallerRequest`
 
 ### Rate Limiting (in `SecureOperations` trait)
-- **Per-CPR**: 1 registration every 5 minutes (prevents duplicate entries)
+- **Per-CPR**: 1 registration every 1 minute (prevents duplicate entries)
 - **Per-IP**: 10 registrations per hour (prevents batch abuse)
 - **Cache-based**: Uses Laravel cache (configurable in `.env`)
 

@@ -164,7 +164,7 @@ CREATE TABLE cache (
 #### Layer 1: Rate Limiting (SecureOperations Trait)
 ```php
 // app/Traits/SecureOperations.php
-Per-CPR:  1 registration / 5 minutes  → cache key: caller.cpr.{cpr}
+Per-CPR:  1 registration / 1 minute  → cache key: caller.cpr.{cpr}
 Per-IP:   10 registrations / hour     → cache key: caller.ip.{ip}
 ```
 

@@ -130,7 +130,7 @@ public function messages(): array
 **Rate Limiting**: Applied to public endpoints
 ```php
 RateLimiter::tooManyAttempts('caller-registration:'.$cpr, 1)
-RateLimiter::hit('caller-registration:'.$cpr, 300); // 5 min TTL
+RateLimiter::hit('caller-registration:'.$cpr, 60); // 1 min TTL
 ```
 
 **Model Protection**: Caller model has boot hook that restricts updates

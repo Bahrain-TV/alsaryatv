@@ -271,7 +271,7 @@ class CallerRegistrationSecurityTest extends TestCase
 
     /**
      * Test real-world: Repeat registration scenario
-     * User submits form twice within 5 minutes
+     * User submits form twice within 1 minute
      */
     public function test_repeat_registration_within_5_minutes_updates_existing_record(): void
     {
