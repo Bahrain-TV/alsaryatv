@@ -763,6 +763,7 @@ mkdir -p "$BACKUP_DIR"
 
 BACKUP_TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 BACKUP_FILE="$BACKUP_DIR/backup_${BACKUP_TIMESTAMP}.sql"
+CALLERS_BACKUP_FILE="$BACKUP_DIR/callers_backup_${BACKUP_TIMESTAMP}.csv"
 
 if [[ "${DB_CONNECTION:-}" == "sqlite" && -f "$DB_DATABASE" ]]; then
     run cp "$DB_DATABASE" "${DB_DATABASE}.backup_${BACKUP_TIMESTAMP}"
