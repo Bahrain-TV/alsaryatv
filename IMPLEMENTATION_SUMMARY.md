@@ -10,11 +10,13 @@
 ## 🎯 Problem Analysis
 
 ### What Was Broken
-- Users could not register on production (https://alsarya.tv)
+
+- Users could not register on production (<https://alsarya.tv>)
 - Form submission appeared to work but no caller record was created
 - Silent failure - no error message, just broken registration
 
 ### Root Cause
+
 The `Caller` model's `boot()` event listener was rejecting ALL non-admin, multi-field updates in production:
 
 ```php
@@ -33,6 +35,7 @@ static::updating(function ($caller) {
 ```
 
 When registration form was submitted:
+
 1. `Caller::updateOrCreate(['cpr' => ...], ['name', 'phone', 'ip_address', 'status'])` was called
 2. Model boot returned `false` (silently rejected)
 3. No exception thrown, update just failed
@@ -47,6 +50,7 @@ When registration form was submitted:
 **Changed**: Lines 104-135 in `boot()` method
 
 **New Logic**:
+
 ```php
 static::updating(function ($caller) {
     // 1. Allow hits-only updates (everyone)
@@ -77,6 +81,7 @@ static::updating(function ($caller) {
 ```
 
 **What This Means**:
+
 - ✅ Public users can register: `['name', 'phone', 'ip_address', 'status']` updates allowed
 - ✅ Public users can update existing registration with same fields
 - ✅ Public users can increment hit counter (hits-only update)
@@ -95,6 +100,7 @@ static::updating(function ($caller) {
    - Files: `deploy_performance.log` (performance metrics)
 
 2. **New Logging Functions**
+
    ```bash
    # Main logging function
    log()    # Logs to file with timestamp
@@ -115,6 +121,7 @@ static::updating(function ($caller) {
    - Captures performance metrics before exit
 
 **Example Log Output**:
+
 ```
 ====== AlSarya TV Deployment Log ======
 Started: 2026-02-19 22:45:30
@@ -168,6 +175,7 @@ PERFORMANCE METRICS:
    - `test_boot_allows_only_whitelisted_fields_for_public_users` - Comprehensive field testing
 
 **Run Tests**:
+
 ```bash
 php artisan test tests/Feature/CallerRegistrationSecurityTest.php
 php artisan test tests/Feature/CallerRegistrationSecurityTest.php --verbose
@@ -179,6 +187,7 @@ php artisan test tests/Feature/CallerRegistrationSecurityTest.php --verbose
 ### 4. Deployment Documentation
 
 **Files Created**:
+
 - `REGISTRATION_FIX_DEPLOYMENT.md` - Manual deployment guide
 - `deploy_registration_fix.sh` - Automated deployment script with pre/post checks
 
@@ -200,6 +209,7 @@ php artisan test tests/Feature/CallerRegistrationSecurityTest.php --verbose
 ## 🚀 Deployment Instructions
 
 ### Option 1: Via Git (Recommended)
+
 ```bash
 cd /Users/aldoyh/Sites/RAMADAN/alsaryatv
 
@@ -211,11 +221,13 @@ git status
 ```
 
 ### Option 2: Automated Script
+
 ```bash
 bash deploy_registration_fix.sh
 ```
 
 ### Option 3: Manual SSH Deploy
+
 ```bash
 ssh root@alsarya.tv << 'EOF'
 cd /home/alsarya.tv/public_html
@@ -229,6 +241,7 @@ EOF
 ## ✅ Verification Steps
 
 ### 1. Test Registration Form
+
 ```bash
 # Visit the registration page
 curl -L https://alsarya.tv/
@@ -240,6 +253,7 @@ curl -X POST https://alsarya.tv/callers \
 ```
 
 ### 2. Check Database
+
 ```bash
 ssh root@alsarya.tv << 'EOF'
 cd /home/alsarya.tv/public_html
@@ -250,11 +264,13 @@ EOF
 ```
 
 ### 3. Monitor Logs
+
 ```bash
 ssh root@alsarya.tv "tail -f /home/alsarya.tv/public_html/storage/logs/laravel.log"
 ```
 
 ### 4. Check Deployment Logs
+
 ```bash
 ssh root@alsarya.tv "ls -lah /home/alsarya.tv/public_html/storage/logs/deployments/"
 ```
@@ -302,18 +318,21 @@ This allows public users to register while still protecting sensitive fields.
 ## 📊 Logging Benefits
 
 ### For Debugging
+
 - Every command logged with timestamps and exit codes
 - Performance metrics show slow operations
 - Failed commands capture context
 - Full deployment flow visible
 
 ### For Monitoring
+
 - Track deployment success/failure
 - Performance trending over time
 - Identify bottlenecks in deployment process
 - Audit trail for compliance
 
 ### Example: Finding Slow Steps
+
 ```bash
 grep "FAILED\|[5-9][0-9]\.[0-9]s" storage/logs/deployments/deploy_*.log
 # Shows commands that took >50 seconds or failed
@@ -324,6 +343,7 @@ grep "FAILED\|[5-9][0-9]\.[0-9]s" storage/logs/deployments/deploy_*.log
 ## 🔄 Testing & Validation
 
 ### Run All Tests
+
 ```bash
 # Just the registration fix tests
 php artisan test tests/Feature/CallerRegistrationSecurityTest.php
@@ -336,6 +356,7 @@ php artisan test
 ```
 
 ### Dry Run Deployment (Safe)
+
 ```bash
 ssh root@alsarya.tv "cd /home/alsarya.tv/public_html && ./deploy.sh --dry-run"
 ```
@@ -345,12 +366,14 @@ ssh root@alsarya.tv "cd /home/alsarya.tv/public_html && ./deploy.sh --dry-run"
 ## 📚 Quick Reference
 
 **What was modified**:
+
 - 1 core fix: `Caller.php` boot method
 - 1 enhancement: `deploy.sh` logging
 - 1 test suite: `CallerRegistrationSecurityTest.php`
 - 1 guide: `REGISTRATION_FIX_DEPLOYMENT.md`
 
 **Files to deploy**:
+
 ```
 app/Models/Caller.php
 deploy.sh
@@ -358,12 +381,14 @@ tests/Feature/CallerRegistrationSecurityTest.php
 ```
 
 **Log location after deployment**:
+
 ```
 production: /home/alsarya.tv/public_html/storage/logs/deployments/
 local: ./storage/logs/deployments/
 ```
 
 **Critical: Read logs after deployment**:
+
 ```bash
 tail -f storage/logs/deployments/deploy_*.log
 ```
@@ -412,4 +437,3 @@ cd /home/alsarya.tv/backups/pre_fix_*/
 **Risk Level**: LOW (isolated model fix + comprehensive testing)  
 **Rollback Risk**: LOW (easy git revert)  
 **Estimated Downtime**: 2-3 minutes (deploy step only)
-

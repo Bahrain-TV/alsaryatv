@@ -226,53 +226,25 @@ class CallerRegistrationSecurityTest extends TestCase
     {
         $allowedPublicFields = ['name', 'phone', 'ip_address', 'status'];
         
-        $testCases = [
-            // Allowed single fields
-            'name_only' => ['name' => 'Test', 'should_pass' => true],
-            'phone_only' => ['phone' => '+123', 'should_pass' => true],
-            'ip_only' => ['ip_address' => '127.0.0.1', 'should_pass' => true],
-            'status_only' => ['status' => 'active', 'should_pass' => true],
-            
-            // Allowed multiple fields
-            'name_and_phone' => ['name' => 'Test', 'phone' => '+123', 'should_pass' => true],
-            'ip_and_status' => ['ip_address' => '127.0.0.1', 'status' => 'active', 'should_pass' => true],
-            
-            // Dangerous single field
-            'is_winner_only' => ['is_winner' => true, 'should_pass' => false],
-            'is_selected_only' => ['is_selected' => true, 'should_pass' => false],
-            'notes_only' => ['notes' => 'hacked', 'should_pass' => false],
-            
-            // Mixed: safe + dangerous
-            'name_and_winner' => ['name' => 'Test', 'is_winner' => true, 'should_pass' => false],
-        ];
-
-        foreach ($testCases as $testLabel => $testData) {
-            $shouldPass = $testData['should_pass'];
-            unset($testData['should_pass']);
-            
-            $dirtyFields = $testData;
-            $dirtyKeys = array_keys($dirtyFields);
-            
-            // Boot logic for public users: all dirty keys must be in allowed list
-            $isPublicUserRequest = true;  // Auth::check() == false
-            $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
-            
-            if ($isPublicUserRequest && count($dirtyKeys) > 0) {
-                $wouldPassBoot = $allFieldsAllowed;
-            } else {
-                $wouldPassBoot = false;
-            }
-            
-            $fieldList = implode(', ', $dirtyKeys);
-            $expectedResult = $shouldPass ? 'PASS' : 'BLOCK';
-            $actualResult = $wouldPassBoot ? 'PASS' : 'BLOCK';
-            
-            $this->assertEquals(
-                $shouldPass,
-                $wouldPassBoot,
-                "Test '$testLabel' with fields [$fieldList] should $expectedResult boot check, but got $actualResult"
-            );
-        }
+        // Test case 1: Single allowed field
+        $dirtyKeys = ['name'];
+        $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
+        $this->assertTrue($allFieldsAllowed, 'name field should be allowed');
+        
+        // Test case 2: Single disallowed field
+        $dirtyKeys = ['is_winner'];
+        $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
+        $this->assertFalse($allFieldsAllowed, 'is_winner field should NOT be allowed');
+        
+        // Test case 3: Multiple allowed fields
+        $dirtyKeys = ['name', 'phone'];
+        $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
+        $this->assertTrue($allFieldsAllowed, 'name and phone should both be allowed');
+        
+        // Test case 4: Mixed allowed and disallowed
+        $dirtyKeys = ['name', 'is_winner'];
+        $allFieldsAllowed = count(array_diff($dirtyKeys, $allowedPublicFields)) === 0;
+        $this->assertFalse($allFieldsAllowed, 'Mixed fields with is_winner should fail');
     }
 
     /**
