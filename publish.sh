@@ -75,6 +75,8 @@ NO_BACKUP_SYNC=false
 UP_MODE=false
 QUICK_UP=false
 DEBUG=${DEBUG:-false}
+DIRTY_WORKTREE=false
+DIRTY_TRACKED_FILES=""
 
 # Parse command line arguments
 for arg in "$@"; do
@@ -185,11 +187,22 @@ validate_git_state() {
 
     # Check for uncommitted changes
     if ! git diff-index --quiet HEAD --; then
-        error "You have uncommitted changes. Please commit or stash them first:"
-        git status
-        exit 1
+        if [[ "$FORCE" == "true" ]]; then
+            DIRTY_WORKTREE=true
+            DIRTY_TRACKED_FILES="$(git diff --name-only HEAD --)"
+            warn "Uncommitted changes detected, but continuing due to --force"
+            warn "Modified tracked files to sync after deploy:"
+            while IFS= read -r changed_file; do
+                [[ -n "$changed_file" ]] && warn "  - $changed_file"
+            done <<< "$DIRTY_TRACKED_FILES"
+        else
+            error "You have uncommitted changes. Please commit or stash them first:"
+            git status
+            exit 1
+        fi
+    else
+        success "No uncommitted changes"
     fi
-    success "No uncommitted changes"
 
     # Check for untracked files (warn only)
     if [[ -n "$(git ls-files --others --exclude-standard)" ]]; then
@@ -291,15 +304,23 @@ trigger_remote_deployment() {
         ssh_key_option="-i $SSH_KEY_PATH"
     fi
 
-    # Build deploy command with flags
-    local deploy_cmd="cd '$PROD_APP_DIR' && ./deploy.sh"
-    [[ "$FRESH" == "true" ]]   && deploy_cmd="$deploy_cmd --fresh"
-    [[ "$SEED" == "true" ]]    && deploy_cmd="$deploy_cmd --seed"
-    [[ "$NO_BUILD" == "true" ]] && deploy_cmd="$deploy_cmd --no-build"
-    [[ "$FORCE" == "true" ]]   && deploy_cmd="$deploy_cmd --force"
-    [[ "$UP_MODE" == "true" ]] && deploy_cmd="$deploy_cmd --up"
-    [[ "$RESET_DB" == "true" ]] && deploy_cmd="$deploy_cmd --reset-db"
-    [[ "$DRY_RUN" == "true" ]] && deploy_cmd="$deploy_cmd --dry-run"
+    # Build deploy command
+    local deploy_cmd="cd '$PROD_APP_DIR'"
+    if [[ "$FORCE" == "true" ]]; then
+        deploy_cmd="$deploy_cmd && git reset --hard HEAD && git clean -fd"
+    fi
+
+    if [[ "$NO_BUILD" == "true" ]]; then
+        deploy_cmd="$deploy_cmd && git pull origin '$PROD_GIT_BRANCH'"
+        deploy_cmd="$deploy_cmd && php artisan optimize:clear"
+        deploy_cmd="$deploy_cmd && php artisan config:cache"
+        deploy_cmd="$deploy_cmd && php artisan route:cache"
+        deploy_cmd="$deploy_cmd && php artisan view:cache"
+        [[ "$UP_MODE" == "true" ]] && deploy_cmd="$deploy_cmd && php artisan up || true"
+    else
+        deploy_cmd="$deploy_cmd && ./deploy.sh"
+        [[ "$DRY_RUN" == "true" ]] && deploy_cmd="$deploy_cmd --dry-run"
+    fi
 
     # Attempt to remediate missing or mismatched .env on remote before running deploy.sh
     info "Ensuring remote .env exists and matches local .env.production (if present)..."
@@ -323,9 +344,9 @@ trigger_remote_deployment() {
             # gather remote hash (or missing flag)
             remote_hash=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
                 "if [ -f '$PROD_APP_DIR/.env' ]; then \
-                    if command -v shasum >/dev/null 2>&1; then shasum -a 256 '$PROD_APP_DIR/.env' | awk '{print \\$1}'; \
-                    elif command -v sha256sum >/dev/null 2>&1; then sha256sum '$PROD_APP_DIR/.env' | awk '{print \\$1}'; \
-                    elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 '$PROD_APP_DIR/.env' | awk '{print \\$2}'; \
+                    if command -v shasum >/dev/null 2>&1; then shasum -a 256 '$PROD_APP_DIR/.env' | awk '{print \$1}'; \
+                    elif command -v sha256sum >/dev/null 2>&1; then sha256sum '$PROD_APP_DIR/.env' | awk '{print \$1}'; \
+                    elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 '$PROD_APP_DIR/.env' | awk '{print \$2}'; \
                     else echo ''; fi; \
                  else echo '__MISSING__'; fi" 2>/dev/null || echo "__SSH_FAIL__")
 
@@ -541,6 +562,65 @@ sync_assets() {
     fi
     
     success "Asset sync process completed."
+}
+
+# ── Sync force-overrides (dirty tracked files) ─────────────────────────────
+sync_force_overrides() {
+    if [[ "$FORCE" != "true" || "$DIRTY_WORKTREE" != "true" ]]; then
+        return 0
+    fi
+
+    if [[ -z "$DIRTY_TRACKED_FILES" ]]; then
+        info "Force mode enabled with dirty tree, but no tracked files to sync."
+        return 0
+    fi
+
+    info "Force mode: syncing uncommitted tracked files to production..."
+
+    if ! command -v rsync &>/dev/null; then
+        error "rsync is required to sync uncommitted files in --force mode"
+        return 1
+    fi
+
+    local ssh_key_option=""
+    if [[ -f "$SSH_KEY_PATH" ]]; then
+        ssh_key_option="-i $SSH_KEY_PATH"
+    fi
+
+    local rsync_ssh="ssh -p $PROD_SSH_PORT $ssh_key_option -o StrictHostKeyChecking=accept-new"
+    local synced_count=0
+
+    while IFS= read -r rel_path; do
+        [[ -z "$rel_path" ]] && continue
+
+        if [[ ! -e "$APP_DIR/$rel_path" ]]; then
+            warn "Skipping deleted/missing file in working tree: $rel_path"
+            continue
+        fi
+
+        local remote_parent
+        remote_parent="$(dirname "$rel_path")"
+
+        if ! ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" "mkdir -p '$PROD_APP_DIR/$remote_parent'"; then
+            warn "Could not prepare remote directory for: $rel_path"
+            continue
+        fi
+
+        if rsync -az --no-o --no-g -e "$rsync_ssh" "$APP_DIR/$rel_path" "$PROD_SSH_USER@$PROD_SSH_HOST:$PROD_APP_DIR/$rel_path"; then
+            success "Synced override: $rel_path"
+            synced_count=$((synced_count + 1))
+        else
+            warn "Failed to sync override: $rel_path"
+        fi
+    done <<< "$DIRTY_TRACKED_FILES"
+
+    info "Refreshing Laravel caches after force override sync..."
+    ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+        "cd '$PROD_APP_DIR' && php artisan optimize:clear >/dev/null 2>&1 || true && php artisan view:cache >/dev/null 2>&1 || true" \
+        && success "Laravel caches refreshed on remote" \
+        || warn "Could not refresh Laravel caches on remote"
+
+    success "Force override sync completed ($synced_count file(s) synced)."
 }
 
 # ── Sync backups from remote to local ──────────────────────────────────────
@@ -775,6 +855,7 @@ echo "  Branch: $PROD_GIT_BRANCH"
 echo "  Commit: $COMMIT_HASH"
 [[ "$NO_BACKUP_SYNC" != "true" ]] && echo "  DB backup sync → local: ${LOCAL_BACKUP_DIR}"
 echo "  Image/asset push → remote: public/images, public/lottie, public/sounds, public/fonts"
+[[ "$DIRTY_WORKTREE" == "true" ]] && echo "  Force override sync: enabled (dirty tracked files will be uploaded)"
 [[ "$FRESH" == "true" ]] && echo "  Mode: FRESH database (destructive - drops all data)"
 [[ "$RESET_DB" == "true" ]] && echo "  Mode: RESET database (migrate:fresh)"
 [[ "$UP_MODE" == "true" ]] && echo "  Mode: UP (force bring site online even if maintenance is active)"
@@ -790,11 +871,15 @@ if [[ "$UP_MODE" == "true" || "$QUICK_UP" == "true" ]]; then
 fi
 
 if [[ "$DRY_RUN" != "true" ]]; then
-    read -p "Continue with deployment? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        warn "Deployment cancelled by user"
-        exit 0
+    if [[ "$FORCE" == "true" ]]; then
+        warn "--force enabled: auto-confirming deployment prompt"
+    else
+        read -p "Continue with deployment? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            warn "Deployment cancelled by user"
+            exit 0
+        fi
     fi
 fi
 
@@ -804,6 +889,7 @@ trigger_remote_deployment
 # Only run asset push + backup sync + health check if deployment succeeded
 if [[ $? -eq 0 ]]; then
     sync_assets
+    sync_force_overrides
     sync_backups_from_remote
     check_deployment_health || warn "Health check failed - check server logs"
 fi

@@ -17,11 +17,34 @@
 
     .obs-overlay-panel {
         position: relative;
-        overflow: visible;
+        overflow: hidden;
         font-family: 'Tajawal', sans-serif;
         height: 220px;
         display: flex;
         flex-direction: column;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(17, 24, 39, 0.86) 55%, rgba(31, 41, 55, 0.88) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .obs-overlay-panel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 16% 22%, rgba(245, 222, 179, 0.12) 0%, transparent 45%),
+                    radial-gradient(circle at 85% 70%, rgba(197, 157, 95, 0.12) 0%, transparent 40%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .obs-overlay-panel::after {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: 0.95rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        pointer-events: none;
+        z-index: 0;
     }
 
     .obs-overlay-panel [dir="auto"] {
@@ -30,18 +53,6 @@
 
     .obs-overlay-pulse {
         animation: obsOverlayPulse 1.8s ease-in-out infinite;
-    }
-
-    .threejs-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 0;
-        border-radius: 1rem;
-        opacity: 0.4;
     }
 
     /* Individual Card Display Container */
@@ -71,7 +82,8 @@
         justify-content: center;
         width: 100%;
         z-index: 50;
-        padding-top: 1rem; 
+        padding-top: 1rem;
+        text-align: center;
     }
 
     .stat-card-individual .card-label {
@@ -91,7 +103,11 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
         line-height: 1;
+        width: 100%;
+        text-align: center;
+        direction: ltr;
         font-variant-numeric: tabular-nums;
+        font-feature-settings: 'tnum' 1, 'lnum' 1;
         text-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
@@ -115,10 +131,16 @@
     }
 
     .stat-cards-grid .stat-card-small {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
         padding: 1.5rem;
         border-radius: 0.75rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        min-height: 128px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
     }
 
     .stat-card-small .card-label {
@@ -128,6 +150,8 @@
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-bottom: 0.75rem;
+        width: 100%;
+        text-align: center;
     }
 
     .stat-card-small .card-value {
@@ -138,7 +162,11 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
         line-height: 1;
+        width: 100%;
+        text-align: center;
+        direction: ltr;
         font-variant-numeric: tabular-nums;
+        font-feature-settings: 'tnum' 1, 'lnum' 1;
     }
 
     /* Animations */
@@ -158,9 +186,7 @@
 <div wire:poll.2s="refreshStats">
     <div class="obs-overlay-wrap">
         <div class="obs-overlay-float">
-            <div class="obs-overlay-panel rounded-2xl border border-white/10 bg-black/70 p-6 shadow-lg backdrop-blur">
-                <!-- Ramadan-themed Three.js Background Canvas -->
-                <canvas class="threejs-canvas" id="obs-ramadan-canvas"></canvas>
+            <div class="obs-overlay-panel rounded-2xl p-6 backdrop-blur">
 
                 <!-- Content wrapper -->
                 <div style="position: relative; z-index: 1;">
@@ -213,7 +239,6 @@
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
 // ============================================
@@ -250,14 +275,13 @@ class SpringValue {
 }
 
 // ============================================
-// OBS STATS CARD ANIMATION WITH THREE.JS
+// OBS STATS CARD ANIMATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
     const cardContainer = document.getElementById('cardContainer');
     const cardLabel = document.getElementById('cardLabel');
     const cardValue = document.getElementById('cardValue');
     const cardsGrid = document.getElementById('cardsGrid');
-    const canvas = document.getElementById('obs-ramadan-canvas');
 
     // Spring physics for number animation
     const numberSpring = new SpringValue(0, 150, 20);
@@ -411,320 +435,14 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSpringAnimation();
     runAnimationSequence();
 
-    // ============================================
-    // ENHANCED THREE.JS RAMADAN BACKGROUND
-    // ============================================
-    if (!canvas || !window.THREE) return;
-
-    const scene = new THREE.Scene();
-    const panelRect = canvas.parentElement.getBoundingClientRect();
-    const camera = new THREE.PerspectiveCamera(60, panelRect.width / panelRect.height, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({
-        canvas: canvas,
-        alpha: true,
-        antialias: true
-    });
-
-    renderer.setSize(panelRect.width, panelRect.height);
-    renderer.setClearColor(0x000000, 0);
-    camera.position.set(0, 0, 8);
-
-    // Color palette
-    const COLORS = {
-        gold: 0xC59D5F,
-        deepRed: 0xA81C2E,
-        emerald: 0x10B981,
-        lightGold: 0xF5DEB3,
-        white: 0xFFFFFF
-    };
-
-    // Enhanced Lantern with spring animation
-    function createEnhancedLantern(scale = 1) {
-        const lantern = new THREE.Group();
-        lantern.userData = {
-            floatSpeed: 0.3 + Math.random() * 0.3,
-            floatOffset: Math.random() * Math.PI * 2,
-            rotationSpeed: 0.001 + Math.random() * 0.002,
-            pulseSpeed: 1 + Math.random() * 1,
-            originalScale: scale
-        };
-
-        // Top dome
-        const domeGeometry = new THREE.SphereGeometry(0.4 * scale, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-        const domeMaterial = new THREE.MeshBasicMaterial({
-            color: COLORS.gold,
-            transparent: true,
-            opacity: 0.6
-        });
-        const dome = new THREE.Mesh(domeGeometry, domeMaterial);
-        dome.position.y = 0.8 * scale;
-        lantern.add(dome);
-
-        // Body
-        const bodyShape = new THREE.Shape();
-        const sides = 6;
-        const radius = 0.5 * scale;
-        for (let i = 0; i < sides; i++) {
-            const angle = (i / sides) * Math.PI * 2;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-            if (i === 0) bodyShape.moveTo(x, y);
-            else bodyShape.lineTo(x, y);
-        }
-        bodyShape.closePath();
-
-        const extrudeSettings = { depth: 1.2 * scale, bevelEnabled: false };
-        const bodyGeometry = new THREE.ExtrudeGeometry(bodyShape, extrudeSettings);
-        const bodyMaterial = new THREE.MeshBasicMaterial({
-            color: COLORS.lightGold,
-            transparent: true,
-            opacity: 0.3,
-            side: THREE.DoubleSide
-        });
-        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-        body.rotation.x = Math.PI / 2;
-        lantern.add(body);
-
-        // Glow core
-        const glowGeometry = new THREE.SphereGeometry(0.3 * scale, 16, 16);
-        const glowMaterial = new THREE.MeshBasicMaterial({
-            color: COLORS.gold,
-            transparent: true,
-            opacity: 0.8
-        });
-        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-        glow.position.y = 0.5 * scale;
-        glow.userData.originalOpacity = 0.8;
-        lantern.add(glow);
-
-        // Light rays
-        for (let i = 0; i < 8; i++) {
-            const angle = (i / 8) * Math.PI * 2;
-            const rayGeometry = new THREE.BufferGeometry();
-            const rayVertices = new Float32Array([
-                0, 0.5 * scale, 0,
-                Math.cos(angle) * 2 * scale, 0.5 * scale + Math.sin(angle) * 0.5, Math.sin(angle) * 2 * scale
-            ]);
-            rayGeometry.setAttribute('position', new THREE.BufferAttribute(rayVertices, 3));
-            const rayMaterial = new THREE.LineBasicMaterial({
-                color: COLORS.gold,
-                transparent: true,
-                opacity: 0.2
-            });
-            const ray = new THREE.Line(rayGeometry, rayMaterial);
-            lantern.add(ray);
-        }
-
-        // Bottom ring
-        const ringGeometry = new THREE.TorusGeometry(0.3 * scale, 0.05 * scale, 8, 16);
-        const ringMaterial = new THREE.MeshBasicMaterial({
-            color: COLORS.deepRed,
-            transparent: true,
-            opacity: 0.7
-        });
-        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-        ring.position.y = -0.7 * scale;
-        lantern.add(ring);
-
-        return lantern;
+    function cleanupAnimations() {
+        cancelAnimationFrame(animationFrameId);
+        window.removeEventListener('beforeunload', cleanupAnimations);
+        window.removeEventListener('pagehide', cleanupAnimations);
     }
-
-    // Create lanterns
-    const lanterns = [];
-    for (let i = 0; i < 5; i++) {
-        const lantern = createEnhancedLantern(0.8 + Math.random() * 0.4);
-        lantern.position.set(
-            (Math.random() - 0.5) * 30,
-            (Math.random() - 0.5) * 20,
-            (Math.random() - 0.5) * 15
-        );
-        scene.add(lantern);
-        lanterns.push(lantern);
-    }
-
-    // Create Crescent Moon with orbital animation
-    function createCrescent() {
-        const crescent = new THREE.Group();
-
-        const outerGeometry = new THREE.CircleGeometry(1.5, 32);
-        const outerMaterial = new THREE.MeshBasicMaterial({
-            color: COLORS.gold,
-            transparent: true,
-            opacity: 0.8,
-            side: THREE.DoubleSide
-        });
-        const outer = new THREE.Mesh(outerGeometry, outerMaterial);
-        crescent.add(outer);
-
-        const innerGeometry = new THREE.CircleGeometry(1.3, 32);
-        const innerMaterial = new THREE.MeshBasicMaterial({
-            color: 0x000000,
-            transparent: true,
-            opacity: 1,
-            side: THREE.DoubleSide
-        });
-        const inner = new THREE.Mesh(innerGeometry, innerMaterial);
-        inner.position.x = 0.7;
-        crescent.add(inner);
-
-        const glowGeometry = new THREE.CircleGeometry(1.8, 32);
-        const glowMaterial = new THREE.MeshBasicMaterial({
-            color: COLORS.lightGold,
-            transparent: true,
-            opacity: 0.2,
-            side: THREE.DoubleSide
-        });
-        const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-        glowMesh.position.z = -0.1;
-        crescent.add(glowMesh);
-
-        return crescent;
-    }
-
-    const crescent = createCrescent();
-    crescent.position.set(-12, 8, -5);
-    crescent.userData.orbitSpeed = 0.002;
-    scene.add(crescent);
-
-    // Create enhanced starfield
-    const starGeometry = new THREE.BufferGeometry();
-    const starCount = 300;
-    const starPositions = new Float32Array(starCount * 3);
-    const starColors = new Float32Array(starCount * 3);
-
-    for (let i = 0; i < starCount; i++) {
-        starPositions[i * 3] = (Math.random() - 0.5) * 50;
-        starPositions[i * 3 + 1] = (Math.random() - 0.5) * 30;
-        starPositions[i * 3 + 2] = (Math.random() - 0.5) * 30;
-
-        const color = Math.random() > 0.5 ? new THREE.Color(COLORS.gold) : new THREE.Color(COLORS.white);
-        starColors[i * 3] = color.r;
-        starColors[i * 3 + 1] = color.g;
-        starColors[i * 3 + 2] = color.b;
-    }
-
-    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-
-    const starMaterial = new THREE.PointsMaterial({
-        size: 0.15,
-        transparent: true,
-        opacity: 0.8,
-        vertexColors: true,
-        blending: THREE.AdditiveBlending,
-        sizeAttenuation: true
-    });
-
-    const stars = new THREE.Points(starGeometry, starMaterial);
-    scene.add(stars);
-
-    // Golden dust particles with physics
-    const dustGeometry = new THREE.BufferGeometry();
-    const dustCount = 400;
-    const dustPositions = new Float32Array(dustCount * 3);
-    const dustVelocity = new Float32Array(dustCount * 3);
-
-    for (let i = 0; i < dustCount; i++) {
-        dustPositions[i * 3] = (Math.random() - 0.5) * 40;
-        dustPositions[i * 3 + 1] = (Math.random() - 0.5) * 25;
-        dustPositions[i * 3 + 2] = (Math.random() - 0.5) * 20;
-
-        dustVelocity[i * 3] = (Math.random() - 0.5) * 0.02;
-        dustVelocity[i * 3 + 1] = Math.random() * 0.05;
-        dustVelocity[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
-    }
-
-    dustGeometry.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
-    dustGeometry.setAttribute('velocity', new THREE.BufferAttribute(dustVelocity, 3));
-
-    const dustMaterial = new THREE.PointsMaterial({
-        size: 0.1,
-        color: COLORS.lightGold,
-        transparent: true,
-        opacity: 0.6,
-        blending: THREE.AdditiveBlending
-    });
-
-    const dust = new THREE.Points(dustGeometry, dustMaterial);
-    scene.add(dust);
-
-    // Animation loop
-    let time = 0;
-    function animate() {
-        requestAnimationFrame(animate);
-        time += 0.01;
-
-        // Animate lanterns with spring-like bobbing
-        lanterns.forEach((lantern, index) => {
-            const bobAmount = Math.sin(time * lantern.userData.floatSpeed + lantern.userData.floatOffset) * 0.015;
-            lantern.position.y += bobAmount;
-            lantern.rotation.y += lantern.userData.rotationSpeed;
-            lantern.rotation.x = Math.sin(time * 0.5 + index) * 0.1;
-
-            // Pulsing glow
-            const glow = lantern.children.find(child => child.geometry?.type === 'SphereGeometry');
-            if (glow) {
-                glow.material.opacity = glow.userData.originalOpacity + Math.sin(time * 2 + index) * 0.3;
-            }
-        });
-
-        // Animate crescent with orbital motion
-        crescent.rotation.z += 0.002;
-        crescent.position.x = Math.cos(time * crescent.userData.orbitSpeed) * 15 - 12;
-        crescent.position.y = Math.sin(time * crescent.userData.orbitSpeed * 0.7) * 8 + 8;
-
-        // Animate stars
-        stars.rotation.y += 0.0005;
-        const starPos = stars.geometry.attributes.position.array;
-        for (let i = 0; i < starCount; i++) {
-            starPos[i * 3 + 1] += Math.sin(time * 0.1 + i * 0.1) * 0.005;
-        }
-        stars.geometry.attributes.position.needsUpdate = true;
-
-        // Animate dust with physics
-        const dustPos = dust.geometry.attributes.position.array;
-        const dustVel = dust.geometry.attributes.velocity.array;
-        for (let i = 0; i < dustCount; i++) {
-            dustPos[i * 3] += dustVel[i * 3];
-            dustPos[i * 3 + 1] += dustVel[i * 3 + 1];
-            dustPos[i * 3 + 2] += dustVel[i * 3 + 2];
-
-            // Bounce particles
-            if (dustPos[i * 3 + 1] > 15) dustVel[i * 3 + 1] *= -0.8;
-            if (dustPos[i * 3 + 1] < -15) {
-                dustPos[i * 3 + 1] = -15;
-                dustVel[i * 3 + 1] *= -0.8;
-            }
-
-            if (Math.abs(dustPos[i * 3]) > 25) dustVel[i * 3] *= -0.9;
-            if (Math.abs(dustPos[i * 3 + 2]) > 25) dustVel[i * 3 + 2] *= -0.9;
-
-            dustVel[i * 3 + 1] -= 0.001; // Gravity
-        }
-        dust.geometry.attributes.position.needsUpdate = true;
-        dust.rotation.y += 0.0008;
-
-        // Subtle camera movement
-        camera.position.x = Math.sin(time * 0.05) * 0.5;
-        camera.position.y = Math.cos(time * 0.08) * 0.3;
-        camera.lookAt(scene.position);
-
-        renderer.render(scene, camera);
-    }
-
-    animate();
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        const panelRect = canvas.parentElement.getBoundingClientRect();
-        camera.aspect = panelRect.width / panelRect.height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(panelRect.width, panelRect.height);
-    });
 
     // Cleanup
-    window.addEventListener('beforeunload', () => {
-        cancelAnimationFrame(animationFrameId);
-    });
+    window.addEventListener('beforeunload', cleanupAnimations);
+    window.addEventListener('pagehide', cleanupAnimations);
 });
 </script>

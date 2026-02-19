@@ -58,6 +58,9 @@ Homestead.json
 
 /public/build
 /storage/pail
+/storage/backups/
+/storage/**/*.sql
+/storage/**/*.sqlite
 .env.backup
 .env.production
 .phpactor.json
