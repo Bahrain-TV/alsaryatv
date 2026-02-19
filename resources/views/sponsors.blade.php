@@ -1,4 +1,3 @@
-```html
 <div class="w-full">
     <section class="py-3 sm:py-4" id="sponsors">
         <div class="container mx-auto px-4">
@@ -8,9 +7,20 @@
                 </h2>
 
                 <!-- Three sponsor logos — equal sizing, consistent presentation with text labels -->
-                <div class="flex flex-wrap justify-center items-center gap-6 sm:gap-10 md:gap-14" id="sponsors-logos">
+                <div class="grid grid-cols-2 justify-items-center items-start gap-6 sm:gap-10 md:gap-14" id="sponsors-logos">
 
-                    {{-- Al Salam Bank — FIRST POSITION --}}
+                    {{-- Bapco Energies — FIRST POSITION --}}
+                    <div class="sponsor-card flex flex-col items-center justify-center gap-2 sm:gap-3 group" data-sponsor="bapco">
+                        <div class="sponsor-logo-container flex items-center justify-center w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 p-4 sm:p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/10 group-hover:border-gold-500/30 group-hover:shadow-lg group-hover:shadow-gold-500/10">
+                            <img src="{{ asset('images/bapco-energies.png') }}"
+                                 alt="Bapco Energies"
+                                 loading="lazy"
+                                 class="sponsor-logo max-h-full max-w-full object-contain transition-transform duration-300 drop-shadow-lg" />
+                        </div>
+                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md">بابكو للطاقة</span>
+                    </div>
+
+                    {{-- Al Salam Bank — SECOND POSITION --}}
                     <div class="sponsor-card flex flex-col items-center justify-center gap-2 sm:gap-3 group" data-sponsor="alsalam">
                         <div class="sponsor-logo-container flex items-center justify-center w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 p-4 sm:p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/10 group-hover:border-gold-500/30 group-hover:shadow-lg group-hover:shadow-gold-500/10">
                             <img src="{{ asset('images/alsalam-logo.svg') }}"
@@ -22,26 +32,15 @@
                         <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md">مصرف السلام</span>
                     </div>
 
-                    {{-- Jasmis --}}
-                    <div class="sponsor-card flex flex-col items-center justify-center gap-2 sm:gap-3 group" data-sponsor="jasmis">
+                    {{-- Jasmi's — THIRD POSITION --}}
+                    <div class="sponsor-card col-span-2 flex flex-col items-center justify-center gap-2 sm:gap-3 group" data-sponsor="jasmis">
                         <div class="sponsor-logo-container flex items-center justify-center w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 p-4 sm:p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/10 group-hover:border-gold-500/30 group-hover:shadow-lg group-hover:shadow-gold-500/10">
                             <img src="{{ asset('images/jasmis-logo.png') }}"
                                  alt="Jasmi's"
                                  loading="lazy"
                                  class="sponsor-logo max-h-full max-w-full object-contain transition-transform duration-300 drop-shadow-lg" />
                         </div>
-                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md">جاسمي</span>
-                    </div>
-
-                    {{-- Bapco Energies --}}
-                    <div class="sponsor-card flex flex-col items-center justify-center gap-2 sm:gap-3 group" data-sponsor="bapco">
-                        <div class="sponsor-logo-container flex items-center justify-center w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 p-4 sm:p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/10 group-hover:border-gold-500/30 group-hover:shadow-lg group-hover:shadow-gold-500/10">
-                            <img src="{{ asset('images/bapco-energies.png') }}"
-                                 alt="Bapco Energies"
-                                 loading="lazy"
-                                 class="sponsor-logo max-h-full max-w-full object-contain transition-transform duration-300 drop-shadow-lg" />
-                        </div>
-                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md">بابكو للطاقة</span>
+                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md" dir="auto">جاسمي - Jasmi's</span>
                     </div>
 
                 </div>
@@ -64,7 +63,7 @@
     10% { transform: translate(-3px, 2px) scale(1.02); }
     20% { transform: translate(4px, -3px) scale(0.98); }
     30% { transform: translate(-2px, -4px) scale(1.01); }
-    40% { transform: translate(3px, 3px) scale(0.99); }
+                
     50% { transform: translate(-4px, 2px) scale(1.03); }
     60% { transform: translate(2px, -2px) scale(1); }
     70% { transform: translate(-3px, 4px) scale(1.01); }
@@ -157,8 +156,7 @@
 </style>
 
 <script>
-// Enhanced random movement for sponsor logos
-document.addEventListener('DOMContentLoaded', function() {
+
     const logoContainers = document.querySelectorAll('.sponsor-logo-container');
     
     // Add subtle random movements to each logo
