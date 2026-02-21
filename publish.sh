@@ -316,7 +316,7 @@ trigger_remote_deployment() {
     fi
 
     if [[ "$NO_BUILD" == "true" ]]; then
-        deploy_cmd="$deploy_cmd && git pull origin '$PROD_GIT_BRANCH'"
+        deploy_cmd="$deploy_cmd && git fetch origin '$PROD_GIT_BRANCH' && git reset --hard origin/'$PROD_GIT_BRANCH'"
         deploy_cmd="$deploy_cmd && php artisan optimize:clear"
         deploy_cmd="$deploy_cmd && php artisan config:cache"
         deploy_cmd="$deploy_cmd && php artisan route:cache"
