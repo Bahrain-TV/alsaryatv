@@ -8,6 +8,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 import { TextPlugin } from 'gsap/TextPlugin';
 import { initMasterTimeline, initGlitchEffect } from './animations';
 import { TornadoEffect } from './tornado-effect';
+import ThankYouScreen from './thank-you-screen';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
@@ -17,6 +18,9 @@ window.gsap = gsap;
 
 // Make TornadoEffect available globally
 window.TornadoEffect = TornadoEffect;
+
+// Make ThankYouScreen available globally
+window.ThankYouScreen = ThankYouScreen;
 
 // Theme detection and management
 window.ThemeManager = {

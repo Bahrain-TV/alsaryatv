@@ -17,7 +17,7 @@ for (let i = 2; i < process.argv.length; i += 2) {
 const url = args.get('--url') ?? 'http://localhost:8000/obs-overlay';
 const outPath = args.get('--out') ?? 'storage/app/obs-overlay.mov';
 const baseSeconds = Number(args.get('--seconds') ?? '65');
-const fps = Number(args.get('--fps') ?? '30');
+const fps = Number(args.get('--fps') ?? '50');
 const preWarmMs = 2800 + Math.random() * 1200; // 2.8-4s pre-warm
 const subtractMs = 2000 + Math.random() * 1000; // Subtract 2-3s randomly
 const seconds = Math.max(baseSeconds - (subtractMs / 1000), 10); // Floor at 10s
@@ -27,6 +27,7 @@ const height = 1080;
 const frameCount = Math.max(1, Math.round(seconds * fps));
 const frameDelayMs = 1000 / fps;
 
+// For 50i interlaced: use field encoding with top field first
 const ffmpegArgs = [
     '-y',
     '-f', 'image2pipe',
@@ -38,6 +39,8 @@ const ffmpegArgs = [
     '-qscale:v', '1',
     '-vendor', 'ap10',
     '-an',
+    '-flags', '+ilme+ildct',
+    '-top', '1',
     outPath
 ];
 
@@ -54,14 +57,15 @@ const bar = new cliProgress.SingleBar({
 
 const run = async () => {
     console.log(chalk.bgCyan.black.bold('\n ═══════════════════════════════════════════════════════════════ '));
-    console.log(chalk.bgCyan.black.bold(' 🎬  AlSarya TV OBS Overlay Recorder - HD ProRes 4444 '));
+    console.log(chalk.bgCyan.black.bold(' 🎬  AlSarya TV OBS Overlay Recorder - 50i Interlaced ProRes 4444 '));
     console.log(chalk.bgCyan.black.bold(' ═══════════════════════════════════════════════════════════════ \n'));
-    
+
     console.log(chalk.yellow('  📺 Configuration:'));
     console.log(chalk.magenta(`     ┌─ Resolution: `) + chalk.cyan.bold(`${width}×${height}`) + chalk.magenta(` px`));
-    console.log(chalk.magenta(`     ├─ Duration:  `) + chalk.green.bold(`${seconds}s`) + chalk.magenta(` at ${fps} FPS`));
+    console.log(chalk.magenta(`     ├─ Duration:  `) + chalk.green.bold(`${seconds}s`) + chalk.magenta(` at ${fps} FPS (50i)`));
     console.log(chalk.magenta(`     ├─ Frames:    `) + chalk.cyan.bold(frameCount));
     console.log(chalk.magenta(`     ├─ URL:       `) + chalk.blue.underline(url));
+    console.log(chalk.magenta(`     ├─ Interlaced:`) + chalk.yellow.bold(' Yes (Top Field First)'));
     console.log(chalk.magenta(`     └─ Output:    `) + chalk.green.bold(outPath));
     console.log('');
 
@@ -173,6 +177,7 @@ const run = async () => {
     console.log(chalk.greenBright('  ├─ Size:   ') + chalk.yellow.bold(fileSize));
     console.log(chalk.greenBright('  ├─ Format: ') + chalk.magenta.bold('ProRes 4444 (RGBA)'));
     console.log(chalk.greenBright('  ├─ Codec:  ') + chalk.cyan.bold('ProRes with Alpha Channel'));
+    console.log(chalk.greenBright('  ├─ Scan:   ') + chalk.yellow.bold('Interlaced (50i, TFF)'));
     console.log(chalk.greenBright('  └─ Ready for TV broadcast!\n'));
     console.log(chalk.bgGreen.black.bold(' 🎉 DONE! 🎉 ') + '\n');
 };

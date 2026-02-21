@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/splash-screen.css',
                 'resources/css/thank-you-screen.css',
+                'resources/js/thank-you-screen.js',
             ],
             refresh: true,
         }),

@@ -271,6 +271,22 @@ else
 fi
 
 # ─────────────────────────────────────────────────────────────────────────
+# STEP 3.5: Pre-Migration Data Backup
+# ─────────────────────────────────────────────────────────────────────────
+
+log "Creating pre-migration data backup..."
+
+if [[ "$DRY_RUN" == "true" ]]; then
+    log_deploy "DRY RUN: Would backup data"
+else
+    # Backup critical data before migration
+    php artisan backup:data --type=all 2>&1 | tee -a "$DEPLOY_LOG" | tail -5
+    php artisan app:persist-data --verify 2>&1 | tee -a "$DEPLOY_LOG" | tail -5
+    ok "Pre-migration backup completed"
+    log_deploy "Pre-migration backup completed"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────
 # STEP 3.6: Database Migrations
 # ─────────────────────────────────────────────────────────────────────────
 
@@ -286,6 +302,20 @@ else
     else
         warn "Migration warning (may already be up to date)"
     fi
+fi
+
+# ─────────────────────────────────────────────────────────────────────────
+# STEP 3.6.1: Post-Migration Data Verification
+# ─────────────────────────────────────────────────────────────────────────
+
+log "Verifying data integrity after migration..."
+
+if [[ "$DRY_RUN" == "true" ]]; then
+    log_deploy "DRY RUN: Would verify data"
+else
+    php artisan app:persist-data --verify 2>&1 | tee -a "$DEPLOY_LOG" | tail -10
+    ok "Post-migration data verification completed"
+    log_deploy "Post-migration data verification completed"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────

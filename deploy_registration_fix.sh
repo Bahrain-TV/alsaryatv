@@ -74,17 +74,33 @@ echo ""
 
 ssh root@alsarya.tv << 'DEPLOY_SCRIPT'
     cd /home/alsarya.tv/public_html
-    
+
     echo "Pulling latest code..."
     git fetch origin
     git pull origin main
     echo "✅ Code pulled from origin/main"
-    
+
+    echo ""
+    echo "Backing up critical data before migration..."
+    php artisan backup:data --type=all 2>&1 | tail -5
+    php artisan app:persist-data --verify 2>&1 | tail -5
+    echo "✅ Pre-migration backup completed"
+
+    echo ""
+    echo "Running database migrations..."
+    php artisan migrate --force 2>&1 | tail -5
+    echo "✅ Database migrations completed"
+
+    echo ""
+    echo "Verifying data after migration..."
+    php artisan app:persist-data --verify 2>&1 | tail -10
+    echo "✅ Post-migration data verification completed"
+
     echo ""
     echo "Clearing application caches..."
     php artisan optimize:clear 2>&1 || echo "⚠️  Cache clear had issues, continuing..."
     echo "✅ Application caches cleared"
-    
+
     echo ""
     echo "Verifying Caller model fix..."
     if grep -q "Allow public caller registration updates" app/Models/Caller.php; then
@@ -93,7 +109,7 @@ ssh root@alsarya.tv << 'DEPLOY_SCRIPT'
         echo "❌ ERROR: Caller model fix not found!"
         exit 1
     fi
-    
+
     echo ""
     echo "Fixing permissions..."
     chown -R alsar4210:alsar4210 . 2>/dev/null || true

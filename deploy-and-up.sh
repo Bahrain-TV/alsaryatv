@@ -130,7 +130,15 @@ if ssh -p "$PROD_SSH_PORT" \
     -o ConnectTimeout=10 \
     -o StrictHostKeyChecking=accept-new \
     "$PROD_SSH_USER@$PROD_SSH_HOST" \
-    "cd '$PROD_APP_DIR' && ./deploy.sh --up --force --no-build 2>&1 | tail -30"; then
+    "cd '$PROD_APP_DIR' && \
+    echo '=== Backing up critical data before migration ===' && \
+    php artisan backup:data --type=all 2>&1 | tail -3 && \
+    php artisan app:persist-data --verify 2>&1 | tail -3 && \
+    echo 'Checking migration status...' && \
+    php artisan migrate:status --no-interaction && \
+    ./deploy.sh --up --force --no-build 2>&1 | tail -30 && \
+    echo '=== Verifying data after migration ===' && \
+    php artisan app:persist-data --verify 2>&1 | tail -5"; then
     success "Remote deployment started ✓"
 else
     error "Failed to connect to production server"

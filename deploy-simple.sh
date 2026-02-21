@@ -78,6 +78,13 @@ DEPLOY_CMD="
 cd '$PROD_DIR' && \
 git pull origin main && \
 php artisan optimize:clear && \
+echo '=== Backing up critical data before migration ===' && \
+php artisan backup:data --type=all 2>&1 | tail -3 && \
+php artisan app:persist-data --verify 2>&1 | tail -3 && \
+echo '=== Running database migrations ===' && \
+php artisan migrate --force && \
+echo '=== Verifying data after migration ===' && \
+php artisan app:persist-data --verify 2>&1 | tail -5 && \
 php artisan config:cache && \
 php artisan route:cache && \
 php artisan view:cache && \

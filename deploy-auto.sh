@@ -48,6 +48,16 @@ echo -e "\n⚙️  Running Laravel optimizations..."
 ssh -p "$PROD_PORT" "$PROD_HOST" << 'REMOTE_CMD'
 cd /home/alsarya.tv/public_html
 
+echo "→ Backing up critical data before migration..."
+php artisan backup:data --type=all 2>&1 | tail -3
+php artisan app:persist-data --verify 2>&1 | tail -3
+
+echo "→ Running database migrations..."
+php artisan migrate --force 2>&1 | tail -3
+
+echo "→ Verifying data after migration..."
+php artisan app:persist-data --verify 2>&1 | tail -5
+
 echo "→ Clearing caches..."
 php artisan config:clear 2>&1 | tail -3
 php artisan cache:clear 2>&1 | tail -3
