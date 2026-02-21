@@ -273,7 +273,7 @@ if [[ -d ".git" ]]; then
         log_deploy "DRY RUN: Would pull from git"
         git status --short || true
     else
-        git pull origin main --force --no-edit 2>&1 | tee -a "$DEPLOY_LOG" && \
+        git fetch origin main && git reset --hard origin/main 2>&1 | tee -a "$DEPLOY_LOG" && \
             ok "Code pulled from git" || \
             warn "Git pull had issues"
         log_deploy "Git pull completed"
