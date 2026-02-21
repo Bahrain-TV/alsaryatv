@@ -29,7 +29,7 @@
                                  class="sponsor-logo max-h-full max-w-full object-contain transition-transform duration-300 drop-shadow-lg"
                                  style="filter: brightness(0) invert(1) sepia(0.15);" />
                         </div>
-                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md" dir="auto">مصرف السلام - Al Salam Bank</span>
+                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md" dir="auto">بنك السلام - Al Salam Bank</span>
                     </div>
 
                     {{-- Jasmi's — THIRD POSITION --}}

@@ -678,7 +678,7 @@
             <!-- Card 3: Al Salam - enters from center at 3.5s, exits at 5s -->
             <div class="sponsor-card" id="sponsorCard3">
                 <div class="sponsor-card-content">
-                    <div class="sponsor-card-title">مصرف السلام - Al Salam Bank</div>
+                    <div class="sponsor-card-title">بنك السلام - Al Salam Bank</div>
                     <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam Bank" class="sponsor-card-logo alsalam-logo">
                 </div>
             </div>
@@ -692,7 +692,7 @@
                 </div>
                 <div class="sponsor-logo-with-label">
                     <img src="{{ asset('images/alsalam-logo.svg') }}" id="sponsor3" alt="Al Salam Bank" class="sponsor-logo alsalam-logo">
-                    <div class="sponsor-label">مصرف السلام - Al Salam Bank</div>
+                    <div class="sponsor-label">بنك السلام - Al Salam Bank</div>
                 </div>
                 <div class="sponsor-logo-with-label">
                     <img src="{{ asset('images/bapco-energies.png') }}" id="sponsor2" alt="Bapco Energies" class="sponsor-logo">

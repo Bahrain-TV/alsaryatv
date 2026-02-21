@@ -15,6 +15,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin Email Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Admin emails to receive winner announcements and reports.
+    | These are the ONLY recipients of winner notification emails.
+    | Winners are NOT emailed directly.
+    |
+    */
+    'admin_emails' => explode(',', env('ADMIN_EMAILS', 'admin@alsarya.tv')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Ramadan Settings
     |--------------------------------------------------------------------------
     |
