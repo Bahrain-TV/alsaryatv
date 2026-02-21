@@ -8,9 +8,24 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Tajawal', Arial, sans-serif; background: #0f172a; padding: 16px; }
+        body { 
+            font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', 'Lucida Grande', sans-serif; 
+            background: #0f172a; 
+            padding: 16px;
+            direction: rtl;
+            text-align: right;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
         .container { max-width: 900px; margin: 0 auto; background: #1a2d4d; border-radius: 16px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
+        /* Ensure Arabic text rendering */
+        p, span, div, td, th, h1, h2, h3, h4, h5, h6 { 
+            direction: rtl; 
+            text-align: right;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
         @media (max-width: 600px) {
             body { padding: 12px; }
             .container { border-radius: 12px; }
@@ -59,12 +74,12 @@
                 <table>
                     <thead>
                         <tr style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(52, 211, 153, 0.15) 100%); border-bottom: 2px solid rgba(16, 185, 129, 0.4);">
-                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0.5px; text-transform: uppercase; border-right: 1px solid rgba(16, 185, 129, 0.2);">#</th>
-                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0.5px; text-transform: uppercase; border-right: 1px solid rgba(16, 185, 129, 0.2);">الاسم</th>
-                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0.5px; text-transform: uppercase; border-right: 1px solid rgba(16, 185, 129, 0.2);">رقم الهوية</th>
-                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0.5px; text-transform: uppercase; border-right: 1px solid rgba(16, 185, 129, 0.2);">الهاتف</th>
-                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0.5px; text-transform: uppercase; border-right: 1px solid rgba(16, 185, 129, 0.2);">الاتصالات</th>
-                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0.5px; text-transform: uppercase;">التاريخ</th>
+                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0px; text-transform: uppercase; border-right: 1px solid rgba(16, 185, 129, 0.2); direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif;">#</th>
+                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0px; border-right: 1px solid rgba(16, 185, 129, 0.2); direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif;">الاسم</th>
+                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0px; border-right: 1px solid rgba(16, 185, 129, 0.2); direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif;">رقم الهوية</th>
+                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0px; border-right: 1px solid rgba(16, 185, 129, 0.2); direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif;">الهاتف</th>
+                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; letter-spacing: 0px; border-right: 1px solid rgba(16, 185, 129, 0.2); direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif;">الاتصالات</th>
+                            <th style="color: #34d399; font-size: 0.9rem; font-weight: 700; padding: 16px 12px; text-align: right; direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif;">التاريخ</th>
                         </tr>
                     </thead>
                     <tbody style="background: rgba(15, 23, 42, 0.4);">
@@ -73,13 +88,13 @@
                                 <td style="color: rgba(255, 255, 255, 0.85); font-size: 0.95rem; padding: 14px 12px; text-align: right; vertical-align: middle; border-right: 1px solid rgba(16, 185, 129, 0.1);">
                                     <span style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%); color: #fbbf24; font-weight: 800; font-size: 1.05rem; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px;">{{ $index + 1 }}</span>
                                 </td>
-                                <td style="color: #ffffff; font-weight: 700; font-size: 0.98rem; padding: 14px 12px; text-align: right; vertical-align: middle; border-right: 1px solid rgba(16, 185, 129, 0.1);">{{ $winner->name }}</td>
+                                <td style="color: #ffffff; font-weight: 700; font-size: 0.98rem; padding: 14px 12px; text-align: right; vertical-align: middle; border-right: 1px solid rgba(16, 185, 129, 0.1); direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif; word-break: break-word;">{{ $winner->name }}</td>
                                 <td style="color: #94a3b8; font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; padding: 14px 12px; text-align: right; vertical-align: middle; border-right: 1px solid rgba(16, 185, 129, 0.1); font-family: 'Courier New', monospace;">{{ $winner->cpr }}</td>
-                                <td style="color: rgba(255, 255, 255, 0.85); font-size: 0.95rem; padding: 14px 12px; text-align: right; vertical-align: middle; border-right: 1px solid rgba(16, 185, 129, 0.1);">{{ $winner->phone }}</td>
+                                <td style="color: rgba(255, 255, 255, 0.85); font-size: 0.95rem; padding: 14px 12px; text-align: right; vertical-align: middle; border-right: 1px solid rgba(16, 185, 129, 0.1); direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif; word-break: break-word;">{{ $winner->phone }}</td>
                                 <td style="color: rgba(255, 255, 255, 0.85); font-size: 0.95rem; padding: 14px 12px; text-align: right; vertical-align: middle; border-right: 1px solid rgba(16, 185, 129, 0.1);">
                                     <span style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(168, 85, 247, 0.15) 100%); color: #c4b5fd; padding: 6px 12px; border-radius: 8px; display: inline-block; font-weight: 700; font-size: 0.9rem;">{{ $winner->hits }} 📞</span>
                                 </td>
-                                <td style="color: rgba(255, 255, 255, 0.65); font-size: 0.85rem; padding: 14px 12px; text-align: right; vertical-align: middle;">{{ $winner->created_at?->locale('ar')->translatedFormat('j M Y') ?? 'N/A' }}</td>
+                                <td style="color: rgba(255, 255, 255, 0.65); font-size: 0.9rem; padding: 14px 12px; text-align: right; vertical-align: middle; direction: rtl; word-break: break-word;">{{ $winner->created_at?->locale('ar')->translatedFormat('j F Y') ?? 'N/A' }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -98,8 +113,8 @@
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
                             <div style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(16, 185, 129, 0.2) 100%); color: #fbbf24; font-weight: 800; font-size: 1rem; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1;">{{ $index + 1 }}</div>
                             <div style="flex: 1; overflow: hidden;">
-                                <p style="color: #34d399; font-size: 0.75rem; font-weight: 700; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 0.5px;">🏆 الفائز</p>
-                                <p style="color: #ffffff; font-size: 1rem; font-weight: 800; margin: 0; word-break: break-word; line-height: 1.3;">{{ $winner->name }}</p>
+                                <p style="color: #34d399; font-size: 0.75rem; font-weight: 700; margin: 0 0 2px 0; text-transform: uppercase; letter-spacing: 0px; direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif;">🏆 الفائز</p>
+                                <p style="color: #ffffff; font-size: 1rem; font-weight: 800; margin: 0; word-break: break-word; line-height: 1.4; direction: rtl; font-family: 'Tajawal', 'Segoe UI', 'Arial Unicode MS', sans-serif;">{{ $winner->name }}</p>
                             </div>
                         </div>
 
@@ -119,10 +134,10 @@
                         </div>
 
                         <!-- CARD FOOTER: Phone & Date in single row -->
-                        <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 10px 12px;">
-                            <div style="color: rgba(255, 255, 255, 0.55); font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px;">📞 الهاتف</div>
-                            <div style="color: #e2e8f0; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; word-break: break-all; line-height: 1.3;">{{ $winner->phone }}</div>
-                            <div style="border-top: 1px solid rgba(16, 185, 129, 0.15); padding-top: 8px; color: rgba(255, 255, 255, 0.55); font-size: 0.75rem; font-weight: 600;">📅 {{ $winner->created_at?->locale('ar')->translatedFormat('j M Y H:i') ?? 'N/A' }}</div>
+                        <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 12px;">
+                            <div style="color: rgba(255, 255, 255, 0.55); font-size: 0.75rem; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0px; direction: rtl;">📞 الهاتف</div>
+                            <div style="color: #e2e8f0; font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; word-break: break-word; line-height: 1.4; direction: rtl;">{{ $winner->phone }}</div>
+                            <div style="border-top: 1px solid rgba(16, 185, 129, 0.15); padding-top: 10px; color: rgba(255, 255, 255, 0.65); font-size: 0.9rem; font-weight: 600; direction: rtl; word-break: break-word; line-height: 1.4;">📅 {{ $winner->created_at?->locale('ar')->translatedFormat('j F Y H:i') ?? 'N/A' }}</div>
                         </div>
                     </div>
                 @empty
