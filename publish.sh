@@ -6,17 +6,18 @@
 # connects to production server via SSH, and triggers remote deployment.
 #
 # Usage:
-#   ./publish.sh              # Full deploy to production (default)
-#   ./publish.sh --up         # Bring site up mode (runs vitals check first)
-#   ./publish.sh --quick-up   # Fast recovery: vitals check + --up --force --no-build
-#   ./publish.sh --fresh      # Fresh database deploy
-#   ./publish.sh --seed       # Add seeding after migration
-#   ./publish.sh --no-build   # Skip npm build on remote
-#   ./publish.sh --force      # Force all steps even if no changes
-#   ./publish.sh --reset-db   # Reset production database (migrate:fresh)
-#   ./publish.sh --dry-run    # Validate without executing
+#   ./publish.sh                 # Full deploy to production (default)
+#   ./publish.sh --up            # Bring site up mode (runs vitals check first)
+#   ./publish.sh --quick-up      # Fast recovery: vitals check + --up --force --no-build
+#   ./publish.sh --fresh         # Fresh database deploy
+#   ./publish.sh --seed          # Add seeding after migration
+#   ./publish.sh --no-build      # Skip npm build on remote
+#   ./publish.sh --force         # Force all steps even if no changes
+#   ./publish.sh --reset-db      # Reset production database (migrate:fresh)
+#   ./publish.sh --dry-run       # Validate without executing
 #   ./publish.sh --no-backup-sync  # Skip pulling DB/CSV backups to local
-#   ./publish.sh --help       # Show this help message
+#   ./publish.sh --sync-assets-only  # Only sync assets (no deploy)
+#   ./publish.sh --help          # Show this help message
 #
 # Requirements:
 #   - Git installed locally
@@ -72,11 +73,13 @@ DRY_RUN=false
 SHOW_HELP=false
 RESET_DB=false
 NO_BACKUP_SYNC=false
+NO_MEDIA_SYNC=false
 UP_MODE=false
 QUICK_UP=false
 DEBUG=${DEBUG:-false}
 DIRTY_WORKTREE=false
 DIRTY_TRACKED_FILES=""
+SYNC_ASSETS_ONLY=false
 
 # Parse command line arguments
 for arg in "$@"; do
@@ -90,6 +93,8 @@ for arg in "$@"; do
         --quick-up)        QUICK_UP=true; UP_MODE=true; FORCE=true; NO_BUILD=true ;;
         --reset-db)        RESET_DB=true ;;
         --no-backup-sync)  NO_BACKUP_SYNC=true ;;
+        --no-media-sync)   NO_MEDIA_SYNC=true ;;
+        --sync-assets-only) SYNC_ASSETS_ONLY=true ;;
         --debug)           DEBUG=true ;;
         --help|-h)         SHOW_HELP=true ;;
         *)                 error "Unknown flag: $arg"; SHOW_HELP=true ;;
@@ -841,6 +846,18 @@ echo -e "${CYAN}╔════════════════════�
 echo -e "${CYAN}║  AlSarya TV - Production Deployment    ║${NC}"
 echo -e "${CYAN}╚════════════════════════════════════════╝${NC}"
 echo ""
+
+# Handle --sync-assets-only mode
+if [[ "$SYNC_ASSETS_ONLY" == "true" ]]; then
+    info "Running in --sync-assets-only mode"
+    info "Syncing local assets to production..."
+    validate_prerequisites
+    test_ssh_connection
+    sync_assets
+    sync_force_overrides
+    success "Asset sync completed"
+    exit 0
+fi
 
 # Run validation and deployment steps
 validate_prerequisites

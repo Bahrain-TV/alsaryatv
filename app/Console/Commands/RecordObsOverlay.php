@@ -34,10 +34,10 @@ class RecordObsOverlay extends Command
         // Detect server port if URL not explicitly provided
         $url = $this->option('url');
         $environment = $this->option('environment');
-        
+
         if (empty($url)) {
             $this->info('🔍 Detecting server environment...');
-            
+
             // If environment is explicitly specified
             if ($environment === 'production') {
                 $detectedUrl = $this->getProductionUrl();
@@ -55,26 +55,63 @@ class RecordObsOverlay extends Command
                 }
                 $this->info("✅ Local server detected: {$detectedUrl}");
             } else {
-                // Auto-detect: try production first if configured, then local
-                $detectedUrl = $this->getProductionUrl();
+                // Auto-detect: try LOCAL first (most common), then production
+                $detectedUrl = $this->detectLocalServer();
                 if ($detectedUrl !== null) {
-                    $this->info("✅ Production URL detected: {$detectedUrl}");
+                    $this->info("✅ Local server detected: {$detectedUrl}");
                 } else {
-                    $detectedUrl = $this->detectLocalServer();
+                    $detectedUrl = $this->getProductionUrl();
                     if ($detectedUrl !== null) {
-                        $this->info("✅ Local server detected: {$detectedUrl}");
+                        $this->info("✅ Production URL detected: {$detectedUrl}");
                     }
                 }
             }
-            
+
             if ($detectedUrl === null) {
                 $this->error('❌ No running server detected.');
-                $this->error('   For local: Run php artisan serve');
-                $this->error('   For production: Set APP_URL in .env or use --environment=production');
+                $this->error('');
+                $this->error('   The OBS overlay route is: /obs-overlay');
+                $this->error('');
+                $this->error('   To fix this, start your Laravel server:');
+                $this->error('   ');
+                $this->error('   php artisan serve --host=127.0.0.1 --port=8122');
+                $this->error('   ');
+                $this->error('   Or use a custom URL:');
+                $this->error('   ');
+                $this->error('   php artisan obs:record --url=http://127.0.0.1:8122/obs-overlay');
+                $this->error('');
                 return self::FAILURE;
             }
-            
+
             $url = $detectedUrl.'/obs-overlay';
+        }
+
+        // Verify the URL is accessible before recording
+        $this->info("🔗 Validating URL: {$url}");
+        try {
+            $urlCheck = Process::timeout(10)->run("curl -s -o /dev/null -w '%{{http_code}}' '{$url}'");
+            $httpCode = trim($urlCheck->output());
+            if ($httpCode === '404') {
+                $this->error('❌ Route /obs-overlay not found on the server.');
+                $this->error('');
+                $this->error('   This means the production server does not have the latest code.');
+                $this->error('   Please deploy the latest version first:');
+                $this->error('');
+                $this->error('   ./deploy-obs-route.sh');
+                $this->error('');
+                $this->error('   Or manually run on production:');
+                $this->error('   git pull && php artisan optimize:clear && php artisan route:cache');
+                return self::FAILURE;
+            } elseif ($httpCode === '403') {
+                $this->error('❌ Access forbidden (403). Check server permissions.');
+                return self::FAILURE;
+            } elseif (! in_array($httpCode, ['200', '301', '302'])) {
+                $this->warn("⚠️  URL returned HTTP {$httpCode}, attempting to continue...");
+            } else {
+                $this->info("✅ URL is accessible (HTTP {$httpCode})");
+            }
+        } catch (\Exception $e) {
+            $this->warn("⚠️  Could not verify URL: {$e->getMessage()}");
         }
 
         // Generate filename with timestamp
@@ -208,40 +245,71 @@ class RecordObsOverlay extends Command
     }
 
     /**
-     * Detect if a server is running and return the base URL.
+     * Get production URL from .env file.
      */
-    protected function detectServerUrl(): ?string
+    protected function getProductionUrl(): ?string
     {
-        $commonPorts = [8000, 8080, 8001, 9000, 3000];
-
-        foreach ($commonPorts as $port) {
-            $url = "http://localhost:{$port}";
-            try {
-                $result = Process::timeout(2)->run("curl -s -o /dev/null -w '%{{http_code}}' {$url}");
-                $httpCode = trim($result->output());
-                if (in_array($httpCode, ['200', '301', '302', '404'])) {
-                    return $url;
-                }
-            } catch (\Exception $e) {
-                continue;
+        $envPath = base_path('.env');
+        if (! file_exists($envPath)) {
+            return null;
+        }
+        
+        $envContent = file_get_contents($envPath);
+        
+        // Look for APP_URL with production-like domain
+        if (preg_match('/APP_URL=(https?:\/\/[^\s]+)/', $envContent, $matches)) {
+            $url = rtrim($matches[1], '/');
+            // Verify it's not a local URL
+            if (! preg_match('/https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)/', $url)) {
+                return $url;
             }
         }
+        
+        return null;
+    }
 
-        // Try to detect port from .env if exists
+    /**
+     * Detect if a local server is running and return the base URL.
+     */
+    protected function detectLocalServer(): ?string
+    {
+        // First, check if APP_URL in .env has a local port we should try
         $envPath = base_path('.env');
+        $appPort = null;
+        
         if (file_exists($envPath)) {
             $envContent = file_get_contents($envPath);
-            if (preg_match('/APP_URL=(?:https?:\/\/)?(?:localhost|127\.0\.0\.1):(\d+)/', $envContent, $matches)) {
-                $port = $matches[1];
-                $url = "http://localhost:{$port}";
+            // Check for APP_PORT in .env
+            if (preg_match('/APP_PORT=(\d+)/', $envContent, $matches)) {
+                $appPort = $matches[1];
+            }
+            // Also check APP_URL for localhost with port
+            if (preg_match('/APP_URL=https?:\/\/(?:localhost|127\.0\.0\.1):(\d+)/', $envContent, $matches)) {
+                $appPort = $matches[1];
+            }
+        }
+        
+        // Build list of ports to check - APP_PORT first, then common ones
+        $portsToCheck = [8122, 8000, 8080, 8001, 9000, 3000];
+        if ($appPort && ! in_array($appPort, $portsToCheck)) {
+            array_unshift($portsToCheck, (int) $appPort);
+        }
+        
+        // Check both localhost and 127.0.0.1 variants
+        $commonHosts = ['127.0.0.1', 'localhost'];
+
+        foreach ($commonHosts as $host) {
+            foreach ($portsToCheck as $port) {
+                $url = "http://{$host}:{$port}";
                 try {
                     $result = Process::timeout(2)->run("curl -s -o /dev/null -w '%{{http_code}}' {$url}");
                     $httpCode = trim($result->output());
                     if (in_array($httpCode, ['200', '301', '302', '404'])) {
+                        $this->info("  Found server at {$url} (HTTP {$httpCode})");
                         return $url;
                     }
                 } catch (\Exception $e) {
-                    // Fall through to null
+                    continue;
                 }
             }
         }

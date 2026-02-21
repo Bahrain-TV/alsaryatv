@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Record OBS overlay daily at 5:00 AM
+        // Auto-detects local server when running (no --environment needed)
         $schedule->command('obs:record')
             ->dailyAt('05:00')
             ->name('obs-overlay-record-daily')

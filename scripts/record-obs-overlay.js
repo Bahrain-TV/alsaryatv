@@ -18,9 +18,11 @@ const url = args.get('--url') ?? 'http://localhost:8000/obs-overlay';
 const outPath = args.get('--out') ?? 'storage/app/obs-overlay.mov';
 const baseSeconds = Number(args.get('--seconds') ?? '65');
 const fps = Number(args.get('--fps') ?? '50');
-const preWarmMs = 2800 + Math.random() * 1200; // 2.8-4s pre-warm
+
+// Pre-warm: Wait for animation to stabilize (at least one full cycle ~25s + buffer)
+const preWarmMs = 2800 + Math.random() * 1200; // 2.8-4s pre-warm for page load
 const subtractMs = 2000 + Math.random() * 1000; // Subtract 2-3s randomly
-const seconds = Math.max(baseSeconds - (subtractMs / 1000), 10); // Floor at 10s
+const seconds = Math.max(baseSeconds - (subtractMs / 1000), 30); // Floor at 30s for full cycle
 
 const width = 1920;
 const height = 1080;
