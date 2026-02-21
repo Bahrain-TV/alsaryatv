@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Process;
 
-class RecordObsOverlay extends Command
+class RecordObsOverlayCommand extends Command
 {
     /**
      * The name and signature of the console command.

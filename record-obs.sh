@@ -20,7 +20,12 @@ err() { echo -e "${RED}✗${NC} $*"; }
 
 cd "$(dirname "$0")"
 
-# Configuration
+# Load environment variables from .env
+if [ -f .env ]; then
+    export $(grep "^APP_PORT=" .env | xargs)
+fi
+
+# Configuration - read actual port from env or .env, default to 8122
 PORT="${APP_PORT:-8122}"
 HOST="127.0.0.1"
 URL="http://${HOST}:${PORT}/obs-overlay"

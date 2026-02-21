@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Caller;
 use Illuminate\Console\Command;
 
-class RestoreData extends Command
+class RestoreDataCommand extends Command
 {
     /**
      * The name and signature of the console command.
