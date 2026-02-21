@@ -22,8 +22,9 @@ class WinnerAnnouncement extends Mailable
      */
     public function __construct(Collection|null $winnersList = null)
     {
-        // If winners list provided, use it. Otherwise, fetch all current winners.
+        // If winners list provided, use it. Otherwise, fetch winners selected in the last 24 hours only.
         $this->winners = $winnersList ?? Caller::where('is_winner', true)
+            ->where('created_at', '>=', now()->subHours(24))
             ->orderBy('created_at', 'desc')
             ->get(['id', 'name', 'cpr', 'phone', 'hits', 'created_at', 'updated_at']);
     }
