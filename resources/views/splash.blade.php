@@ -475,61 +475,160 @@
             to { opacity: 0; transform: scale(0.9); }
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* ===== RESPONSIVE & ENHANCED MOBILE ===== */
         @media (max-width: 768px) {
             .basmala {
                 top: 15px;
                 font-size: clamp(1rem, 2.5vw, 1.4rem);
+                letter-spacing: 2px;
+                text-shadow: 0 2px 8px rgba(168, 28, 46, 0.6);
             }
 
             .sponsor-card .sponsor-card-content {
-                gap: 2rem;
-                padding: 2rem;
+                gap: 2.5rem;
+                padding: 2.5rem 1.5rem;
+                animation: slideInFromBottom 0.6s ease-out;
             }
 
             .sponsor-card .sponsor-card-logo {
-                width: 180px;
-                max-height: 180px;
+                width: 200px;
+                max-height: 200px;
+                filter: drop-shadow(0 0 25px rgba(168, 28, 46, 0.8))
+                        drop-shadow(0 0 35px rgba(232, 215, 195, 0.6));
+                animation: logoFloat 3s ease-in-out infinite;
             }
 
             .sponsor-card .sponsor-card-title {
-                font-size: clamp(1rem, 2.5vw, 1.4rem);
+                font-size: clamp(1.1rem, 3vw, 1.6rem);
+                font-weight: 800;
+                text-shadow: 0 3px 12px rgba(168, 28, 46, 0.6);
+                animation: titlePulse 2s ease-in-out infinite;
             }
 
             .sponsors-logos {
-                gap: 2.5rem;
+                gap: 3rem;
                 flex-direction: column;
-                padding: 1.5rem;
+                padding: 2rem 1rem;
             }
 
             .sponsor-logo {
-                width: 120px;
-                max-height: 120px;
+                width: 140px;
+                max-height: 140px;
+                opacity: 1 !important;
+                transform: scale(1) !important;
+                animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .sponsor-logo:hover {
+                transform: scale(1.1) translateY(-8px) !important;
             }
 
             .sponsored-by {
-                font-size: clamp(1rem, 2.5vw, 1.6rem);
+                font-size: clamp(1.1rem, 3vw, 1.7rem);
+                text-shadow: 0 2px 10px rgba(168, 28, 46, 0.5);
             }
 
             .logo-container {
-                width: 240px;
-                height: 240px;
+                width: 280px;
+                height: 280px;
+                animation: logoPulse 2s ease-in-out infinite;
             }
 
             .show-logo {
-                width: 200px;
+                width: 240px;
+                filter: drop-shadow(0 0 40px rgba(232, 215, 195, 0.8));
             }
 
             .logo-glow {
-                width: 280px;
-                height: 280px;
+                width: 320px;
+                height: 320px;
+                box-shadow: inset 0 0 60px rgba(168, 28, 46, 0.4),
+                           0 0 80px rgba(168, 28, 46, 0.5);
             }
 
             .magic-circle {
-                width: 350px;
-                height: 350px;
+                width: 400px;
+                height: 400px;
+                box-shadow: 0 0 100px rgba(168, 28, 46, 0.6),
+                           0 0 150px rgba(232, 215, 195, 0.4);
+            }
+
+            @keyframes slideInFromBottom {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes logoFloat {
+                0%, 100% {
+                    transform: scale(1) translateY(0);
+                }
+                50% {
+                    transform: scale(1.02) translateY(-8px);
+                }
+            }
+
+            @keyframes titlePulse {
+                0%, 100% {
+                    opacity: 0.9;
+                    text-shadow: 0 3px 12px rgba(168, 28, 46, 0.6);
+                }
+                50% {
+                    opacity: 1;
+                    text-shadow: 0 3px 16px rgba(168, 28, 46, 0.8);
+                }
+            }
+
+            @keyframes logoPulse {
+                0%, 100% {
+                    box-shadow: 0 0 30px rgba(168, 28, 46, 0.4),
+                               0 0 50px rgba(232, 215, 195, 0.2);
+                }
+                50% {
+                    box-shadow: 0 0 50px rgba(168, 28, 46, 0.6),
+                               0 0 80px rgba(232, 215, 195, 0.4);
+                }
+            }
+
+            @keyframes popIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.5);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
             }
         }
+
+        /* Extra small screens enhancement */
+        @media (max-width: 480px) {
+            .sponsor-card .sponsor-card-logo {
+                width: 160px;
+                max-height: 160px;
+            }
+
+            .sponsor-logo {
+                width: 110px;
+                max-height: 110px;
+            }
+
+            .logo-container {
+                width: 220px;
+                height: 220px;
+            }
+
+            .show-logo {
+                width: 180px;
+            }
+        }
+
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {

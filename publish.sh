@@ -267,7 +267,64 @@ test_ssh_connection() {
     fi
 }
 
-# ── Pre-deployment vitals check (non-blocking) ─────────────────────────────
+# ── Fix remote file ownership (pre-deployment) ──────────────────────────────
+fix_remote_ownership_pre() {
+    info "Fixing file ownership on production server (pre-deployment)..."
+
+    local ssh_key_option=""
+    if [[ -f "$SSH_KEY_PATH" ]]; then
+        ssh_key_option="-i $SSH_KEY_PATH"
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        info "[DRY-RUN] Would fix ownership on remote"
+        return 0
+    fi
+
+    # Determine web server user (www-data for Debian/Ubuntu, nobody for others)
+    local web_user
+    web_user=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+        "id www-data &>/dev/null && echo 'www-data' || echo 'nobody'" 2>/dev/null || echo "www-data")
+
+    if ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+        "chown -R ${web_user}:${web_user} '$PROD_APP_DIR' 2>/dev/null && echo 'OK' || echo 'WARN'" 2>/dev/null | grep -q "OK"; then
+        success "File ownership fixed: ${web_user}:${web_user}"
+    else
+        warn "Could not change file ownership - may affect deployment"
+    fi
+}
+
+# ── Fix remote file ownership (post-deployment) ─────────────────────────────
+fix_remote_ownership_post() {
+    info "Fixing file ownership on production server (post-deployment)..."
+
+    local ssh_key_option=""
+    if [[ -f "$SSH_KEY_PATH" ]]; then
+        ssh_key_option="-i $SSH_KEY_PATH"
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        info "[DRY-RUN] Would finalize ownership on remote"
+        return 0
+    fi
+
+    # Determine web server user
+    local web_user
+    web_user=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+        "id www-data &>/dev/null && echo 'www-data' || echo 'nobody'" 2>/dev/null || echo "www-data")
+
+    # Fix ownership and permissions
+    if ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+        "chown -R ${web_user}:${web_user} '$PROD_APP_DIR' && \
+         chmod -R 755 '$PROD_APP_DIR' && \
+         chmod -R 775 '$PROD_APP_DIR/storage' '$PROD_APP_DIR/bootstrap/cache' 2>/dev/null" 2>/dev/null; then
+        success "File ownership and permissions finalized"
+    else
+        warn "Could not finalize file ownership/permissions"
+    fi
+}
+
+# ── Pre-deployment vitals check (non-blocking) ──────────────────────────────
 run_vitals_precheck() {
     info "Running vitals precheck before deployment..."
 
@@ -901,10 +958,12 @@ if [[ "$DRY_RUN" != "true" ]]; then
 fi
 
 push_to_remote
+fix_remote_ownership_pre
 trigger_remote_deployment
 
 # Only run asset push + backup sync + health check if deployment succeeded
 if [[ $? -eq 0 ]]; then
+    fix_remote_ownership_post
     sync_assets
     sync_force_overrides
     sync_backups_from_remote

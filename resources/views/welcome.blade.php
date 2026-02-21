@@ -134,31 +134,68 @@
             border: none;
             color: white;
             box-shadow:
-                0 4px 15px oklch(0.65 0.18 70.0804 / 0.3),
-                0 2px 8px oklch(0.65 0.18 70.0804 / 0.2);
-            transition: all 0.3s ease;
+                0 8px 20px oklch(0.65 0.18 70.0804 / 0.35),
+                0 4px 12px oklch(0.65 0.18 70.0804 / 0.25);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            min-height: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 14px;
+            padding: 12px 24px;
+            touch-action: manipulation;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.02);
             box-shadow:
-                0 8px 25px oklch(0.65 0.18 70.0804 / 0.4),
-                0 4px 15px oklch(0.65 0.18 70.0804 / 0.3);
+                0 12px 30px oklch(0.65 0.18 70.0804 / 0.45),
+                0 6px 20px oklch(0.65 0.18 70.0804 / 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 4px 10px oklch(0.65 0.18 70.0804 / 0.3);
         }
 
         /* Enhanced form styling */
         .form-input {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.85) 100%);
+            border: 2px solid rgba(197, 157, 95, 0.3);
+            border-radius: 14px;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            font-size: 1rem;
+            padding: 12px 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         .form-input:focus {
             border-color: oklch(0.65 0.18 70.0804);
-            box-shadow: 0 0 0 3px oklch(0.65 0.18 70.0804 / 0.1);
-            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 4px oklch(0.65 0.18 70.0804 / 0.15), 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
+            transform: translateY(-2px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+            font-weight: 500;
         }
 
         /* Ramadan crescent moon effect */
@@ -486,11 +523,78 @@
             }
         }
 
-        /* Extra small phones */
-        @media (max-width: 380px) {
-            #main-content {
-                padding: 0.5rem 0.5rem !important;
+        /* Enhanced mobile styling for better UX */
+        @media (max-width: 768px) {
+            /* Larger touch targets */
+            .btn-primary {
+                min-height: 56px !important;
+                padding: 14px 28px !important;
+                font-size: 1.05rem !important;
+                border-radius: 16px !important;
             }
+
+            /* Enhanced input styling for mobile */
+            .form-input {
+                border-radius: 16px !important;
+                padding: 14px 18px !important;
+                font-size: 1.05rem !important;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.88) 100%) !important;
+                border: 2px solid rgba(197, 157, 95, 0.4) !important;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+            }
+
+            .form-input:focus {
+                border-color: oklch(0.65 0.18 70.0804) !important;
+                box-shadow: 0 0 0 5px oklch(0.65 0.18 70.0804 / 0.2), 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+            }
+
+            /* Label styling */
+            label {
+                font-size: 0.95rem !important;
+                font-weight: 600 !important;
+                margin-bottom: 8px !important;
+            }
+
+            /* Enhanced form container */
+            .glass-panel {
+                backdrop-filter: blur(15px) !important;
+                border-radius: 20px !important;
+                padding: 28px !important;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+            }
+
+            /* Better spacing */
+            .gap-4 {
+                gap: 18px !important;
+            }
+
+            /* Mobile button animation */
+            .btn-primary:active {
+                transform: scale(0.95) !important;
+            }
+        }
+
+        /* Extra small phones - additional enhancements */
+        @media (max-width: 380px) {
+            .btn-primary {
+                min-height: 52px !important;
+                padding: 12px 24px !important;
+                font-size: 0.95rem !important;
+                border-radius: 14px !important;
+            }
+
+            .form-input {
+                padding: 12px 16px !important;
+                font-size: 0.95rem !important;
+                border-radius: 14px !important;
+            }
+
+            .glass-panel {
+                padding: 20px !important;
+                border-radius: 16px !important;
+            }
+        }
+
             header h1 {
                 font-size: 1.5rem !important;
             }
