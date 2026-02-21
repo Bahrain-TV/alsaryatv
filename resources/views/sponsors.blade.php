@@ -17,7 +17,7 @@
                                  loading="lazy"
                                  class="sponsor-logo max-h-full max-w-full object-contain transition-transform duration-300 drop-shadow-lg" />
                         </div>
-                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md">بابكو للطاقة</span>
+                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md" dir="auto">بابكو للطاقة - Bapco Energies</span>
                     </div>
 
                     {{-- Al Salam Bank — SECOND POSITION --}}
@@ -29,7 +29,7 @@
                                  class="sponsor-logo max-h-full max-w-full object-contain transition-transform duration-300 drop-shadow-lg"
                                  style="filter: brightness(0) invert(1) sepia(0.15);" />
                         </div>
-                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md">مصرف السلام</span>
+                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md" dir="auto">مصرف السلام - Al Salam Bank</span>
                     </div>
 
                     {{-- Jasmi's — THIRD POSITION --}}
@@ -40,7 +40,7 @@
                                  loading="lazy"
                                  class="sponsor-logo max-h-full max-w-full object-contain transition-transform duration-300 drop-shadow-lg" />
                         </div>
-                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md" dir="auto">جاسمي - Jasmi's</span>
+                        <span class="sponsor-name text-white/90 text-sm sm:text-base md:text-lg font-bold tracking-wide drop-shadow-md" dir="auto">جاسميز - Jasmi's</span>
                     </div>
 
                 </div>

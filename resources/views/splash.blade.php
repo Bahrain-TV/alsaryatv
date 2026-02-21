@@ -207,6 +207,31 @@
                     drop-shadow(0 0 40px rgba(232, 215, 195, 0.6));
         }
 
+        /* Sponsor logo with label styling */
+        .sponsor-logo-with-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sponsor-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: clamp(0.75rem, 2vw, 1rem);
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 1px;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.5s ease;
+        }
+
+        .sponsor-logo-with-label:hover .sponsor-logo {
+            filter: drop-shadow(0 0 40px rgba(168, 28, 46, 0.7))
+                    drop-shadow(0 0 50px rgba(232, 215, 195, 0.6));
+            transform: scale(1.05) translateY(-5px);
+        }
+
         /* Individual card animations */
         @keyframes cardSlideInFromLeft {
             0% { opacity: 0; transform: translateX(-100px) scale(0.8); }
@@ -538,15 +563,15 @@
             <!-- Card 1: Jasmis - enters from left at 0s, exits at 2s -->
             <div class="sponsor-card" id="sponsorCard1">
                 <div class="sponsor-card-content">
-                    <div class="sponsor-card-title">Jasmis</div>
-                    <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="sponsor-card-logo">
+                    <div class="sponsor-card-title">جاسميز - Jasmi's</div>
+                    <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmi's" class="sponsor-card-logo">
                 </div>
             </div>
 
             <!-- Card 2: Bapco Energies - enters from right at 2s, exits at 3.5s -->
             <div class="sponsor-card" id="sponsorCard2">
                 <div class="sponsor-card-content">
-                    <div class="sponsor-card-title">Bapco Energies</div>
+                    <div class="sponsor-card-title">بابكو للطاقة - Bapco Energies</div>
                     <img src="{{ asset('images/bapco-energies.png') }}" alt="Bapco Energies" class="sponsor-card-logo">
                 </div>
             </div>
@@ -554,17 +579,26 @@
             <!-- Card 3: Al Salam - enters from center at 3.5s, exits at 5s -->
             <div class="sponsor-card" id="sponsorCard3">
                 <div class="sponsor-card-content">
-                    <div class="sponsor-card-title">Al Salam</div>
-                    <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam" class="sponsor-card-logo alsalam-logo">
+                    <div class="sponsor-card-title">مصرف السلام - Al Salam Bank</div>
+                    <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam Bank" class="sponsor-card-logo alsalam-logo">
                 </div>
             </div>
 
             <!-- Combined Display: All three sponsors together (5s-11s) - LONGEST PHASE -->
             <div class="sponsored-by" id="sponsoredByText">برعاية</div>
             <div class="sponsors-logos" id="sponsorsLogos">
-                <img src="{{ asset('images/jasmis-logo.png') }}" id="sponsor1" alt="Jasmis" class="sponsor-logo">
-                <img src="{{ asset('images/alsalam-logo.svg') }}" id="sponsor3" alt="Al Salam" class="sponsor-logo alsalam-logo">
-                <img src="{{ asset('images/bapco-energies.png') }}" id="sponsor2" alt="Bapco Energies" class="sponsor-logo">
+                <div class="sponsor-logo-with-label">
+                    <img src="{{ asset('images/jasmis-logo.png') }}" id="sponsor1" alt="Jasmi's" class="sponsor-logo">
+                    <div class="sponsor-label">جاسميز - Jasmi's</div>
+                </div>
+                <div class="sponsor-logo-with-label">
+                    <img src="{{ asset('images/alsalam-logo.svg') }}" id="sponsor3" alt="Al Salam Bank" class="sponsor-logo alsalam-logo">
+                    <div class="sponsor-label">مصرف السلام - Al Salam Bank</div>
+                </div>
+                <div class="sponsor-logo-with-label">
+                    <img src="{{ asset('images/bapco-energies.png') }}" id="sponsor2" alt="Bapco Energies" class="sponsor-logo">
+                    <div class="sponsor-label">بابكو للطاقة - Bapco Energies</div>
+                </div>
             </div>
         </div>
 
@@ -703,6 +737,17 @@
                 setTimeout(() => {
                     sponsor2.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
                 }, 5600);
+
+                // Animate sponsor labels fade in with the logos
+                setTimeout(() => {
+                    const labels = document.querySelectorAll('.sponsor-label');
+                    labels.forEach((label, index) => {
+                        const delays = [0, 300, 600];
+                        setTimeout(() => {
+                            label.style.animation = 'textFadeIn 1s ease-out forwards';
+                        }, delays[index]);
+                    });
+                }, 5000);
 
                 // 6.5-11s: HOLD SPONSOR LOGOS VISIBLE FOR 4.5+ SECONDS!
                 // Give plenty of time for images to load and display
