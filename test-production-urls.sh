@@ -81,7 +81,7 @@ TOTAL_TESTS=$((TOTAL_TESTS + 1))
 echo -n "Extracting CSRF token... "
 
 # Fetch registration form and extract CSRF token
-form_html=$(timeout $TIMEOUT curl -s --connect-timeout 5 --max-time $((TIMEOUT-1)) "${PRODUCTION_URL}/callers/create" 2>/dev/null)
+form_html=$(timeout $TIMEOUT curl -s --connect-timeout 5 --max-time $((TIMEOUT-1)) "${PRODUCTION_URL}/" 2>/dev/null)
 csrf_token=$(echo "$form_html" | grep -o 'value="[a-zA-Z0-9/+=]*"' | head -1 | sed 's/value="\(.*\)"/\1/')
 
 if [ -z "$csrf_token" ] || [ ${#csrf_token} -lt 20 ]; then
@@ -97,7 +97,7 @@ else
     
     submit_response=$(timeout $TIMEOUT curl -s -X POST --connect-timeout 5 --max-time $((TIMEOUT-1)) \
         -d "_token=${csrf_token}&name=TestUser&cpr=12345678901&phone_number=%2B97366123456" \
-        "${PRODUCTION_URL}/callers" 2>/dev/null)
+        "${PRODUCTION_URL}/" 2>/dev/null)
     
     # Check if thank you screen is in response
     if echo "$submit_response" | grep -qi "شكرا\|thank\|success\|تم\|aшкran" 2>/dev/null; then
