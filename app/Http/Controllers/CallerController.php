@@ -94,9 +94,11 @@ class CallerController extends Controller
         RateLimiter::hit('caller-registration-ip:'.$request->ip(), 3600);
 
         session([
+            'name' => $caller->name,
             'cpr' => $cpr,
             'userHits' => $caller->hits,
-            'totalHits' => HitsCounter::getHits(),
+            'totalHits' => HitsCounter::getTotalHits(),
+            'seconds' => 30,
         ]);
 
         return redirect()->route('callers.success');

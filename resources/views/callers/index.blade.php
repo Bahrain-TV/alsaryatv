@@ -376,11 +376,7 @@
             {!! $callers->links() !!}
         </div>
         <div class="mt-2 text-center">
-            <button type="button" x-show="currentPage < lastPage" @click="loadPage(currentPage + 1, false)" :disabled="loading" class="inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                <span x-show="!loading">{{ __('Load more') }}</span>
-                <span x-show="loading">{{ __('Loading...') }}</span>
-            </button>
-            <div id="infinite-sentinel" style="height:1px;"></div>
+            <span x-show="loading" class="text-sm text-gray-500">{{ __('Loading...') }}</span>
         </div>
 
         <form id="delete-form" method="POST" class="hidden">
@@ -423,19 +419,6 @@
                 }
                 const input = document.getElementById('caller-search');
                 if (input) input.addEventListener('input', () => this.onSearchInput());
-
-                // Infinite scroll sentinel
-                const sentinel = document.getElementById('infinite-sentinel');
-                if (sentinel && 'IntersectionObserver' in window) {
-                    const io = new IntersectionObserver(entries => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting && !this.loading && this.currentPage < this.lastPage) {
-                                this.loadPage(this.currentPage + 1, false);
-                            }
-                        });
-                    }, { root: null, rootMargin: '400px' });
-                    io.observe(sentinel);
-                }
             },
 
             get filteredCallers() {
@@ -483,11 +466,11 @@
             onSearchInput() {
                 clearTimeout(this.debounceTimer);
                 this.debounceTimer = setTimeout(() => {
-                    this.loadPage(1, true);
+                    this.loadPage(1);
                 }, 300);
             },
 
-            async loadPage(page = 1, replace = true) {
+            async loadPage(page = 1) {
                 if (this.abortController) this.abortController.abort();
                 this.abortController = new AbortController();
 
@@ -505,7 +488,7 @@
                     });
                     const data = await response.json();
                     const items = data.data || data;
-                    if (replace) this.callers = items; else this.callers = this.callers.concat(items);
+                    this.callers = items;
                     this.currentPage = data.current_page || page;
                     this.lastPage = data.last_page || this.lastPage;
                     this.perPage = data.per_page || this.perPage;

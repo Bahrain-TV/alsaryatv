@@ -463,7 +463,7 @@
                 <h2>تم التسجيل بنجاح!</h2>
 
                 <p class="subtitle">
-                    شكراً <span class="highlight">{{ session('name') ?: 'المشارك الكريم' }}</span> لمشاركتك في برنامج السارية
+                    شكراً <span class="highlight">{{ session('name', 'المشارك الكريم') }}</span> لمشاركتك في برنامج السارية
                 </p>
 
                 <!-- Bapco Energies section -->
@@ -476,11 +476,11 @@
                 </div>
 
                 <!-- Statistics -->
-                @if(session('userHits') !== null || session('totalHits') !== null)
+                @if(($userHits ?? null) !== null || ($totalHits ?? null) !== null)
                 <div class="stats-container">
                     <div class="stat-label">عدد مرات مشاركتك</div>
-                    <div class="stat-value" id="hits-counter">{{ session('userHits', 1) }}</div>
-                    <div class="stat-total">من إجمالي <strong>{{ number_format(session('totalHits', 0)) }}</strong> مشارك</div>
+                    <div class="stat-value" id="hits-counter">{{ $userHits ?? 1 }}</div>
+                    <div class="stat-total">من إجمالي <strong>{{ number_format($totalHits ?? 0) }}</strong> مشارك</div>
                 </div>
 
                 <div class="warning-box">
@@ -496,7 +496,7 @@
                     </div>
 
                     <div class="countdown-text">
-                        <span class="countdown-number" id="countdown">{{ session('seconds', 30) }}</span>
+                        <span class="countdown-number" id="countdown">{{ $seconds ?? 30 }}</span>
                         <span class="countdown-label" id="seconds-word">ثوانٍ</span>
                     </div>
 
@@ -557,7 +557,7 @@
 
             if (isDirtyFile) {
                 // ===== SUCCESS PAGE COUNTDOWN =====
-                const userHits = {{ session('userHits', 1) }};
+                const userHits = {{ (int) ($userHits ?? 1) }};
                 const hitsCounter = document.getElementById('hits-counter');
                 const progressBar = document.getElementById('progress');
                 const countdownEl = document.getElementById('countdown');
@@ -598,7 +598,7 @@
                     }
                 }
 
-                let secondsLeft = {{ session('seconds', 30) }};
+                let secondsLeft = {{ (int) ($seconds ?? 30) }};
                 const totalSeconds = secondsLeft;
                 let isRunning = true;
                 

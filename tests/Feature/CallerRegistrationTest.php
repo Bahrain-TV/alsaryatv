@@ -240,4 +240,25 @@ class CallerRegistrationTest extends TestCase
         $this->assertEquals(2, Caller::winners()->count());
         $this->assertEquals(3, Caller::where('is_winner', false)->count());
     }
+
+    public function test_registration_sets_success_counter_session_data(): void
+    {
+        $welcomeResponse = $this->get('/');
+        $csrfToken = $this->getCsrfToken($welcomeResponse);
+
+        $response = $this->post('/callers', [
+            'name' => 'محمد علي',
+            'cpr' => '77777777777',
+            'phone_number' => '+97360001111',
+            'registration_type' => 'individual',
+            '_token' => $csrfToken,
+        ]);
+
+        $response->assertRedirect(route('callers.success'));
+        $response->assertSessionHas('name', 'محمد علي');
+        $response->assertSessionHas('cpr', '77777777777');
+        $response->assertSessionHas('userHits', 1);
+        $response->assertSessionHas('seconds', 30);
+        $response->assertSessionHas('totalHits');
+    }
 }

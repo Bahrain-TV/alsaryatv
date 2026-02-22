@@ -192,9 +192,9 @@ class ThankYouScreenCounterTest extends TestCase
         
         // Verify inline counter animation exists
         $this->assertStringContainsString(
-            'const userHits = {{ session(\'userHits\', 1) }}',
+            'const userHits = {{ (int) ($userHits ?? 1) }}',
             $content,
-            'Should get userHits from session'
+            'Should get userHits from success view data'
         );
         
         $this->assertStringContainsString(
