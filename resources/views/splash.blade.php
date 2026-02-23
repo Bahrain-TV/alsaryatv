@@ -171,6 +171,17 @@
             padding: 3rem 2rem;
         }
 
+        /* Container for sponsors + stats side by side */
+        .sponsors-logos-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4rem;
+            opacity: 0;
+            width: 100%;
+            padding: 2rem;
+        }
+
         .sponsor-logo {
             width: 160px;
             height: auto;
@@ -213,6 +224,80 @@
             flex-direction: column;
             align-items: center;
             gap: 0.75rem;
+        }
+
+        /* ===== STATS CARD STYLING ===== */
+        .stats-card-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.8) translateY(40px);
+        }
+
+        .stat-card-splash {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            border-radius: 20px;
+            min-width: 140px;
+            min-height: 160px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(255, 215, 0, 0.06) 100%);
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(168, 28, 46, 0.3);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .stat-card-splash:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.18) 0%, rgba(255, 215, 0, 0.1) 100%);
+            border-color: rgba(255, 215, 0, 0.4);
+            transform: scale(1.08) translateY(-4px);
+            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.25);
+        }
+
+        .stat-card-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.75);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            text-align: center;
+            line-height: 1.3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFD700 0%, #FF9500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            width: 100%;
+            text-align: center;
+            direction: ltr;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: 'tnum' 1, 'lnum' 1;
+            filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.25));
+        }
+
+        /* Animation for stats card slide in */
+        @keyframes statsCardSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         .sponsor-label {
@@ -476,6 +561,27 @@
         }
 
         /* ===== RESPONSIVE & ENHANCED MOBILE ===== */
+        @media (max-width: 1024px) {
+            .sponsors-logos-container {
+                flex-direction: column;
+                gap: 3rem;
+            }
+
+            .stat-card-splash {
+                min-width: 130px;
+                min-height: 150px;
+                padding: 1.5rem 1.2rem;
+            }
+
+            .stat-card-value {
+                font-size: 2.2rem;
+            }
+
+            .stat-card-label {
+                font-size: 0.8rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .basmala {
                 top: 15px;
@@ -506,9 +612,15 @@
             }
 
             .sponsors-logos {
-                gap: 3rem;
+                gap: 2rem;
                 flex-direction: column;
-                padding: 2rem 1rem;
+                padding: 1.5rem 1rem;
+            }
+
+            .sponsors-logos-container {
+                flex-direction: column;
+                gap: 2.5rem;
+                padding: 1.5rem;
             }
 
             .sponsor-logo {
@@ -551,6 +663,20 @@
                 height: 400px;
                 box-shadow: 0 0 100px rgba(168, 28, 46, 0.6),
                            0 0 150px rgba(232, 215, 195, 0.4);
+            }
+
+            .stat-card-splash {
+                min-width: 120px;
+                min-height: 140px;
+                padding: 1.25rem 1rem;
+            }
+
+            .stat-card-value {
+                font-size: 2rem;
+            }
+
+            .stat-card-label {
+                font-size: 0.75rem;
             }
 
             @keyframes slideInFromBottom {
@@ -627,6 +753,33 @@
             .show-logo {
                 width: 180px;
             }
+
+            .sponsors-logos {
+                gap: 1.5rem;
+            }
+
+            .sponsor-logo-with-label {
+                gap: 0.5rem;
+            }
+
+            .sponsor-label {
+                font-size: 0.65rem;
+            }
+
+            .stat-card-splash {
+                min-width: 110px;
+                min-height: 130px;
+                padding: 1rem 0.75rem;
+            }
+
+            .stat-card-value {
+                font-size: 1.75rem;
+            }
+
+            .stat-card-label {
+                font-size: 0.7rem;
+                letter-spacing: 0.5px;
+            }
         }
 
 
@@ -683,20 +836,39 @@
                 </div>
             </div>
 
-            <!-- Combined Display: All three sponsors together (5s-11s) - LONGEST PHASE -->
+            <!-- Combined Display: All three sponsors together + Total Hits (5s-11s) - LONGEST PHASE -->
             <div class="sponsored-by" id="sponsoredByText">برعاية</div>
-            <div class="sponsors-logos" id="sponsorsLogos">
-                <div class="sponsor-logo-with-label">
-                    <img src="{{ asset('images/jasmis-logo.png') }}" id="sponsor1" alt="Jasmi's" class="sponsor-logo">
-                    <div class="sponsor-label">جاسميز - Jasmi's</div>
+            <div class="sponsors-logos-container" id="sponsorsLogosContainer">
+                <div class="sponsors-logos" id="sponsorsLogos">
+                    <div class="sponsor-logo-with-label">
+                        <img src="{{ asset('images/jasmis-logo.png') }}" id="sponsor1" alt="Jasmi's" class="sponsor-logo">
+                        <div class="sponsor-label">
+                            <div>جاسميز</div>
+                            <div>Jasmi's</div>
+                        </div>
+                    </div>
+                    <div class="sponsor-logo-with-label">
+                        <img src="{{ asset('images/alsalam-logo.svg') }}" id="sponsor3" alt="Al Salam Bank" class="sponsor-logo alsalam-logo">
+                        <div class="sponsor-label">
+                            <div>بنك السلام</div>
+                            <div>Al Salam Bank</div>
+                        </div>
+                    </div>
+                    <div class="sponsor-logo-with-label">
+                        <img src="{{ asset('images/bapco-energies.png') }}" id="sponsor2" alt="Bapco Energies" class="sponsor-logo">
+                        <div class="sponsor-label">
+                            <div>بابكو للطاقة</div>
+                            <div>Bapco Energies</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="sponsor-logo-with-label">
-                    <img src="{{ asset('images/alsalam-logo.svg') }}" id="sponsor3" alt="Al Salam Bank" class="sponsor-logo alsalam-logo">
-                    <div class="sponsor-label">بنك السلام - Al Salam Bank</div>
-                </div>
-                <div class="sponsor-logo-with-label">
-                    <img src="{{ asset('images/bapco-energies.png') }}" id="sponsor2" alt="Bapco Energies" class="sponsor-logo">
-                    <div class="sponsor-label">بابكو للطاقة - Bapco Energies</div>
+
+                <!-- Animated Stats Card - Total Hits displayed alongside logos -->
+                <div class="stats-card-container" id="statsCardContainer">
+                    <div class="stat-card-splash">
+                        <div class="stat-card-label" id="statCardLabel">إجمالي المشاركات</div>
+                        <div class="stat-card-value" id="statCardValue">0</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -738,6 +910,104 @@
     <div class="vignette" id="vignette"></div>
     <div class="oblivion-overlay" id="oblivionOverlay"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        // ============================================
+        // SPRING PHYSICS ENGINE FOR STATS ANIMATION
+        // ============================================
+        class SpringValue {
+            constructor(initialValue = 0, stiffness = 100, damping = 18) {
+                this.position = initialValue;
+                this.velocity = 0;
+                this.target = initialValue;
+                this.stiffness = stiffness;
+                this.damping = damping;
+            }
+
+            setTarget(value) {
+                this.target = value;
+            }
+
+            update(deltaTime) {
+                const displacement = this.position - this.target;
+                const springForce = -this.stiffness * displacement;
+                const dampingForce = -this.damping * this.velocity;
+                const acceleration = (springForce + dampingForce) / 1;
+
+                this.velocity += acceleration * deltaTime;
+                this.position += this.velocity * deltaTime;
+
+                return this.position;
+            }
+
+            getValue() {
+                return this.position;
+            }
+        }
+
+        // ============================================
+        // STATS ANIMATION INTEGRATION
+        // ============================================
+        function initStatsAnimation() {
+            const statCardValue = document.getElementById('statCardValue');
+            const statCardContainer = document.getElementById('statsCardContainer');
+            
+            if (!statCardValue || !statCardContainer) {
+                console.warn('Stats card elements not found');
+                return;
+            }
+
+            // Fetch total hits from API
+            fetch('/api/caller-stats')
+                .then(response => response.json())
+                .then(data => {
+                    const totalHits = data.total_hits || 0;
+                    
+                    // Spring physics for smooth number animation
+                    const numberSpring = new SpringValue(0, 95, 20);
+                    let currentDisplayValue = 0;
+
+                    // Format number with thousand separators
+                    function formatNumber(num) {
+                        return Math.floor(num).toLocaleString('en-US');
+                    }
+
+                    // Smooth spring animation loop
+                    let animationFrameId = null;
+                    
+                    function updateSpringAnimation() {
+                        const deltaTime = 0.016; // 60fps target
+                        const newValue = numberSpring.update(deltaTime);
+
+                        if (Math.abs(newValue - currentDisplayValue) > 0.1) {
+                            currentDisplayValue = newValue;
+                            statCardValue.textContent = formatNumber(currentDisplayValue);
+                        }
+
+                        animationFrameId = requestAnimationFrame(updateSpringAnimation);
+                    }
+
+                    // Start animation immediately (already triggered from timeline at 5.7s)
+                    // Animate number from 0 to totalHits over 2.3 seconds with spring physics
+                    numberSpring.setTarget(totalHits);
+                    updateSpringAnimation();
+
+                    // Cleanup on page unload
+                    window.addEventListener('beforeunload', () => {
+                        if (animationFrameId) {
+                            cancelAnimationFrame(animationFrameId);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Failed to fetch caller stats:', error);
+                    // Show a fallback value
+                    statCardValue.textContent = '0';
+                });
+        }
+
+        // Stats animation will be triggered from the splash animation timeline at 5.7s
+    </script>
     <script>
         (function() {
             const particles = document.getElementById('particles');
@@ -783,7 +1053,9 @@
                 const sponsorCard2 = document.getElementById('sponsorCard2');
                 const sponsorCard3 = document.getElementById('sponsorCard3');
                 const sponsoredBy = document.getElementById('sponsoredByText');
+                const sponsorsLogosContainer = document.getElementById('sponsorsLogosContainer');
                 const sponsorsLogos = document.getElementById('sponsorsLogos');
+                const statsCardContainer = document.getElementById('statsCardContainer');
                 // #sponsor1/2/3 are now the img elements directly
                 const sponsor1 = document.getElementById('sponsor1');
                 const sponsor2 = document.getElementById('sponsor2');
@@ -819,8 +1091,9 @@
                     sponsorCard3.style.animation = 'cardSlideOut 0.8s ease-in forwards';
                 }, 4500);
 
+                // 4.7s: Show the combined sponsors + stats container
                 setTimeout(() => {
-                    sponsorsLogos.style.opacity = '1';
+                    sponsorsLogosContainer.style.opacity = '1';
                     sponsoredBy.style.animation = 'sponsorFadeIn 0.8s ease-out forwards';
                 }, 4700);
 
@@ -837,6 +1110,15 @@
                     sponsor2.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
                 }, 5600);
 
+                // 5.7s: Stats card slides in parallel with logos
+                setTimeout(() => {
+                    if (statsCardContainer) {
+                        statsCardContainer.style.animation = 'statsCardSlideIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                        // Start the number animation
+                        initStatsAnimation();
+                    }
+                }, 5700);
+
                 // Animate sponsor labels fade in with the logos
                 setTimeout(() => {
                     const labels = document.querySelectorAll('.sponsor-label');
@@ -848,11 +1130,11 @@
                     });
                 }, 5000);
 
-                // 6.5-11s: HOLD SPONSOR LOGOS VISIBLE FOR 4.5+ SECONDS!
+                // 6.5-11s: HOLD SPONSOR LOGOS + STATS VISIBLE FOR 4.5+ SECONDS!
                 // Give plenty of time for images to load and display
                 setTimeout(() => {
-                    // Keep sponsors visible - they're the stars!
-                    console.log('Sponsors prominently displayed - 4.5+ seconds visible');
+                    // Keep sponsors+stats visible - they're the stars!
+                    console.log('Sponsors + Stats prominently displayed - 4.5+ seconds visible');
                 }, 6500);
 
                 // 11-12s: Fade entire sponsor phase to transition to magic
