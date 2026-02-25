@@ -30,6 +30,9 @@ Route::middleware('api')->group(function (): void {
     Route::post('/callers/{id}/live', [CallerStatusController::class, 'sendToLive']);
     Route::post('/callers/{id}/toggle-winner', [CallerStatusController::class, 'toggleWinner']);
 
+    // Public stats endpoints
+    Route::get('/caller-stats', 'App\Http\Controllers\CallerStatsController@getStats');
+
     // Add route to check for CPR duplication
     Route::post('/check-cpr', 'App\Http\Controllers\CallerController@checkCpr');
 });

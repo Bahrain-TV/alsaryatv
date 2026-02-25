@@ -3,10 +3,11 @@
 # publish.sh — AlSarya TV Show Registration System
 #
 # Local deployment publisher script. Validates git state, pushes to remote,
-# connects to production server via SSH, and triggers remote deployment.
+# connects to production server via SSH, triggers remote deployment, and runs
+# post-deployment production URL tests with automatic retry on failure.
 #
 # Usage:
-#   ./publish.sh                 # Full deploy to production (default)
+#   ./publish.sh                 # Full deploy to production (default, with tests)
 #   ./publish.sh --up            # Bring site up mode (runs vitals check first)
 #   ./publish.sh --quick-up      # Fast recovery: vitals check + --up --force --no-build
 #   ./publish.sh --fresh         # Fresh database deploy
@@ -19,11 +20,19 @@
 #   ./publish.sh --sync-assets-only  # Only sync assets (no deploy)
 #   ./publish.sh --help          # Show this help message
 #
+# Post-Deployment Testing:
+#   After successful deployment, the script automatically runs production URL
+#   tests via ./test-production-urls.sh. If tests fail:
+#     - User is prompted to retry (unless --force is set)
+#     - With --force, retries are automatic (3 attempts, 15 sec between each)
+#     - On final failure, shows warning but allows deployment to complete
+#
 # Requirements:
 #   - Git installed locally
 #   - SSH access to production server configured
 #   - SSH key in ~/.ssh (or SSH_KEY_PATH environment variable)
 #   - rsync installed locally (for asset + backup sync)
+#   - test-production-urls.sh script must exist for post-deploy testing
 #
 # Asset sync (local → production, after every successful deployment):
 #   public/images/, public/lottie/, public/sounds/, public/fonts/ are pushed
@@ -281,14 +290,22 @@ fix_remote_ownership_pre() {
         return 0
     fi
 
-    # Determine web server user (www-data for Debian/Ubuntu, nobody for others)
-    local web_user
-    web_user=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
-        "id www-data &>/dev/null && echo 'www-data' || echo 'nobody'" 2>/dev/null || echo "www-data")
+    # Retrieve actual current ownership from remote app directory
+    local current_ownership
+    current_ownership=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+        "stat -c '%U:%G' '$PROD_APP_DIR' 2>/dev/null || stat -f '%Su:%Sg' '$PROD_APP_DIR' 2>/dev/null" 2>/dev/null)
 
+    if [[ -z "$current_ownership" ]]; then
+        warn "Could not retrieve current ownership from remote app directory"
+        return 1
+    fi
+
+    info "Detected current ownership: $current_ownership"
+
+    # Use detected ownership for the entire folder
     if ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
-        "chown -R ${web_user}:${web_user} '$PROD_APP_DIR' 2>/dev/null && echo 'OK' || echo 'WARN'" 2>/dev/null | grep -q "OK"; then
-        success "File ownership fixed: ${web_user}:${web_user}"
+        "chown -R $current_ownership '$PROD_APP_DIR' 2>/dev/null && echo 'OK' || echo 'WARN'" 2>/dev/null | grep -q "OK"; then
+        success "File ownership set to: $current_ownership"
     else
         warn "Could not change file ownership - may affect deployment"
     fi
@@ -308,17 +325,24 @@ fix_remote_ownership_post() {
         return 0
     fi
 
-    # Determine web server user
-    local web_user
-    web_user=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
-        "id www-data &>/dev/null && echo 'www-data' || echo 'nobody'" 2>/dev/null || echo "www-data")
+    # Retrieve actual current ownership from remote app directory
+    local current_ownership
+    current_ownership=$(ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
+        "stat -c '%U:%G' '$PROD_APP_DIR' 2>/dev/null || stat -f '%Su:%Sg' '$PROD_APP_DIR' 2>/dev/null" 2>/dev/null)
 
-    # Fix ownership and permissions
+    if [[ -z "$current_ownership" ]]; then
+        warn "Could not retrieve current ownership from remote app directory"
+        return 1
+    fi
+
+    info "Using detected ownership: $current_ownership"
+
+    # Fix ownership and permissions using detected ownership
     if ssh $ssh_key_option -p "$PROD_SSH_PORT" "$PROD_SSH_USER@$PROD_SSH_HOST" \
-        "chown -R ${web_user}:${web_user} '$PROD_APP_DIR' && \
+        "chown -R $current_ownership '$PROD_APP_DIR' && \
          chmod -R 755 '$PROD_APP_DIR' && \
          chmod -R 775 '$PROD_APP_DIR/storage' '$PROD_APP_DIR/bootstrap/cache' 2>/dev/null" 2>/dev/null; then
-        success "File ownership and permissions finalized"
+        success "File ownership and permissions finalized: $current_ownership"
     else
         warn "Could not finalize file ownership/permissions"
     fi
@@ -957,6 +981,55 @@ if [[ "$DRY_RUN" != "true" ]]; then
     fi
 fi
 
+# ── Run Production URL Tests ────────────────────────────────────────────────
+run_production_tests() {
+    info "Running production URL tests..."
+    echo ""
+    
+    # Check if test script exists
+    if [[ ! -f "./test-production-urls.sh" ]]; then
+        error "test-production-urls.sh not found. Skipping tests."
+        return 1
+    fi
+    
+    # Make sure it's executable
+    chmod +x ./test-production-urls.sh
+    
+    # Run the test script
+    if ./test-production-urls.sh; then
+        success "All production tests passed!"
+        return 0
+    else
+        error "Some production tests failed"
+        return 1
+    fi
+}
+
+# ── Retry Production Tests ───────────────────────────────────────────────────
+retry_production_tests() {
+    local max_retries=3
+    local retry_count=0
+    
+    while [[ $retry_count -lt $max_retries ]]; do
+        retry_count=$((retry_count + 1))
+        
+        if [[ $retry_count -gt 1 ]]; then
+            info "Waiting 15 seconds before retry attempt $retry_count of $max_retries..."
+            sleep 15
+        fi
+        
+        info "Test retry attempt $retry_count of $max_retries..."
+        echo ""
+        
+        if run_production_tests; then
+            return 0
+        fi
+    done
+    
+    echo "Tests still failing after 3 attempts"
+    return 1
+}
+
 push_to_remote
 fix_remote_ownership_pre
 trigger_remote_deployment
@@ -968,4 +1041,49 @@ if [[ $? -eq 0 ]]; then
     sync_force_overrides
     sync_backups_from_remote
     check_deployment_health || warn "Health check failed - check server logs"
+    
+    # ── Run production URL tests after successful deployment ──────────────────
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  Production URL Tests${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    # Wait briefly for site to stabilize
+    info "Waiting 10 seconds for production site to stabilize..."
+    sleep 10
+    
+    if run_production_tests; then
+        echo ""
+        success "deployment completed successfully with all tests passing!"
+        exit 0
+    else
+        echo ""
+        error "Production tests failed"
+        warn "This may indicate an issue with the deployment"
+        echo ""
+        
+        # Ask user if they want to retry
+        if [[ "$FORCE" != "true" ]]; then
+            read -p "Retry tests? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                if retry_production_tests; then
+                    success "Tests passed after retry!"
+                    exit 0
+                else
+                    error "Tests still failing after multiple attempts"
+                    exit 1
+                fi
+            else
+                warn "Tests failed but continuing. Check https://alsarya.tv manually"
+                exit 0
+            fi
+        else
+            warn "Test failures detected but --force enabled. Skipping retry."
+            exit 0
+        fi
+    fi
+else
+    error "Deployment failed. Skipping production tests."
+    exit 1
 fi

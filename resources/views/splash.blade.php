@@ -171,12 +171,13 @@
             padding: 3rem 2rem;
         }
 
-        /* Container for sponsors + stats side by side */
+        /* Container for sponsors + stats stacked vertically */
         .sponsors-logos-container {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4rem;
+            gap: 3rem;
             opacity: 0;
             width: 100%;
             padding: 2rem;
@@ -241,10 +242,10 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 2rem 1.5rem;
+            padding: 1.5rem 1.2rem;
             border-radius: 20px;
-            min-width: 140px;
-            min-height: 160px;
+            min-width: 120px;
+            min-height: 140px;
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(255, 215, 0, 0.06) 100%);
             border: 2px solid rgba(255, 215, 0, 0.25);
             backdrop-filter: blur(8px);
@@ -260,12 +261,12 @@
         }
 
         .stat-card-label {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.75);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
             width: 100%;
             text-align: center;
             line-height: 1.3;
@@ -273,7 +274,7 @@
         }
 
         .stat-card-value {
-            font-size: 2.5rem;
+            font-size: 2.1rem;
             font-weight: 900;
             background: linear-gradient(135deg, #FFD700 0%, #FF9500 100%);
             -webkit-background-clip: text;
@@ -522,6 +523,7 @@
         }
 
         @keyframes sponsorLogoIn {
+            from { opacity: 0; transform: scale(0.7) translateY(40px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
@@ -568,17 +570,17 @@
             }
 
             .stat-card-splash {
-                min-width: 130px;
-                min-height: 150px;
-                padding: 1.5rem 1.2rem;
+                min-width: 110px;
+                min-height: 130px;
+                padding: 1.25rem 1rem;
             }
 
             .stat-card-value {
-                font-size: 2.2rem;
+                font-size: 1.9rem;
             }
 
             .stat-card-label {
-                font-size: 0.8rem;
+                font-size: 0.7rem;
             }
         }
 
@@ -666,17 +668,17 @@
             }
 
             .stat-card-splash {
-                min-width: 120px;
-                min-height: 140px;
-                padding: 1.25rem 1rem;
+                min-width: 100px;
+                min-height: 120px;
+                padding: 1rem 0.8rem;
             }
 
             .stat-card-value {
-                font-size: 2rem;
+                font-size: 1.7rem;
             }
 
             .stat-card-label {
-                font-size: 0.75rem;
+                font-size: 0.65rem;
             }
 
             @keyframes slideInFromBottom {
@@ -1091,42 +1093,36 @@
                     sponsorCard3.style.animation = 'cardSlideOut 0.8s ease-in forwards';
                 }, 4500);
 
-                // 4.7s: Show the combined sponsors + stats container
-                setTimeout(() => {
-                    sponsorsLogosContainer.style.opacity = '1';
-                    sponsoredBy.style.animation = 'sponsorFadeIn 0.8s ease-out forwards';
-                }, 4700);
-
-                // 5-6.5s: Animate all three sponsor logos together
-                setTimeout(() => {
-                    sponsor1.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 5000);
-
-                setTimeout(() => {
-                    sponsor3.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 5300);
-
-                setTimeout(() => {
-                    sponsor2.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                }, 5600);
-
-                // 5.7s: Stats card slides in parallel with logos
+                // 4.5s: Animate stats card up from below (early arrival)
                 setTimeout(() => {
                     if (statsCardContainer) {
                         statsCardContainer.style.animation = 'statsCardSlideIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-                        // Start the number animation
+                        // Start number animation with stats card early
                         initStatsAnimation();
                     }
-                }, 5700);
+                }, 4500);
 
-                // Animate sponsor labels fade in with the logos
+                // 4.7s: Show the combined sponsors + stats container
+                setTimeout(() => {
+                    sponsorsLogosContainer.style.opacity = '1';
+                    sponsorsLogos.style.opacity = '1';  // Also make the inner logos container visible
+                    sponsoredBy.style.animation = 'sponsorFadeIn 0.8s ease-out forwards';
+                }, 4700);
+
+                // 5.0-6.0s: GROUP STAND - All logos animate in (stats already visible from 4.5s)
+                // Create the unified visual moment with all three sponsors displayed as a group
+                setTimeout(() => {
+                    // All three logos animate in simultaneously for maximum visual impact
+                    sponsor1.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                    sponsor2.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                    sponsor3.style.animation = 'sponsorLogoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                }, 5000);
+
+                // 5.0s: Animate all sponsor labels fade in together with logos
                 setTimeout(() => {
                     const labels = document.querySelectorAll('.sponsor-label');
-                    labels.forEach((label, index) => {
-                        const delays = [0, 300, 600];
-                        setTimeout(() => {
-                            label.style.animation = 'textFadeIn 1s ease-out forwards';
-                        }, delays[index]);
+                    labels.forEach((label) => {
+                        label.style.animation = 'textFadeIn 1s ease-out forwards';
                     });
                 }, 5000);
 
