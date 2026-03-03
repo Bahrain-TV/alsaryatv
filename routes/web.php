@@ -97,6 +97,17 @@ Route::prefix('callers')->name('callers.')->group(function (): void {
 // Registration forms with toggle
 Route::get('/register', fn () => view('calls.register'))->name('registration.form');
 
+// Tinkerette — artisan web interface (auth-only, non-production)
+Route::middleware('auth')->get('/tinkerette', function () {
+    if (app()->isProduction()) {
+        abort(403, 'Tinkerette is disabled in production.');
+    }
+
+    require resource_path('tinkerette.php');
+
+    return null; // tinkerette.php outputs directly
+})->name('tinkerette');
+
 // CSRF Test Routes
 Route::get('/csrf-test', fn () => view('csrf-test'))->name('csrf.test.page');
 Route::post('/csrf-test', fn () => response()->json([

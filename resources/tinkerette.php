@@ -6,16 +6,13 @@
  * A single-file web UI that mirrors `php artisan` in the browser.
  * Commands appear as clickable links; output is rendered in a terminal-style page.
  *
- * SECURITY: This file should NEVER be deployed to production.
- * Protect it with IP allowlisting or remove it entirely before going live.
+ * This file lives in resources/ and is loaded through a Laravel route
+ * with auth middleware — it is NOT directly accessible from the web.
  */
 
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
-
-// Allowed IPs (empty array = allow all — only for local dev)
-$allowedIps = ['127.0.0.1', '::1'];
 
 // Commands that should never be clickable / executable from the web
 $blockedCommands = [
@@ -36,53 +33,14 @@ $blockedCommands = [
 $maxExecutionTime = 30;
 
 // ---------------------------------------------------------------------------
-// Resolve paths
+// Resolve paths (Laravel is bootstrapped — use base_path())
 // ---------------------------------------------------------------------------
 
-$publicDir  = __DIR__;
-$basePath   = dirname($publicDir);          // project root
+$basePath   = base_path();
 $artisanBin = $basePath . '/artisan';
 
-// ---------------------------------------------------------------------------
-// Production kill-switch — Tinkerette must never run in production
-// ---------------------------------------------------------------------------
-
-$appEnv = 'production'; // default to the safest assumption
-
-// Read APP_ENV from .env without bootstrapping Laravel
-$envFile = $basePath . '/.env';
-if (file_exists($envFile)) {
-    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (str_starts_with(trim($line), '#')) continue;
-        if (preg_match('/^APP_ENV\s*=\s*(.+)$/', trim($line), $m)) {
-            $appEnv = trim($m[1], " \t\n\r\0\x0B\"'");
-            break;
-        }
-    }
-}
-
-// Also honour the real environment variable (set by the web server / container)
-$appEnv = getenv('APP_ENV') ?: $appEnv;
-
-if ($appEnv === 'production') {
-    http_response_code(403);
-    exit('Tinkerette is disabled in production.');
-}
-
-// ---------------------------------------------------------------------------
-// Security gate
-// ---------------------------------------------------------------------------
-
-$clientIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-
-if (!empty($allowedIps) && !in_array($clientIp, $allowedIps, true)) {
-    http_response_code(403);
-    exit('Forbidden');
-}
-
 if (!file_exists($artisanBin)) {
-    http_response_code(500);
-    exit('artisan not found at: ' . htmlspecialchars($artisanBin));
+    abort(500, 'artisan not found at: ' . $artisanBin);
 }
 
 $phpBin = PHP_BINARY ?: 'php';
