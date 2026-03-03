@@ -1,5 +1,14 @@
 <footer id="footer" class="w-full bg-black bg-opacity-70 text-white py-2 sm:py-3 z-10 rtl">
     <div class="container mx-auto px-4">
+        <!-- BTV Branding -->
+        <div class="flex items-center justify-center gap-3 mb-2 pb-2 border-b border-gray-700 border-opacity-30">
+            <img src="{{ asset('images/btv-logo-ar.png') }}" alt="تلفزيون البحرين" class="h-8 sm:h-10 w-auto opacity-90" />
+            <div class="text-center font-tajawal leading-tight">
+                <span class="block text-sm sm:text-base font-bold text-orange-200">تلفزيون البحرين</span>
+                <span class="block text-xs sm:text-sm text-gray-300 opacity-80">يقدم لكم</span>
+            </div>
+        </div>
+
         <!-- Single row footer with tight spacing -->
         <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 text-xs sm:text-sm">
             <!-- Left: Branding -->

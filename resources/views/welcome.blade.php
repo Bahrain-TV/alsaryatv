@@ -203,6 +203,13 @@
 
         <!-- Footer -->
         <div class="footer-section">
+            <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:0.5rem;">
+                <img src="{{ asset('images/btv-logo-ar.png') }}" alt="تلفزيون البحرين" style="height:2rem;width:auto;opacity:0.9;" />
+                <div style="text-align:center;line-height:1.4;">
+                    <span style="display:block;font-weight:700;color:#E8D7C3;font-size:0.95rem;">تلفزيون البحرين</span>
+                    <span style="display:block;font-size:0.8rem;color:#cbd5e1;opacity:0.85;">يقدم لكم</span>
+                </div>
+            </div>
             <p>© {{ date('Y') }} <a href="https://live.bh" target="_blank">تلفزيون البحرين</a> | جميع الحقوق محفوظة</p>
 
             <div class="footer-meta">

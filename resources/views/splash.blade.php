@@ -255,6 +255,43 @@
             animation: fadeInBack 1.5s ease-in-out 0s forwards !important;
         }
 
+        /* BTV Branding - "تلفزيون البحرين يقدم لكم" */
+        .btv-branding {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideInDown 1s cubic-bezier(0.34, 1.56, 0.64, 1) 1.2s backwards;
+        }
+
+        .btv-logo {
+            width: 80px;
+            height: auto;
+            filter: drop-shadow(0 4px 12px rgba(232, 215, 195, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .btv-text {
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        .btv-text .btv-name {
+            display: block;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            font-weight: 700;
+            color: #E8D7C3;
+            letter-spacing: 1px;
+        }
+
+        .btv-text .btv-presents {
+            display: block;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            font-weight: 500;
+            color: #cbd5e1;
+            opacity: 0.85;
+        }
+
         /* Text content */
         .splash-content {
             animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s backwards;
@@ -397,6 +434,10 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            .btv-logo {
+                width: 60px;
+            }
+
             .logo-image {
                 width: 180px;
             }
@@ -468,6 +509,15 @@
 
     <!-- Main splash screen -->
     <div class="splash-container">
+        <!-- BTV Branding -->
+        <div class="btv-branding">
+            <img src="{{ asset('images/btv-logo-ar.png') }}" alt="تلفزيون البحرين" class="btv-logo" />
+            <div class="btv-text">
+                <span class="btv-name">تلفزيون البحرين</span>
+                <span class="btv-presents">يقدم لكم</span>
+            </div>
+        </div>
+
         <!-- Logo with glow - Animated flip -->
         <div class="logo-wrapper">
             <div class="logo-flip-card">
