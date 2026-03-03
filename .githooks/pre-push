@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#
+# pre-push hook — Mirror push to Codeberg
+#
+# Reads credentials from .env (CODEBERG_USER, CODEBERG_REPO, CODEBERG_TOKEN).
+# Silently skips if any are missing. Runs the mirror push in the background
+# so it never blocks the primary push.
+#
+# Install:
+#   git config core.hooksPath .githooks
+#   — or —
+#   cp .githooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+#
+
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Resolve repo root (works from both .githooks/ and .git/hooks/)
+if [[ "$HOOK_DIR" == *".git/hooks"* ]]; then
+    REPO_ROOT="$(cd "$HOOK_DIR/../.." && pwd)"
+else
+    REPO_ROOT="$(cd "$HOOK_DIR/.." && pwd)"
+fi
+
+ENV_FILE="$REPO_ROOT/.env"
+
+# --- Read .env ---------------------------------------------------------------
+if [[ ! -f "$ENV_FILE" ]]; then
+    exit 0   # no .env → nothing to do
+fi
+
+get_env() {
+    grep -E "^$1=" "$ENV_FILE" | head -1 | cut -d'=' -f2- | sed 's/^["'"'"']//;s/["'"'"']$//' | xargs
+}
+
+CODEBERG_USER="$(get_env CODEBERG_USER)"
+CODEBERG_REPO="$(get_env CODEBERG_REPO)"
+CODEBERG_TOKEN="$(get_env CODEBERG_TOKEN)"
+
+if [[ -z "$CODEBERG_USER" || -z "$CODEBERG_REPO" || -z "$CODEBERG_TOKEN" ]]; then
+    exit 0   # incomplete config → skip silently
+fi
+
+# --- Determine branch --------------------------------------------------------
+BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+if [[ -z "$BRANCH" ]]; then
+    exit 0   # detached HEAD → skip
+fi
+
+CODEBERG_URL="https://${CODEBERG_USER}:${CODEBERG_TOKEN}@codeberg.org/${CODEBERG_USER}/${CODEBERG_REPO}.git"
+
+# --- Mirror push (background, best-effort) -----------------------------------
+(
+    # Add remote if missing, or update URL (token may have rotated)
+    if ! git remote get-url codeberg &>/dev/null; then
+        git remote add codeberg "$CODEBERG_URL"
+    else
+        git remote set-url codeberg "$CODEBERG_URL"
+    fi
+
+    # Retry with exponential backoff (4 attempts)
+    for attempt in 1 2 3 4; do
+        if git push codeberg "$BRANCH" 2>/dev/null; then
+            echo "[codeberg-mirror] Pushed $BRANCH to codeberg.org/$CODEBERG_USER/$CODEBERG_REPO"
+            exit 0
+        fi
+        sleep $((2 ** attempt))
+    done
+    echo "[codeberg-mirror] Warning: failed to push $BRANCH to Codeberg after 4 attempts" >&2
+) &
+
+exit 0

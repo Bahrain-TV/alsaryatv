@@ -206,6 +206,33 @@ php artisan migrate --force
 ./publish.sh
 ```
 
+### Git Mirrors — Codeberg
+
+The repository is mirrored to **Codeberg** (`codeberg.org/aldoyh/alsaryatv`) on every push via a `pre-push` Git hook.
+
+**Setup (one-time per clone):**
+```bash
+# Option A: point Git to the committed hooks directory
+git config core.hooksPath .githooks
+
+# Option B: copy the hook manually
+cp .githooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+```
+
+**Required `.env` variables** (see `.env.example`):
+```
+CODEBERG_USER=aldoyh
+CODEBERG_REPO=alsaryatv
+CODEBERG_TOKEN=<your-codeberg-personal-access-token>
+```
+
+The hook reads these at push time, so rotating the token is just an `.env` edit — no Git config changes needed.
+
+**IMPORTANT for Claude Code sessions:** After every `git push -u origin <branch>`, the `pre-push` hook automatically mirrors to Codeberg. If the hook is not installed (e.g. fresh clone), push manually:
+```bash
+git push codeberg <branch>
+```
+
 ---
 
 ## Key Files & Responsibilities
@@ -256,6 +283,11 @@ BROADCAST_CONNECTION=log|pusher
 QUEUE_CONNECTION=database|redis
 CACHE_STORE=database|redis|array
 SESSION_DRIVER=database|array
+
+# Codeberg mirror (used by .githooks/pre-push)
+CODEBERG_USER=aldoyh
+CODEBERG_REPO=alsaryatv
+CODEBERG_TOKEN=<personal-access-token>
 ```
 
 See `.env.example` for all options.
