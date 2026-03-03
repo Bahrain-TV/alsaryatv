@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CallerController;
+use App\Http\Controllers\TinkeretteController;
 use App\Providers\HitsCounter;
 use Carbon\Carbon;
 use Illuminate\Mail\Markdown;
@@ -41,6 +42,7 @@ Route::middleware([
     Route::get('/dashboard', [CallerController::class, 'index'])->name('dashboard');
     Route::get('/winners', [CallerController::class, 'winners'])->name('winners');
     Route::get('/families', [CallerController::class, 'families'])->name('families');
+    Route::get('/tinkerette', TinkeretteController::class)->name('tinkerette');
 
     // Filament shortcuts (if needed)
     Route::get('/admin/callers', [\App\Filament\Resources\CallerResource\Pages\ListCallers::class, 'index'])->name('filament.admin.resources.callers.index');
@@ -96,17 +98,6 @@ Route::prefix('callers')->name('callers.')->group(function (): void {
 
 // Registration forms with toggle
 Route::get('/register', fn () => view('calls.register'))->name('registration.form');
-
-// Tinkerette — artisan web interface (auth-only, non-production)
-Route::middleware('auth')->get('/tinkerette', function () {
-    if (app()->isProduction()) {
-        abort(403, 'Tinkerette is disabled in production.');
-    }
-
-    require resource_path('tinkerette.php');
-
-    return null; // tinkerette.php outputs directly
-})->name('tinkerette');
 
 // CSRF Test Routes
 Route::get('/csrf-test', fn () => view('csrf-test'))->name('csrf.test.page');
