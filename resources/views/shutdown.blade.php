@@ -42,9 +42,11 @@
         .main-content {
             flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem 1rem 1rem;
+            gap: 1.5rem;
+            padding: 4rem 1rem 1rem;
         }
 
         .success-card {
@@ -214,6 +216,12 @@
 
     <!-- ── Main content ─────────────────────────────────── -->
     <div class="main-content">
+        <!-- Logo -->
+        <div class="flex justify-center mt-4 z-10" style="animation: cardIn 0.8s ease-out 0.2s both;">
+            <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" 
+                style="display:block; margin:0 auto; width:auto; height:clamp(120px, 25vw, 180px); object-fit:contain; filter: drop-shadow(0px 4px 20px rgba(0,0,0,0.5));" />
+        </div>
+        
         <div class="success-card max-w-md w-full p-8 text-white text-center">
             <div class="flex justify-center mb-4">
                 <lottie-player src="lottie/crecent-moon-ramadan.json" background="transparent" speed=".1"
