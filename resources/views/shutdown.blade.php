@@ -229,7 +229,7 @@
             <div class="mt-4">
                 <a href="/" class="inline-block px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"
                     style="background: rgba(168,28,46,0.25); border: 1px solid rgba(168,28,46,0.5); color: #F5DEB3;">
-                    ← موقع برنامج السارية
+                    فريق عمل الســــاريـة ❤️
                 </a>
             </div>
         </div>
