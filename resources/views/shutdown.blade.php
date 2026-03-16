@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,16 +17,19 @@
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             min-height: 100vh;
         }
 
         body {
-            background-image: url("{{ asset('storage/images/alsarya-bg-2026-by-gemini.jpeg') }}");
+            background-image: url("{{ asset('images/alsarya-bg-2026-by-gemini.jpeg') }}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -49,14 +53,17 @@
             -webkit-backdrop-filter: blur(12px);
             border-radius: 18px;
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.55),
-                        0 0 0 1px rgba(168, 28, 46, 0.15);
+                0 0 0 1px rgba(168, 28, 46, 0.15);
             opacity: 0;
             transform: translateY(24px);
             animation: cardIn 0.7s ease-out 0.8s forwards;
         }
 
         @keyframes cardIn {
-            to { opacity: 1; transform: translateY(0); }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ── Sponsors sliding ticker ─────────────────────── */
@@ -101,8 +108,13 @@
         }
 
         @keyframes sponsorTicker {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
         }
 
         .tick-logo {
@@ -115,7 +127,9 @@
             transition: opacity 0.25s ease;
         }
 
-        .tick-logo:hover { opacity: 1; }
+        .tick-logo:hover {
+            opacity: 1;
+        }
 
         /* Al Salam SVG has dark navy fill — invert to cream-white on dark bg */
         .tick-logo-alsalam {
@@ -164,7 +178,9 @@
             transition: color 0.2s ease;
         }
 
-        .footer-links a:hover { color: #F5DEB3; }
+        .footer-links a:hover {
+            color: #F5DEB3;
+        }
 
         .footer-dot {
             color: rgba(168, 28, 46, 0.5);
@@ -185,6 +201,7 @@
         }
     </style>
 </head>
+
 <body class="antialiased">
 
     <!-- ── Basmala ──────────────────────────────────────── -->
@@ -199,12 +216,8 @@
     <div class="main-content">
         <div class="success-card max-w-md w-full p-8 text-white text-center">
             <div class="flex justify-center mb-4">
-                <lottie-player
-                    src="lottie/crecent-moon-ramadan.json"
-                    background="transparent"
-                    speed=".1"
-                    style="width: 180px; height: 180px;"
-                    loop autoplay>
+                <lottie-player src="lottie/crecent-moon-ramadan.json" background="transparent" speed=".1"
+                    style="width: 180px; height: 180px;" loop autoplay>
                 </lottie-player>
             </div>
             <h1 class="text-3xl font-bold mb-3">
@@ -214,9 +227,8 @@
                 نشكر لكم اهتمامكم ومتابعتكم لبرنامج السارية.. راجعين وأقوى من قبل!
             </p>
             <div class="mt-4">
-                <a href="/"
-                   class="inline-block px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"
-                   style="background: rgba(168,28,46,0.25); border: 1px solid rgba(168,28,46,0.5); color: #F5DEB3;">
+                <a href="/" class="inline-block px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"
+                    style="background: rgba(168,28,46,0.25); border: 1px solid rgba(168,28,46,0.5); color: #F5DEB3;">
                     ← موقع برنامج السارية
                 </a>
             </div>
@@ -229,13 +241,13 @@
         <div class="sponsors-ticker-track">
             <div class="sponsors-ticker-inner">
                 {{-- First set --}}
-                <img src="{{ asset('images/jasmis-logo.png') }}"     alt="Jasmis"        class="tick-logo">
-                <img src="{{ asset('images/alsalam-logo.svg') }}"    alt="Al Salam"      class="tick-logo tick-logo-alsalam">
-                <img src="{{ asset('images/bapco-energies.png') }}"  alt="Bapco Energies" class="tick-logo">
+                <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="tick-logo">
+                <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam" class="tick-logo tick-logo-alsalam">
+                <img src="{{ asset('images/bapco-energies.png') }}" alt="Bapco Energies" class="tick-logo">
                 {{-- Duplicate for seamless infinite loop --}}
-                <img src="{{ asset('images/jasmis-logo.png') }}"     alt="Jasmis"        class="tick-logo">
-                <img src="{{ asset('images/alsalam-logo.svg') }}"    alt="Al Salam"      class="tick-logo tick-logo-alsalam">
-                <img src="{{ asset('images/bapco-energies.png') }}"  alt="Bapco Energies" class="tick-logo">
+                <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="tick-logo">
+                <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam" class="tick-logo tick-logo-alsalam">
+                <img src="{{ asset('images/bapco-energies.png') }}" alt="Bapco Energies" class="tick-logo">
             </div>
         </div>
     </div>
@@ -261,4 +273,5 @@
     </footer>
 
 </body>
+
 </html>

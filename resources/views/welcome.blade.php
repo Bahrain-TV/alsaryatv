@@ -293,8 +293,26 @@
             white-space: nowrap;
             transition: top 0.35s ease, font-size 0.35s ease;
         }
+        #basmala-logo {
+            position: fixed;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            pointer-events: none;
+            opacity: 0.9;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+            transition: top 0.35s ease, opacity 0.35s ease;
+        }
+        #basmala-logo img {
+            height: 32px;
+            width: auto;
+            object-fit: contain;
+        }
         @media (max-width: 480px) {
             #basmala { font-size: 0.72rem; top: 12px; }
+            #basmala-logo { top: 38px; }
+            #basmala-logo img { height: 24px; }
         }
 
         /* ── Sticky header bar (basmala + shrunken logo) ── */
@@ -642,6 +660,11 @@
     <!-- Basmala — fixed at top per project requirement -->
     <div id="basmala">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
 
+    <!-- Brand Logo underneath Basmala -->
+    <div id="basmala-logo">
+        <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية" />
+    </div>
+
     <!-- Sticky header: slides in when user focuses a form field or scrolls into form -->
     <div id="sticky-header" aria-hidden="true">
         <span class="sticky-basmala">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</span>
@@ -945,6 +968,7 @@
         (function initStickyHeader() {
             const stickyHeader = document.getElementById('sticky-header');
             const fixedBasmala = document.getElementById('basmala');
+            const fixedBasmalaLogo = document.getElementById('basmala-logo');
             const mainContent  = document.getElementById('main-content');
             if (!stickyHeader || !mainContent) return;
 
@@ -955,8 +979,9 @@
                 isVisible = true;
                 stickyHeader.classList.add('visible');
                 stickyHeader.setAttribute('aria-hidden', 'false');
-                // Hide the stand-alone basmala so they don't overlap
+                // Hide the stand-alone basmala and logo so they don't overlap
                 if (fixedBasmala) fixedBasmala.style.opacity = '0';
+                if (fixedBasmalaLogo) fixedBasmalaLogo.style.opacity = '0';
             }
 
             function hideSticky() {
@@ -965,6 +990,7 @@
                 stickyHeader.classList.remove('visible');
                 stickyHeader.setAttribute('aria-hidden', 'true');
                 if (fixedBasmala) fixedBasmala.style.opacity = '1';
+                if (fixedBasmalaLogo) fixedBasmalaLogo.style.opacity = '1';
             }
 
             // Activate on any form input focus

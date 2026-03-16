@@ -26,6 +26,11 @@ $getRamadanContext = function () {
 
 // Home route - shows splash screen (session storage handles skip on return)
 Route::get('/', function () use ($getRamadanContext) {
+    // If registration is disabled, show shutdown page
+    if (! config('alsarya.registration.enabled', false)) {
+        return view('shutdown', $getRamadanContext());
+    }
+
     // If skip-splash param present OR user came from splash, show registration
     if (request()->has('skip-splash')) {
         return view('welcome', $getRamadanContext());
@@ -36,12 +41,45 @@ Route::get('/', function () use ($getRamadanContext) {
 })->name('home');
 
 // Splash screen explicit route
-Route::get('/splash', fn () => view('splash', $getRamadanContext()))->name('splash');
+Route::get('/splash', function () use ($getRamadanContext) {
+    // If registration is disabled, show shutdown page
+    if (! config('alsarya.registration.enabled', false)) {
+        return view('shutdown', $getRamadanContext());
+    }
+
+    return view('splash', $getRamadanContext());
+})->name('splash');
 
 // Registration form routes
-Route::get('/welcome', fn () => view('welcome', $getRamadanContext()))->name('welcome');
-Route::get('/register', fn () => view('welcome', $getRamadanContext()))->name('registration.form');
-Route::get('/family', fn () => view('welcome', $getRamadanContext()))->name('family.registration');
+Route::get('/welcome', function () use ($getRamadanContext) {
+    // If registration is disabled, show shutdown page
+    if (! config('alsarya.registration.enabled', false)) {
+        return view('shutdown', $getRamadanContext());
+    }
+
+    return view('welcome', $getRamadanContext());
+})->name('welcome');
+
+Route::get('/register', function () use ($getRamadanContext) {
+    // If registration is disabled, show shutdown page
+    if (! config('alsarya.registration.enabled', false)) {
+        return view('shutdown', $getRamadanContext());
+    }
+
+    return view('welcome', $getRamadanContext());
+})->name('registration.form');
+
+Route::get('/family', function () use ($getRamadanContext) {
+    // If registration is disabled, show shutdown page
+    if (! config('alsarya.registration.enabled', false)) {
+        return view('shutdown', $getRamadanContext());
+    }
+
+    return view('welcome', $getRamadanContext());
+})->name('family.registration');
+
+// Explicit shutdown route (for testing or manual activation)
+Route::get('/shutdown', fn () => view('shutdown', $getRamadanContext()))->name('shutdown');
 
 // Public OBS overlay — accessible without authentication for OBS Browser Source
 Route::get('/obs-overlay', fn () => view('obs.overlay'))->name('obs.overlay');
