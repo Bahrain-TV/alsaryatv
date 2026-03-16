@@ -25,7 +25,7 @@
         }
 
         body {
-            background-image: url("{{ asset('images/seef-district-from-sea.jpg') }}");
+            background-image: url("{{ asset('storage/images/alsarya-bg-2026-by-gemini.jpeg') }}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -202,13 +202,17 @@
                 <lottie-player
                     src="lottie/crecent-moon-ramadan.json"
                     background="transparent"
-                    speed="1"
+                    speed=".1"
                     style="width: 180px; height: 180px;"
                     loop autoplay>
                 </lottie-player>
             </div>
-            <h1 class="text-3xl font-bold mb-3">وبس خلصنا …</h1>
-            <p class="text-lg opacity-80 mb-6">نشوفكم قريب إن شاء الله.</p>
+            <h1 class="text-3xl font-bold mb-3">
+                التسجيل متوقف حتى إشعار آخر.
+            </h1>
+            <p class="text-lg opacity-80 mb-6">
+                نشكر لكم اهتمامكم ومتابعتكم لبرنامج السارية.. راجعين وأقوى من قبل!
+            </p>
             <div class="mt-4">
                 <a href="/"
                    class="inline-block px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300"

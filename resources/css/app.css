@@ -1454,3 +1454,148 @@ button:disabled:hover {
         display: none;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════ */
+/* SLOW DRAMATIC SAD ANIMATION FOR ALL TEXT */
+/* ═══════════════════════════════════════════════════════════ */
+
+@keyframes sad-drift {
+    0%, 100% {
+        opacity: 0.7;
+        transform: translateY(0px) rotate(0deg);
+        filter: blur(0px);
+    }
+    25% {
+        opacity: 0.5;
+        transform: translateY(-3px) rotate(-0.5deg);
+        filter: blur(0.3px);
+    }
+    50% {
+        opacity: 0.4;
+        transform: translateY(-6px) rotate(0.3deg);
+        filter: blur(0.5px);
+    }
+    75% {
+        opacity: 0.5;
+        transform: translateY(-3px) rotate(-0.3deg);
+        filter: blur(0.3px);
+    }
+}
+
+@keyframes sad-fade {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+@keyframes sad-sway {
+    0%, 100% {
+        transform: translateX(0) skewX(0deg);
+    }
+    33% {
+        transform: translateX(-2px) skewX(-0.3deg);
+    }
+    66% {
+        transform: translateX(2px) skewX(0.3deg);
+    }
+}
+
+/* Apply sad animations to all text elements */
+body,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+div,
+a,
+label,
+strong,
+em,
+blockquote,
+cite,
+q,
+figcaption,
+legend,
+caption,
+th,
+td,
+li,
+dt,
+dd,
+mark,
+small,
+sub,
+sup,
+code,
+pre,
+abbr,
+time {
+    animation: 
+        sad-drift 12s ease-in-out infinite,
+        sad-fade 16s ease-in-out infinite,
+        sad-sway 18s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform, opacity, filter;
+}
+
+/* Stagger animations for different elements to create dramatic effect */
+h1 { animation-delay: 0s, -2s, -4s; }
+h2 { animation-delay: -1s, -3s, -5s; }
+h3 { animation-delay: -2s, -4s, -6s; }
+h4 { animation-delay: -3s, -5s, -7s; }
+h5 { animation-delay: -4s, -6s, -8s; }
+h6 { animation-delay: -5s, -7s, -9s; }
+p { animation-delay: -6s, -8s, -10s; }
+span { animation-delay: -7s, -9s, -11s; }
+a { animation-delay: -8s, -10s, -12s; }
+div { animation-delay: -9s, -11s, -13s; }
+label { animation-delay: -10s, -12s, -14s; }
+strong { animation-delay: -11s, -13s, -15s; }
+li { animation-delay: -12s, -14s, -16s; }
+td, th { animation-delay: -13s, -15s, -17s; }
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    body,
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    span,
+    div,
+    a,
+    label,
+    strong,
+    em,
+    blockquote,
+    cite,
+    q,
+    figcaption,
+    legend,
+    caption,
+    th,
+    td,
+    li,
+    dt,
+    dd,
+    mark,
+    small,
+    sub,
+    sup,
+    code,
+    pre,
+    abbr,
+    time {
+        animation: none;
+    }
+}

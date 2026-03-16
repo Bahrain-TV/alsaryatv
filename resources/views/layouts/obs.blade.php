@@ -12,7 +12,10 @@
             html,
             body,
             main {
-                background: transparent !important;
+                background: url("{{ asset('images/alsarya-bg-2026-by-gemini-compressed.jpeg') }}") !important;
+                background-size: cover !important;
+                background-position: center !important;
+                background-attachment: fixed !important;
             }
         </style>
 

@@ -1,4 +1,4 @@
-<div class="w-full">
+<div class="w-full min-h-screen" style="background-image: url('{{ asset('images/alsarya-bg-2026-by-gemini-compressed.jpeg') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
     <section class="py-3 sm:py-4" id="sponsors">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center justify-center">

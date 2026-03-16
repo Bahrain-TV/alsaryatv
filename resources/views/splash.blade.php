@@ -24,7 +24,10 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background: #0F172A;
+            background-image: url("{{ asset('images/alsarya-bg-2026-by-gemini-compressed.jpeg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             display: flex;
             align-items: center;
             justify-content: center;

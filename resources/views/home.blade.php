@@ -12,7 +12,7 @@
         <style>
 
             body {
-                background-image: url('{{ asset("images/seef-district-from-sea.jpg") }}');
+                background-image: url('{{ asset("images/alsarya-bg-2026-by-gemini-compressed.jpeg") }}');
                 background-size: cover;
                 background-position: center;
                 background-attachment: fixed;
