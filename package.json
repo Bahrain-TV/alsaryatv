@@ -13,9 +13,9 @@
     "dependencies": {
         "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/typography": "^0.5.19",
-        "@tailwindcss/vite": "^4.2.0",
-        "alpinejs": "^3.15.8",
-        "axios": "^1.13.5",
+        "@tailwindcss/vite": "^4.2.2",
+        "alpinejs": "^3.15.9",
+        "axios": "^1.14.0",
         "chalk": "^5.6.2",
         "cli-progress": "^3.12.0",
         "concurrently": "^9.2.1",
@@ -27,17 +27,17 @@
     },
     "optionalDependencies": {
         "@rollup/rollup-linux-x64-gnu": "4.9.5",
-        "@tailwindcss/oxide-linux-x64-gnu": "^4.2.0",
-        "lightningcss-linux-x64-gnu": "^1.31.1"
+        "@tailwindcss/oxide-linux-x64-gnu": "^4.2.2",
+        "lightningcss-linux-x64-gnu": "^1.32.0"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.7",
         "@tailwindcss/typography": "^0.5.10",
-        "autoprefixer": "^10.4.24",
-        "laravel-echo": "^2.3.0",
+        "autoprefixer": "^10.4.27",
+        "laravel-echo": "^2.3.1",
         "playwright": "^1.58.2",
-        "postcss": "^8.5.6",
-        "pusher-js": "^8.4.0",
+        "postcss": "^8.5.8",
+        "pusher-js": "^8.4.3",
         "tailwindcss": "^3.4.19"
     }
 }
