@@ -147,7 +147,7 @@ const main = async () => {
 
       const submitBtn = page.locator('button[type="submit"]').first();
       if (await submitBtn.count() > 0) {
-        await submitBtn.click();
+        await submitBtn.click({ timeout: 5000 }).catch(e => page.keyboard.press('Enter'));
       } else {
         await page.keyboard.press('Enter');
       }
