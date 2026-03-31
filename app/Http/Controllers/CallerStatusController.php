@@ -56,6 +56,8 @@ class CallerStatusController extends Controller
 
         // Mark as winner (one-way only)
         $caller->is_winner = true;
+        $caller->is_selected = true;
+        $caller->status = 'selected';
         $caller->save();
 
         return response()->json([

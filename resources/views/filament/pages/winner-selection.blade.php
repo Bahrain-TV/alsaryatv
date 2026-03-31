@@ -188,29 +188,48 @@
         function confirmWinner() {
             if (!selectedWinner) return;
 
-            const formData = new FormData();
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+                || decodeURIComponent(
+                    document.cookie.split('; ').find(r => r.startsWith('XSRF-TOKEN='))?.split('=')[1] ?? ''
+                )
+                || '';
 
-            // Make API call to mark winner
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.6';
+
+            // Make API call to mark winner (sets is_winner=true and is_selected=true)
             fetch(`/api/callers/${selectedWinner.id}/toggle-winner`, {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
                 },
                 body: JSON.stringify({ is_winner: true })
             })
-            .then(response => {
-                if (response.ok) {
-                    showSuccessMessage(`تم تحديد ${selectedWinner.name} كفائز`);
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.success) {
+                    // Remove confirmed winner from local eligible list so spinner can't re-select them
+                    const idx = eligibleCallers.findIndex(c => c.id === selectedWinner.id);
+                    if (idx !== -1) eligibleCallers.splice(idx, 1);
+
+                    showSuccessMessage(`🏆 تم تحديد ${selectedWinner.name} كفائز`);
                     setTimeout(() => {
                         location.reload();
-                    }, 1500);
+                    }, 1800);
+                } else {
+                    showErrorMessage(data.message || 'حدث خطأ أثناء تحديد الفائز');
+                    confirmBtn.disabled = false;
+                    confirmBtn.style.opacity = '1';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 showErrorMessage('حدث خطأ أثناء تحديد الفائز');
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = '1';
             });
         }
 

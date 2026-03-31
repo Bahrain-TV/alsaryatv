@@ -1577,30 +1577,175 @@
             }
         });
     </script>
-    <!-- Onboarding Tutorial Script -->
-    @if(request()->has('tutorial'))
-    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+    <!-- Driver.js Onboarding Tutorial -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.2/dist/driver.css"/>
+    <style>
+        /* Floating tutorial button */
+        #tutorial-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 150;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+            color: #F5DEB3;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid rgba(245, 222, 179, 0.4);
+            box-shadow: 0 4px 20px rgba(185, 28, 28, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Tajawal', sans-serif;
+        }
+        #tutorial-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 28px rgba(185, 28, 28, 0.7);
+        }
+        /* RTL-aware Driver.js popover overrides */
+        .driver-popover {
+            direction: rtl;
+            font-family: 'Tajawal', sans-serif !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35) !important;
+        }
+        .driver-popover-title {
+            font-family: 'Tajawal', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 1.1rem !important;
+            color: #1f2937 !important;
+        }
+        .driver-popover-description {
+            font-family: 'Tajawal', sans-serif !important;
+            font-size: 0.95rem !important;
+            color: #4b5563 !important;
+            line-height: 1.6 !important;
+        }
+        .driver-popover-footer {
+            direction: ltr;
+        }
+        .driver-popover-progress-text {
+            font-family: 'Tajawal', sans-serif !important;
+            font-size: 0.8rem !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.2/dist/driver.js.iife.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const driver = window.driver.js.driver;
-            
-            const driverObj = driver({
-                showProgress: true,
-                steps: [
-                    { element: '#name', popover: { title: 'الاسم الكامل', description: 'أدخ�� اسمك كما يظهر في البطاقة الذكية' } },
-                    { element: '#cpr', popover: { title: 'الرقم الشخصي', description: 'أدخل رقمك الشخصي المكون من 9 أرقام' } },
-                    { element: '#phone_number', popover: { title: 'رقم الهاتف', description: 'أدخل رقم هاتف فعال للتواصل في حال الفوز' } },
-                    { element: 'button[type="submit"]', popover: { title: 'تأكيد التسجيل', description: 'اضغط هنا لإرسال طلبك' } }
-                ]
-            });
-            
-            // Start tutorial after a delay to allow animations
-            setTimeout(() => {
+        (function () {
+            // Floating tutorial button
+            const fab = document.createElement('button');
+            fab.id = 'tutorial-fab';
+            fab.title = 'دليل التسجيل';
+            fab.setAttribute('aria-label', 'ابدأ الدليل التفاعلي');
+            fab.textContent = '?';
+            document.body.appendChild(fab);
+
+            function buildTutorialSteps() {
+                const isFamily = document.getElementById('registration_type')?.value === 'family';
+                const steps = [
+                    {
+                        element: '#basmala',
+                        popover: {
+                            title: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
+                            description: 'أهلاً بك في برنامج السارية المباشر من تلفزيون البحرين. سنأخذك في جولة سريعة لشرح خطوات التسجيل.',
+                            side: 'bottom',
+                            align: 'center',
+                        }
+                    },
+                ];
+
+                // Registration type toggle (only if family registration enabled)
+                const tabFamily = document.getElementById('tab-family');
+                const tabIndividual = document.getElementById('tab-individual');
+                if (tabFamily && tabIndividual) {
+                    steps.push({
+                        element: '#tab-individual',
+                        popover: {
+                            title: 'نوع التسجيل',
+                            description: 'اختر "تسجيل فردي" إذا كنت تسجّل لنفسك، أو "تسجيل عائلي" إذا كنت تمثّل عائلتك.',
+                            side: 'bottom',
+                            align: 'center',
+                        }
+                    });
+                }
+
+                steps.push(
+                    {
+                        element: '#name',
+                        popover: {
+                            title: 'الاسم الكامل',
+                            description: 'أدخل اسمك الرباعي كما يظهر في بطاقة الهوية الوطنية (البطاقة الذكية).',
+                            side: 'bottom',
+                            align: 'start',
+                        }
+                    },
+                    {
+                        element: '#cpr',
+                        popover: {
+                            title: 'الرقم الشخصي (CPR)',
+                            description: 'أدخل رقمك الشخصي المكوّن من 9 أرقام. يُستخدم لضمان عدم تكرار التسجيل.',
+                            side: 'bottom',
+                            align: 'start',
+                        }
+                    },
+                    {
+                        element: '#phone_number',
+                        popover: {
+                            title: 'رقم الهاتف',
+                            description: 'أدخل رقم هاتفك الجوّال الفعّال. سيتم التواصل معك على هذا الرقم في حال فوزك بالجائزة.',
+                            side: 'bottom',
+                            align: 'start',
+                        }
+                    },
+                    {
+                        element: 'button[type="submit"]',
+                        popover: {
+                            title: 'تأكيد التسجيل',
+                            description: 'بعد ملء جميع الحقول، اضغط هنا لإرسال طلب مشاركتك. ستصلك رسالة تأكيد فور التسجيل.',
+                            side: 'top',
+                            align: 'center',
+                        }
+                    }
+                );
+
+                return steps;
+            }
+
+            function startTutorial() {
+                if (typeof window.driver === 'undefined') {
+                    console.warn('Driver.js not yet loaded');
+                    return;
+                }
+                const driverFn = window.driver.driver || window.driver;
+                const driverObj = driverFn({
+                    showProgress: true,
+                    allowClose: true,
+                    overlayClickNext: false,
+                    stagePadding: 8,
+                    animate: true,
+                    progressText: '{{CURRENT_STEP}} / {{TOTAL_STEPS}}',
+                    nextBtnText: 'التالي →',
+                    prevBtnText: '← السابق',
+                    doneBtnText: '✓ انتهيت',
+                    steps: buildTutorialSteps(),
+                });
                 driverObj.drive();
-            }, 3000);
-        });
+            }
+
+            fab.addEventListener('click', startTutorial);
+
+            // Auto-start tutorial on first visit if ?tutorial param present
+            // Delay allows page animations (GSAP, preloader) to complete first
+            @if(request()->has('tutorial'))
+            document.addEventListener('DOMContentLoaded', function () {
+                setTimeout(startTutorial, 2000);
+            });
+            @endif
+        })();
     </script>
-    @endif
 </body>
 </html>
