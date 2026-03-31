@@ -19,6 +19,8 @@ class FilamentDashboardFeatureTest extends TestCase
         User::factory()->create([
             'email' => 'admin@test.com',
             'password' => bcrypt('password'),
+            'is_admin' => true,
+            'role' => 'admin',
         ]);
 
         // Create test data

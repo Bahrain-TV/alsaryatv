@@ -13,6 +13,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 
 class CallerResource extends Resource
 {
@@ -279,11 +282,13 @@ class CallerResource extends Resource
                         false: fn ($query) => $query->where('hits', '<=', 5),
                     ),
             ])
-
             ->actions([
-                ActionGroup::make([
+                \Filament\Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
                     // Export Actions
-                    Action::make('exportCsv')
+                    BulkAction::make('exportCsv')
                         ->label('تصدير CSV')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
@@ -292,7 +297,7 @@ class CallerResource extends Resource
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    Action::make('exportExcel')
+                    BulkAction::make('exportExcel')
                         ->label('تصدير Excel')
                         ->icon('heroicon-o-table-cells')
                         ->color('success')
@@ -302,12 +307,12 @@ class CallerResource extends Resource
                         ->deselectRecordsAfterCompletion(),
 
                     // Status Management
-                    Action::make('changeStatus')
+                    BulkAction::make('changeStatus')
                         ->label('تغيير الحالة')
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
                         ->form([
-                            Forms\Components\Select::make('status')
+                            \Filament\Forms\Components\Select::make('status')
                                 ->label('الحالة الجديدة')
                                 ->options([
                                     'active' => 'نشط',
@@ -329,75 +334,11 @@ class CallerResource extends Resource
                         ->deselectRecordsAfterCompletion(),
 
                     // Delete Action
-                    Action::make('delete')
+                    DeleteBulkAction::make()
                         ->label('حذف المحدد'),
 
-                    // Winner Selection
-                    Action::make('selectMultipleRandomWinners')
-                        ->label('اختيار مُختارين عشوائيين')
-                        ->icon('heroicon-o-sparkles')
-                        ->color('info')
-                        ->form([
-                            Forms\Components\TextInput::make('count')
-                                ->label('عدد المُختارين')
-                                ->required()
-                                ->numeric()
-                                ->minValue(1)
-                                ->maxValue(10)
-                                ->default(3),
-                        ])
-                        ->action(function (array $data): void {
-                            $count = (int) $data['count'];
-
-                            // Get eligible callers (not selected, not winner)
-                            $eligibleCallers = Caller::getEligibleCallers();
-
-                            if ($eligibleCallers->count() < $count) {
-                                $this->notify('warning', 'عدد المتصلين المؤهلين غير كافٍ. يوجد فقط '.$eligibleCallers->count().' متصل.');
-
-                                return;
-                            }
-
-                            $selectedCallers = [];
-                            $selectedCpRs = [];
-
-                            // Select unique callers based on CPR
-                            for ($i = 0; $i < $count; $i++) {
-                                if ($eligibleCallers->isEmpty()) {
-                                    break;
-                                }
-
-                                // Filter out callers whose CPR has already been selected
-                                $availableCallers = $eligibleCallers->filter(function ($caller) use ($selectedCpRs) {
-                                    return ! in_array($caller->cpr, $selectedCpRs);
-                                });
-
-                                if ($availableCallers->isEmpty()) {
-                                    break;
-                                }
-
-                                $selected = $availableCallers->random();
-                                $selected->update([
-                                    'is_selected' => true,
-                                    'status' => 'selected',
-                                ]);
-
-                                $selectedCallers[] = $selected;
-                                $selectedCpRs[] = $selected->cpr;
-                            }
-
-                            $selectedNames = implode('، ', array_map(function ($caller) {
-                                return $caller->name.' ('.$caller->cpr.')';
-                            }, $selectedCallers));
-
-                            $this->notify('success', 'تم اختيار '.count($selectedCallers).' مُختار: '.$selectedNames);
-                        })
-                        ->requiresConfirmation()
-                        ->modalHeading('اختيار مُختارين عشوائيين')
-                        ->modalDescription('سيتم اختيار مُختارين عشوائياً من المتصلين المؤهلين. لن يتم تحديدهم كفائزين — يمكنك ذلك لاحقاً يدوياً.'),
-
                     // Mark Selected as Winners (manual confirmation)
-                    Action::make('markAsWinners')
+                    BulkAction::make('markAsWinners')
                         ->label('تأكيد كفائزين')
                         ->icon('heroicon-o-trophy')
                         ->color('success')
@@ -421,7 +362,7 @@ class CallerResource extends Resource
                         ->deselectRecordsAfterCompletion(),
 
                     // Remove Winner Status (keeps selected)
-                    Action::make('removeWinnerStatus')
+                    BulkAction::make('removeWinnerStatus')
                         ->label('إزالة حالة الفوز')
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
@@ -440,7 +381,7 @@ class CallerResource extends Resource
                         ->deselectRecordsAfterCompletion(),
 
                     // Reset Selection (allow them back into draws)
-                    Action::make('resetSelection')
+                    BulkAction::make('resetSelection')
                         ->label('إعادة إلى السحب')
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('gray')
@@ -463,9 +404,7 @@ class CallerResource extends Resource
                         ->modalHeading('إعادة إلى السحب')
                         ->modalDescription('سيتم إزالة حالة الاختيار والفوز وإعادتهم كمتصلين نشطين مؤهلين للسحب.')
                         ->deselectRecordsAfterCompletion(),
-                ])
-                    ->icon('heroicon-o-ellipsis-horizontal')
-                    ->tooltip('إجراءات'),
+                ]),
             ])
             ->headerActions([
                 Action::make('exportAll')

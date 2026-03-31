@@ -1,0 +1,36 @@
+                transform: translateY(-8px);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .down-head {
+                flex-direction: column;
+            }
+
+            .down-brand {
+                flex: 1 1 100%;
+                justify-content: center;
+            }
+
+            .countdown-card {
+                min-width: 100%;
+            }
+
+            .fun-message {
+                grid-column: 1 / -1;
+            }
+
+            /* Slower rotation on mobile for better performance */
+            .logo-3d-rotating {
+                animation: rotate3D-slow 10s linear infinite;
+            }
+
+            /* Reduce glow intensity on mobile */
+            .logo-glow {
+                opacity: 0.4;
+            }
+        }
+
+        /* Medium screens optimization */
+        @media (min-width: 769px) and (max-width: 1024px) {
