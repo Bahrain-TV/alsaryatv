@@ -1,0 +1,171 @@
+                    ),
+            ])
+
+            ->actions([
+                ActionGroup::make([
+                    // Export Actions
+                    Action::make('exportCsv')
+                        ->label('تصدير CSV')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->action(function ($records) {
+                            return static::exportToCsv($records);
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    Action::make('exportExcel')
+                        ->label('تصدير Excel')
+                        ->icon('heroicon-o-table-cells')
+                        ->color('success')
+                        ->action(function ($records) {
+                            return static::exportToExcel($records);
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    // Status Management
+                    Action::make('changeStatus')
+                        ->label('تغيير الحالة')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('warning')
+                        ->form([
+                            Forms\Components\Select::make('status')
+                                ->label('الحالة الجديدة')
+                                ->options([
+                                    'active' => 'نشط',
+                                    'inactive' => 'غير نشط',
+                                    'selected' => 'مُختار',
+                                    'blocked' => 'محظور',
+                                ])
+                                ->required()
+                                ->native(false),
+                        ])
+                        ->action(function (array $data, $records): void {
+                            $records->each(function ($record) use ($data): void {
+                                $record->update(['status' => $data['status']]);
+                            });
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('تغيير حالة المتصلين')
+                        ->modalDescription('سيتم تغيير حالة جميع المتصلين المحددين')
+                        ->deselectRecordsAfterCompletion(),
+
+                    // Delete Action
+                    Action::make('delete')
+                        ->label('حذف المحدد'),
+
+                    // Winner Selection
+                    Action::make('selectMultipleRandomWinners')
+                        ->label('اختيار مُختارين عشوائيين')
+                        ->icon('heroicon-o-sparkles')
+                        ->color('info')
+                        ->form([
+                            Forms\Components\TextInput::make('count')
+                                ->label('عدد المُختارين')
+                                ->required()
+                                ->numeric()
+                                ->minValue(1)
+                                ->maxValue(10)
+                                ->default(3),
+                        ])
+                        ->action(function (array $data): void {
+                            $count = (int) $data['count'];
+
+                            // Get eligible callers (not selected, not winner)
+                            $eligibleCallers = Caller::getEligibleCallers();
+
+                            if ($eligibleCallers->count() < $count) {
+                                $this->notify('warning', 'عدد المتصلين المؤهلين غير كافٍ. يوجد فقط '.$eligibleCallers->count().' متصل.');
+
+                                return;
+                            }
+
+                            $selectedCallers = [];
+                            $selectedCpRs = [];
+
+                            // Select unique callers based on CPR
+                            for ($i = 0; $i < $count; $i++) {
+                                if ($eligibleCallers->isEmpty()) {
+                                    break;
+                                }
+
+                                // Filter out callers whose CPR has already been selected
+                                $availableCallers = $eligibleCallers->filter(function ($caller) use ($selectedCpRs) {
+                                    return ! in_array($caller->cpr, $selectedCpRs);
+                                });
+
+                                if ($availableCallers->isEmpty()) {
+                                    break;
+                                }
+
+                                $selected = $availableCallers->random();
+                                $selected->update([
+                                    'is_selected' => true,
+                                    'status' => 'selected',
+                                ]);
+
+                                $selectedCallers[] = $selected;
+                                $selectedCpRs[] = $selected->cpr;
+                            }
+
+                            $selectedNames = implode('، ', array_map(function ($caller) {
+                                return $caller->name.' ('.$caller->cpr.')';
+                            }, $selectedCallers));
+
+                            $this->notify('success', 'تم اختيار '.count($selectedCallers).' مُختار: '.$selectedNames);
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('اختيار مُختارين عشوائيين')
+                        ->modalDescription('سيتم اختيار مُختارين عشوائياً من المتصلين المؤهلين. لن يتم تحديدهم كفائزين — يمكنك ذلك لاحقاً يدوياً.'),
+
+                    // Mark Selected as Winners (manual confirmation)
+                    Action::make('markAsWinners')
+                        ->label('تأكيد كفائزين')
+                        ->icon('heroicon-o-trophy')
+                        ->color('success')
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
+                                $record->update([
+                                    'is_winner' => true,
+                                    'is_selected' => true, // also ensure they're marked selected
+                                ]);
+                            });
+
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('تم التحديث')
+                                ->body('تم تأكيد '.$records->count().' متصل كفائزين')
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('تأكيد الفائزين')
+                        ->modalDescription('سيتم تأكيد المتصلين المحددين كفائزين نهائيين.')
+                        ->deselectRecordsAfterCompletion(),
+
+                    // Remove Winner Status (keeps selected)
+                    Action::make('removeWinnerStatus')
+                        ->label('إزالة حالة الفوز')
+                        ->icon('heroicon-o-x-mark')
+                        ->color('danger')
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
+                                $record->update(['is_winner' => false]);
+                            });
+
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('تم التحديث')
+                                ->body('تم إزالة حالة الفوز من '.$records->count().' متصل (لا يزالون مُختارين)')
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion(),
+
+                    // Reset Selection (allow them back into draws)
+                    Action::make('resetSelection')
+                        ->label('إعادة إلى السحب')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('gray')
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
+                                $record->update([
+                                    'is_selected' => false,

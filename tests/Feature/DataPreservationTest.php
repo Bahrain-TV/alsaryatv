@@ -4,11 +4,23 @@ namespace Tests\Feature;
 
 use App\Models\Caller;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Facades\DB;
 
 class DataPreservationTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Ensure there is at least some data for the persist-data command
+        Caller::factory()->count(5)->create(['is_winner' => false, 'status' => 'active']);
+        Caller::factory()->count(2)->create(['is_winner' => true, 'status' => 'active']);
+    }
+
     /**
      * Test that backup:data command exists and works.
      */

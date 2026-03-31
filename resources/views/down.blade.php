@@ -370,11 +370,17 @@
         @media (max-width: 768px) {
             .down-head {
                 flex-direction: column;
+                text-align: center;
             }
 
             .down-brand {
                 flex: 1 1 100%;
                 justify-content: center;
+                flex-direction: column;
+            }
+
+            .down-text {
+                margin-top: 1rem;
             }
 
             .countdown-card {
@@ -393,6 +399,10 @@
             /* Reduce glow intensity on mobile */
             .logo-glow {
                 opacity: 0.4;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
         }
 

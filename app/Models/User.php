@@ -10,7 +10,10 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens;
 
@@ -91,5 +94,13 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return $this->hasRole('super_admin');
+    }
+
+    /**
+     * Determine if the user can access the given Filament panel.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isAdmin();
     }
 }
