@@ -11,7 +11,7 @@ document.head.appendChild(driverCSS);
 
 // Load Driver.js Script
 const driverScript = document.createElement('script');
-driverScript.src = 'https://cdn.jsdelivr.net/npm/driver.js@1.3.2/dist/index.umd.js';
+driverScript.src = 'https://cdn.jsdelivr.net/npm/driver.js@1.3.2/dist/driver.js.iife.js';
 driverScript.onload = () => {
     // Driver.js is now available as window.driver
     console.log('Driver.js loaded successfully');
@@ -30,55 +30,42 @@ document.head.appendChild(driverScript);
 // Add custom Arabic styling for Driver.js popovers
 const style = document.createElement('style');
 style.textContent = `
-    .driver-popover-ar {
+    .driver-popover {
         direction: rtl;
+        font-family: 'Tajawal', sans-serif !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.35) !important;
     }
 
-    .driver-popover-ar .driver-title {
-        font-family: 'Tajawal', sans-serif;
-        font-weight: 700;
-        font-size: 1.25rem;
-        color: #1f2937;
-        margin-bottom: 0.5rem;
+    .driver-popover-title {
+        font-family: 'Tajawal', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        color: #1f2937 !important;
     }
 
-    .driver-popover-ar .driver-description {
-        font-family: 'Tajawal', sans-serif;
-        font-size: 1rem;
-        color: #4b5563;
-        line-height: 1.5;
+    .driver-popover-description {
+        font-family: 'Tajawal', sans-serif !important;
+        font-size: 0.95rem !important;
+        color: #4b5563 !important;
+        line-height: 1.6 !important;
     }
 
-    .driver-popover-ar .driver-button {
-        font-family: 'Tajawal', sans-serif;
-        font-weight: 600;
+    .driver-popover-footer {
+        direction: ltr;
     }
 
-    .driver-popover-ar .driver-button:hover {
-        background-color: #3b82f6;
-    }
-
-    .driver-popover-ar .driver-button-primary {
-        background-color: #2563eb;
-        color: white;
-    }
-
-    .driver-popover-ar .driver-progress {
-        font-family: 'Tajawal', sans-serif;
-    }
-
-    /* Highlight styling */
-    .driver-highlight {
-        border-radius: 8px;
-        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+    .driver-popover-progress-text {
+        font-family: 'Tajawal', sans-serif !important;
+        font-size: 0.8rem !important;
     }
 
     /* Popover animations */
     .driver-popover {
-        animation: slideIn 0.3s ease-out;
+        animation: driverSlideIn 0.25s ease-out;
     }
 
-    @keyframes slideIn {
+    @keyframes driverSlideIn {
         from {
             opacity: 0;
             transform: translateY(-10px);

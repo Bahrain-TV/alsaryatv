@@ -9,7 +9,7 @@ export function initDashboardTutorial() {
         return;
     }
 
-    const driver = window.driver.driver;
+    const driverFn = window.driver.driver || window.driver;
 
     const dashboardSteps = [
         {
@@ -62,12 +62,15 @@ export function initDashboardTutorial() {
         }
     ];
 
-    const driverObj = driver({
+    const driverObj = driverFn({
         showProgress: true,
         allowClose: true,
         overlayClickNext: false,
         stagePadding: 10,
-        popoverClass: 'driver-popover-ar',
+        animate: true,
+        nextBtnText: 'التالي →',
+        prevBtnText: '← السابق',
+        doneBtnText: '✓ انتهيت',
         steps: dashboardSteps
     });
 
@@ -83,7 +86,7 @@ export function initQuickTips() {
         return;
     }
 
-    const driver = window.driver.driver;
+    const driverFn = window.driver.driver || window.driver;
 
     const tips = [
         {
@@ -115,12 +118,15 @@ export function initQuickTips() {
         }
     ];
 
-    const driverObj = driver({
+    const driverObj = driverFn({
         showProgress: true,
         allowClose: true,
         overlayClickNext: false,
         stagePadding: 10,
-        popoverClass: 'driver-popover-ar',
+        animate: true,
+        nextBtnText: 'التالي →',
+        prevBtnText: '← السابق',
+        doneBtnText: '✓ انتهيت',
         steps: tips
     });
 

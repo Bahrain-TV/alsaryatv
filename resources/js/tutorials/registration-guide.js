@@ -9,7 +9,7 @@ export function initRegistrationTutorial() {
         return;
     }
 
-    const driver = window.driver.driver;
+    const driverFn = window.driver.driver || window.driver;
 
     const registrationSteps = [
         {
@@ -22,7 +22,7 @@ export function initRegistrationTutorial() {
             }
         },
         {
-            element: '#toggleIndividual',
+            element: '#tab-individual',
             popover: {
                 title: 'اختر نوع التسجيل',
                 description: 'اضغط هنا للتسجيل كمشارك فردي',
@@ -31,38 +31,29 @@ export function initRegistrationTutorial() {
             }
         },
         {
-            element: 'input[name="name"]',
+            element: '#name',
             popover: {
                 title: 'الاسم الكامل',
-                description: 'أدخل اسمك الرباعي كاملاً',
+                description: 'أدخل اسمك الرباعي كاملاً كما يظهر في بطاقة الهوية',
                 side: 'bottom',
                 align: 'start'
             }
         },
         {
-            element: 'input[name="phone_number"]',
+            element: '#cpr',
+            popover: {
+                title: 'الرقم الشخصي (CPR)',
+                description: 'أدخل رقمك الشخصي المكوّن من 9 أرقام',
+                side: 'bottom',
+                align: 'start'
+            }
+        },
+        {
+            element: '#phone_number',
             popover: {
                 title: 'رقم الهاتف',
-                description: 'أدخل رقم هاتفك الجوال (مثال: +973 33333333)',
+                description: 'أدخل رقم هاتفك الجوّال الفعّال للتواصل في حال الفوز',
                 side: 'bottom',
-                align: 'start'
-            }
-        },
-        {
-            element: 'input[name="cpr"]',
-            popover: {
-                title: 'الرقم الشخصي',
-                description: 'أدخل رقمك الشخصي/البطاقة المدنية',
-                side: 'bottom',
-                align: 'start'
-            }
-        },
-        {
-            element: 'input[name="policy_agreement"]',
-            popover: {
-                title: 'الموافقة على الشروط',
-                description: 'تأكد من الموافقة على شروط المشاركة',
-                side: 'top',
                 align: 'start'
             }
         },
@@ -74,24 +65,18 @@ export function initRegistrationTutorial() {
                 side: 'top',
                 align: 'center'
             }
-        },
-        {
-            element: '#sponsors-logos',
-            popover: {
-                title: 'رعاة البرنامج',
-                description: 'البرنامج يأتيكم برعاية هذه الشركات الموثوقة',
-                side: 'top',
-                align: 'center'
-            }
         }
     ];
 
-    const driverObj = driver({
+    const driverObj = driverFn({
         showProgress: true,
         allowClose: true,
         overlayClickNext: false,
         stagePadding: 10,
-        popoverClass: 'driver-popover-ar',
+        animate: true,
+        nextBtnText: 'التالي →',
+        prevBtnText: '← السابق',
+        doneBtnText: '✓ انتهيت',
         steps: registrationSteps
     });
 
@@ -107,11 +92,11 @@ export function initFamilyRegistrationTutorial() {
         return;
     }
 
-    const driver = window.driver.driver;
+    const driverFn = window.driver.driver || window.driver;
 
     const familySteps = [
         {
-            element: '#toggleFamily',
+            element: '#tab-family',
             popover: {
                 title: 'تسجيل العائلة',
                 description: 'اضغط هنا للتسجيل كعائلة',
@@ -120,7 +105,7 @@ export function initFamilyRegistrationTutorial() {
             }
         },
         {
-            element: 'input[name="name"]',
+            element: '#name',
             popover: {
                 title: 'اسم المسؤول عن العائلة',
                 description: 'أدخل اسم رب الأسرة كاملاً',
@@ -129,19 +114,19 @@ export function initFamilyRegistrationTutorial() {
             }
         },
         {
-            element: 'input[name="phone_number"]',
+            element: '#cpr',
             popover: {
-                title: 'رقم التواصل',
-                description: 'رقم جوال يمكن التواصل عليه',
+                title: 'الرقم الشخصي (CPR) لرب العائلة',
+                description: 'رقم البطاقة المدنية لمسؤول العائلة',
                 side: 'bottom',
                 align: 'start'
             }
         },
         {
-            element: 'input[name="cpr"]',
+            element: '#phone_number',
             popover: {
-                title: 'الرقم الشخصي',
-                description: 'رقم البطاقة المدنية لمسؤول العائلة',
+                title: 'رقم هاتف التواصل',
+                description: 'رقم جوال يمكن التواصل عليه',
                 side: 'bottom',
                 align: 'start'
             }
@@ -157,12 +142,15 @@ export function initFamilyRegistrationTutorial() {
         }
     ];
 
-    const driverObj = driver({
+    const driverObj = driverFn({
         showProgress: true,
         allowClose: true,
         overlayClickNext: false,
         stagePadding: 10,
-        popoverClass: 'driver-popover-ar',
+        animate: true,
+        nextBtnText: 'التالي →',
+        prevBtnText: '← السابق',
+        doneBtnText: '✓ انتهيت',
         steps: familySteps
     });
 

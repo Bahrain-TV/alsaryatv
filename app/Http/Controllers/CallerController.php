@@ -169,7 +169,7 @@ class CallerController extends Controller
 
     public function randomWinner(Request $request)
     {
-        $caller = Caller::where('is_winner', false)->inRandomOrder()->first();
+        $caller = Caller::eligible()->inRandomOrder()->first();
 
         if (! $caller) {
             return response()->json([
@@ -178,7 +178,7 @@ class CallerController extends Controller
             ], 422);
         }
 
-        $caller->update(['is_winner' => true]);
+        $caller->update(['is_winner' => true, 'is_selected' => true, 'status' => 'selected']);
         app(NtfyNotifier::class)->notifyWinner($caller);
 
         return response()->json([
