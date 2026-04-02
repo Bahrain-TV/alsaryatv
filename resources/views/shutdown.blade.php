@@ -403,6 +403,23 @@
             }
         }
 
+        /* Mid-range phones in portrait (481px–767px) */
+        @media (min-width: 481px) and (max-width: 767px) {
+            :root {
+                --dock-height: 10rem;
+            }
+
+            .sponsor-marquee {
+                mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+                -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+            }
+
+            .tick-logo {
+                height: clamp(1.5rem, 5vw, 2rem);
+                max-width: clamp(5rem, 18vw, 7rem);
+            }
+        }
+
         @media (min-width: 768px) {
             :root {
                 --dock-height: 9rem;
@@ -464,7 +481,7 @@
 
         @media (max-width: 480px) {
             :root {
-                --dock-height: 12.5rem;
+                --dock-height: 9.5rem;
             }
 
             .basmala {
@@ -498,20 +515,100 @@
             }
 
             .bottom-dock {
-                padding-inline: 0.55rem;
+                padding-inline: 0.4rem;
             }
 
             .bottom-dock-inner {
                 border-radius: 1.15rem;
-                padding: 0.7rem;
+                padding: 0.55rem;
+            }
+
+            .sponsor-ribbon {
+                gap: 0.4rem;
+            }
+
+            .sponsor-label {
+                font-size: 0.65rem;
+                padding: 0.25rem 0.6rem;
             }
 
             .sponsor-marquee {
-                padding-block: 0.65rem;
+                padding-block: 0.45rem;
+                border-radius: 0.75rem;
+                mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+                -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
             }
 
             .sponsor-track {
+                gap: 1.5rem;
+                padding-inline: 0.75rem;
                 animation-duration: 14s;
+            }
+
+            .tick-logo {
+                height: 1.4rem;
+                max-width: 4.5rem;
+            }
+
+            .dock-meta {
+                gap: 0.3rem;
+                margin-top: 0.55rem;
+                padding-top: 0.55rem;
+            }
+
+            .dock-brand {
+                font-size: 0.72rem;
+            }
+
+            .dock-links {
+                font-size: 0.65rem;
+                gap: 0.35rem;
+            }
+
+            .dock-copy {
+                font-size: 0.62rem;
+            }
+        }
+
+        /* Very small screens (iPhone SE, Galaxy Fold, etc.) */
+        @media (max-width: 360px) {
+            :root {
+                --dock-height: 8.5rem;
+            }
+
+            .sponsor-label {
+                font-size: 0.6rem;
+                padding: 0.2rem 0.5rem;
+            }
+
+            .sponsor-track {
+                gap: 1.2rem;
+                padding-inline: 0.5rem;
+                animation-duration: 12s;
+            }
+
+            .tick-logo {
+                height: 1.2rem;
+                max-width: 3.8rem;
+            }
+
+            .dock-meta {
+                gap: 0.25rem;
+                margin-top: 0.4rem;
+                padding-top: 0.4rem;
+            }
+
+            .dock-brand {
+                font-size: 0.65rem;
+            }
+
+            .dock-links {
+                font-size: 0.6rem;
+                gap: 0.25rem;
+            }
+
+            .dock-copy {
+                font-size: 0.58rem;
             }
         }
     </style>
