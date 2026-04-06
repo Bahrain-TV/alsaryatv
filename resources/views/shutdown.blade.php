@@ -393,7 +393,12 @@
 
         .sponsor-ribbon {
             display: grid;
-            gap: 0.75rem;
+            gap: 0.8rem;
+        }
+
+        .sponsor-intro {
+            display: grid;
+            gap: 0.32rem;
         }
 
         .sponsor-label {
@@ -411,22 +416,31 @@
             white-space: nowrap;
         }
 
+        .sponsor-note {
+            color: rgba(245,222,179,0.72);
+            font-size: 0.74rem;
+            line-height: 1.5;
+        }
+
         .sponsor-marquee {
             position: relative;
             overflow: hidden;
             width: 100%;
-            padding: 0.75rem 0;
-            border-radius: 1rem;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-            mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+            padding: 0.9rem 0;
+            border-radius: 1.15rem;
+            border: 1px solid rgba(245,222,179,0.09);
+            background:
+                linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06), rgba(255,255,255,0.03)),
+                radial-gradient(circle at center, rgba(168,28,46,0.12), transparent 58%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
             -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
         }
 
         .sponsor-track {
             display: flex;
             align-items: center;
-            gap: clamp(2rem, 7vw, 4.5rem);
+            gap: 1rem;
             width: max-content;
             padding-inline: clamp(1rem, 4vw, 2rem);
             will-change: transform;
@@ -440,18 +454,78 @@
             animation-play-state: running;
         }
 
-        .tick-logo {
-            height: clamp(1.7rem, 6vw, 2.4rem);
-            width: auto;
-            max-width: clamp(5.5rem, 22vw, 8rem);
-            object-fit: contain;
-            flex-shrink: 0;
+        .sponsor-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.85rem;
+            min-width: clamp(12.5rem, 24vw, 15.25rem);
+            padding: 0.72rem 0.95rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(245,222,179,0.12);
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+            box-shadow: 0 14px 28px rgba(0,0,0,0.12);
             opacity: 0;
-            transition: opacity 0.6s ease-out;
+            transform: translateY(8px) scale(0.98);
+            transition: opacity 0.45s ease, transform 0.45s ease, border-color 0.2s ease;
         }
 
-        .tick-logo.is-visible {
+        .sponsor-item.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .sponsor-item:hover {
+            border-color: rgba(245,222,179,0.22);
+        }
+
+        .sponsor-logo-frame {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: clamp(3rem, 7vw, 3.8rem);
+            height: clamp(3rem, 7vw, 3.8rem);
+            padding: 0.5rem;
+            border-radius: 0.9rem;
+            background: rgba(10,9,12,0.46);
+            border: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+
+        .sponsor-copy {
+            display: grid;
+            gap: 0.14rem;
+            min-width: 0;
+        }
+
+        .sponsor-name-ar {
+            color: var(--cream);
+            font-size: 0.88rem;
+            font-weight: 800;
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        .sponsor-name-en {
+            color: rgba(255,255,255,0.58);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .tick-logo {
+            height: clamp(1.65rem, 5vw, 2.15rem);
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            flex-shrink: 0;
             opacity: 0.94;
+            transition: transform 0.25s ease-out;
+        }
+
+        .sponsor-item:hover .tick-logo {
+            transform: scale(1.04);
         }
 
         .tick-logo-alsalam {
@@ -595,8 +669,8 @@
             :root { --dock-height: 10rem; }
 
             .sponsor-marquee {
-                mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
                 -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+                mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
             }
 
             .tick-logo {
@@ -628,8 +702,12 @@
             .panel-actions { justify-content: flex-start; }
 
             .sponsor-ribbon {
-                grid-template-columns: auto minmax(0, 1fr);
-                align-items: center;
+                grid-template-columns: minmax(10rem, 12.5rem) minmax(0, 1fr);
+                align-items: start;
+            }
+
+            .sponsor-intro {
+                padding-top: 0.18rem;
             }
 
             .bottom-dock-inner {
@@ -688,27 +766,53 @@
 
             .sponsor-ribbon { gap: 0.4rem; }
 
+            .sponsor-note {
+                font-size: 0.65rem;
+            }
+
             .sponsor-label {
                 font-size: 0.65rem;
                 padding: 0.25rem 0.6rem;
             }
 
             .sponsor-marquee {
-                padding-block: 0.45rem;
+                padding-block: 0.55rem;
                 border-radius: 0.75rem;
-                mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
                 -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+                mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
             }
 
             .sponsor-track {
-                gap: 1.5rem;
+                gap: 0.7rem;
                 padding-inline: 0.75rem;
-                animation-duration: 14s;
+                animation-duration: 16s;
+            }
+
+            .sponsor-item {
+                gap: 0.65rem;
+                min-width: 10.3rem;
+                padding: 0.56rem 0.7rem;
+                border-radius: 0.85rem;
+            }
+
+            .sponsor-logo-frame {
+                width: 2.55rem;
+                height: 2.55rem;
+                padding: 0.4rem;
+                border-radius: 0.72rem;
+            }
+
+            .sponsor-name-ar {
+                font-size: 0.74rem;
+            }
+
+            .sponsor-name-en {
+                font-size: 0.58rem;
+                letter-spacing: 0.05em;
             }
 
             .tick-logo {
-                height: 1.4rem;
-                max-width: 4.5rem;
+                height: 1.3rem;
             }
 
             .dock-meta {
@@ -735,20 +839,42 @@
         @media (max-width: 360px) {
             :root { --dock-height: 8.5rem; }
 
+            .sponsor-note {
+                display: none;
+            }
+
             .sponsor-label {
                 font-size: 0.6rem;
                 padding: 0.2rem 0.5rem;
             }
 
             .sponsor-track {
-                gap: 1.2rem;
+                gap: 0.55rem;
                 padding-inline: 0.5rem;
                 animation-duration: 12s;
             }
 
+            .sponsor-item {
+                min-width: 9.1rem;
+                padding: 0.48rem 0.58rem;
+            }
+
+            .sponsor-logo-frame {
+                width: 2.2rem;
+                height: 2.2rem;
+                padding: 0.32rem;
+            }
+
+            .sponsor-name-ar {
+                font-size: 0.68rem;
+            }
+
+            .sponsor-name-en {
+                font-size: 0.54rem;
+            }
+
             .tick-logo {
-                height: 1.2rem;
-                max-width: 3.8rem;
+                height: 1.08rem;
             }
 
             .dock-meta {
@@ -782,7 +908,7 @@
             .panel-meta,
             .panel-actions,
             .bottom-dock,
-            .tick-logo {
+            .sponsor-item {
                 opacity: 1 !important;
                 transform: none !important;
             }
@@ -793,9 +919,7 @@
                 animation-iteration-count: infinite !important;
             }
 
-            .tick-logo {
-                opacity: 0.94 !important;
-            }
+            .tick-logo { opacity: 0.94 !important; }
         }
     </style>
 </head>
@@ -842,16 +966,72 @@
     <div class="bottom-dock">
         <div class="bottom-dock-inner">
             <div class="sponsor-ribbon">
-                <span class="sponsor-label">برعاية</span>
+                <div class="sponsor-intro">
+                    <span class="sponsor-label">برعاية</span>
+                    <span class="sponsor-note">شركاء السارية الداعمون للبث المباشر هذا الموسم</span>
+                </div>
 
                 <div class="sponsor-marquee" aria-label="الرعاة">
                     <div class="sponsor-track" id="sponsorTrack">
-                        <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="tick-logo">
-                        <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam" class="tick-logo tick-logo-alsalam">
-                        <img src="{{ asset('images/bapco-energies.png') }}" alt="Bapco Energies" class="tick-logo">
-                        <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="tick-logo">
-                        <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam" class="tick-logo tick-logo-alsalam">
-                        <img src="{{ asset('images/bapco-energies.png') }}" alt="Bapco Energies" class="tick-logo">
+                        <div class="sponsor-item">
+                            <div class="sponsor-logo-frame">
+                                <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="tick-logo">
+                            </div>
+                            <div class="sponsor-copy">
+                                <span class="sponsor-name-ar">جاسميز</span>
+                                <span class="sponsor-name-en">Jasmi's</span>
+                            </div>
+                        </div>
+
+                        <div class="sponsor-item">
+                            <div class="sponsor-logo-frame">
+                                <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam" class="tick-logo tick-logo-alsalam">
+                            </div>
+                            <div class="sponsor-copy">
+                                <span class="sponsor-name-ar">بنك السلام</span>
+                                <span class="sponsor-name-en">Al Salam Bank</span>
+                            </div>
+                        </div>
+
+                        <div class="sponsor-item">
+                            <div class="sponsor-logo-frame">
+                                <img src="{{ asset('images/bapco-energies.png') }}" alt="Bapco Energies" class="tick-logo">
+                            </div>
+                            <div class="sponsor-copy">
+                                <span class="sponsor-name-ar">بابكو للطاقة</span>
+                                <span class="sponsor-name-en">Bapco Energies</span>
+                            </div>
+                        </div>
+
+                        <div class="sponsor-item" aria-hidden="true">
+                            <div class="sponsor-logo-frame">
+                                <img src="{{ asset('images/jasmis-logo.png') }}" alt="" class="tick-logo">
+                            </div>
+                            <div class="sponsor-copy">
+                                <span class="sponsor-name-ar">جاسميز</span>
+                                <span class="sponsor-name-en">Jasmi's</span>
+                            </div>
+                        </div>
+
+                        <div class="sponsor-item" aria-hidden="true">
+                            <div class="sponsor-logo-frame">
+                                <img src="{{ asset('images/alsalam-logo.svg') }}" alt="" class="tick-logo tick-logo-alsalam">
+                            </div>
+                            <div class="sponsor-copy">
+                                <span class="sponsor-name-ar">بنك السلام</span>
+                                <span class="sponsor-name-en">Al Salam Bank</span>
+                            </div>
+                        </div>
+
+                        <div class="sponsor-item" aria-hidden="true">
+                            <div class="sponsor-logo-frame">
+                                <img src="{{ asset('images/bapco-energies.png') }}" alt="" class="tick-logo">
+                            </div>
+                            <div class="sponsor-copy">
+                                <span class="sponsor-name-ar">بابكو للطاقة</span>
+                                <span class="sponsor-name-en">Bapco Energies</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -879,7 +1059,7 @@
         'use strict';
 
         /**
-         * After the dock entrance animation completes, reveal sponsor logos
+         * After the dock entrance animation completes, reveal sponsor cards
          * one-by-one with a stagger, then start the marquee scroll.
          */
         (function initSponsorEntrance() {
@@ -890,20 +1070,20 @@
             var track = document.getElementById('sponsorTrack');
             if (!track) return;
 
-            var logos = track.querySelectorAll('.tick-logo');
+            var sponsorItems = track.querySelectorAll('.sponsor-item');
 
-            // Wait for dock to finish sliding up, then reveal logos
+            // Wait for dock to finish sliding up, then reveal sponsor cards
             setTimeout(function() {
-                logos.forEach(function(logo, i) {
+                sponsorItems.forEach(function(item, i) {
                     setTimeout(function() {
-                        logo.classList.add('is-visible');
+                        item.classList.add('is-visible');
                     }, i * logoStagger);
                 });
 
                 // Start marquee after all logos are visible
                 setTimeout(function() {
                     track.classList.add('is-running');
-                }, logos.length * logoStagger + 200);
+                }, sponsorItems.length * logoStagger + 200);
             }, dockDelay + dockDuration);
         })();
     </script>
