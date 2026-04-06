@@ -49,7 +49,7 @@ php artisan vendor:publish --force --tag=filament-assets
 
 ### تنفيذ وتصميم
 
-- [حسن الدوي](https://www.linkedin.com/in/aldoyh/)
+- [حسن الدوي](https://www.linkedin.com/in/aldoyh/) - Agents Orchestration
 - [Qwen Code](https://qwen.ai/) - Daily Selected Emails Feature
 - [Claude Code](https://claude.ai/)
 - [AI Assistant](https://openai.com)
