@@ -1,4 +1,13 @@
 <?php
+/**
+ * Archived route: auth.php
+ *
+ * This file was moved from `routes/auth.php` during cleanup of the routes/
+ * directory to keep only the minimal Laravel core route files there.
+ *
+ * Original contents preserved for reference.
+ * Date archived: 2026-04-11
+ */
 
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Livewire\Actions\Logout;

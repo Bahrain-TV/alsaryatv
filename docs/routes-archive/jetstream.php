@@ -1,4 +1,13 @@
 <?php
+/**
+ * Archived route: jetstream.php
+ *
+ * This file was moved from `routes/jetstream.php` during cleanup of the routes/
+ * directory to keep only the minimal Laravel core route files there.
+ *
+ * Original contents preserved for reference.
+ * Date archived: 2026-04-11
+ */
 
 use Illuminate\Support\Facades\Route;
 use Laravel\Jetstream\Http\Controllers\CurrentTeamController;
