@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -13,7 +14,7 @@ class Register extends Component
 
     public function mount(): void
     {
-        $this->authorize('create', \App\Models\User::class);
+        $this->authorize('create', User::class);
     }
 
     public function render()

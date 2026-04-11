@@ -6,6 +6,7 @@ use App\Mail\DailySelectedEmails;
 use App\Models\Caller;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 
 class SendDailySelectedEmailsCommand extends Command
@@ -122,7 +123,7 @@ class SendDailySelectedEmailsCommand extends Command
     /**
      * Get the last selected callers.
      */
-    protected function getSelectedCallers(int $limit): \Illuminate\Support\Collection
+    protected function getSelectedCallers(int $limit): Collection
     {
         return Caller::selected()
             ->orderByDesc('updated_at')
@@ -143,7 +144,7 @@ class SendDailySelectedEmailsCommand extends Command
      * Send the email with selected callers.
      */
     protected function sendEmail(
-        \Illuminate\Support\Collection $selectedCallers,
+        Collection $selectedCallers,
         int $totalCount,
         array $toEmails,
         array $ccEmails,

@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Helpers\PerformanceHelper;
+use App\Models\Caller;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Cache;
 
@@ -63,15 +64,15 @@ class AnimatedStatsOverviewWidget extends Widget
 
     private function loadData(): void
     {
-        $this->totalCallers = \App\Models\Caller::count();
-        $this->totalWinners = \App\Models\Caller::where('is_winner', true)->count();
-        $this->todayCallers = \App\Models\Caller::whereDate('created_at', today())->count();
-        $this->totalHits = \App\Models\Caller::sum('hits') ?? 0;
-        $this->activeCallers = \App\Models\Caller::where('status', 'active')->count();
-        $this->uniqueCprs = \App\Models\Caller::distinct('cpr')->count('cpr');
+        $this->totalCallers = Caller::count();
+        $this->totalWinners = Caller::where('is_winner', true)->count();
+        $this->todayCallers = Caller::whereDate('created_at', today())->count();
+        $this->totalHits = Caller::sum('hits') ?? 0;
+        $this->activeCallers = Caller::where('status', 'active')->count();
+        $this->uniqueCprs = Caller::distinct('cpr')->count('cpr');
 
         // Calculate previous day callers for trend calculation
         $yesterday = today()->subDay();
-        $this->previousDayCallers = \App\Models\Caller::whereDate('created_at', $yesterday)->count();
+        $this->previousDayCallers = Caller::whereDate('created_at', $yesterday)->count();
     }
 }

@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Caller;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class DataPreservationTest extends TestCase
 {
@@ -52,7 +52,7 @@ class DataPreservationTest extends TestCase
         // Just test that the command runs successfully
         $this->artisan('app:persist-data --verify')
             ->assertSuccessful();
-        
+
         // Verify the command doesn't destroy data
         $winnersCount = Caller::where('is_winner', true)->count();
         $this->assertGreaterThanOrEqual(0, $winnersCount);
@@ -67,7 +67,7 @@ class DataPreservationTest extends TestCase
         // Just test that the command runs successfully
         $this->artisan('app:persist-data --verify')
             ->assertSuccessful();
-        
+
         // Verify the command doesn't destroy data
         $selectedCount = Caller::where('is_selected', true)->where('is_winner', false)->count();
         $this->assertGreaterThanOrEqual(0, $selectedCount);
@@ -82,7 +82,7 @@ class DataPreservationTest extends TestCase
         // Just test that the command runs successfully
         $this->artisan('app:persist-data --verify')
             ->assertSuccessful();
-        
+
         // Verify levels exist
         $goldCount = Caller::where('level', 'gold')->count();
         $silverCount = Caller::where('level', 'silver')->count();
@@ -107,15 +107,15 @@ class DataPreservationTest extends TestCase
         foreach ($deployScripts as $script) {
             $path = base_path($script);
             $this->assertFileExists($path, "Deploy script $script should exist");
-            
+
             $content = file_get_contents($path);
-            
+
             $this->assertStringContainsString(
                 'backup:data',
                 $content,
                 "$script should contain backup:data command"
             );
-            
+
             $this->assertStringContainsString(
                 'app:persist-data',
                 $content,
@@ -132,15 +132,15 @@ class DataPreservationTest extends TestCase
     {
         $path = base_path('deploy-with-data-preserve.sh');
         $this->assertFileExists($path, 'deploy-with-data-preserve.sh should exist');
-        
+
         $content = file_get_contents($path);
-        
+
         $this->assertStringContainsString(
             'Pre-Migration Backup',
             $content,
             'Script should have pre-migration backup step'
         );
-        
+
         $this->assertStringContainsString(
             'post-migration',
             strtolower($content),
@@ -158,17 +158,17 @@ class DataPreservationTest extends TestCase
             DB::getSchemaBuilder()->hasColumn('callers', 'is_winner'),
             'callers table should have is_winner column'
         );
-        
+
         $this->assertTrue(
             DB::getSchemaBuilder()->hasColumn('callers', 'is_selected'),
             'callers table should have is_selected column'
         );
-        
+
         $this->assertTrue(
             DB::getSchemaBuilder()->hasColumn('callers', 'level'),
             'callers table should have level column'
         );
-        
+
         $this->assertTrue(
             DB::getSchemaBuilder()->hasColumn('callers', 'hits'),
             'callers table should have hits column'
@@ -194,7 +194,7 @@ class DataPreservationTest extends TestCase
         // Run backup command
         $this->artisan('backup:data --type=all')
             ->assertSuccessful();
-        
+
         // Check if backup directory exists and has files
         $backupDir = storage_path('backups');
         $this->assertDirectoryExists($backupDir, 'Backup directory should exist');

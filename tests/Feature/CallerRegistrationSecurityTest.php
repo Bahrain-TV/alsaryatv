@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Caller;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
@@ -305,7 +306,7 @@ class CallerRegistrationSecurityTest extends TestCase
      */
     private function createAdminUser()
     {
-        return \App\Models\User::create([
+        return User::create([
             'name' => 'Admin User',
             'email' => 'admin@test.local',
             'password' => bcrypt('password'),

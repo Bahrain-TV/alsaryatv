@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Caller;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use League\Csv\Writer;
 
@@ -128,7 +129,7 @@ class ExportCallersCommand extends Command
 
         } catch (\Exception $e) {
             $this->error("Export failed: {$e->getMessage()}");
-            \Illuminate\Support\Facades\Log::error('Callers export error', [
+            Log::error('Callers export error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

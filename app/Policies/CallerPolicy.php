@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Caller;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class CallerPolicy
 {
@@ -15,7 +16,7 @@ class CallerPolicy
      *
      * This allows anyone (including guests) to create callers
      *
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
     public function create(?User $user)
     {
@@ -26,7 +27,7 @@ class CallerPolicy
     /**
      * Determine whether the user can update the model.
      *
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
     public function update(User $user, Caller $caller)
     {

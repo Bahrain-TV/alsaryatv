@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\VersionManager;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class ManageVersionCommand extends Command
@@ -150,7 +151,7 @@ class ManageVersionCommand extends Command
                 $entry['version'],
                 strtoupper($entry['type']),
                 substr($entry['message'], 0, 50).(strlen($entry['message']) > 50 ? '...' : ''),
-                \Carbon\Carbon::parse($entry['timestamp'])->format('Y-m-d H:i'),
+                Carbon::parse($entry['timestamp'])->format('Y-m-d H:i'),
             ], $displayed)
         );
     }

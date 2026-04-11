@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\Caller;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -20,7 +21,7 @@ class WinnerAnnouncement extends Mailable
      * Create a new message instance.
      * This email is sent to ADMINS ONLY with all selected winners.
      */
-    public function __construct(Collection|null $winnersList = null)
+    public function __construct(?Collection $winnersList = null)
     {
         // If winners list provided, use it. Otherwise, fetch winners selected in the last 24 hours only.
         $this->winners = $winnersList ?? Caller::where('is_winner', true)
@@ -66,7 +67,7 @@ class WinnerAnnouncement extends Mailable
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {

@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -12,6 +13,6 @@ abstract class TestCase extends BaseTestCase
 
         // Disable CSRF verification for feature tests to simplify form submissions
         // Tests exercise validation and controller logic directly.
-        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+        $this->withoutMiddleware(VerifyCsrfToken::class);
     }
 }

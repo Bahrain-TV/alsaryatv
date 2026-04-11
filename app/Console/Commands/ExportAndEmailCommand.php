@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Process;
 
 class ExportAndEmailCommand extends Command
 {
@@ -132,7 +133,7 @@ class ExportAndEmailCommand extends Command
                 $startTime = microtime(true);
 
                 // Start a background process to show spinner
-                $process = new \Symfony\Component\Process\Process(['php', 'artisan', $command]);
+                $process = new Process(['php', 'artisan', $command]);
                 $process->setTimeout(3600); // 1 hour timeout
                 $process->start();
 

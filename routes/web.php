@@ -1,5 +1,7 @@
 <?php
 
+use App\Filament\Resources\CallerResource\Pages\ListCallers;
+use App\Filament\Resources\CallerResource\Pages\ListWinners;
 use App\Http\Controllers\CallerController;
 use App\Providers\HitsCounter;
 use Carbon\Carbon;
@@ -96,8 +98,8 @@ Route::middleware([
     Route::get('/families', [CallerController::class, 'families'])->name('families');
 
     // Filament shortcuts (if needed)
-    Route::get('/admin/callers', [\App\Filament\Resources\CallerResource\Pages\ListCallers::class, 'index'])->name('filament.admin.resources.callers.index');
-    Route::get('/admin/callers/winners', [\App\Filament\Resources\CallerResource\Pages\ListWinners::class, 'index'])->name('filament.admin.resources.callers.winners');
+    Route::get('/admin/callers', [ListCallers::class, 'index'])->name('filament.admin.resources.callers.index');
+    Route::get('/admin/callers/winners', [ListWinners::class, 'index'])->name('filament.admin.resources.callers.winners');
 });
 
 Route::get('/privacy', fn () => view('privacy', [

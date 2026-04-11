@@ -2,13 +2,19 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\AppendImageVersion;
 use App\View\Components\AppLayout;
 use App\View\Components\GuestLayout;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Console\Events\CommandFinished;
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -43,8 +49,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Ensure local images are cache-busted after deployments by appending file-modified timestamps.
         // This appends ?v=<filemtime> to local image, favicon and lottie URLs found in HTML responses.
-        $router = $this->app->make(\Illuminate\Routing\Router::class);
-        $router->pushMiddlewareToGroup('web', \App\Http\Middleware\AppendImageVersion::class);
+        $router = $this->app->make(Router::class);
+        $router->pushMiddlewareToGroup('web', AppendImageVersion::class);
 
         // Persistence Hooks: Automatically backup/restore data during migrations
         if ($this->app->runningInConsole()) {
@@ -57,15 +63,15 @@ class AppServiceProvider extends ServiceProvider
      */
     private function registerMigrationHooks(): void
     {
-        \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\CommandStarting::class, function ($event): void {
+        Event::listen(CommandStarting::class, function ($event): void {
             if (in_array($event->command, ['migrate', 'db:seed', 'migrate:fresh', 'migrate:refresh', 'migrate:rollback'])) {
-                \Illuminate\Support\Facades\Artisan::call('app:persist-data', ['--export-csv' => true, '--verify' => true]);
+                Artisan::call('app:persist-data', ['--export-csv' => true, '--verify' => true]);
             }
         });
 
-        \Illuminate\Support\Facades\Event::listen(\Illuminate\Console\Events\CommandFinished::class, function ($event): void {
+        Event::listen(CommandFinished::class, function ($event): void {
             if ($event->exitCode === 0 && in_array($event->command, ['migrate', 'db:seed', 'migrate:fresh', 'migrate:refresh'])) {
-                \Illuminate\Support\Facades\Artisan::call('app:callers:import', ['--force' => true]);
+                Artisan::call('app:callers:import', ['--force' => true]);
             }
         });
     }

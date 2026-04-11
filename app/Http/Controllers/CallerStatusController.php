@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\CallerApproved;
 use App\Http\Requests\UpdateCallerStatusRequest;
 use App\Models\Caller;
+use Illuminate\Http\JsonResponse;
 
 class CallerStatusController extends Controller
 {
@@ -23,7 +24,7 @@ class CallerStatusController extends Controller
      * Send an approved caller to the live stage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function sendToLive($id)
     {
@@ -43,7 +44,7 @@ class CallerStatusController extends Controller
      * Toggle the caller's winner status (one-way: can only be set to winner, not unset).
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function toggleWinner($id)
     {

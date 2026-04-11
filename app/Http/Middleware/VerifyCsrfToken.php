@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
+use Illuminate\Support\Facades\Log;
 
 class VerifyCsrfToken extends Middleware
 {
@@ -20,7 +21,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected function logFailure($request)
     {
-        \Illuminate\Support\Facades\Log::warning('CSRF token verification failed', [
+        Log::warning('CSRF token verification failed', [
             'path' => $request->path(),
             'method' => $request->method(),
             'user_ip' => $request->ip(),

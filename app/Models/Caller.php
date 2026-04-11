@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Providers\HitsCounter;
 use App\Services\NtfyNotifier;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -105,7 +106,7 @@ class Caller extends Model
         $this->refresh();
 
         // Ensure global counters are refreshed
-        \App\Providers\HitsCounter::incrementHits();
+        HitsCounter::incrementHits();
     }
 
     /**

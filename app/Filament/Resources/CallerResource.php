@@ -4,18 +4,23 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CallerResource\Pages;
 use App\Models\Caller;
+use Carbon\Carbon;
 use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Navigation\NavigationItem;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Table;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CallerResource extends Resource
 {
@@ -92,7 +97,7 @@ class CallerResource extends Resource
                             ->label('مُختار')
                             ->helperText('تم اختياره عشوائياً (لن يظهر في السحب مجدداً)')
                             ->disabled(),
-                        Forms\Components\Select::make('status')
+                        Select::make('status')
                             ->label('حالة الحساب')
                             ->options([
                                 'active' => 'نشط',
@@ -226,11 +231,11 @@ class CallerResource extends Resource
                         $indicators = [];
 
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'من: '.\Carbon\Carbon::parse($data['created_from'])->format('Y/m/d');
+                            $indicators[] = 'من: '.Carbon::parse($data['created_from'])->format('Y/m/d');
                         }
 
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'إلى: '.\Carbon\Carbon::parse($data['created_until'])->format('Y/m/d');
+                            $indicators[] = 'إلى: '.Carbon::parse($data['created_until'])->format('Y/m/d');
                         }
 
                         return $indicators;
@@ -283,7 +288,7 @@ class CallerResource extends Resource
                     ),
             ])
             ->actions([
-                \Filament\Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -312,7 +317,7 @@ class CallerResource extends Resource
                         ->icon('heroicon-o-arrow-path')
                         ->color('warning')
                         ->form([
-                            \Filament\Forms\Components\Select::make('status')
+                            Select::make('status')
                                 ->label('الحالة الجديدة')
                                 ->options([
                                     'active' => 'نشط',
@@ -350,7 +355,7 @@ class CallerResource extends Resource
                                 ]);
                             });
 
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->success()
                                 ->title('تم التحديث')
                                 ->body('تم تأكيد '.$records->count().' متصل كفائزين')
@@ -371,7 +376,7 @@ class CallerResource extends Resource
                                 $record->update(['is_winner' => false]);
                             });
 
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->success()
                                 ->title('تم التحديث')
                                 ->body('تم إزالة حالة الفوز من '.$records->count().' متصل (لا يزالون مُختارين)')
@@ -394,7 +399,7 @@ class CallerResource extends Resource
                                 ]);
                             });
 
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->success()
                                 ->title('تم التحديث')
                                 ->body('تم إعادة '.$records->count().' متصل إلى قائمة السحب')
@@ -463,7 +468,7 @@ class CallerResource extends Resource
     /**
      * Export callers to CSV format
      */
-    protected static function exportToCsv($records): \Symfony\Component\HttpFoundation\StreamedResponse
+    protected static function exportToCsv($records): StreamedResponse
     {
         $fileName = 'callers_'.now()->format('Y-m-d_H-i-s').'.csv';
 
@@ -517,7 +522,7 @@ class CallerResource extends Resource
     /**
      * Export callers to Excel format (HTML table that Excel can open)
      */
-    protected static function exportToExcel($records): \Symfony\Component\HttpFoundation\Response
+    protected static function exportToExcel($records): Response
     {
         $fileName = 'callers_'.now()->format('Y-m-d_H-i-s').'.xls';
 

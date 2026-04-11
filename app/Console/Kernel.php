@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -32,10 +33,10 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/obs-overlay.log'))
             ->onSuccess(function (): void {
-                \Illuminate\Support\Facades\Log::info('OBS overlay recording completed successfully');
+                Log::info('OBS overlay recording completed successfully');
             })
             ->onFailure(function (): void {
-                \Illuminate\Support\Facades\Log::error('OBS overlay recording failed');
+                Log::error('OBS overlay recording failed');
             });
 
         // Run persist-data command every hour to ensure data persistence
@@ -44,10 +45,10 @@ class Kernel extends ConsoleKernel
             ->name('persist-data-hourly')
             ->withoutOverlapping()
             ->onSuccess(function (): void {
-                \Illuminate\Support\Facades\Log::info('Data persistence check completed successfully');
+                Log::info('Data persistence check completed successfully');
             })
             ->onFailure(function (): void {
-                \Illuminate\Support\Facades\Log::error('Data persistence check failed');
+                Log::error('Data persistence check failed');
             });
 
         // Export all callers to encrypted CSV daily at 2:00 AM
@@ -58,10 +59,10 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/exports.log'))
             ->onSuccess(function (): void {
-                \Illuminate\Support\Facades\Log::info('Daily callers export completed successfully');
+                Log::info('Daily callers export completed successfully');
             })
             ->onFailure(function (): void {
-                \Illuminate\Support\Facades\Log::error('Daily callers export failed');
+                Log::error('Daily callers export failed');
             });
 
         // Run daily at 2:00 AM with full verification and export
@@ -71,10 +72,10 @@ class Kernel extends ConsoleKernel
             ->timezone('Asia/Bahrain')
             ->withoutOverlapping()
             ->onSuccess(function (): void {
-                \Illuminate\Support\Facades\Log::info('Daily data persistence full check completed successfully');
+                Log::info('Daily data persistence full check completed successfully');
             })
             ->onFailure(function (): void {
-                \Illuminate\Support\Facades\Log::error('Daily data persistence full check failed');
+                Log::error('Daily data persistence full check failed');
             });
 
         // Optional: Run immediately after deployment to verify data integrity
@@ -89,10 +90,10 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/daily-selected-emails.log'))
             ->onSuccess(function (): void {
-                \Illuminate\Support\Facades\Log::info('Daily selected names email sent successfully');
+                Log::info('Daily selected names email sent successfully');
             })
             ->onFailure(function (): void {
-                \Illuminate\Support\Facades\Log::error('Daily selected names email failed');
+                Log::error('Daily selected names email failed');
             });
     }
 

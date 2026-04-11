@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\SetLocale::class,
+            SetLocale::class,
         ]);
 
         // Exempt webhook and static assets from maintenance mode
@@ -30,7 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+        $exceptions->render(function (HttpException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], $e->getStatusCode());

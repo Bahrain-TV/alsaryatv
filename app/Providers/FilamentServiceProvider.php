@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Filament\Pages\WinnerSelection;
 use Filament\Facades\Filament;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
@@ -28,7 +29,7 @@ class FilamentServiceProvider extends ServiceProvider
 
         // Register custom Filament pages
         Filament::registerPages([
-            \App\Filament\Pages\WinnerSelection::class,
+            WinnerSelection::class,
         ]);
 
         Filament::serving(function (): void {

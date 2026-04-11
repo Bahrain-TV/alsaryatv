@@ -43,6 +43,7 @@ class RecordObsOverlayCommand extends Command
                 $detectedUrl = $this->getProductionUrl();
                 if ($detectedUrl === null) {
                     $this->error('❌ Production URL not configured. Please set APP_URL in .env');
+
                     return self::FAILURE;
                 }
                 $this->info("✅ Production mode: {$detectedUrl}");
@@ -51,6 +52,7 @@ class RecordObsOverlayCommand extends Command
                 if ($detectedUrl === null) {
                     $this->error('❌ No local server detected. Please start your Laravel server first.');
                     $this->error('   Run: php artisan serve');
+
                     return self::FAILURE;
                 }
                 $this->info("✅ Local server detected: {$detectedUrl}");
@@ -80,6 +82,7 @@ class RecordObsOverlayCommand extends Command
                 $this->error('   ');
                 $this->error('   php artisan obs:record --url=http://127.0.0.1:8122/obs-overlay');
                 $this->error('');
+
                 return self::FAILURE;
             }
 
@@ -101,9 +104,11 @@ class RecordObsOverlayCommand extends Command
                 $this->error('');
                 $this->error('   Or manually run on production:');
                 $this->error('   git pull && php artisan optimize:clear && php artisan route:cache');
+
                 return self::FAILURE;
             } elseif ($httpCode === '403') {
                 $this->error('❌ Access forbidden (403). Check server permissions.');
+
                 return self::FAILURE;
             } elseif (! in_array($httpCode, ['200', '301', '302'])) {
                 $this->warn("⚠️  URL returned HTTP {$httpCode}, attempting to continue...");
@@ -253,9 +258,9 @@ class RecordObsOverlayCommand extends Command
         if (! file_exists($envPath)) {
             return null;
         }
-        
+
         $envContent = file_get_contents($envPath);
-        
+
         // Look for APP_URL with production-like domain
         if (preg_match('/APP_URL=(https?:\/\/[^\s]+)/', $envContent, $matches)) {
             $url = rtrim($matches[1], '/');
@@ -264,7 +269,7 @@ class RecordObsOverlayCommand extends Command
                 return $url;
             }
         }
-        
+
         return null;
     }
 
@@ -276,7 +281,7 @@ class RecordObsOverlayCommand extends Command
         // First, check if APP_URL in .env has a local port we should try
         $envPath = base_path('.env');
         $appPort = null;
-        
+
         if (file_exists($envPath)) {
             $envContent = file_get_contents($envPath);
             // Check for APP_PORT in .env
@@ -288,13 +293,13 @@ class RecordObsOverlayCommand extends Command
                 $appPort = $matches[1];
             }
         }
-        
+
         // Build list of ports to check - APP_PORT first, then common ones
         $portsToCheck = [8122, 8000, 8080, 8001, 9000, 3000];
         if ($appPort && ! in_array($appPort, $portsToCheck)) {
             array_unshift($portsToCheck, (int) $appPort);
         }
-        
+
         // Check both localhost and 127.0.0.1 variants
         $commonHosts = ['127.0.0.1', 'localhost'];
 
@@ -306,6 +311,7 @@ class RecordObsOverlayCommand extends Command
                     $httpCode = trim($result->output());
                     if (in_array($httpCode, ['200', '301', '302', '404'])) {
                         $this->info("  Found server at {$url} (HTTP {$httpCode})");
+
                         return $url;
                     }
                 } catch (\Exception $e) {

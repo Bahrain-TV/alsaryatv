@@ -31,7 +31,7 @@ class CsvExportService
     /**
      * Generate CSV file from callers data
      *
-     * @param  \Illuminate\Support\Collection  $callers
+     * @param  Collection  $callers
      * @return string Path to generated CSV file
      *
      * @throws \Exception

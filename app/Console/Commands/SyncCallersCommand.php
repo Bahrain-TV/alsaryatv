@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Caller;
 use App\Services\CsvExportService;
 use App\Services\GoogleSheetsCallerService;
 use Illuminate\Console\Command;
@@ -56,7 +57,7 @@ class SyncCallersCommand extends Command
             $progressBar->start();
 
             try {
-                $callers = \App\Models\Caller::all();
+                $callers = Caller::all();
                 $csvPath = $this->csvService->generate($callers);
 
                 $progressBar->finish();

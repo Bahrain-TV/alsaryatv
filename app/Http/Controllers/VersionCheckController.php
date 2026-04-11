@@ -6,6 +6,7 @@ use App\Services\VersionManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class VersionCheckController extends Controller
 {
@@ -75,7 +76,7 @@ class VersionCheckController extends Controller
             $response['notification'] = $this->buildNotification($remoteVersion, $localVersion, $remoteBranch, $localBranch);
 
             // Log the notification for audit trail
-            \Illuminate\Support\Facades\Log::info('Version mismatch detected', [
+            Log::info('Version mismatch detected', [
                 'local_version' => $localVersion,
                 'remote_version' => $remoteVersion,
                 'local_branch' => $localBranch,
@@ -124,7 +125,7 @@ class VersionCheckController extends Controller
             'patch' => VersionManager::incrementPatch(),
         };
 
-        \Illuminate\Support\Facades\Log::warning('Version incremented by user', [
+        Log::warning('Version incremented by user', [
             'user' => Auth::user()?->email,
             'type' => $type,
             'new_version' => $newVersion,

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class VersionManager
 {
@@ -67,7 +68,7 @@ class VersionManager
 
         self::writeVersionData($data);
 
-        \Illuminate\Support\Facades\Log::info('Version updated', [
+        Log::info('Version updated', [
             'version' => $version,
             'updated_by' => $data['updated_by'],
         ]);
@@ -179,7 +180,7 @@ class VersionManager
 
         self::writeVersionData($data);
 
-        \Illuminate\Support\Facades\Log::info("Version incremented ({$part})", [
+        Log::info("Version incremented ({$part})", [
             'from' => $version,
             'to' => $newVersion,
         ]);
