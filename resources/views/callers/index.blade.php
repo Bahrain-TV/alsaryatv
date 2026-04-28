@@ -124,31 +124,42 @@
             </div>
         </div>
 
-        <div x-data="{ collapsed: window.innerWidth <= 768 }" class="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm overflow-hidden">
-            <div class="flex items-center justify-between mb-4">
+        <div x-data="{ collapsed: window.innerWidth <= 768 }" class="rounded-lg bg-white dark:bg-gray-800 p-4 md:p-6 shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between mb-3 md:mb-4">
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ __('Random Winner Draw') }}</h2>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('Tap the button to pick a random winner and mark them.') }}</p>
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100">{{ __('Random Winner Draw') }}</h2>
+                    <p class="mt-1 md:mt-2 text-sm text-gray-600 dark:text-gray-300">{{ __('Tap the button to pick a random winner and mark them.') }}</p>
                 </div>
                 <button type="button" @click="collapsed = !collapsed" :aria-expanded="!collapsed" class="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800"> <span x-show="collapsed">{{ __('Show') }}</span><span x-show="!collapsed">{{ __('Hide') }}</span></button>
             </div>
             <div x-show="!collapsed" x-transition>
-                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-4 text-center">
-                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100" x-text="randomWinner ? randomWinner.name : '{{ __('Ready to draw') }}'"></p>
-                        <p class="mt-1 text-xs text-gray-500" x-text="randomWinner ? randomWinner.phone : '---'"></p>
-                        <p class="text-xs text-gray-500" x-text="randomWinner ? randomWinner.cpr : '---'"></p>
+                <div class="flex flex-col gap-4 md:gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 p-4 md:p-6 text-center bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 min-h-[100px] md:min-h-[120px] flex flex-col items-center justify-center">
+                        <div class="text-3xl md:text-4xl mb-2" x-show="!randomWinner">🎲</div>
+                        <p class="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100" x-text="randomWinner ? randomWinner.name : '{{ __('Ready to draw') }}'"></p>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400 font-mono" x-show="randomWinner" x-text="randomWinner.phone"></p>
+                        <p class="text-xs text-gray-500 dark:text-gray-500 font-mono" x-show="randomWinner" x-text="randomWinner.cpr"></p>
+                        <div x-show="randomWinner" class="mt-2 inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                            🏆 {{ __('Winner Selected!') }}
+                        </div>
                     </div>
-                    <div class="flex flex-col items-start gap-2">
+                    <div class="flex flex-col items-start gap-2 md:gap-3">
                         <button
                             type="button"
-                            class="inline-flex items-center justify-center rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-600 disabled:opacity-60"
+                            class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-5 md:px-8 py-2.5 md:py-3 text-sm md:text-base font-semibold text-white shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transform transition-all duration-200 hover:scale-105 active:scale-95 touch-manipulation"
                             @click="pickRandomWinner"
                             :disabled="isPicking || callers.length === 0"
+                            x-text="isPicking ? '{{ __('Drawing...') }}' : '{{ __('Select Random Winner') }}'"
                         >
-                            {{ __('Select Random Winner') }}
                         </button>
-                        <span x-show="pickError" class="text-sm text-red-600" x-text="pickError"></span>
+                        <div x-show="isPicking" class="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
+                            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>{{ __('Selecting winner...') }}</span>
+                        </div>
+                        <span x-show="pickError" class="text-sm md:text-base text-red-600 dark:text-red-400 font-medium" x-text="pickError"></span>
                     </div>
                 </div>
             </div>

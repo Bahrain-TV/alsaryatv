@@ -1,58 +1,58 @@
 <x-filament-panels::page>
     <div class="space-y-6">
         <!-- Stats Overview -->
-        <div class="grid grid-cols-3 gap-4">
-            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-                <div class="text-sm font-medium opacity-90">إجمالي المتصلين</div>
-                <div class="text-3xl font-bold mt-2">{{ $this->getTotalCallersCount() }}</div>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-4 md:p-6 text-white">
+                <div class="text-xs md:text-sm font-medium opacity-90">إجمالي المتصلين</div>
+                <div class="text-2xl md:text-3xl font-bold mt-2">{{ $this->getTotalCallersCount() }}</div>
             </div>
-            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
-                <div class="text-sm font-medium opacity-90">المتصلين المؤهلين</div>
-                <div class="text-3xl font-bold mt-2">{{ $this->getEligibleCallersCount() }}</div>
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-4 md:p-6 text-white">
+                <div class="text-xs md:text-sm font-medium opacity-90">المتصلين المؤهلين</div>
+                <div class="text-2xl md:text-3xl font-bold mt-2">{{ $this->getEligibleCallersCount() }}</div>
             </div>
-            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg p-6 text-white">
-                <div class="text-sm font-medium opacity-90">الفائزون</div>
-                <div class="text-3xl font-bold mt-2">{{ $this->getWinnersCount() }}</div>
+            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg p-4 md:p-6 text-white col-span-2 md:col-span-1">
+                <div class="text-xs md:text-sm font-medium opacity-90">الفائزون</div>
+                <div class="text-2xl md:text-3xl font-bold mt-2">{{ $this->getWinnersCount() }}</div>
             </div>
         </div>
 
         <!-- Winner Selection Zone -->
-        <div class="bg-white rounded-lg shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">منطقة اختيار الفائز</h2>
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-8">
+            <h2 class="text-xl md:text-2xl font-bold text-center mb-4 md:mb-8 text-gray-800">منطقة اختيار الفائز</h2>
 
             @if($this->getEligibleCallersCount() > 0)
-                <div class="space-y-6">
+                <div class="space-y-4 md:space-y-6">
                     <!-- Spinner Display -->
-                    <div class="flex flex-col items-center justify-center min-h-96 bg-gradient-to-b from-indigo-50 to-white rounded-lg border-2 border-indigo-200 relative overflow-hidden">
+                    <div class="flex flex-col items-center justify-center min-h-[280px] md:min-h-96 bg-gradient-to-b from-indigo-50 to-white rounded-lg border-2 border-indigo-200 relative overflow-hidden">
                         <!-- Decorative spinning ring -->
                         <div class="absolute inset-0 flex items-center justify-center opacity-10">
-                            <div class="w-64 h-64 border-4 border-indigo-500 rounded-full animate-spin" style="animation-duration: 3s;"></div>
+                            <div class="w-48 h-48 md:w-64 md:h-64 border-4 border-indigo-500 rounded-full animate-spin" style="animation-duration: 3s;"></div>
                         </div>
 
                         <!-- Names spinner container -->
-                        <div id="namesSpinner" class="relative z-10 text-center">
-                            <div class="text-lg font-semibold text-gray-600 mb-6">جاهز لاختيار الفائز؟</div>
-                            <div id="spinnerText" class="text-5xl font-bold text-indigo-600 min-h-24 flex items-center justify-center">
+                        <div id="namesSpinner" class="relative z-10 text-center px-4">
+                            <div class="text-sm md:text-lg font-semibold text-gray-600 mb-4 md:mb-6">جاهز لاختيار الفائز؟</div>
+                            <div id="spinnerText" class="text-3xl md:text-5xl font-bold text-indigo-600 min-h-[60px] md:min-h-24 flex items-center justify-center">
                                 ✨
                             </div>
-                            <div class="text-sm text-gray-500 mt-4">اضغط الزر لبدء الدوران</div>
+                            <div class="text-xs md:text-sm text-gray-500 mt-3 md:mt-4">اضغط الزر لبدء الدوران</div>
                         </div>
                     </div>
 
                     <!-- Control Buttons -->
-                    <div class="flex gap-4 justify-center">
+                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                         <button
                             type="button"
                             onclick="startSpinner()"
-                            class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg"
-                            style="min-width: 200px;">
+                            class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none touch-manipulation"
+                            style="min-width: 180px;">
                             🎯 ابدأ الدوران
                         </button>
                         <button
                             type="button"
                             onclick="confirmWinner()"
-                            class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg"
-                            style="min-width: 200px;"
+                            class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none touch-manipulation"
+                            style="min-width: 180px;"
                             id="confirmBtn"
                             disabled>
                             ✅ تأكيد الفائز
@@ -60,34 +60,34 @@
                     </div>
 
                     <!-- Selected Winner Info -->
-                    <div id="winnerInfo" class="hidden bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg p-6">
+                    <div id="winnerInfo" class="hidden bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg p-4 md:p-6">
                         <div class="text-center">
-                            <div class="text-sm font-medium text-green-700 mb-2">🏆 الفائز المختار</div>
-                            <div id="winnerName" class="text-3xl font-bold text-green-600"></div>
-                            <div id="winnerDetails" class="text-gray-600 mt-3 space-y-1"></div>
+                            <div class="text-xs md:text-sm font-medium text-green-700 mb-2">🏆 الفائز المختار</div>
+                            <div id="winnerName" class="text-2xl md:text-3xl font-bold text-green-600"></div>
+                            <div id="winnerDetails" class="text-sm md:text-base text-gray-600 mt-2 md:mt-3 space-y-1"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Eligible Callers List -->
-                <div class="mt-10">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">قائمة المتصلين المؤهلين</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                <div class="mt-8 md:mt-10">
+                    <h3 class="text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4">قائمة المتصلين المؤهلين</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 max-h-[300px] md:max-h-96 overflow-y-auto">
                         @foreach($this->getEligibleCallers() as $caller)
-                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                                <div class="font-semibold text-gray-800">{{ $caller['name'] }}</div>
-                                <div class="text-sm text-gray-600 mt-1">☎️ {{ $caller['phone'] }}</div>
-                                <div class="text-sm text-gray-600">🆔 {{ $caller['cpr'] }}</div>
-                                <div class="text-sm font-medium text-indigo-600 mt-2">📊 {{ $caller['hits'] }} مشاركة</div>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow">
+                                <div class="font-semibold text-sm md:text-base text-gray-800">{{ $caller['name'] }}</div>
+                                <div class="text-xs md:text-sm text-gray-600 mt-1">☎️ {{ $caller['phone'] }}</div>
+                                <div class="text-xs md:text-sm text-gray-600">🆔 {{ $caller['cpr'] }}</div>
+                                <div class="text-xs md:text-sm font-medium text-indigo-600 mt-2">📊 {{ $caller['hits'] }} مشاركة</div>
                             </div>
                         @endforeach
                     </div>
                 </div>
             @else
-                <div class="text-center py-16">
-                    <div class="text-6xl mb-4">📭</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">لا يوجد متصلين مؤهلين</h3>
-                    <p class="text-gray-600">يجب أن يكون هناك متصلين نشطين لاختيار فائز</p>
+                <div class="text-center py-12 md:py-16">
+                    <div class="text-5xl md:text-6xl mb-3 md:mb-4">📭</div>
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-2 px-4">لا يوجد متصلين مؤهلين</h3>
+                    <p class="text-sm md:text-base text-gray-600 px-4">يجب أن يكون هناك متصلين نشطين لاختيار فائز</p>
                 </div>
             @endif
         </div>
@@ -234,47 +234,80 @@
         }
 
         function showConfetti() {
-            // Create confetti elements
-            const confetti = Array.from({ length: 50 }, (_, i) => {
-                const div = document.createElement('div');
-                div.style.position = 'fixed';
-                div.style.pointerEvents = 'none';
-                div.innerHTML = ['🎉', '🎊', '🏆', '⭐', '✨'][Math.floor(Math.random() * 5)];
-                div.style.fontSize = '2rem';
-                div.style.left = Math.random() * 100 + '%';
-                div.style.top = '-50px';
-                document.body.appendChild(div);
+            // Create multiple confetti bursts for a more celebratory feel
+            const confettiEmojis = ['🎉', '🎊', '🏆', '⭐', '✨', '🌟', '💫', '🎯', '🥇', '🎁'];
+            const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#F7B731', '#FC427B', '#26DE81'];
+            
+            // Create 3 bursts of confetti
+            for (let burst = 0; burst < 3; burst++) {
+                setTimeout(() => {
+                    // Create 30 confetti pieces per burst
+                    for (let i = 0; i < 30; i++) {
+                        const div = document.createElement('div');
+                        const useEmoji = Math.random() > 0.5;
+                        
+                        if (useEmoji) {
+                            div.innerHTML = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+                            div.style.fontSize = (Math.random() * 1.5 + 1.5) + 'rem';
+                        } else {
+                            div.style.width = (Math.random() * 10 + 8) + 'px';
+                            div.style.height = (Math.random() * 10 + 8) + 'px';
+                            div.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                            div.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                        }
+                        
+                        div.style.position = 'fixed';
+                        div.style.pointerEvents = 'none';
+                        div.style.left = (Math.random() * 100) + '%';
+                        div.style.top = '-50px';
+                        div.style.zIndex = '9999';
+                        document.body.appendChild(div);
 
-                gsap.to(div, {
-                    duration: 2,
-                    y: window.innerHeight + 50,
-                    x: (Math.random() - 0.5) * 200,
-                    opacity: 0,
-                    ease: 'power2.in',
-                    onComplete: () => div.remove()
-                });
-            });
+                        // Animate with GSAP for smooth falling
+                        gsap.to(div, {
+                            duration: Math.random() * 1.5 + 2,
+                            y: window.innerHeight + 100,
+                            x: (Math.random() - 0.5) * 300,
+                            rotation: Math.random() * 720 - 360,
+                            opacity: 0,
+                            ease: 'power2.in',
+                            delay: Math.random() * 0.3,
+                            onComplete: () => div.remove()
+                        });
+                    }
+                }, burst * 200);
+            }
         }
 
         function showSuccessMessage(message) {
             const msg = document.createElement('div');
-            msg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-            msg.textContent = message;
+            msg.className = 'fixed top-4 right-4 left-4 md:left-auto md:w-96 bg-green-500 text-white px-6 py-4 rounded-lg shadow-xl z-[10000] text-center font-bold text-sm md:text-base';
+            msg.innerHTML = `🎉 ${message} 🎉`;
             document.body.appendChild(msg);
 
             gsap.fromTo(msg,
-                { opacity: 0, y: -20 },
-                { opacity: 1, y: 0, duration: 0.3 }
+                { opacity: 0, y: -30, scale: 0.9 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: 'back.out(1.7)' }
             );
+
+            // Pulse animation
+            gsap.to(msg, {
+                scale: 1.02,
+                duration: 0.2,
+                yoyo: true,
+                repeat: 2,
+                delay: 0.5
+            });
 
             setTimeout(() => {
                 gsap.to(msg, {
                     opacity: 0,
-                    y: -20,
+                    y: -30,
+                    scale: 0.9,
                     duration: 0.3,
                     onComplete: () => msg.remove()
                 });
-            }, 2000);
+            }, 2500);
         }
 
         function showErrorMessage(message) {

@@ -8,8 +8,12 @@
         "report:visual-pdf": "node scripts/visual-report-pdf.js",
         "report:visual-pdf:local": "node scripts/visual-report-pdf.js --local",
         "screenshots": "node scripts/ci-screenshots.js",
-        "record:obs-overlay": "node scripts/record-obs-overlay.js"
-    },
+        "record:obs-overlay": "node scripts/record-obs-overlay.js",
+        "audit:dashboard:capture": "node scripts/capture-dashboard-audit.js",
+        "audit:dashboard:html": "node scripts/build-dashboard-audit-html.js",
+        "audit:dashboard:video": "node scripts/build-dashboard-audit-video.sh",
+        "audit:dashboard": "npm run audit:dashboard:capture && npm run audit:dashboard:html"
+    }
     "dependencies": {
         "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/typography": "^0.5.19",

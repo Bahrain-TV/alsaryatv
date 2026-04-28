@@ -688,6 +688,8 @@
             .shutdown-shell {
                 padding-top: 6.5rem;
                 padding-bottom: calc(var(--dock-height) + 2rem);
+                padding-left: 2rem;
+                padding-right: 2rem;
             }
 
             .shutdown-stage { gap: 1.35rem; }
@@ -723,6 +725,18 @@
             .dock-brand  { justify-self: start; }
             .dock-links  { justify-self: center; }
             .dock-copy   { justify-self: end; }
+
+            /* Better hover effects for desktop */
+            .sponsor-item {
+                cursor: pointer;
+                transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            }
+
+            .sponsor-item:hover {
+                transform: translateY(-2px);
+                border-color: rgba(245,222,179,0.28);
+                box-shadow: 0 18px 36px rgba(0,0,0,0.18);
+            }
         }
 
         /* ================================================================
@@ -735,39 +749,107 @@
                 top: 0.7rem;
                 font-size: 0.82rem;
                 letter-spacing: 0.05em;
+                width: min(95vw, 24rem);
             }
 
             .shutdown-shell {
                 align-items: start;
-                padding-top: 4.4rem;
+                padding-top: 4rem;
+                padding-bottom: calc(var(--dock-height) + 1.2rem);
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
+            .shutdown-stage {
+                width: 100%;
+                gap: 0.9rem;
+            }
+
+            .brand-stack {
+                gap: 0.7rem;
+            }
+
+            .brand-logo {
+                width: min(65vw, 12rem);
+            }
+
+            .brand-kicker {
+                font-size: 0.7rem;
+                padding: 0.45rem 0.75rem;
             }
 
             .shutdown-panel {
-                padding: 1.15rem;
+                padding: 1.25rem 1rem;
                 border-radius: 1.35rem;
+                margin: 0;
+                width: 100%;
+            }
+
+            .panel-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+
+            .panel-visual {
+                order: -1;
             }
 
             .panel-visual-shell {
-                width: 9.5rem;
+                width: 8.5rem;
                 border-radius: 1.2rem;
+                margin: 0 auto;
             }
 
-            .panel-actions { flex-direction: column; }
+            .panel-copy {
+                text-align: center;
+            }
+
+            .panel-title {
+                font-size: clamp(1.5rem, 6.5vw, 2.2rem);
+                line-height: 1.2;
+            }
+
+            .panel-text {
+                font-size: clamp(0.9rem, 4vw, 1.05rem);
+                line-height: 1.7;
+                margin-top: 0.75rem;
+            }
+
+            .panel-meta {
+                font-size: 0.8rem;
+                margin-top: 0.9rem;
+            }
+
+            .panel-actions {
+                flex-direction: column;
+                gap: 0.6rem;
+                margin-top: 1.2rem;
+            }
 
             .panel-action,
-            .panel-secondary { width: 100%; }
+            .panel-secondary {
+                width: 100%;
+                min-width: unset;
+                min-height: 2.9rem;
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+            }
 
-            .bottom-dock { padding-inline: 0.4rem; }
+            .bottom-dock {
+                padding-inline: 0.5rem;
+                padding-bottom: calc(env(safe-area-inset-bottom) + 0.6rem);
+            }
 
             .bottom-dock-inner {
                 border-radius: 1.15rem;
-                padding: 0.55rem;
+                padding: 0.75rem 0.65rem 0.65rem;
             }
 
             .sponsor-ribbon { gap: 0.4rem; }
 
             .sponsor-note {
                 font-size: 0.65rem;
+                line-height: 1.4;
             }
 
             .sponsor-label {
@@ -920,6 +1002,80 @@
             }
 
             .tick-logo { opacity: 0.94 !important; }
+        }
+
+        /* ================================================================
+           TOUCH-FRIENDLY IMPROVEMENTS
+           ================================================================ */
+        @media (hover: none) and (pointer: coarse) {
+            .panel-action,
+            .panel-secondary {
+                min-height: 3.2rem;
+                padding: 0.85rem 1.2rem;
+            }
+
+            .sponsor-item {
+                min-height: 3.5rem;
+            }
+
+            .bottom-dock-inner {
+                padding-bottom: 0.75rem;
+            }
+
+            .dock-links a {
+                padding: 0.4rem 0.2rem;
+            }
+        }
+
+        /* ================================================================
+           LANDSCAPE MOBILE OPTIMIZATIONS
+           ================================================================ */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .shutdown-shell {
+                padding-top: 3.5rem;
+                padding-bottom: calc(var(--dock-height) + 0.8rem);
+            }
+
+            .basmala {
+                top: 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .brand-logo {
+                width: min(50vw, 8rem);
+            }
+
+            .brand-kicker {
+                font-size: 0.68rem;
+                padding: 0.35rem 0.65rem;
+            }
+
+            .shutdown-panel {
+                padding: 1rem;
+            }
+
+            .panel-title {
+                font-size: clamp(1.3rem, 5vw, 1.8rem);
+            }
+
+            .panel-text {
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+            }
+
+            .panel-visual-shell {
+                width: 6rem;
+            }
+
+            .panel-actions {
+                margin-top: 0.9rem;
+            }
+
+            .panel-action,
+            .panel-secondary {
+                min-height: 2.6rem;
+                padding: 0.6rem 0.9rem;
+            }
         }
     </style>
 </head>
