@@ -17,8 +17,16 @@ class MainFunctionalityTest extends TestCase
     {
         parent::setUp();
 
+        config()->set('alsarya.registration.enabled', true);
+
         // Clear all callers before each test
         Caller::truncate();
+
+        // Reset relevant throttles between tests for deterministic behavior
+        RateLimiter::clear('caller-registration:12345678901');
+        RateLimiter::clear('caller-registration:11111111111');
+        RateLimiter::clear('caller-registration-ip:127.0.0.1');
+        RateLimiter::clear('caller-registration-ip:::1');
     }
 
     public function test_complete_registration_flow(): void

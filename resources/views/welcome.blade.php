@@ -1727,7 +1727,7 @@
                     overlayClickNext: false,
                     stagePadding: 8,
                     animate: true,
-                    progressText: '{{CURRENT_STEP}} / {{TOTAL_STEPS}}',
+                    progressText: '@{{CURRENT_STEP}} / @{{TOTAL_STEPS}}',
                     nextBtnText: 'التالي →',
                     prevBtnText: '← السابق',
                     doneBtnText: '✓ انتهيت',
