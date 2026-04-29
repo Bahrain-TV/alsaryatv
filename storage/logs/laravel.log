@@ -1,0 +1,21 @@
+[2026-04-28 16:41:03] local.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260428_164103.csv","record_count":1263} 
+[2026-04-28 16:41:03] local.INFO: Data persistence metrics {"timestamp":"2026-04-28 16:41:03","total_callers":1263,"total_winners":4,"database":"sqlite","environment":"local","disk_space_available_gb":39.63935089111328} 
+[2026-04-28 16:41:03] local.INFO: Deleted old export file {"file":"private/exports/callers/csv/callers-export_20260330_195554.csv"} 
+[2026-04-28 16:41:03] local.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260428_164103.csv","record_count":1263} 
+[2026-04-28 16:41:05] local.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260428_164105.csv","record_count":1270} 
+[2026-04-28 16:41:05] local.INFO: Data persistence metrics {"timestamp":"2026-04-28 16:41:05","total_callers":1270,"total_winners":6,"database":"sqlite","environment":"local","disk_space_available_gb":39.63860321044922} 
+[2026-04-28 16:41:05] local.INFO: Deleted old export file {"file":"private/exports/callers/csv/callers-export_20260413_163822.csv"} 
+[2026-04-28 16:41:05] local.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260428_164105.csv","record_count":1270} 
+[2026-04-28 16:41:05] local.INFO: Data persistence metrics {"timestamp":"2026-04-28 16:41:05","total_callers":1270,"total_winners":6,"database":"sqlite","environment":"local","disk_space_available_gb":39.63851547241211} 
+[2026-04-28 16:41:05] local.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260428_164105.csv","record_count":1270} 
+[2026-04-28 16:41:05] local.INFO: Data persistence metrics {"timestamp":"2026-04-28 16:41:05","total_callers":1270,"total_winners":6,"database":"sqlite","environment":"local","disk_space_available_gb":39.63819885253906} 
+[2026-04-28 16:41:05] local.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260428_164105.csv","record_count":1270} 
+[2026-04-28 16:41:05] local.INFO: Data persistence metrics {"timestamp":"2026-04-28 16:41:05","total_callers":1270,"total_winners":6,"database":"sqlite","environment":"local","disk_space_available_gb":39.63856506347656} 
+[2026-04-29 02:54:55] staging.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260429_025455.csv","record_count":1263} 
+[2026-04-29 02:54:55] staging.INFO: Data persistence metrics {"timestamp":"2026-04-29 02:54:55","total_callers":1263,"total_winners":4,"database":"sqlite","environment":"staging","disk_space_available_gb":30.705623626708984} 
+[2026-04-29 02:54:55] staging.INFO: Created admin user: aldoyh@gmail.com  
+[2026-04-29 02:54:56] staging.INFO: Created admin user: aldoyh@info.gov.bh  
+[2026-04-29 02:54:56] staging.INFO: Created admin user: superadmin@alsarya.tv  
+[2026-04-29 02:55:01] staging.INFO: Deleted old export file {"file":"private/exports/callers/csv/callers-export_20260413_163825.csv"} 
+[2026-04-29 02:55:01] staging.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260429_025501.csv","record_count":1263} 
+[2026-04-29 02:55:02] local.INFO: Deleted old export file {"file":"private/exports/callers/csv/callers-export_20260413_163840.csv"} 
