@@ -13,7 +13,7 @@
         "audit:dashboard:html": "node scripts/build-dashboard-audit-html.js",
         "audit:dashboard:video": "node scripts/build-dashboard-audit-video.sh",
         "audit:dashboard": "npm run audit:dashboard:capture && npm run audit:dashboard:html"
-    }
+    },
     "dependencies": {
         "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/typography": "^0.5.19",
