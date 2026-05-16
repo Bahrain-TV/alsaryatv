@@ -96,16 +96,29 @@ body {
     content: '';
     position: absolute;
     top: 0;
-    inset-inline-start: -100%;
+    inset-inline-start: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to inline-end, transparent, rgba(245, 158, 11, 0.1), transparent);
-    transition: inset-inline-start 0.5s;
+    /* Use translate instead of inset-inline-start — inset-inline-* is not
+       GPU-compositable and causes jitter; translate runs on the compositor */
+    background: linear-gradient(to right, transparent, rgba(245, 158, 11, 0.1), transparent);
+    transform: translateX(-200%);
+    transition: transform 0.5s ease;
+    will-change: transform;
     z-index: 0;
 }
 
+[dir="rtl"] .fi-sidebar-item::before {
+    background: linear-gradient(to left, transparent, rgba(245, 158, 11, 0.1), transparent);
+    transform: translateX(200%);
+}
+
 .fi-sidebar-item:hover::before {
-    inset-inline-start: 100%;
+    transform: translateX(200%);
+}
+
+[dir="rtl"] .fi-sidebar-item:hover::before {
+    transform: translateX(-200%);
 }
 
 .fi-sidebar-item>a,
@@ -221,7 +234,9 @@ body {
     background: var(--card-bg) !important;
     border: 1px solid var(--card-border) !important;
     border-radius: 1rem !important;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Promote to own layer so hover lift doesn't force surrounding elements to reflow */
+    will-change: transform;
 }
 
 .fi-section:hover,
@@ -415,7 +430,8 @@ body {
     position: relative;
 }
 
-/* Top accent bar on hover */
+/* Top accent bar on hover — use left/right (not logical inline-start) in
+   transform-origin because logical properties are not valid there */
 .fi-wi::before {
     content: '';
     position: absolute;
@@ -425,8 +441,13 @@ body {
     height: 4px;
     background: var(--primary-gradient);
     transform: scaleX(0);
-    transform-origin: inline-start;
-    transition: transform 0.5s ease;
+    transform-origin: left center;
+    transition: transform 0.4s ease;
+    will-change: transform;
+}
+
+[dir="rtl"] .fi-wi::before {
+    transform-origin: right center;
 }
 
 .fi-wi:hover::before {

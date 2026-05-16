@@ -33,7 +33,8 @@
 
     <!-- Additional styles for flip cards and particles -->
     <style>
-        /* Light mode body override */
+        /* Light mode body override — static gradient, no animation (animating body background
+           causes full-page repaints and flickers every child element) */
         body:not(.dark-mode) {
             background: linear-gradient(135deg,
                 oklch(0.99 0.02 85) 0%,
@@ -41,12 +42,6 @@
                 oklch(0.97 0.04 65) 50%,
                 oklch(0.96 0.03 55) 75%,
                 oklch(0.98 0.02 45) 100%);
-            animation: gentle-float 20s ease-in-out infinite;
-        }
-
-        @keyframes gentle-float {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
         }
 
         /* Enhanced Typography Gradients for Light Mode */
@@ -99,6 +94,17 @@
         }
         .face-front { transform: rotateY(0deg); }
         .face-back { transform: rotateY(180deg); }
+
+        /* Flip card scene isolation — prevents 3D transforms from leaking into
+           surrounding elements and causing flicker/repaint on siblings */
+        .flip-scene {
+            isolation: isolate;
+            contain: layout style;
+        }
+        .flip-card {
+            will-change: transform;
+            backface-visibility: hidden;
+        }
 
         /* Beautiful Background layers for Light Mode */
         .background-layers {
@@ -224,6 +230,10 @@
             border-radius: 50%;
             border: 1px solid;
             pointer-events: none;
+            /* Promote to own compositing layer so rotation doesn't repaint siblings */
+            will-change: transform;
+            backface-visibility: hidden;
+            transform: translateZ(0);
         }
 
         .circle-1 {
@@ -270,10 +280,11 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Animation classes */
+        /* Animation classes — promote to own layer to prevent sibling repaints */
         .gsap-entry, .gsap-card, .gsap-item {
             opacity: 0;
             transform: translateY(30px);
+            will-change: transform, opacity;
         }
 
         /* ── Basmala — fixed at top of every page (CLAUDE.md requirement) ── */
@@ -1160,35 +1171,28 @@
         window.addEventListener('load', () => {
             // Skip GSAP animations on mobile - elements are already visible via CSS
             if (window.innerWidth < 768) {
-                // Set initial states to visible immediately on mobile
-                gsap.set(".gsap-entry", { opacity: 1, y: 0, scale: 1 });
-                gsap.set(".gsap-card", { opacity: 1, y: 0, scale: 1, rotationX: 0 });
-                gsap.set(".gsap-item", { opacity: 1, y: 0, x: 0, scale: 1, rotationX: 0 });
+                gsap.set(".gsap-entry", { opacity: 1, y: 0, scale: 1, willChange: "auto" });
+                gsap.set(".gsap-card", { opacity: 1, y: 0, scale: 1, willChange: "auto" });
+                gsap.set(".gsap-item", { opacity: 1, y: 0, scale: 1, willChange: "auto" });
                 return;
             }
 
-            // 1. Hard-set initial states (3D positions off-screen)
+            // 1. Hard-set initial states — keep transforms GPU-friendly (no rotationX/perspective
+            //    per-item, as that creates separate stacking contexts that fight each other)
             gsap.set(".gsap-entry", {
                 opacity: 0,
                 y: -70,
                 scale: 0.88,
-                transformPerspective: 900,
             });
             gsap.set(".gsap-card", {
                 opacity: 0,
                 y: 120,
                 scale: 0.82,
-                rotationX: 28,
-                transformPerspective: 1100,
-                transformOrigin: "50% 110%",
             });
             gsap.set(".gsap-item", {
                 opacity: 0,
                 y: 55,
-                x: function(i) { return i % 2 === 0 ? -40 : 40; }, // alternate sides
                 scale: 0.88,
-                rotationX: 12,
-                transformPerspective: 900,
             });
             gsap.set(".flip-card", { rotationY: 0 });
 
@@ -1204,29 +1208,31 @@
                 ease: "power4.out",
             });
 
-            // Card RISES from below with a satisfying 3D flip
+            // Card rises from below
             tl.to(".gsap-card", {
                 opacity: 1,
                 y: 0,
                 scale: 1,
-                rotationX: 0,
                 duration: 1.25,
                 ease: "power4.out",
             }, "-=0.55");
 
-            // Inner items cascade in with elastic spring — alternating left/right
+            // Inner items cascade in with a simple stagger — no x-offset to avoid
+            // the alternating-side shimmy that causes perceived flicker
             tl.to(".gsap-item", {
                 opacity: 1,
                 y: 0,
-                x: 0,
                 scale: 1,
-                rotationX: 0,
-                duration: 0.9,
+                duration: 0.85,
                 stagger: {
-                    amount: 0.75,
+                    amount: 0.6,
                     ease: "power2.inOut",
                 },
-                ease: "back.out(1.4)",
+                ease: "power3.out",
+                onComplete: function() {
+                    // Clear will-change after animation to free GPU memory
+                    gsap.set(".gsap-entry, .gsap-card, .gsap-item", { willChange: "auto" });
+                },
             }, "-=0.65");
         });
 
@@ -1261,9 +1267,9 @@
                 if (!isMobile) {
                     gsap.to(".flip-card", {
                         rotationY: 180,
-                        duration: 0.9,
-                        stagger: 0.08,
-                        ease: "back.out(1.2)"
+                        duration: 0.75,
+                        stagger: 0.06,
+                        ease: "power3.inOut"
                     });
                 }
 
@@ -1282,9 +1288,9 @@
                 if (!isMobile) {
                     gsap.to(".flip-card", {
                         rotationY: 0,
-                        duration: 0.9,
-                        stagger: 0.08,
-                        ease: "back.out(1.2)"
+                        duration: 0.75,
+                        stagger: 0.06,
+                        ease: "power3.inOut"
                     });
                 }
             }
@@ -1304,7 +1310,6 @@
 
             // Ensure all required elements exist
             if (!individualToggle || !familyToggle || !registrationType) {
-                console.warn('Registration form elements not found');
                 return;
             }
 
@@ -1387,50 +1392,49 @@
                     return;
                 }
 
-                // Create GSAP timeline for the spinning animation with slower transition and overlap
+                // Smooth crossfade — avoids rotationY+x which causes sibling repaints
+                // without a proper perspective container
                 const tl = gsap.timeline({
                     onComplete: function() {
                         isAnimating = false;
                         individualToggle.disabled = false;
                         familyToggle.disabled = false;
+                        if (registrationForm) gsap.set(registrationForm, { willChange: "auto" });
                     }
                 });
 
-                // Animate form container flip based on mode - slowed down with 0.3s overlap
+                if (registrationForm) {
+                    gsap.set(registrationForm, { willChange: "opacity, transform" });
+                }
+
                 if (isFamily) {
-                    // Family mode animation - 0.6s each half with 0.3s overlap
-                    tl.to(registrationForm, {
-                        duration: 0.6,
-                        rotationY: 90,
-                        x: 100,
-                        opacity: 0.5,
-                        ease: "power2.inOut"
+                    tl.to(registrationForm || {}, {
+                        duration: 0.25,
+                        opacity: 0,
+                        scale: 0.97,
+                        ease: "power2.in"
                     }, 0)
-                    .call(() => setFamilyMode(), null, 0.3)
-                    .to(registrationForm, {
-                        duration: 0.6,
-                        rotationY: 0,
-                        x: 0,
+                    .call(() => setFamilyMode(), null, 0.25)
+                    .to(registrationForm || {}, {
+                        duration: 0.35,
                         opacity: 1,
-                        ease: "power2.inOut"
-                    }, 0.3);
+                        scale: 1,
+                        ease: "power2.out"
+                    }, 0.25);
                 } else {
-                    // Individual mode animation - 0.6s each half with 0.3s overlap
-                    tl.to(registrationForm, {
-                        duration: 0.6,
-                        rotationY: -90,
-                        x: -100,
-                        opacity: 0.5,
-                        ease: "power2.inOut"
+                    tl.to(registrationForm || {}, {
+                        duration: 0.25,
+                        opacity: 0,
+                        scale: 0.97,
+                        ease: "power2.in"
                     }, 0)
-                    .call(() => setIndividualMode(), null, 0.3)
-                    .to(registrationForm, {
-                        duration: 0.6,
-                        rotationY: 0,
-                        x: 0,
+                    .call(() => setIndividualMode(), null, 0.25)
+                    .to(registrationForm || {}, {
+                        duration: 0.35,
                         opacity: 1,
-                        ease: "power2.inOut"
-                    }, 0.3);
+                        scale: 1,
+                        ease: "power2.out"
+                    }, 0.25);
                 }
             }
 
@@ -1448,20 +1452,19 @@
             setIndividualMode();
         }
 
-        // Initialize on DOMContentLoaded
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupRegistrationToggle);
-        } else {
-            // DOM is already loaded
+        // Initialize once — guard against double-init from DOMContentLoaded + load
+        let _toggleInitialized = false;
+        function initToggleOnce() {
+            if (_toggleInitialized) return;
+            _toggleInitialized = true;
             setupRegistrationToggle();
         }
 
-        // Also setup if GSAP loads late
-        window.addEventListener('load', function() {
-            if (typeof window.gsap !== 'undefined' && document.getElementById('individual-toggle')) {
-                setupRegistrationToggle();
-            }
-        });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initToggleOnce);
+        } else {
+            initToggleOnce();
+        }
 
         // ==================== PRELOADER / SPLASH SCREEN ====================
         (function() {

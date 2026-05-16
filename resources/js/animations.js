@@ -1,6 +1,22 @@
 import gsap from 'gsap';
 
+function hasLegacyLandingDom() {
+    return Boolean(
+        document.querySelector('.fixed-layout') &&
+        document.getElementById('logo-animation-wrapper') &&
+        document.querySelector('.toggle-button') &&
+        document.querySelector('.forms-stack') &&
+        document.querySelector('.sponsors-container') &&
+        document.getElementById('call-form-container') &&
+        document.getElementById('family-form-container')
+    );
+}
+
 export function initMasterTimeline() {
+    if (!hasLegacyLandingDom()) {
+        return null;
+    }
+
     const master = gsap.timeline({
         paused: false,
         defaults: { ease: "power3.out" }
@@ -225,16 +241,25 @@ function createFormsSequence() {
 
 export function initGlitchEffect() {
     const glitchTargets = ['#logo img', '#days'];
+    const availableTargets = glitchTargets.filter((selector) => document.querySelector(selector));
+
+    if (!availableTargets.length) {
+        return null;
+    }
+
     let isGlitching = false;
 
     function triggerGlitch() {
         if (isGlitching) return;
         isGlitching = true;
 
-        const randomTarget = glitchTargets[Math.floor(Math.random() * glitchTargets.length)];
+        const randomTarget = availableTargets[Math.floor(Math.random() * availableTargets.length)];
         const element = document.querySelector(randomTarget);
         
-        if (!element) return;
+        if (!element) {
+            isGlitching = false;
+            return;
+        }
 
         const tl = gsap.timeline({
             onComplete: () => isGlitching = false
@@ -272,4 +297,6 @@ export function initGlitchEffect() {
         .add(() => gsap.delayedCall(gsap.utils.random(5, 15), triggerGlitch));
 
     setTimeout(() => glitchTimeline.play(), 5000);
+
+    return glitchTimeline;
 }

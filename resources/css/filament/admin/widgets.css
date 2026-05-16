@@ -16,10 +16,12 @@
     border: 1px solid var(--card-border) !important;
     border-radius: 1rem !important;
     padding: 1.5rem !important;
-    transition: all 0.3s ease !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
     position: relative;
     overflow: hidden;
     text-align: start !important;
+    /* Own compositing layer so hover lift doesn't reflow neighbours */
+    will-change: transform;
 }
 
 .fi-wi-stats-overview-stat::before {
@@ -31,8 +33,14 @@
     height: 4px;
     background: var(--primary-gradient);
     transform: scaleX(0);
-    transform-origin: inline-start;
-    transition: transform 0.5s ease;
+    /* transform-origin doesn't accept logical keywords — use physical values */
+    transform-origin: left center;
+    transition: transform 0.4s ease;
+    will-change: transform;
+}
+
+[dir="rtl"] .fi-wi-stats-overview-stat::before {
+    transform-origin: right center;
 }
 
 .fi-wi-stats-overview-stat:hover::before {
