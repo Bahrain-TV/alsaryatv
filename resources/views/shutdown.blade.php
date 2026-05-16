@@ -26,7 +26,7 @@
             --glass: rgba(6, 5, 8, 0.66);
             --glass-strong: rgba(10, 7, 11, 0.84);
             --line: rgba(255, 255, 255, 0.08);
-            --dock-height: 11.5rem;
+            --dock-height: 13rem;
 
             /* entrance stagger delays */
             --d-basmala: 0s;
@@ -370,8 +370,8 @@
             bottom: 0;
             left: 0;
             z-index: 80;
-            padding: 0 0.8rem calc(env(safe-area-inset-bottom) + 0.8rem);
-            background: linear-gradient(180deg, rgba(0,0,0,0), rgba(8,6,8,0.18) 20%, rgba(8,6,8,0.92) 100%);
+            padding: 0 0.6rem calc(env(safe-area-inset-bottom) + 0.6rem);
+            background: linear-gradient(180deg, rgba(0,0,0,0), rgba(8,6,8,0.25) 15%, rgba(8,6,8,0.95) 100%);
 
             /* entrance: slide up from below */
             opacity: 0;
@@ -382,9 +382,9 @@
         .bottom-dock-inner {
             width: min(100%, 76rem);
             margin: 0 auto;
-            padding: 0.8rem;
+            padding: 0.7rem 0.8rem 0.6rem;
             border: 1px solid var(--line);
-            border-radius: 1.5rem;
+            border-radius: 1.25rem;
             background: linear-gradient(180deg, rgba(13,9,14,0.92), rgba(5,4,7,0.97));
             box-shadow: 0 -18px 34px rgba(0,0,0,0.2);
             backdrop-filter: blur(16px);
@@ -393,7 +393,7 @@
 
         .sponsor-ribbon {
             display: grid;
-            gap: 0.8rem;
+            gap: 0.5rem;
         }
 
         .sponsor-intro {
@@ -426,23 +426,23 @@
             position: relative;
             overflow: hidden;
             width: 100%;
-            padding: 0.9rem 0;
-            border-radius: 1.15rem;
+            padding: 0.65rem 0;
+            border-radius: 1rem;
             border: 1px solid rgba(245,222,179,0.09);
             background:
                 linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06), rgba(255,255,255,0.03)),
                 radial-gradient(circle at center, rgba(168,28,46,0.12), transparent 58%);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
-            mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         }
 
         .sponsor-track {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
             width: max-content;
-            padding-inline: clamp(1rem, 4vw, 2rem);
+            padding-inline: clamp(0.75rem, 3vw, 1.5rem);
             will-change: transform;
 
             /* marquee starts paused, JS unpauses after entrance */
@@ -457,9 +457,10 @@
         .sponsor-item {
             display: inline-flex;
             align-items: center;
-            gap: 0.85rem;
-            min-width: clamp(12.5rem, 24vw, 15.25rem);
-            padding: 0.72rem 0.95rem;
+            gap: 0.7rem;
+            min-width: clamp(10rem, 22vw, 14rem);
+            max-width: 16rem;
+            padding: 0.6rem 0.8rem;
             border-radius: 1rem;
             border: 1px solid rgba(245,222,179,0.12);
             background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
@@ -482,10 +483,10 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: clamp(3rem, 7vw, 3.8rem);
-            height: clamp(3rem, 7vw, 3.8rem);
-            padding: 0.5rem;
-            border-radius: 0.9rem;
+            width: clamp(2.6rem, 6vw, 3.4rem);
+            height: clamp(2.6rem, 6vw, 3.4rem);
+            padding: 0.4rem;
+            border-radius: 0.75rem;
             background: rgba(10,9,12,0.46);
             border: 1px solid rgba(255,255,255,0.06);
             flex-shrink: 0;
@@ -493,25 +494,30 @@
 
         .sponsor-copy {
             display: grid;
-            gap: 0.14rem;
+            gap: 0.1rem;
             min-width: 0;
+            overflow: hidden;
         }
 
         .sponsor-name-ar {
             color: var(--cream);
-            font-size: 0.88rem;
+            font-size: 0.82rem;
             font-weight: 800;
             line-height: 1.3;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .sponsor-name-en {
             color: rgba(255,255,255,0.58);
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 700;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .tick-logo {
@@ -534,9 +540,9 @@
 
         .dock-meta {
             display: grid;
-            gap: 0.5rem;
-            margin-top: 0.9rem;
-            padding-top: 0.85rem;
+            gap: 0.35rem;
+            margin-top: 0.6rem;
+            padding-top: 0.6rem;
             border-top: 1px solid rgba(255,255,255,0.05);
             text-align: center;
         }
@@ -666,11 +672,20 @@
            RESPONSIVE — mid-range phones (481px–767px)
            ================================================================ */
         @media (min-width: 481px) and (max-width: 767px) {
-            :root { --dock-height: 10rem; }
+            :root { --dock-height: 12rem; }
+
+            .shutdown-shell {
+                padding-top: 4.5rem;
+                padding-bottom: calc(var(--dock-height) + 1.2rem);
+            }
 
             .sponsor-marquee {
                 -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
                 mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+            }
+
+            .sponsor-item {
+                min-width: 11rem;
             }
 
             .tick-logo {
@@ -683,7 +698,7 @@
            RESPONSIVE — tablets & desktop (768px+)
            ================================================================ */
         @media (min-width: 768px) {
-            :root { --dock-height: 9rem; }
+            :root { --dock-height: 10.5rem; }
 
             .shutdown-shell {
                 padding-top: 6.5rem;
@@ -743,7 +758,7 @@
            RESPONSIVE — small phones (<= 480px)
            ================================================================ */
         @media (max-width: 480px) {
-            :root { --dock-height: 9.5rem; }
+            :root { --dock-height: 11.5rem; }
 
             .basmala {
                 top: 0.7rem;
@@ -755,9 +770,9 @@
             .shutdown-shell {
                 align-items: start;
                 padding-top: 4rem;
-                padding-bottom: calc(var(--dock-height) + 1.2rem);
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
+                padding-bottom: calc(var(--dock-height) + 1rem);
+                padding-left: 0.6rem;
+                padding-right: 0.6rem;
             }
 
             .shutdown-stage {
@@ -770,24 +785,24 @@
             }
 
             .brand-logo {
-                width: min(65vw, 12rem);
+                width: min(60vw, 11rem);
             }
 
             .brand-kicker {
                 font-size: 0.7rem;
-                padding: 0.45rem 0.75rem;
+                padding: 0.4rem 0.7rem;
             }
 
             .shutdown-panel {
-                padding: 1.25rem 1rem;
-                border-radius: 1.35rem;
+                padding: 1.1rem 0.85rem;
+                border-radius: 1.25rem;
                 margin: 0;
                 width: 100%;
             }
 
             .panel-grid {
                 grid-template-columns: 1fr;
-                gap: 1.2rem;
+                gap: 1rem;
             }
 
             .panel-visual {
@@ -795,8 +810,8 @@
             }
 
             .panel-visual-shell {
-                width: 8.5rem;
-                border-radius: 1.2rem;
+                width: 7rem;
+                border-radius: 1rem;
                 margin: 0 auto;
             }
 
@@ -805,107 +820,108 @@
             }
 
             .panel-title {
-                font-size: clamp(1.5rem, 6.5vw, 2.2rem);
+                font-size: clamp(1.4rem, 6vw, 2rem);
                 line-height: 1.2;
             }
 
             .panel-text {
-                font-size: clamp(0.9rem, 4vw, 1.05rem);
-                line-height: 1.7;
-                margin-top: 0.75rem;
+                font-size: clamp(0.85rem, 3.8vw, 1rem);
+                line-height: 1.65;
+                margin-top: 0.6rem;
             }
 
             .panel-meta {
-                font-size: 0.8rem;
-                margin-top: 0.9rem;
+                font-size: 0.78rem;
+                margin-top: 0.7rem;
             }
 
             .panel-actions {
                 flex-direction: column;
-                gap: 0.6rem;
-                margin-top: 1.2rem;
+                gap: 0.5rem;
+                margin-top: 1rem;
             }
 
             .panel-action,
             .panel-secondary {
                 width: 100%;
                 min-width: unset;
-                min-height: 2.9rem;
-                padding: 0.7rem 1rem;
-                font-size: 0.9rem;
+                min-height: 2.75rem;
+                padding: 0.65rem 0.9rem;
+                font-size: 0.85rem;
             }
 
             .bottom-dock {
-                padding-inline: 0.5rem;
-                padding-bottom: calc(env(safe-area-inset-bottom) + 0.6rem);
+                padding-inline: 0.4rem;
+                padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
             }
 
             .bottom-dock-inner {
-                border-radius: 1.15rem;
-                padding: 0.75rem 0.65rem 0.65rem;
+                border-radius: 1rem;
+                padding: 0.6rem 0.5rem 0.5rem;
             }
 
-            .sponsor-ribbon { gap: 0.4rem; }
+            .sponsor-ribbon { gap: 0.35rem; }
 
             .sponsor-note {
-                font-size: 0.65rem;
-                line-height: 1.4;
+                font-size: 0.6rem;
+                line-height: 1.35;
             }
 
             .sponsor-label {
-                font-size: 0.65rem;
-                padding: 0.25rem 0.6rem;
+                font-size: 0.62rem;
+                padding: 0.22rem 0.55rem;
             }
 
             .sponsor-marquee {
-                padding-block: 0.55rem;
-                border-radius: 0.75rem;
-                -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-                mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+                padding-block: 0.45rem;
+                border-radius: 0.7rem;
+                -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+                mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
             }
 
             .sponsor-track {
-                gap: 0.7rem;
-                padding-inline: 0.75rem;
-                animation-duration: 16s;
+                gap: 0.6rem;
+                padding-inline: 0.6rem;
+                animation-duration: 14s;
             }
 
             .sponsor-item {
-                gap: 0.65rem;
-                min-width: 10.3rem;
-                padding: 0.56rem 0.7rem;
-                border-radius: 0.85rem;
+                gap: 0.5rem;
+                min-width: 9rem;
+                max-width: 11rem;
+                padding: 0.45rem 0.6rem;
+                border-radius: 0.75rem;
             }
 
             .sponsor-logo-frame {
-                width: 2.55rem;
-                height: 2.55rem;
-                padding: 0.4rem;
-                border-radius: 0.72rem;
+                width: 2.2rem;
+                height: 2.2rem;
+                padding: 0.3rem;
+                border-radius: 0.6rem;
             }
 
             .sponsor-name-ar {
-                font-size: 0.74rem;
+                font-size: 0.7rem;
             }
 
             .sponsor-name-en {
-                font-size: 0.58rem;
-                letter-spacing: 0.05em;
+                font-size: 0.55rem;
+                letter-spacing: 0.04em;
             }
 
             .tick-logo {
-                height: 1.3rem;
+                height: 1.15rem;
             }
 
             .dock-meta {
-                gap: 0.3rem;
-                margin-top: 0.55rem;
-                padding-top: 0.55rem;
+                gap: 0.2rem;
+                margin-top: 0.4rem;
+                padding-top: 0.4rem;
             }
 
-            .dock-brand  { font-size: 0.72rem; }
-            .dock-links  { font-size: 0.65rem; gap: 0.35rem; }
-            .dock-copy   { font-size: 0.62rem; }
+            .dock-brand  { font-size: 0.68rem; }
+            .dock-links  { font-size: 0.62rem; gap: 0.3rem; }
+            .dock-copy   { font-size: 0.58rem; }
 
             /* tone down ambient on low-end */
             .shutdown-panel::before { animation-duration: 10s; }
@@ -919,55 +935,176 @@
            RESPONSIVE — very small screens (<= 360px)
            ================================================================ */
         @media (max-width: 360px) {
-            :root { --dock-height: 8.5rem; }
+            :root { --dock-height: 10rem; }
+
+            .basmala {
+                font-size: 0.75rem;
+                top: 0.5rem;
+            }
+
+            .shutdown-shell {
+                padding-top: 3.5rem;
+                padding-left: 0.45rem;
+                padding-right: 0.45rem;
+            }
+
+            .brand-logo {
+                width: min(55vw, 9rem);
+            }
+
+            .brand-kicker {
+                font-size: 0.65rem;
+                padding: 0.35rem 0.6rem;
+            }
+
+            .shutdown-panel {
+                padding: 0.9rem 0.7rem;
+                border-radius: 1.1rem;
+            }
+
+            .panel-visual-shell {
+                width: 5.5rem;
+            }
+
+            .panel-title {
+                font-size: clamp(1.2rem, 5.5vw, 1.7rem);
+            }
+
+            .panel-text {
+                font-size: 0.82rem;
+                line-height: 1.6;
+                margin-top: 0.5rem;
+            }
+
+            .panel-meta {
+                font-size: 0.72rem;
+            }
+
+            .panel-actions {
+                margin-top: 0.8rem;
+                gap: 0.4rem;
+            }
+
+            .panel-action,
+            .panel-secondary {
+                min-height: 2.5rem;
+                padding: 0.55rem 0.8rem;
+                font-size: 0.8rem;
+                border-radius: 0.85rem;
+            }
 
             .sponsor-note {
                 display: none;
             }
 
             .sponsor-label {
-                font-size: 0.6rem;
-                padding: 0.2rem 0.5rem;
+                font-size: 0.58rem;
+                padding: 0.18rem 0.45rem;
+            }
+
+            .bottom-dock {
+                padding-inline: 0.3rem;
+            }
+
+            .bottom-dock-inner {
+                padding: 0.5rem 0.4rem 0.4rem;
+                border-radius: 0.85rem;
+            }
+
+            .sponsor-marquee {
+                padding-block: 0.35rem;
+                border-radius: 0.6rem;
             }
 
             .sponsor-track {
-                gap: 0.55rem;
-                padding-inline: 0.5rem;
+                gap: 0.45rem;
+                padding-inline: 0.4rem;
                 animation-duration: 12s;
             }
 
             .sponsor-item {
-                min-width: 9.1rem;
-                padding: 0.48rem 0.58rem;
+                min-width: 7.8rem;
+                max-width: 9.5rem;
+                padding: 0.38rem 0.48rem;
+                gap: 0.4rem;
+                border-radius: 0.6rem;
             }
 
             .sponsor-logo-frame {
-                width: 2.2rem;
-                height: 2.2rem;
-                padding: 0.32rem;
+                width: 1.9rem;
+                height: 1.9rem;
+                padding: 0.25rem;
+                border-radius: 0.5rem;
             }
 
             .sponsor-name-ar {
-                font-size: 0.68rem;
+                font-size: 0.62rem;
             }
 
             .sponsor-name-en {
-                font-size: 0.54rem;
+                font-size: 0.5rem;
             }
 
             .tick-logo {
-                height: 1.08rem;
+                height: 0.95rem;
             }
 
             .dock-meta {
-                gap: 0.25rem;
-                margin-top: 0.4rem;
-                padding-top: 0.4rem;
+                gap: 0.15rem;
+                margin-top: 0.3rem;
+                padding-top: 0.3rem;
             }
 
-            .dock-brand  { font-size: 0.65rem; }
-            .dock-links  { font-size: 0.6rem; gap: 0.25rem; }
-            .dock-copy   { font-size: 0.58rem; }
+            .dock-brand  { font-size: 0.6rem; }
+            .dock-links  { font-size: 0.55rem; gap: 0.2rem; }
+            .dock-copy   { font-size: 0.52rem; }
+        }
+
+        /* ================================================================
+           VERY TALL DOCK ON SHORT PORTRAIT SCREENS (e.g. iPhone SE)
+           ================================================================ */
+        @media (max-height: 667px) and (orientation: portrait) {
+            .panel-visual-shell {
+                width: min(6rem, 20vw);
+            }
+
+            .panel-actions {
+                margin-top: 0.8rem;
+            }
+
+            .brand-logo {
+                width: min(50vw, 9rem);
+            }
+        }
+
+        /* ================================================================
+           ULTRA-WIDE PHONES (Samsung Fold outer, narrow width)
+           ================================================================ */
+        @media (max-width: 300px) {
+            :root { --dock-height: 9rem; }
+
+            .sponsor-item {
+                min-width: 6.5rem;
+                gap: 0.3rem;
+                padding: 0.3rem 0.4rem;
+            }
+
+            .sponsor-logo-frame {
+                width: 1.6rem;
+                height: 1.6rem;
+                padding: 0.2rem;
+                border-radius: 0.4rem;
+            }
+
+            .sponsor-name-ar { font-size: 0.56rem; }
+            .sponsor-name-en { font-size: 0.46rem; }
+            .tick-logo { height: 0.8rem; }
+
+            .brand-logo { width: min(55vw, 7rem); }
+            .panel-title { font-size: 1.1rem; }
+            .panel-text { font-size: 0.78rem; }
+
+            .dock-links { display: none; }
         }
 
         /* ================================================================
@@ -1010,20 +1147,16 @@
         @media (hover: none) and (pointer: coarse) {
             .panel-action,
             .panel-secondary {
-                min-height: 3.2rem;
-                padding: 0.85rem 1.2rem;
+                min-height: 3rem;
+                padding: 0.8rem 1.1rem;
             }
 
             .sponsor-item {
-                min-height: 3.5rem;
-            }
-
-            .bottom-dock-inner {
-                padding-bottom: 0.75rem;
+                min-height: 3rem;
             }
 
             .dock-links a {
-                padding: 0.4rem 0.2rem;
+                padding: 0.35rem 0.15rem;
             }
         }
 
@@ -1031,51 +1164,121 @@
            LANDSCAPE MOBILE OPTIMIZATIONS
            ================================================================ */
         @media (max-height: 500px) and (orientation: landscape) {
+            :root { --dock-height: 8.5rem; }
+
             .shutdown-shell {
-                padding-top: 3.5rem;
-                padding-bottom: calc(var(--dock-height) + 0.8rem);
+                padding-top: 3rem;
+                padding-bottom: calc(var(--dock-height) + 0.6rem);
             }
 
             .basmala {
-                top: 0.5rem;
-                font-size: 0.85rem;
+                top: 0.4rem;
+                font-size: 0.78rem;
+            }
+
+            .brand-stack {
+                gap: 0.5rem;
             }
 
             .brand-logo {
-                width: min(50vw, 8rem);
+                width: min(30vw, 7rem);
             }
 
             .brand-kicker {
-                font-size: 0.68rem;
-                padding: 0.35rem 0.65rem;
+                font-size: 0.65rem;
+                padding: 0.3rem 0.55rem;
             }
 
             .shutdown-panel {
-                padding: 1rem;
+                padding: 0.85rem;
             }
 
-            .panel-title {
-                font-size: clamp(1.3rem, 5vw, 1.8rem);
-            }
-
-            .panel-text {
-                font-size: 0.9rem;
-                margin-top: 0.5rem;
+            .panel-grid {
+                grid-template-columns: 5rem minmax(0, 1fr);
+                gap: 0.8rem;
             }
 
             .panel-visual-shell {
-                width: 6rem;
+                width: 5rem;
+            }
+
+            .panel-copy { text-align: right; }
+
+            .panel-title {
+                font-size: clamp(1.1rem, 4vw, 1.5rem);
+            }
+
+            .panel-text {
+                font-size: 0.82rem;
+                margin-top: 0.4rem;
+                line-height: 1.5;
+            }
+
+            .panel-meta {
+                font-size: 0.72rem;
+                margin-top: 0.5rem;
             }
 
             .panel-actions {
-                margin-top: 0.9rem;
+                margin-top: 0.7rem;
+                flex-direction: row;
             }
 
             .panel-action,
             .panel-secondary {
-                min-height: 2.6rem;
-                padding: 0.6rem 0.9rem;
+                min-height: 2.4rem;
+                min-width: unset;
+                padding: 0.5rem 0.8rem;
+                font-size: 0.78rem;
             }
+
+            .bottom-dock-inner {
+                padding: 0.45rem 0.6rem 0.4rem;
+            }
+
+            .sponsor-ribbon {
+                grid-template-columns: auto minmax(0, 1fr);
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .sponsor-note { display: none; }
+
+            .sponsor-label {
+                font-size: 0.58rem;
+                padding: 0.18rem 0.45rem;
+            }
+
+            .sponsor-marquee {
+                padding-block: 0.35rem;
+                border-radius: 0.6rem;
+            }
+
+            .sponsor-item {
+                min-width: 8rem;
+                padding: 0.35rem 0.5rem;
+                gap: 0.4rem;
+            }
+
+            .sponsor-logo-frame {
+                width: 1.8rem;
+                height: 1.8rem;
+                padding: 0.2rem;
+            }
+
+            .sponsor-name-ar { font-size: 0.62rem; }
+            .sponsor-name-en { font-size: 0.5rem; }
+            .tick-logo { height: 0.9rem; }
+
+            .dock-meta {
+                gap: 0.15rem;
+                margin-top: 0.3rem;
+                padding-top: 0.3rem;
+            }
+
+            .dock-brand { font-size: 0.6rem; }
+            .dock-links { font-size: 0.55rem; gap: 0.2rem; }
+            .dock-copy { font-size: 0.52rem; }
         }
     </style>
 </head>
