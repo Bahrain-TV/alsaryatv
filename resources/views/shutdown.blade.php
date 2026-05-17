@@ -454,6 +454,11 @@
             animation-play-state: running;
         }
 
+        .sponsor-track.no-stagger .sponsor-item {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
         .sponsor-item {
             display: inline-flex;
             align-items: center;
@@ -868,6 +873,7 @@
                 gap: 0.7rem;
                 padding-inline: 0.75rem;
                 animation-duration: 16s;
+                animation-play-state: running;
             }
 
             .sponsor-item {
@@ -875,6 +881,8 @@
                 min-width: 10.3rem;
                 padding: 0.56rem 0.7rem;
                 border-radius: 0.85rem;
+                opacity: 1;
+                transform: translateY(0) scale(1);
             }
 
             .sponsor-logo-frame {
@@ -934,6 +942,7 @@
                 gap: 0.55rem;
                 padding-inline: 0.5rem;
                 animation-duration: 12s;
+                animation-play-state: running;
             }
 
             .sponsor-item {
@@ -1081,6 +1090,48 @@
 </head>
 
 <body class="antialiased">
+    <style>
+        /* Guardrail: neutralize accidental global sad-* animations from shared CSS bundles. */
+        body {
+            animation: none !important;
+            opacity: 1 !important;
+            filter: none !important;
+            transform: none !important;
+        }
+
+        .shutdown-shell,
+        .shutdown-shell * ,
+        .bottom-dock,
+        .bottom-dock * {
+            animation-name: none !important;
+            filter: none !important;
+            opacity: 1 !important;
+        }
+
+        /* Keep intended shutdown motion after neutralizing the accidental global effect. */
+        .basmala {
+            animation:
+                fadeDown 0.8s ease-out var(--d-basmala) forwards,
+                basmalaPulse 4s ease-in-out 1s infinite !important;
+        }
+
+        .brand-logo {
+            animation:
+                scaleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) var(--d-logo) forwards,
+                logoFloat 6s ease-in-out 1.2s infinite !important;
+        }
+
+        .brand-kicker { animation: riseIn 0.6s ease-out var(--d-kicker) forwards !important; }
+        .shutdown-panel { animation: riseIn 0.7s ease-out var(--d-panel) forwards !important; }
+        .panel-visual { animation: scaleIn 0.6s ease-out var(--d-visual) forwards !important; }
+        .panel-title { animation: riseIn 0.6s ease-out var(--d-title) forwards !important; }
+        .panel-text { animation: riseIn 0.6s ease-out var(--d-text) forwards !important; }
+        .panel-meta { animation: fadeIn 0.5s ease-out var(--d-meta) forwards !important; }
+        .panel-actions { animation: riseIn 0.6s ease-out var(--d-actions) forwards !important; }
+        .bottom-dock { animation: dockSlideUp 0.7s cubic-bezier(0.22,1,0.36,1) var(--d-dock) forwards !important; }
+        .sponsor-track { animation: sponsorMarquee 18s linear infinite !important; }
+    </style>
+
     <div class="basmala" id="basmala">بسم الله الرحمن الرحيم</div>
 
     <main class="shutdown-shell">
@@ -1222,11 +1273,21 @@
             var dockDelay = 2350;   // matches --d-dock (2.35s) in ms
             var dockDuration = 700; // matches dockSlideUp duration
             var logoStagger = 120;  // ms between each logo reveal
+            var isSmallScreen = window.matchMedia('(max-width: 767px)').matches;
+            var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             var track = document.getElementById('sponsorTrack');
             if (!track) return;
 
             var sponsorItems = track.querySelectorAll('.sponsor-item');
+
+            if (isSmallScreen || prefersReducedMotion) {
+                track.classList.add('is-running', 'no-stagger');
+                sponsorItems.forEach(function(item) {
+                    item.classList.add('is-visible');
+                });
+                return;
+            }
 
             // Wait for dock to finish sliding up, then reveal sponsor cards
             setTimeout(function() {

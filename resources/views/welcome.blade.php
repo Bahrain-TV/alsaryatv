@@ -624,35 +624,6 @@
             }
         }
 
-            header h1 {
-                font-size: 1.5rem !important;
-            }
-            header p {
-                font-size: 0.65rem !important;
-            }
-            .glass-panel {
-                padding: 0.5rem !important;
-            }
-            .flip-scene {
-                height: 64px !important;
-            }
-            .form-input {
-                padding: 0.45rem 0.5rem !important;
-                font-size: 0.8rem !important;
-            }
-            label {
-                font-size: 0.55rem !important;
-            }
-            .flex.bg-black\/40 button {
-                font-size: 0.65rem !important;
-                gap: 2px !important;
-            }
-            .flex.bg-black\/40 button svg {
-                width: 10px !important;
-                height: 10px !important;
-            }
-        }
-
         /* Respect reduced-motion preference */
         @media (prefers-reduced-motion: reduce) {
             .spinning-circle { animation: none !important; }
@@ -668,6 +639,28 @@
 </head>
 
 <body dir="rtl">
+    <style>
+        /* Guardrail: stop accidental global sad-* animations from shared CSS bundles. */
+        body {
+            animation: none !important;
+            opacity: 1 !important;
+            filter: none !important;
+            transform: none !important;
+        }
+
+        #main-content,
+        #main-content * {
+            animation-name: none !important;
+            filter: none !important;
+            opacity: 1 !important;
+        }
+
+        /* Keep footer pulse indicator animation intentionally active. */
+        #main-content .animate-ping {
+            animation-name: ping !important;
+        }
+    </style>
+
     <!-- Basmala — fixed at top per project requirement -->
     <div id="basmala">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
 
@@ -1470,6 +1463,7 @@
         (function() {
             const SPLASH_DURATION = 3000; // Show splash for exactly 3 seconds
             const FADE_DURATION = 800;    // Fade out duration
+            let revealStarted = false;
 
             // Generate random stars for splash background
             function initStars() {
@@ -1493,11 +1487,18 @@
             function revealContent() {
                 const preloader = document.getElementById('preloader');
                 const lottieBackground = document.querySelector('.lottie-background');
-                const mainContainer = document.querySelector('.main-container');
+                const mainContainer = document.querySelector('.main-container') || document.getElementById('main-content');
 
                 if (preloader) preloader.classList.add('fade-out');
                 if (lottieBackground) lottieBackground.classList.add('revealed');
                 if (mainContainer) mainContainer.classList.add('revealed');
+
+                // Hard fallback: guarantee the overlay can never block form interaction.
+                if (preloader) {
+                    setTimeout(function() {
+                        preloader.style.display = 'none';
+                    }, FADE_DURATION + 120);
+                }
             }
 
             // Initialize immediately
@@ -1506,12 +1507,14 @@
             // Start the reveal sequence after splash duration
             // Use both DOMContentLoaded and load to ensure it fires
             function startReveal() {
+                if (revealStarted) return;
+                revealStarted = true;
                 setTimeout(revealContent, SPLASH_DURATION);
             }
 
             // Safety fallback: Force reveal after 4 seconds max
             setTimeout(() => {
-                const mainContainer = document.querySelector('.main-container');
+                const mainContainer = document.querySelector('.main-container') || document.getElementById('main-content');
                 const preloader = document.getElementById('preloader');
                 const lottieBackground = document.querySelector('.lottie-background');
 
@@ -1520,6 +1523,9 @@
                 }
                 if (preloader && !preloader.classList.contains('fade-out')) {
                     preloader.classList.add('fade-out');
+                }
+                if (preloader) {
+                    preloader.style.display = 'none';
                 }
                 if (lottieBackground && !lottieBackground.classList.contains('revealed')) {
                     lottieBackground.classList.add('revealed');

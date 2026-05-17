@@ -1503,40 +1503,40 @@ button:disabled:hover {
     }
 }
 
-/* Apply sad animations to all text elements */
-body,
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-span,
-div,
-a,
-label,
-strong,
-em,
-blockquote,
-cite,
-q,
-figcaption,
-legend,
-caption,
-th,
-td,
-li,
-dt,
-dd,
-mark,
-small,
-sub,
-sup,
-code,
-pre,
-abbr,
-time {
+/* Apply sad animations only when explicitly enabled with .sad-mode */
+.sad-mode,
+.sad-mode p,
+.sad-mode h1,
+.sad-mode h2,
+.sad-mode h3,
+.sad-mode h4,
+.sad-mode h5,
+.sad-mode h6,
+.sad-mode span,
+.sad-mode div,
+.sad-mode a,
+.sad-mode label,
+.sad-mode strong,
+.sad-mode em,
+.sad-mode blockquote,
+.sad-mode cite,
+.sad-mode q,
+.sad-mode figcaption,
+.sad-mode legend,
+.sad-mode caption,
+.sad-mode th,
+.sad-mode td,
+.sad-mode li,
+.sad-mode dt,
+.sad-mode dd,
+.sad-mode mark,
+.sad-mode small,
+.sad-mode sub,
+.sad-mode sup,
+.sad-mode code,
+.sad-mode pre,
+.sad-mode abbr,
+.sad-mode time {
     animation: 
         sad-drift 12s ease-in-out infinite,
         sad-fade 16s ease-in-out infinite,
@@ -1546,20 +1546,20 @@ time {
 }
 
 /* Stagger animations for different elements to create dramatic effect */
-h1 { animation-delay: 0s, -2s, -4s; }
-h2 { animation-delay: -1s, -3s, -5s; }
-h3 { animation-delay: -2s, -4s, -6s; }
-h4 { animation-delay: -3s, -5s, -7s; }
-h5 { animation-delay: -4s, -6s, -8s; }
-h6 { animation-delay: -5s, -7s, -9s; }
-p { animation-delay: -6s, -8s, -10s; }
-span { animation-delay: -7s, -9s, -11s; }
-a { animation-delay: -8s, -10s, -12s; }
-div { animation-delay: -9s, -11s, -13s; }
-label { animation-delay: -10s, -12s, -14s; }
-strong { animation-delay: -11s, -13s, -15s; }
-li { animation-delay: -12s, -14s, -16s; }
-td, th { animation-delay: -13s, -15s, -17s; }
+.sad-mode h1 { animation-delay: 0s, -2s, -4s; }
+.sad-mode h2 { animation-delay: -1s, -3s, -5s; }
+.sad-mode h3 { animation-delay: -2s, -4s, -6s; }
+.sad-mode h4 { animation-delay: -3s, -5s, -7s; }
+.sad-mode h5 { animation-delay: -4s, -6s, -8s; }
+.sad-mode h6 { animation-delay: -5s, -7s, -9s; }
+.sad-mode p { animation-delay: -6s, -8s, -10s; }
+.sad-mode span { animation-delay: -7s, -9s, -11s; }
+.sad-mode a { animation-delay: -8s, -10s, -12s; }
+.sad-mode div { animation-delay: -9s, -11s, -13s; }
+.sad-mode label { animation-delay: -10s, -12s, -14s; }
+.sad-mode strong { animation-delay: -11s, -13s, -15s; }
+.sad-mode li { animation-delay: -12s, -14s, -16s; }
+.sad-mode td, .sad-mode th { animation-delay: -13s, -15s, -17s; }
 
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
