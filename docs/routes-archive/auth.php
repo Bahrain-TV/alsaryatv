@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Archived route: auth.php
  *
