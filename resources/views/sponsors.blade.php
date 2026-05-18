@@ -111,6 +111,17 @@
     transform-origin: center;
 }
 
+/* Ensure sponsor images scale responsively inside their framed containers */
+.sponsor-logo {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+
 /* Different timing for each logo container */
 .sponsor-logo-container[data-sponsor="alsalam"] {
     animation-duration: 8s, 15s, 4s;
@@ -156,9 +167,10 @@
 </style>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const logoContainers = Array.from(document.querySelectorAll('.sponsor-logo-container'));
+    if (!logoContainers.length) return;
 
-    const logoContainers = document.querySelectorAll('.sponsor-logo-container');
-    
     // Add subtle random movements to each logo
     logoContainers.forEach((container, index) => {
         let currentX = 0;
@@ -166,29 +178,29 @@
         let targetX = 0;
         let targetY = 0;
         let speed = 0.02 + (index * 0.005); // Different speed for each
-        
+
         function animate() {
             // Randomly change target position
             if (Math.random() < 0.02) { // 2% chance per frame
                 targetX = (Math.random() - 0.5) * 8; // -4px to 4px
                 targetY = (Math.random() - 0.5) * 8;
             }
-            
+
             // Smooth interpolation to target
             currentX += (targetX - currentX) * speed;
             currentY += (targetY - currentY) * speed;
-            
+
             // Apply subtle transform (preserving other transforms)
             const scale = 1 + Math.sin(Date.now() * 0.001 + index) * 0.02;
             container.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
-            
+
             requestAnimationFrame(animate);
         }
-        
+
         // Start animation loop
         animate();
     });
-    
+
     // Add occasional sudden "jump" animation
     setInterval(() => {
         const randomContainer = logoContainers[Math.floor(Math.random() * logoContainers.length)];
@@ -197,7 +209,7 @@
             const jumpX = (Math.random() - 0.5) * 12;
             const jumpY = (Math.random() - 0.5) * 12;
             randomContainer.style.transform = `translate(${jumpX}px, ${jumpY}px) scale(1.05)`;
-            
+
             setTimeout(() => {
                 randomContainer.style.transition = 'transform 0.3s ease-out';
                 randomContainer.style.transform = 'translate(0, 0) scale(1)';
