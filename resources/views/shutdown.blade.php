@@ -520,10 +520,12 @@
         }
 
         .tick-logo {
-            height: clamp(1.65rem, 5vw, 2.15rem);
             width: auto;
+            height: auto;
             max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
+            display: block;
             flex-shrink: 0;
             opacity: 0.94;
             transition: transform 0.25s ease-out;
@@ -679,7 +681,7 @@
             }
 
             .tick-logo {
-                height: clamp(1.5rem, 5vw, 2rem);
+                max-height: clamp(1.5rem, 5vw, 2rem);
                 max-width: clamp(5rem, 18vw, 7rem);
             }
         }
@@ -902,7 +904,7 @@
             }
 
             .tick-logo {
-                height: 1.3rem;
+                max-height: 1.3rem;
             }
 
             .dock-meta {
@@ -965,7 +967,7 @@
             }
 
             .tick-logo {
-                height: 1.08rem;
+                max-height: 1.08rem;
             }
 
             .dock-meta {
