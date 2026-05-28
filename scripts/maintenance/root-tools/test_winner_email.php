@@ -9,9 +9,15 @@
  * 3. Sends email to admin addresses for testing
  */
 
-require __DIR__.'/vendor/autoload.php';
+$rootPath = realpath(__DIR__.'/../../..');
+if (! $rootPath) {
+    fwrite(STDERR, "Unable to resolve project root from script location.\n");
+    exit(1);
+}
 
-$app = require_once __DIR__.'/bootstrap/app.php';
+require $rootPath.'/vendor/autoload.php';
+
+$app = require_once $rootPath.'/bootstrap/app.php';
 
 $kernel = $app->make(Kernel::class);
 $kernel->bootstrap();

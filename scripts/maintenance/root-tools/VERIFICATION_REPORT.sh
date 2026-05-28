@@ -8,7 +8,9 @@ echo "║                     February 19, 2026                                 
 echo "╚════════════════════════════════════════════════════════════════════════════╝"
 echo ""
 
-cd /Users/aldoyh/Sites/RAMADAN/alsaryatv
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+cd "$ROOT_DIR"
 
 # ─────────────────────────────────────────────────────────────────────────────
 echo "VERIFICATION CHECKLIST:"
@@ -100,13 +102,13 @@ echo "4️⃣  DOCUMENTATION FILES"
 echo "───────────────────────────────────────────────────────────────────────────"
 
 DOCS=(
-    "SOLUTION_COMPLETE.md"
-    "IMPLEMENTATION_SUMMARY.md"
-    "QUICK_REFERENCE.txt"
+    "docs/archive/root-notes/SOLUTION_COMPLETE.md"
+    "docs/archive/root-notes/IMPLEMENTATION_SUMMARY.md"
+    "docs/archive/root-notes/QUICK_REFERENCE.txt"
     "QUICK_START_DEPLOYMENT.sh"
-    "REGISTRATION_FIX_DEPLOYMENT.md"
+    "docs/archive/root-notes/REGISTRATION_FIX_DEPLOYMENT.md"
     "deploy_registration_fix.sh"
-    "test_caller_registration_fix.php"
+    "scripts/maintenance/root-tools/test_caller_registration_fix.php"
 )
 
 for doc in "${DOCS[@]}"; do

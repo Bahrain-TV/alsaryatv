@@ -47,11 +47,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php${{ matrix.php-version }}-composer-
 
+    - name: Prepare Laravel Environment
+      run: |
+        cp .env.example .env
+        mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} database
+        touch database/database.sqlite
+
     - name: Install Composer Dependencies
       run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
-
-    - name: Copy Environment File
-      run: cp .env.example .env
 
     - name: Generate Application Key
       run: php artisan key:generate
@@ -160,6 +163,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-composer-
 
+    - name: Prepare Laravel Environment
+      run: |
+        cp .env.example .env
+        mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} database
+        touch database/database.sqlite
+
     - name: Install Composer Dependencies
       run: composer install --prefer-dist --no-interaction --no-progress
 
@@ -243,14 +252,18 @@ jobs:
         path: vendor
         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
+    - name: Prepare Laravel Environment
+      run: |
+        cp .env.example .env
+        mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} database
+        touch database/database.sqlite
+
     - name: Install Dependencies
       run: composer install --prefer-dist --no-interaction
 
     - name: Setup Environment
       run: |
-        cp .env.example .env
         php artisan key:generate
-        touch database/database.sqlite
 
     - name: Test Fresh Migration
       run: php artisan migrate:fresh --force
