@@ -9,8 +9,6 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=tajawal:400,500,700,800&display=swap" rel="stylesheet" />
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <style>
@@ -51,7 +49,7 @@
             min-height: 100svh;
             overflow-x: hidden;
             background: var(--ink);
-            background-image: url("{{ asset('images/alsarya-bg-2026-by-gemini.jpeg') }}");
+            background-image: url('/images/alsarya-bg-2026-by-gemini.jpeg');
             background-position: center;
             background-size: cover;
             background-repeat: no-repeat;
@@ -89,17 +87,17 @@
            ================================================================ */
         .basmala {
             position: fixed;
-            top: 0.9rem;
+            top: 0.8rem;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 90;
+            z-index: 130;
             width: min(92vw, 30rem);
             text-align: center;
-            color: var(--cream);
-            font-size: clamp(0.9rem, 2.8vw, 1.4rem);
-            font-weight: 700;
+            color: #fff2d2;
+            font-size: clamp(0.95rem, 3vw, 1.45rem);
+            font-weight: 800;
             letter-spacing: 0.08em;
-            text-shadow: 0 4px 18px rgba(168,28,46,0.45);
+            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.7), 0 0 24px rgba(168, 28, 46, 0.55);
             pointer-events: none;
 
             /* entrance */
@@ -107,6 +105,41 @@
             animation:
                 fadeDown 0.8s ease-out var(--d-basmala) forwards,
                 basmalaPulse 4s ease-in-out 1s infinite;
+        }
+
+        .brand-presented-by {
+            position: fixed;
+            top: 2.95rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 129;
+            display: grid;
+            justify-items: center;
+            gap: 0.2rem;
+            width: min(92vw, 14rem);
+            padding: 0;
+            border: 0;
+            background: transparent;
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        .presented-by-btv-logo {
+            width: 20%;
+            min-width: 3.6rem;
+            max-width: 4.7rem;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+        }
+
+        .presented-by-text {
+            color: rgba(255, 247, 228, 0.98);
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.62);
+            line-height: 1;
         }
 
         /* ================================================================
@@ -142,9 +175,10 @@
         .brand-logo {
             width: min(72vw, 15rem);
             filter: drop-shadow(0 12px 24px rgba(0,0,0,0.45));
+            opacity: 1;
+            will-change: transform, opacity;
 
             /* entrance: scale up */
-            opacity: 0;
             transform: scale(0.6);
             animation:
                 scaleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) var(--d-logo) forwards,
@@ -528,6 +562,7 @@
             display: block;
             flex-shrink: 0;
             opacity: 0.94;
+            visibility: visible;
             transition: transform 0.25s ease-out;
         }
 
@@ -757,6 +792,21 @@
                 font-size: 0.82rem;
                 letter-spacing: 0.05em;
                 width: min(95vw, 24rem);
+            }
+
+            .brand-presented-by {
+                top: 2.2rem;
+                gap: 0.16rem;
+                width: min(94vw, 11.5rem);
+            }
+
+            .presented-by-btv-logo {
+                min-width: 3rem;
+                max-width: 3.8rem;
+            }
+
+            .presented-by-text {
+                font-size: 0.54rem;
             }
 
             .shutdown-shell {
@@ -1117,6 +1167,8 @@
                 basmalaPulse 4s ease-in-out 1s infinite !important;
         }
 
+        .brand-presented-by { opacity: 1 !important; }
+
         .brand-logo {
             animation:
                 scaleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) var(--d-logo) forwards,
@@ -1136,11 +1188,18 @@
 
     <div class="basmala" id="basmala">بسم الله الرحمن الرحيم</div>
 
+    <div class="brand-presented-by" aria-label="Bahrain TV presents AlSarya">
+        <img src="/images/bahrain-tv-sm.png" alt="BTV LOGO" class="presented-by-btv-logo"
+            onerror="this.onerror=null;this.src='/images/btv-logo-ar.png';">
+        <span class="presented-by-text">يقدم لكم</span>
+    </div>
+
     <main class="shutdown-shell">
         <section class="shutdown-stage">
             <div class="brand-stack">
                 <div class="brand-logo">
-                    <img src="{{ asset('images/alsarya-logo-2026-1.png') }}" alt="السارية">
+                    <img src="/images/alsarya-logo-2026-1.png" alt="السارية"
+                        onerror="this.onerror=null;this.src='/images/alsarya-logo.png';">
                 </div>
                 <span class="brand-kicker">البث المباشر يعود قريباً</span>
             </div>
@@ -1164,7 +1223,7 @@
 
                         <div class="panel-actions">
                             <a href="/" class="panel-action">فريق عمل الســــاريـة ❤️</a>
-                            <a href="{{ route('policy') }}" class="panel-secondary">الاطلاع على الشروط والأحكام</a>
+                            <a href="/policy" class="panel-secondary">الاطلاع على الشروط والأحكام</a>
                         </div>
                     </div>
                 </div>
@@ -1184,7 +1243,8 @@
                     <div class="sponsor-track" id="sponsorTrack">
                         <div class="sponsor-item">
                             <div class="sponsor-logo-frame">
-                                <img src="{{ asset('images/jasmis-logo.png') }}" alt="Jasmis" class="tick-logo">
+                                <img src="/images/jasmis-logo.png" alt="Jasmis" class="tick-logo"
+                                    onerror="this.onerror=null;this.src='/images/alsarya-logo.png';">
                             </div>
                             <div class="sponsor-copy">
                                 <span class="sponsor-name-ar">جاسميز</span>
@@ -1194,7 +1254,8 @@
 
                         <div class="sponsor-item">
                             <div class="sponsor-logo-frame">
-                                <img src="{{ asset('images/alsalam-logo.svg') }}" alt="Al Salam" class="tick-logo tick-logo-alsalam">
+                                <img src="/images/alsalam-logo.svg" alt="Al Salam" class="tick-logo tick-logo-alsalam"
+                                    onerror="this.onerror=null;this.src='/images/alsarya-logo.png';">
                             </div>
                             <div class="sponsor-copy">
                                 <span class="sponsor-name-ar">بنك السلام</span>
@@ -1204,7 +1265,8 @@
 
                         <div class="sponsor-item">
                             <div class="sponsor-logo-frame">
-                                <img src="{{ asset('images/bapco-energies.png') }}" alt="Bapco Energies" class="tick-logo">
+                                <img src="/images/bapco-energies.png" alt="Bapco Energies" class="tick-logo"
+                                    onerror="this.onerror=null;this.src='/images/bapco-energies.svg';">
                             </div>
                             <div class="sponsor-copy">
                                 <span class="sponsor-name-ar">بابكو للطاقة</span>
@@ -1214,7 +1276,8 @@
 
                         <div class="sponsor-item" aria-hidden="true">
                             <div class="sponsor-logo-frame">
-                                <img src="{{ asset('images/jasmis-logo.png') }}" alt="" class="tick-logo">
+                                <img src="/images/jasmis-logo.png" alt="" class="tick-logo"
+                                    onerror="this.onerror=null;this.src='/images/alsarya-logo.png';">
                             </div>
                             <div class="sponsor-copy">
                                 <span class="sponsor-name-ar">جاسميز</span>
@@ -1224,7 +1287,8 @@
 
                         <div class="sponsor-item" aria-hidden="true">
                             <div class="sponsor-logo-frame">
-                                <img src="{{ asset('images/alsalam-logo.svg') }}" alt="" class="tick-logo tick-logo-alsalam">
+                                <img src="/images/alsalam-logo.svg" alt="" class="tick-logo tick-logo-alsalam"
+                                    onerror="this.onerror=null;this.src='/images/alsarya-logo.png';">
                             </div>
                             <div class="sponsor-copy">
                                 <span class="sponsor-name-ar">بنك السلام</span>
@@ -1234,7 +1298,8 @@
 
                         <div class="sponsor-item" aria-hidden="true">
                             <div class="sponsor-logo-frame">
-                                <img src="{{ asset('images/bapco-energies.png') }}" alt="" class="tick-logo">
+                                <img src="/images/bapco-energies.png" alt="" class="tick-logo"
+                                    onerror="this.onerror=null;this.src='/images/bapco-energies.svg';">
                             </div>
                             <div class="sponsor-copy">
                                 <span class="sponsor-name-ar">بابكو للطاقة</span>
@@ -1249,11 +1314,11 @@
                 <span class="dock-brand">برنامج السارية - تلفزيون البحرين</span>
 
                 <div class="dock-links">
-                    <a href="{{ route('privacy') }}">سياسة الخصوصية</a>
+                    <a href="/privacy">سياسة الخصوصية</a>
                     <span>•</span>
-                    <a href="{{ route('terms') }}">شروط الاستخدام</a>
+                    <a href="/terms">شروط الاستخدام</a>
                     <span>•</span>
-                    <a href="{{ route('policy') }}">الشروط والأحكام</a>
+                    <a href="/policy">الشروط والأحكام</a>
                 </div>
 
                 <div class="dock-copy">
