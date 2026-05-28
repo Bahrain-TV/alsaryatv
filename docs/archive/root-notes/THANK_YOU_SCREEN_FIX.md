@@ -1,5 +1,7 @@
 # Thank You Screen Counter Fix
 
+> Archived from repository root during cleanup on 2026-05-28 to keep project root focused on active runtime files.
+
 ## Problem
 The thank you screen counter was not displaying or animating properly. The `thank-you-screen.js` component existed but:
 1. ❌ Never displayed the user's hit counter
