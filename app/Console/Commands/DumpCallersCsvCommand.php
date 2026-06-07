@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\FormatHelper;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -127,7 +128,7 @@ class DumpCallersCsvCommand extends Command
 
                 // Add file size information
                 $fileSize = Storage::size($filePath);
-                $readableSize = $this->formatBytes($fileSize);
+                $readableSize = FormatHelper::formatBytes($fileSize);
                 $this->line("📊 File size: {$readableSize}");
             }
 
@@ -142,21 +143,5 @@ class DumpCallersCsvCommand extends Command
 
             return 1;
         }
-    }
-
-    /**
-     * Format bytes to human-readable format
-     */
-    protected function formatBytes($bytes, $precision = 2)
-    {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-
-        $bytes /= (1 << (10 * $pow));
-
-        return round($bytes, $precision).' '.$units[$pow];
     }
 }

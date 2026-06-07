@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\FormatHelper;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -81,7 +82,7 @@ class SendCallersCsvCommand extends Command
             }
 
             $fileSize = Storage::size($csvPath);
-            $this->info("CSV file generated: {$csvPath} (".$this->formatBytes($fileSize).')');
+            $this->info("CSV file generated: {$csvPath} (".FormatHelper::formatBytes($fileSize).')');
 
             // Send email
             $emailStatus = $this->sendEmail($csvPath, $toEmails, $ccEmails, $bccEmails, $subject, $note, $totalRecords);
@@ -210,7 +211,7 @@ class SendCallersCsvCommand extends Command
                 $this->info('BCC: '.implode(', ', $bccEmails));
             }
 
-            $this->line("Attaching CSV file: {$fileName} (".$this->formatBytes($fileSize).')');
+            $this->line("Attaching CSV file: {$fileName} (".FormatHelper::formatBytes($fileSize).')');
 
             // Create email content
             $content = "Attached is your export of {$recordCount} caller records.\n\n";
@@ -271,21 +272,5 @@ class SendCallersCsvCommand extends Command
 
             return false;
         }
-    }
-
-    /**
-     * Format bytes to human-readable size
-     */
-    protected function formatBytes($bytes, $precision = 2)
-    {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-
-        $bytes /= (1 << (10 * $pow));
-
-        return round($bytes, $precision).' '.$units[$pow];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ObsOverlayVideoResource\Pages;
+use App\Helpers\FormatHelper;
 use App\Models\ObsOverlayVideo;
 use Filament\Forms;
 use Filament\Resources\Resource;
@@ -39,7 +40,7 @@ class ObsOverlayVideoResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('file_size')
                             ->disabled()
-                            ->formatStateUsing(fn ($state) => self::formatBytes($state)),
+                            ->formatStateUsing(fn ($state) => FormatHelper::formatBytes((int) $state)),
                         Forms\Components\TextInput::make('mime_type')
                             ->disabled(),
                         Forms\Components\DateTimePicker::make('recorded_at')
@@ -73,7 +74,7 @@ class ObsOverlayVideoResource extends Resource
                     ->copyable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('file_size')
-                    ->formatStateUsing(fn ($state) => self::formatBytes($state))
+                    ->formatStateUsing(fn ($state) => FormatHelper::formatBytes((int) $state))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -109,16 +110,5 @@ class ObsOverlayVideoResource extends Resource
             'create' => Pages\CreateObsOverlayVideo::route('/create'),
             'edit' => Pages\EditObsOverlayVideo::route('/{record}/edit'),
         ];
-    }
-
-    private static function formatBytes(int $bytes): string
-    {
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-        $bytes /= (1 << (10 * $pow));
-
-        return round($bytes, 2).' '.$units[$pow];
     }
 }

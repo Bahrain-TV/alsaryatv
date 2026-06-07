@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\FormatHelper;
 use App\Models\Caller;
 use Illuminate\Console\Command;
 
@@ -51,7 +52,7 @@ class RestoreDataCommand extends Command
         }
 
         $this->info("Restore file: {$file}");
-        $this->info('File size: '.human_filesize(filesize($file)));
+        $this->info('File size: '.FormatHelper::formatBytes(filesize($file)));
 
         // Count records in CSV
         $records = count(file($file)) - 1; // Subtract header
@@ -114,7 +115,7 @@ class RestoreDataCommand extends Command
         foreach ($files as $file) {
             $count++;
             $filename = basename($file);
-            $size = human_filesize(filesize($file));
+            $size = FormatHelper::formatBytes(filesize($file));
             $date = date('Y-m-d H:i:s', filemtime($file));
 
             $records = count(file($file)) - 1;
@@ -235,21 +236,5 @@ class RestoreDataCommand extends Command
         } catch (\Exception $e) {
             $this->error('Restore failed: '.$e->getMessage());
         }
-    }
-}
-
-/**
- * Convert bytes to human-readable format
- */
-if (! function_exists('human_filesize')) {
-    function human_filesize($bytes)
-    {
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-        $bytes /= (1 << (10 * $pow));
-
-        return round($bytes, 2).' '.$units[$pow];
     }
 }

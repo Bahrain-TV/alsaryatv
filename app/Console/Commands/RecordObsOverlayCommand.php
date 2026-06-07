@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\FormatHelper;
 use App\Models\ObsOverlayVideo;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -185,7 +186,7 @@ class RecordObsOverlayCommand extends Command
 
             $this->info('');
             $this->info('✅ Recording completed successfully!');
-            $this->info('📊 File size: '.$this->formatBytes($fileSize));
+            $this->info('📊 File size: '.FormatHelper::formatBytes($fileSize));
             $this->info("🆔 Video ID: {$video->id}");
             $this->line('');
 
@@ -233,20 +234,6 @@ class RecordObsOverlayCommand extends Command
         }
 
         $this->info('✓ Pruning complete');
-    }
-
-    /**
-     * Format bytes to human readable.
-     */
-    protected function formatBytes(int $bytes): string
-    {
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-        $bytes /= (1 << (10 * $pow));
-
-        return round($bytes, 2).' '.$units[$pow];
     }
 
     /**
