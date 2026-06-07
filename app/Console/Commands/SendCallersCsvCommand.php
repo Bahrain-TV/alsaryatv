@@ -22,12 +22,14 @@ class SendCallersCsvCommand extends Command
     protected $description = 'Send a CSV export of callers to specified email address';
 
     /**
-     * Default recipients when no email is provided
+     * Default recipients when no email is provided (from config)
      */
-    protected $defaultRecipients = [
-        'aldoyh.info@gmail.com',
-        'alsaryatv@gmail.com',
-    ];
+    protected function getDefaultRecipients(): array
+    {
+        $emails = config('alsarya.admin_emails', []);
+
+        return is_array($emails) ? $emails : explode(',', $emails);
+    }
 
     /**
      * Execute the console command
@@ -39,7 +41,7 @@ class SendCallersCsvCommand extends Command
 
         try {
             // Parse recipients
-            $toEmails = $this->argument('email') ? [$this->argument('email')] : $this->defaultRecipients;
+            $toEmails = $this->argument('email') ? [$this->argument('email')] : $this->getDefaultRecipients();
             $ccEmails = $this->parseEmails($this->option('cc'));
             $bccEmails = $this->parseEmails($this->option('bcc'));
 

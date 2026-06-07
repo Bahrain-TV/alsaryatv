@@ -25,10 +25,12 @@ Route::middleware('api')->group(function (): void {
         Route::post('/increment', [VersionCheckController::class, 'incrementVersion'])->middleware('auth:sanctum');
     });
 
-    // Caller status routes
-    Route::post('/callers/{id}/status', [CallerStatusController::class, 'updateStatus']);
-    Route::post('/callers/{id}/live', [CallerStatusController::class, 'sendToLive']);
-    Route::post('/callers/{id}/toggle-winner', [CallerStatusController::class, 'toggleWinner']);
+    // Caller status routes (admin-only)
+    Route::middleware('auth:sanctum')->group(function (): void {
+        Route::post('/callers/{id}/status', [CallerStatusController::class, 'updateStatus']);
+        Route::post('/callers/{id}/live', [CallerStatusController::class, 'sendToLive']);
+        Route::post('/callers/{id}/toggle-winner', [CallerStatusController::class, 'toggleWinner']);
+    });
 
     // Public stats endpoints
     Route::get('/caller-stats', 'App\Http\Controllers\CallerStatsController@getStats');

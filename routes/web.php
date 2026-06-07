@@ -161,10 +161,4 @@ Route::prefix('callers')->name('callers.')->group(function (): void {
 // (removed duplicate route that referenced missing view 'calls.register')
 // The '/register' route is defined above and renders the welcome/registration page.
 
-// CSRF Test Routes
-Route::get('/csrf-test', fn () => view('csrf-test'))->name('csrf.test.page');
-Route::post('/csrf-test', fn () => response()->json([
-    'message' => 'CSRF token is valid! ✓',
-    'timestamp' => now(),
-    'session_id' => session()->getId(),
-]))->name('csrf.test');
+// CSRF test routes removed for security — session IDs and config should not be exposed publicly.

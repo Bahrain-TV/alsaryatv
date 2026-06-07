@@ -19,11 +19,12 @@ class ShowStatisticsCommand extends Command
 
     protected $dateFilter = '';
 
-    // Default email addresses
-    protected $defaultEmails = [
-        'aldoyh@gmail.com',
-        'alsaryatv@gmail.com',
-    ];
+    protected function getDefaultEmails(): array
+    {
+        $csv = config('alsarya.admin_emails', []);
+
+        return is_array($csv) ? $csv : explode(',', $csv);
+    }
 
     public function handle(): string
     {
@@ -140,7 +141,7 @@ class ShowStatisticsCommand extends Command
             $emailsToSend = [];
 
             // Ask about each default email address using built-in confirm()
-            foreach ($this->defaultEmails as $email) {
+            foreach ($this->getDefaultEmails() as $email) {
                 if ($this->confirm("Send a copy to {$email}?", true)) {
                     $emailsToSend[] = $email;
                 }
@@ -187,18 +188,31 @@ class ShowStatisticsCommand extends Command
 
     protected function getDateFilter(): string
     {
+        return '';
+    }
+
+    /**
+     * Build parameterized date filter conditions and bindings.
+     *
+     * @return array{string, array<int, string>}
+     */
+    protected function getDateFilterWithBindings(): array
+    {
         $from = $this->option('from');
         $to = $this->option('to');
 
         $filter = '';
+        $bindings = [];
         if ($from) {
-            $filter .= " AND created_at >= '".Carbon::parse($from)->toDateString()."'";
+            $filter .= ' AND created_at >= ?';
+            $bindings[] = Carbon::parse($from)->toDateString();
         }
         if ($to) {
-            $filter .= " AND created_at <= '".Carbon::parse($to)->toDateString()."'";
+            $filter .= ' AND created_at <= ?';
+            $bindings[] = Carbon::parse($to)->toDateString();
         }
 
-        return $filter;
+        return [$filter, $bindings];
     }
 
     protected function getStats(): ?array
@@ -228,13 +242,15 @@ class ShowStatisticsCommand extends Command
     protected function getDailyStats(): ?Collection
     {
         try {
+            [$filter, $bindings] = $this->getDateFilterWithBindings();
+
             return collect(DB::select("
                 SELECT DATE(created_at) as date, COUNT(*) as count
                 FROM callers
-                WHERE 1=1 {$this->dateFilter}
+                WHERE 1=1 {$filter}
                 GROUP BY DATE(created_at)
                 ORDER BY date ASC
-            "));
+            ", $bindings));
         } catch (\Exception $e) {
             $this->error('Error getting daily stats: '.$e->getMessage());
 
@@ -245,13 +261,15 @@ class ShowStatisticsCommand extends Command
     protected function showTimeBasedAnalysis(): ?Collection
     {
         try {
+            [$filter, $bindings] = $this->getDateFilterWithBindings();
+
             return collect(DB::select("
                 SELECT HOUR(created_at) as hour, COUNT(*) as count
                 FROM callers
-                WHERE 1=1 {$this->dateFilter}
+                WHERE 1=1 {$filter}
                 GROUP BY HOUR(created_at)
                 ORDER BY hour ASC
-            "));
+            ", $bindings));
         } catch (\Exception $e) {
             $this->error('Error getting time-based analysis: '.$e->getMessage());
 
@@ -262,13 +280,15 @@ class ShowStatisticsCommand extends Command
     protected function showStatusDistribution(): ?Collection
     {
         try {
+            [$filter, $bindings] = $this->getDateFilterWithBindings();
+
             return collect(DB::select("
                 SELECT status, COUNT(*) as count
                 FROM callers
-                WHERE 1=1 {$this->dateFilter}
+                WHERE 1=1 {$filter}
                 GROUP BY status
                 ORDER BY count DESC
-            "));
+            ", $bindings));
         } catch (\Exception $e) {
             $this->error('Error getting status distribution: '.$e->getMessage());
 
@@ -279,13 +299,15 @@ class ShowStatisticsCommand extends Command
     protected function showRegistrationPeriod(): ?object
     {
         try {
+            [$filter, $bindings] = $this->getDateFilterWithBindings();
+
             return DB::selectOne("
                 SELECT 
                     MIN(created_at) as first_registration,
                     MAX(created_at) as last_registration
                 FROM callers
-                WHERE 1=1 {$this->dateFilter}
-            ");
+                WHERE 1=1 {$filter}
+            ", $bindings);
         } catch (\Exception $e) {
             $this->error('Error getting registration period: '.$e->getMessage());
 
@@ -298,7 +320,8 @@ class ShowStatisticsCommand extends Command
         try {
             return DB::table('callers')
                 ->where('is_winner', true)
-                ->whereRaw("1=1 {$this->dateFilter}") // Added date filter to winner stats query.
+                ->when($this->option('from'), fn ($q, $from) => $q->where('created_at', '>=', Carbon::parse($from)->toDateString()))
+                ->when($this->option('to'), fn ($q, $to) => $q->where('created_at', '<=', Carbon::parse($to)->toDateString()))
                 ->select(
                     DB::raw('COUNT(*) as total_winners'),
                     DB::raw('AVG(hits) as avg_hits'),
