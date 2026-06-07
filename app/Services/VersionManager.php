@@ -200,8 +200,21 @@ class VersionManager
         }
 
         $content = File::get($path);
+        $data = json_decode($content, true);
 
-        return json_decode($content, true) ?? [];
+        if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
+            Log::error('Failed to parse version.json', [
+                'path' => $path,
+                'json_error' => json_last_error_msg(),
+            ]);
+
+            // Re-initialize with defaults rather than returning empty array
+            self::initializeVersion();
+            $content = File::get($path);
+            $data = json_decode($content, true);
+        }
+
+        return $data ?? [];
     }
 
     /**

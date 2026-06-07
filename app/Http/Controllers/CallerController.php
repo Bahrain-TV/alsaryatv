@@ -73,21 +73,31 @@ class CallerController extends Controller
             return back()->withErrors(['general' => 'Too many registrations from your location.'])->withInput();
         }
 
-        $caller = Caller::updateOrCreate(
-            ['cpr' => $cpr],
-            [
-                'name' => $validated['name'],
-                'phone' => $validated['phone_number'],
-                'ip_address' => $request->ip(),
-                'status' => 'active',
-            ]
-        );
+        try {
+            $caller = Caller::updateOrCreate(
+                ['cpr' => $cpr],
+                [
+                    'name' => $validated['name'],
+                    'phone' => $validated['phone_number'],
+                    'ip_address' => $request->ip(),
+                    'status' => 'active',
+                ]
+            );
 
-        if ($caller->wasRecentlyCreated) {
-            app(NtfyNotifier::class)->notifyRegistration($caller);
+            if ($caller->wasRecentlyCreated) {
+                app(NtfyNotifier::class)->notifyRegistration($caller);
+            }
+
+            $caller->incrementHits();
+        } catch (\Exception $e) {
+            Log::error('Caller registration failed', [
+                'cpr' => $cpr,
+                'ip' => $request->ip(),
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors(['general' => 'Registration failed. Please try again.'])->withInput();
         }
-
-        $caller->incrementHits();
 
         // Record attempts
         RateLimiter::hit('caller-registration:'.$cpr, 60);
@@ -158,7 +168,16 @@ class CallerController extends Controller
 
     public function toggleWinner(Caller $caller)
     {
-        $caller->update(['is_winner' => ! $caller->is_winner]);
+        $updated = $caller->update(['is_winner' => ! $caller->is_winner]);
+
+        if (! $updated) {
+            Log::warning('Failed to toggle winner status', ['caller_id' => $caller->id]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update winner status.',
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,
@@ -178,7 +197,17 @@ class CallerController extends Controller
             ], 422);
         }
 
-        $caller->update(['is_winner' => true, 'is_selected' => true, 'status' => 'selected']);
+        $updated = $caller->update(['is_winner' => true, 'is_selected' => true, 'status' => 'selected']);
+
+        if (! $updated) {
+            Log::error('Failed to mark caller as winner', ['caller_id' => $caller->id]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update winner status.',
+            ], 500);
+        }
+
         app(NtfyNotifier::class)->notifyWinner($caller);
 
         return response()->json([

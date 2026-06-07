@@ -59,7 +59,13 @@ class CallerStatusController extends Controller
         $caller->is_winner = true;
         $caller->is_selected = true;
         $caller->status = 'selected';
-        $caller->save();
+
+        if (! $caller->save()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save winner status. Update may be restricted.',
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,

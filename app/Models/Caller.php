@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class Caller extends Model
 {
@@ -81,10 +82,20 @@ class Caller extends Model
         $winner = self::eligible()->inRandomOrder()->first();
 
         if ($winner) {
-            $winner->update([
+            $updated = $winner->update([
                 'is_selected' => true,
                 'status' => 'selected',
             ]);
+
+            if (! $updated) {
+                Log::error('Failed to mark caller as selected', [
+                    'caller_id' => $winner->id,
+                    'cpr' => $winner->cpr,
+                ]);
+
+                return null;
+            }
+
             app(NtfyNotifier::class)->notifyWinner($winner);
         }
 
@@ -142,6 +153,12 @@ class Caller extends Model
 
             // In production, restrict other updates
             if (app()->environment('production')) {
+                Log::warning('Caller update blocked in production', [
+                    'caller_id' => $caller->id,
+                    'dirty_fields' => $dirtyKeys,
+                    'user_id' => Auth::id() ?? 'guest',
+                ]);
+
                 return false;
             }
 

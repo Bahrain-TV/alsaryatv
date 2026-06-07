@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Caller;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class NtfyNotifier
 {
@@ -37,10 +38,25 @@ class NtfyNotifier
             return;
         }
 
-        Http::withHeaders([
-            'Title' => $title,
-            'Priority' => '4',
-        ])->post($url, $message);
+        try {
+            $response = Http::withHeaders([
+                'Title' => $title,
+                'Priority' => '4',
+            ])->post($url, $message);
+
+            if ($response->failed()) {
+                Log::warning('Ntfy notification failed', [
+                    'title' => $title,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::warning('Ntfy notification request failed', [
+                'title' => $title,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     private function maskCpr(?string $cpr): string
