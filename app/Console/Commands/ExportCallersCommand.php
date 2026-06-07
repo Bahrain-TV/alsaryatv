@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Caller;
+use App\Services\FileCleanupService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
@@ -142,32 +143,9 @@ class ExportCallersCommand extends Command
      */
     private function cleanupOldExports(string $path): void
     {
-        $files = Storage::files($path);
-
-        // Filter only export files and sort by modification time
-        $csvFiles = array_filter($files, fn ($file) => str_contains($file, 'callers_export_') && str_ends_with($file, '.csv'));
-
-        if (count($csvFiles) > 30) {
-            $files_with_time = [];
-            foreach ($csvFiles as $file) {
-                $files_with_time[$file] = Storage::lastModified($file);
-            }
-
-            // Sort by time (oldest first)
-            asort($files_with_time);
-
-            // Delete oldest files, keeping 30
-            $to_delete = array_slice($files_with_time, 0, count($files_with_time) - 30);
-
-            foreach (array_keys($to_delete) as $file) {
-                Storage::delete($file);
-                // Also delete corresponding manifest
-                $manifest_file = str_replace('.csv', '.manifest.json', $file);
-                if (Storage::exists($manifest_file)) {
-                    Storage::delete($manifest_file);
-                }
-                $this->line("  Cleaned up: {$file}");
-            }
+        $deleted = FileCleanupService::keepLatest($path, 30, 'callers_export_');
+        if ($deleted > 0) {
+            $this->line("  Cleaned up {$deleted} old export file(s)");
         }
     }
 }

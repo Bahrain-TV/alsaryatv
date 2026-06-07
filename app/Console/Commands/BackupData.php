@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Caller;
+use App\Services\FileCleanupService;
 use Illuminate\Console\Command;
 
 class BackupData extends Command
@@ -193,26 +194,7 @@ class BackupData extends Command
     {
         $this->info("Cleaning up files older than {$days} days...");
 
-        if (! is_dir($dir)) {
-            return;
-        }
-
-        $cutoff = now()->subDays($days)->timestamp;
-        $deleted = 0;
-
-        foreach (scandir($dir) as $file) {
-            if ($file === '.' || $file === '..') {
-                continue;
-            }
-
-            $filepath = "{$dir}/{$file}";
-
-            if (is_file($filepath) && filemtime($filepath) < $cutoff) {
-                unlink($filepath);
-                $this->line("  ✓ Deleted: {$file}");
-                $deleted++;
-            }
-        }
+        $deleted = FileCleanupService::cleanupLocalDir($dir, $days);
 
         if ($deleted > 0) {
             $this->info("  Removed {$deleted} old file(s)");
