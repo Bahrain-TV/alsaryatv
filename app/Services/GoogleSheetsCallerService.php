@@ -55,10 +55,29 @@ class GoogleSheetsCallerService
             while ($retries < $maxRetries) {
                 try {
                     return $operation();
-                    break;
                 } catch (Google_Service_Exception $e) {
+                    $retries++;
+
+                    if ($retries >= $maxRetries) {
+                        Log::error('Google Sheets API request failed after max retries', [
+                            'retries' => $retries,
+                            'error' => $e->getMessage(),
+                        ]);
+                        throw $e;
+                    }
+
+                    Log::warning('Google Sheets API request failed, retrying', [
+                        'attempt' => $retries,
+                        'backoff_ms' => $backoff,
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    usleep($backoff * 1000);
+                    $backoff *= 2; // Exponential backoff
                 }
             }
+
+            return null;
         };
     }
 
@@ -81,9 +100,13 @@ class GoogleSheetsCallerService
     /**
      * Execute with backoff if handler is set
      */
-    protected static function safeExecute(callable $operation)
+    protected function safeExecute(callable $operation)
     {
-        return call_user_func(self::$backoffHandler, $operation);
+        if ($this->backoffHandler) {
+            return call_user_func($this->backoffHandler, $operation);
+        }
+
+        return $operation();
     }
 
     /**
@@ -104,7 +127,7 @@ class GoogleSheetsCallerService
      */
     public function syncCallers($lastSync = null)
     {
-        // First generate CSV export
+        // First generate CSV export (non-blocking - sync continues even if CSV fails)
         try {
             $query = DB::table('callers');
             if ($lastSync) {
@@ -124,7 +147,10 @@ class GoogleSheetsCallerService
                 'records' => $callers->count(),
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to generate CSV for sync', ['error' => $e->getMessage()]);
+            Log::error('Failed to generate CSV for sync, continuing with sheet sync', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
         $result = [
             'added_to_db' => [],
