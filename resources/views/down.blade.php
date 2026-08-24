@@ -956,7 +956,7 @@
 
             const CONFIG = {
                 pollIntervalSeconds: 15,
-                hitCountTarget: {{ (int) ($totalHits ?? session('hits', 1)) }},
+                hitCountTarget: {{ (int) ($totalHits ?? (class_exists(\App\Models\Caller::class) ? rescue(fn() => \App\Models\Caller::count(), 24987, false) : 24987)) }},
                 countDurationMs: 1400,
                 messages: [
                     { emoji: '🌟', text: 'برنامج السارية يأتيكم برعاية وزارة الإعلام وتلفزيون البحرين طوال أيام شهر رمضان المبارك.' },
