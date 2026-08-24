@@ -92,8 +92,17 @@ fi
 # ─────────────────────────────────────────────────────────────────────────
 step "STEP 4: Push to GitHub"
 
-if git push origin main --force-with-lease; then
+if git push origin main --force-with-lease 2>/dev/null; then
     success "Pushed to GitHub ✓"
+elif command -v gh &>/dev/null && gh auth status &>/dev/null; then
+    warn "Direct git push failed, pushing via authenticated GitHub CLI token..."
+    GH_TOKEN="$(gh auth token 2>/dev/null)"
+    if git -c "url.https://github.com/.insteadOf=git@github.com:" push "https://${GH_TOKEN}@github.com/Bahrain-TV/alsaryatv.git" main --force-with-lease; then
+        success "Pushed to GitHub via GitHub CLI authentication ✓"
+    else
+        error "Failed to push to GitHub"
+        exit 1
+    fi
 else
     error "Failed to push to GitHub"
     exit 1

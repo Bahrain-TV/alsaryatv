@@ -240,12 +240,33 @@ push_to_remote() {
         return 0
     fi
 
-    if git push origin "$CURRENT_BRANCH"; then
+    if git push origin "$CURRENT_BRANCH" 2>/dev/null; then
         success "Code pushed to remote ($CURRENT_BRANCH)"
-    else
-        error "Failed to push code to remote. Check your git configuration."
-        exit 1
+        return 0
     fi
+
+    # Fallback: Use GitHub CLI credentials if direct push fails (e.g., SSH key lacks org SSO authorization)
+    if command -v gh &>/dev/null && gh auth status &>/dev/null; then
+        warn "Direct git push failed (SSH key may lack organization SSO/push access)."
+        info "Attempting push via authenticated GitHub CLI token..."
+        local gh_token
+        gh_token="$(gh auth token 2>/dev/null)"
+        if [[ -n "$gh_token" ]]; then
+            local remote_url
+            remote_url="$(git config --get remote.origin.url || echo 'https://github.com/Bahrain-TV/alsaryatv.git')"
+            local repo_slug
+            repo_slug=$(echo "$remote_url" | sed -E 's#(https://github.com/|git@github.com:)([^/]+/[^/]+)(\.git)?#\2#' | sed 's/\.git$//')
+            [[ -z "$repo_slug" ]] && repo_slug="Bahrain-TV/alsaryatv"
+
+            if git -c "url.https://github.com/.insteadOf=git@github.com:" push "https://${gh_token}@github.com/${repo_slug}.git" "$CURRENT_BRANCH"; then
+                success "Code pushed to remote via GitHub CLI authentication ($CURRENT_BRANCH)"
+                return 0
+            fi
+        fi
+    fi
+
+    error "Failed to push code to remote. Check your git configuration."
+    exit 1
 }
 
 # ── Test SSH connection ─────────────────────────────────────────────────────
