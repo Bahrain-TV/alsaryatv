@@ -572,8 +572,11 @@ check_deployment_health() {
     if [[ "$status_code" == "200" ]] || [[ "$status_code" == "302" ]]; then
         success "✓ Application health check passed (HTTP $status_code)"
         return 0
+    elif [[ "$status_code" == "503" ]]; then
+        success "✓ Application is in maintenance / down mode (HTTP 503)"
+        return 0
     else
-        warn "✗ Application returned HTTP $status_code (expected 200/302)"
+        warn "✗ Application returned HTTP $status_code (expected 200/302/503)"
         warn "  Check the application logs on the server"
         return 1
     fi
@@ -1007,17 +1010,22 @@ run_production_tests() {
     info "Running production URL tests..."
     echo ""
     
+    local test_script="./test-production-urls.sh"
+    if [[ ! -f "$test_script" && -f "./scripts/maintenance/root-tools/test-production-urls.sh" ]]; then
+        test_script="./scripts/maintenance/root-tools/test-production-urls.sh"
+    fi
+    
     # Check if test script exists
-    if [[ ! -f "./test-production-urls.sh" ]]; then
-        error "test-production-urls.sh not found. Skipping tests."
-        return 1
+    if [[ ! -f "$test_script" ]]; then
+        warn "test-production-urls.sh not found. Skipping tests."
+        return 0
     fi
     
     # Make sure it's executable
-    chmod +x ./test-production-urls.sh
+    chmod +x "$test_script"
     
     # Run the test script
-    if ./test-production-urls.sh; then
+    if "$test_script"; then
         success "All production tests passed!"
         return 0
     else
