@@ -304,9 +304,17 @@ log "Building frontend assets..."
 if [[ "$DRY_RUN" == "true" ]]; then
     log_deploy "DRY RUN: Would run npm run build"
 else
-    npm run build 2>&1 | tee -a "$DEPLOY_LOG" && \
-        ok "Frontend assets built" || \
-        warn "Frontend build had issues"
+    if [[ ! -d "node_modules" ]]; then
+        log "Installing npm dependencies..."
+        npm install --no-audit 2>&1 | tee -a "$DEPLOY_LOG" || true
+    fi
+    if ! npm run build 2>&1 | tee -a "$DEPLOY_LOG"; then
+        warn "Initial npm build failed, reinstalling dependencies..."
+        npm install --no-audit 2>&1 | tee -a "$DEPLOY_LOG" || true
+        npm run build 2>&1 | tee -a "$DEPLOY_LOG" && ok "Frontend assets built" || warn "Frontend build had issues"
+    else
+        ok "Frontend assets built"
+    fi
     log_deploy "Frontend build completed"
 fi
 
