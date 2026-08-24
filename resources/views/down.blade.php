@@ -144,7 +144,7 @@
             display: flex;
             flex-direction: column;
             gap: clamp(14px, 2.5vw, 24px);
-            margin: auto 0;
+            margin: 0 auto;
         }
 
         /* ================================================================
@@ -679,6 +679,11 @@
                 gap: 14px;
             }
 
+            .hero-text {
+                align-items: center;
+                text-align: center;
+            }
+
             .logo-container {
                 width: 90px;
                 height: 90px;
@@ -694,9 +699,21 @@
             }
 
             .strip-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .card-main-content {
+                align-items: center;
+                text-align: center;
+            }
+
+            .countdown-timer-text {
+                justify-content: center;
+            }
+
+            .card-caption {
+                text-align: center;
             }
 
             .footer-channels {
