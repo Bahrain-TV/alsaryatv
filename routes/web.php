@@ -80,8 +80,9 @@ Route::get('/family', function () use ($getRamadanContext) {
     return view('welcome', $getRamadanContext());
 })->name('family.registration');
 
-// Explicit shutdown route (for testing or manual activation)
+// Explicit shutdown and down routes (for testing or manual activation)
 Route::get('/shutdown', fn () => view('shutdown', $getRamadanContext()))->name('shutdown');
+Route::get('/down', fn () => view('down', $getRamadanContext()))->name('down');
 
 // Public OBS overlay — accessible without authentication for OBS Browser Source
 Route::get('/obs-overlay', fn () => view('obs.overlay'))->name('obs.overlay');

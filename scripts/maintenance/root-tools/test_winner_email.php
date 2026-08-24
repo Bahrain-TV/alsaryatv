@@ -8,7 +8,6 @@
  * 2. Retrieves all current winners from database
  * 3. Sends email to admin addresses for testing
  */
-
 $rootPath = realpath(__DIR__.'/../../..');
 if (! $rootPath) {
     fwrite(STDERR, "Unable to resolve project root from script location.\n");

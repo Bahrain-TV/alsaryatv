@@ -1,0 +1,18 @@
+[2026-08-24 03:02:37] testing.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260824_030237.csv","record_count":7} 
+[2026-08-24 03:02:37] testing.INFO: Data persistence metrics {"timestamp":"2026-08-24 03:02:37","total_callers":7,"total_winners":2,"database":"sqlite","environment":"testing","disk_space_available_gb":51.43621063232422} 
+[2026-08-24 03:02:37] testing.INFO: Deleted old export file {"file":"private/exports/callers/csv/callers-export_20260429_025501.csv"} 
+[2026-08-24 03:02:37] testing.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260824_030237.csv","record_count":7} 
+[2026-08-24 03:02:37] testing.INFO: Data persistence metrics {"timestamp":"2026-08-24 03:02:37","total_callers":7,"total_winners":2,"database":"sqlite","environment":"testing","disk_space_available_gb":51.43620681762695} 
+[2026-08-24 03:02:37] testing.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260824_030237.csv","record_count":7} 
+[2026-08-24 03:02:37] testing.INFO: Data persistence metrics {"timestamp":"2026-08-24 03:02:37","total_callers":7,"total_winners":2,"database":"sqlite","environment":"testing","disk_space_available_gb":51.43620681762695} 
+[2026-08-24 03:02:37] testing.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260824_030237.csv","record_count":7} 
+[2026-08-24 03:02:37] testing.INFO: Data persistence metrics {"timestamp":"2026-08-24 03:02:37","total_callers":7,"total_winners":2,"database":"sqlite","environment":"testing","disk_space_available_gb":51.43620681762695} 
+[2026-08-24 03:04:08] testing.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260824_030408.csv","record_count":7} 
+[2026-08-24 03:04:08] testing.INFO: Data persistence metrics {"timestamp":"2026-08-24 03:04:08","total_callers":7,"total_winners":2,"database":"sqlite","environment":"testing","disk_space_available_gb":52.36458206176758} 
+[2026-08-24 03:04:08] testing.INFO: Deleted old export file {"file":"private/exports/callers/csv/callers-export_20260430_154309.csv"} 
+[2026-08-24 03:04:08] testing.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260824_030408.csv","record_count":7} 
+[2026-08-24 03:04:08] testing.INFO: Data persistence metrics {"timestamp":"2026-08-24 03:04:08","total_callers":7,"total_winners":2,"database":"sqlite","environment":"testing","disk_space_available_gb":52.364566802978516} 
+[2026-08-24 03:04:08] testing.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260824_030408.csv","record_count":7} 
+[2026-08-24 03:04:08] testing.INFO: Data persistence metrics {"timestamp":"2026-08-24 03:04:08","total_callers":7,"total_winners":2,"database":"sqlite","environment":"testing","disk_space_available_gb":52.364566802978516} 
+[2026-08-24 03:04:08] testing.INFO: CSV export completed {"path":"private/exports/callers/csv/callers-export_20260824_030408.csv","record_count":7} 
+[2026-08-24 03:04:08] testing.INFO: Data persistence metrics {"timestamp":"2026-08-24 03:04:08","total_callers":7,"total_winners":2,"database":"sqlite","environment":"testing","disk_space_available_gb":52.364566802978516} 
