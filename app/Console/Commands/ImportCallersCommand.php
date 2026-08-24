@@ -655,7 +655,7 @@ class ImportCallersCommand extends Command
         if ($skipped > 0) {
             $this->warn("Skipped records: {$skipped}");
 
-            if ($this->confirm('Do you want to see the errors?', false)) {
+            if ($this->input->isInteractive() && ! $this->option('force') && $this->confirm('Do you want to see the errors?', false)) {
                 $this->displayErrors($errors);
             }
         }
