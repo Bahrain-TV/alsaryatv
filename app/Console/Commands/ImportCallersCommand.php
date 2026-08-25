@@ -284,8 +284,11 @@ class ImportCallersCommand extends Command
         $this->info('Sending email to admin...');
 
         $subject = "Winners imported - Updated: $foundWinners, Not found: $notFoundWinners";
-        mail('aldoyh.info@gmail.com', $subject, $emailContent, 'From: '.env('MAIL_FROM_ADDRESS'));
-        // mail('alsaryatv@gmail.com', $subject, $emailContent, 'From: ' . env('MAIL_FROM_ADDRESS'));
+        $adminEmails = config('alsarya.admin_emails', []);
+        $firstAdmin = is_array($adminEmails) ? ($adminEmails[0] ?? null) : explode(',', $adminEmails)[0] ?? null;
+        if ($firstAdmin) {
+            mail($firstAdmin, $subject, $emailContent, 'From: '.config('mail.from.address'));
+        }
 
         $this->info('Email sent to admin successfully.');
     }

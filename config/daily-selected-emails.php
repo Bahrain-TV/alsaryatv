@@ -2,9 +2,7 @@
 
 return [
     'recipients' => [
-        'to' => [
-            0 => 'alsaryatv@gmail.com',
-        ],
+        'to' => explode(',', env('DAILY_SELECTED_EMAIL_RECIPIENTS', env('ADMIN_EMAILS', 'admin@alsarya.tv'))),
         'cc' => [
         ],
         'bcc' => [

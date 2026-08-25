@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -22,30 +23,27 @@ class UserSeeder extends Seeder
      */
     private function seedAdminUsers(): void
     {
+        $defaultPassword = env('ADMIN_DEFAULT_PASSWORD', Str::random(32));
+
         $admins = [
             [
                 'name' => 'Hasan',
-                'email' => 'aldoyh@gmail.com',
-                'password' => '97333334122',
+                'email' => env('ADMIN_EMAIL_1', 'admin@alsarya.tv'),
+                'password' => $defaultPassword,
                 'role' => 'admin',
             ],
             [
                 'name' => 'Admin Bee',
-                'email' => 'aldoyh@info.gov.bh',
-                'password' => '97333334122',
+                'email' => env('ADMIN_EMAIL_2', 'admin2@alsarya.tv'),
+                'password' => $defaultPassword,
                 'role' => 'admin',
             ],
             [
                 'name' => 'Super Admin',
-                'email' => 'superadmin@alsarya.tv',
-                'password' => '97333334122',
+                'email' => env('ADMIN_EMAIL_3', 'superadmin@alsarya.tv'),
+                'password' => $defaultPassword,
                 'role' => 'super_admin',
             ],
-            // [
-            //     'name' => 'AlSarya TEAM',
-            //     'email' => 'alsaryatv@gmail.com',
-            //     'password' => '97366632332',
-            // ],
         ];
 
         foreach ($admins as $admin) {

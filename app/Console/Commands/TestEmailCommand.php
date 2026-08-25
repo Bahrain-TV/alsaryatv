@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Mail;
 class TestEmailCommand extends Command
 {
     protected $signature = 'test:email
-                            {email=aldoyh@gmail.com : Email address to send test to}
+                            {email? : Email address to send test to (defaults to first admin email from config)}
                             {--type=admin : Email type: admin (for admin notification)}
                             {--mailer=gmail : Mailer to use: gmail, smtp, log, or failover}';
 
@@ -17,7 +17,7 @@ class TestEmailCommand extends Command
 
     public function handle()
     {
-        $email = $this->argument('email');
+        $email = $this->argument('email') ?? config('alsarya.admin_emails.0', 'admin@alsarya.tv');
         $type = $this->option('type');
         $mailer = $this->option('mailer');
 
