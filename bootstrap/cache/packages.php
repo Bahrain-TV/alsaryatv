@@ -1,4 +1,11 @@
 <?php return array (
+  'anourvalar/eloquent-serialize' => 
+  array (
+    'aliases' => 
+    array (
+      'EloquentSerialize' => 'AnourValar\\EloquentSerialize\\Facades\\EloquentSerializeFacade',
+    ),
+  ),
   'blade-ui-kit/blade-heroicons' => 
   array (
     'providers' => 
@@ -88,13 +95,6 @@
     'providers' => 
     array (
       0 => 'Kirschbaum\\PowerJoins\\PowerJoinsServiceProvider',
-    ),
-  ),
-  'laravel/dusk' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Laravel\\Dusk\\DuskServiceProvider',
     ),
   ),
   'laravel/fortify' => 
