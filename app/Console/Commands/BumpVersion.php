@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\EnvFileUpdater;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -132,35 +133,10 @@ class BumpVersion extends Command
     {
         $envPath = base_path('.env');
 
-        if (! File::exists($envPath)) {
-            return;
-        }
+        $versionStr = "{$version['major']}.{$version['minor']}.{$version['patch']}";
+        EnvFileUpdater::set($envPath, 'APP_VERSION', $versionStr);
+        EnvFileUpdater::set($envPath, 'APP_BUILD', (string) $version['build']);
 
-        $envContent = File::get($envPath);
-
-        // Update or add APP_VERSION
-        if (preg_match('/^APP_VERSION=.*/m', $envContent)) {
-            $envContent = preg_replace(
-                '/^APP_VERSION=.*/m',
-                "APP_VERSION={$version['major']}.{$version['minor']}.{$version['patch']}",
-                $envContent
-            );
-        } else {
-            $envContent .= "\nAPP_VERSION={$version['major']}.{$version['minor']}.{$version['patch']}";
-        }
-
-        // Update or add APP_BUILD
-        if (preg_match('/^APP_BUILD=.*/m', $envContent)) {
-            $envContent = preg_replace(
-                '/^APP_BUILD=.*/m',
-                "APP_BUILD={$version['build']}",
-                $envContent
-            );
-        } else {
-            $envContent .= "\nAPP_BUILD={$version['build']}";
-        }
-
-        File::put($envPath, $envContent);
         $this->info('Updated .env file');
     }
 

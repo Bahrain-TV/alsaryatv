@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\FormatHelper;
 use App\Models\Caller;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -134,7 +135,7 @@ class DumpCallersCommand extends Command
                         $this->info("Files successfully compressed to: {$zipPath} in {$compressionTime}s");
 
                         $zipSize = Storage::size($zipPath);
-                        $this->line('ZIP file size: '.$this->formatBytes($zipSize));
+                        $this->line('ZIP file size: '.FormatHelper::formatBytes($zipSize));
 
                         // Delete individual files after successful compression
                         foreach ($generatedFiles as $file) {
@@ -229,18 +230,5 @@ class DumpCallersCommand extends Command
         }
 
         return false;
-    }
-
-    protected function formatBytes($bytes, $precision = 2)
-    {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-
-        $bytes /= (1 << (10 * $pow));
-
-        return round($bytes, $precision).' '.$units[$pow];
     }
 }

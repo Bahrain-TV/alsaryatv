@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\FormatHelper;
 use Illuminate\Support\Facades\Hash;
 
 class CprHashingService
@@ -18,6 +19,6 @@ class CprHashingService
 
     public function maskCpr(string $cpr): string
     {
-        return substr($cpr, 0, 3).str_repeat('*', strlen($cpr) - 3);
+        return FormatHelper::maskCpr($cpr);
     }
 }

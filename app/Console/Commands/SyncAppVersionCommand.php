@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\EnvFileUpdater;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -32,44 +33,7 @@ class SyncAppVersionCommand extends Command
         $this->info("📝 Syncing APP_VERSION to: {$versionFromFile}");
         $this->line('');
 
-        $envFiles = [
-            '.env' => base_path('.env'),
-            '.env.local' => base_path('.env.local'),
-            '.env.production' => base_path('.env.production'),
-        ];
-
-        $updated = 0;
-
-        foreach ($envFiles as $name => $path) {
-            if (! File::exists($path)) {
-                $this->comment("⊘ {$name} not found");
-
-                continue;
-            }
-
-            $content = File::get($path);
-
-            if (preg_match('/^APP_VERSION=.*/m', $content)) {
-                $newContent = preg_replace(
-                    '/^APP_VERSION=.*/m',
-                    "APP_VERSION={$versionFromFile}",
-                    $content
-                );
-
-                if ($newContent !== $content) {
-                    File::put($path, $newContent);
-                    $this->info("✅ {$name}: APP_VERSION updated to {$versionFromFile}");
-                    $updated++;
-                } else {
-                    $this->comment("→ {$name}: Already set to {$versionFromFile}");
-                }
-            } else {
-                $newContent = rtrim($content)."\nAPP_VERSION={$versionFromFile}\n";
-                File::put($path, $newContent);
-                $this->info("✅ {$name}: APP_VERSION added as {$versionFromFile}");
-                $updated++;
-            }
-        }
+        $updated = EnvFileUpdater::syncAppVersion($versionFromFile);
 
         $this->line('');
 

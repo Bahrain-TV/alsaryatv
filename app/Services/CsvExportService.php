@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -127,38 +126,12 @@ class CsvExportService
     protected function cleanupOldExports(): void
     {
         try {
-            if (! Storage::exists($this->directory)) {
-                return;
-            }
-
-            $files = Storage::files($this->directory);
-
-            // If we have 5 or fewer files, don't delete any
-            if (count($files) <= 5) {
-                return;
-            }
-
-            // Sort files by modified time, oldest first
-            usort($files, function ($a, $b) {
-                return Storage::lastModified($a) - Storage::lastModified($b);
-            });
-
-            $cutoffDate = Carbon::now()->subDays($this->retentionDays);
-            $deletedCount = 0;
-
-            // Keep deleting old files as long as we still have more than 5 left
-            foreach ($files as $file) {
-                $lastModified = Carbon::createFromTimestamp(Storage::lastModified($file));
-
-                if ($lastModified->lt($cutoffDate) && (count($files) - $deletedCount > 5)) {
-                    Storage::delete($file);
-                    Log::info('Deleted old export file', ['file' => $file]);
-                    $deletedCount++;
-                }
+            $deleted = FileCleanupService::cleanupByAge($this->directory, $this->retentionDays, 5);
+            if ($deleted > 0) {
+                Log::info("Cleaned up {$deleted} old export file(s)", ['directory' => $this->directory]);
             }
         } catch (\Exception $e) {
             Log::error('Error cleaning up old exports: '.$e->getMessage());
-            // Don't throw the exception as this is a background cleanup task
         }
     }
 
